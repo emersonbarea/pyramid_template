@@ -11,5 +11,6 @@ def user(request):
         raise HTTPForbidden
 
     testezica.testezica()
+    print('teste')
 
     return {}
