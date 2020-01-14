@@ -6,3 +6,4 @@ def includeme(config):
     config.add_route('dashboard', '/dashboard')
     config.add_route('user', '/user')
     config.add_route('userAction', '/user/{action}')
+    config.add_route('cluster', '/cluster')
