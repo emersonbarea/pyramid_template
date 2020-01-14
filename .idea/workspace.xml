@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="602d5a97-c5a1-4504-88e0-f986531565ea" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/minisecbgp/views/cluster.py" beforeDir="false" afterPath="$PROJECT_DIR$/minisecbgp/views/cluster.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
