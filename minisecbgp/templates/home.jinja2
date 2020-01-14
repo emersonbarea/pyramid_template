@@ -1,0 +1,19 @@
+{% extends "layout/home.layout.jinja2" %}
+
+{% block contentHome %}
+
+  <div class="row">
+    <p class="loginMessage">{{ message }}</p>
+    <div class="span12 span12-home">
+      <a href="{{ request.route_url('home') }}"><img class="logo img-responsive" src="{{request.static_url('minisecbgp:static/img/MiniSecBGP.png') }}" alt="MiniSecBGP"></a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12 span12-home">
+      <h1>MiniSecBGP</h1>
+      <p class="lead">Welcome to MiniSecBGP, a lightweight and distributed testbed for security analysis in BGP.</p>
+    </div>
+  </div>
+
+{% endblock contentHome %}

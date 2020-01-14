@@ -1,0 +1,12 @@
+{% extends "layout/layout.jinja2" %}
+
+{% block subtitle %}{{ subtitle }}{% endblock subtitle %}
+
+{% block content %}
+<div class="row">
+  <div class="span12">
+    <h1><span class="font-semi-bold"> <a class="brand" href="{{ request.route_url('home') }}">MiniSecBGP</a></span> <span class="smaller">: 404 - Page Not Found</span></h1>
+    <p class="lead"><span class="font-semi-bold">A Lightweight and Distributed Testbed for Security Analysis in BGP</span></p>
+  </div>
+</div>
+{% endblock content %}

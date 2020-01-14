@@ -1,0 +1,63 @@
+{% extends "user.jinja2" %}
+
+{% block contentUser %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Create New User</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <form action="{{ request.route_url('userAction',action='create') }}" method="POST">
+
+        <div class="form-field">
+          {{ form.username.label }}
+          {{ form.username }}
+          {% if form.username.errors %}
+            <ul class="errorMessage">
+              {% for error in form.username.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        {{ form.role.label }}
+        {{ form.role }}
+
+        <div class="form-field">
+          {{ form.password_hash.label }}
+          {{ form.password_hash }}
+          {% if form.password_hash.errors %}
+            <ul class="errorMessage">
+              {% for error in form.password_hash.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="form-field">
+          {{ form.confirmPassword.label }}
+          {{ form.confirmPassword }}
+          {% if form.confirmPassword.errors %}
+            <ul class="errorMessage">
+              {% for error in form.confirmPassword.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        <div class="form-button">
+          <button type="submit" name="form.submitted" value="Create" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>  
+
+{% endblock contentUser %}
+
+

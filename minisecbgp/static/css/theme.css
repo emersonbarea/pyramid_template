@@ -1,0 +1,26 @@
+body { 
+  padding: 60px;
+}
+
+footer, .span12-home {
+  text-align: center;
+  padding-top: 60px;
+}
+
+/* Messages */
+.loginMessage {
+  color: #c82603;
+  font-weight: bold;
+  text-align: center;
+  font-size: 200%;
+}
+
+.successMessage {
+  color: #249a69;
+  font-weight: bold;
+}
+
+.errorMessage {
+  color: #c82603;
+  font-weight: bold;
+}

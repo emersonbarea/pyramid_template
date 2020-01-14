@@ -1,0 +1,26 @@
+{% extends "home.layout.jinja2" %}
+
+{% block contentHome %}
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header">Administration</li>
+              <li><a href="{{ request.route_url('user') }}">Users</a></li>
+            <li><a href="#">Cluster</a></li>
+            <li class="nav-header">Topology</li>
+              <li><a href="#">Realistic</a></li>
+          </ul>
+        </div><!--/.well -->
+      </div><!--/span-->
+      <div class="span9">
+
+        {% block contentDashboard %} {% endblock contentDashboard %}
+
+      </div><!--/span-->
+    </div><!--/row-->
+  </div>
+
+{% endblock contentHome %}
