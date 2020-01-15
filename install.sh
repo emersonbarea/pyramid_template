@@ -35,13 +35,9 @@ install_Python_reqs() {
 }
 
 
-main() {
+BUILD_DIR=$(pwd)
 
-	BUILD_DIR=$(pwd)
-
-	welcome;
-	update;
-	install_Linux_reqs;
-	install_Python_reqs;
-
-}
+welcome;
+update;
+install_Linux_reqs;
+install_Python_reqs;
