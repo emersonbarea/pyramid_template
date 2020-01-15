@@ -39,6 +39,7 @@ virtualenv() {
 install_Python_reqs() {
 
         printf '\n\e[1;32m%-6s\e[m\n' '-- Installing Python prerequisites ...'
+        pip3 install wheel
         pip3 install -r requirements.txt;
 }
 
