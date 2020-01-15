@@ -1,10 +1,10 @@
 #!/bin/bash
 
-apt update
-apt upgrade -y
-apt -f install -y
-apt autoremove -y
+sudo apt update
+sudo apt upgrade -y
+sudo apt -f install -y
+sudo apt autoremove -y
 
 sudo apt install python3-pip postgresql postgresql-contrib postgresql-server-dev-all -y
 
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
