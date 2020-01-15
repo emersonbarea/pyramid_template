@@ -24,20 +24,28 @@ update() {
 install_Linux_reqs() {
 
 	printf '\n\e[1;32m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
-	sudo apt install python3-pip postgresql postgresql-contrib postgresql-server-dev-all -y;
+	sudo apt install python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
+
+}
+
+virtualenv() {
+
+	printf '\n\e[1;32m%-6s\e[m\n' '-- Creating Python3 Virtualenv ...'
+	python3 -m venv $BUILD_DIR/venv
+	source $BUILD_DIR/venv/bin/activate
 
 }
 
 install_Python_reqs() {
 
 	printf '\n\e[1;32m%-6s\e[m\n' '-- Installing Python prerequisites ...'
-	sudo pip3 install -r requirements.txt;
+	pip3 install -r requirements.txt;
 }
-
 
 BUILD_DIR=$(pwd)
 
 welcome;
 update;
 install_Linux_reqs;
+virtualenv;
 install_Python_reqs;
