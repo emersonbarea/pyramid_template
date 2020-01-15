@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pip install -e ".[testing]"
+pip3 install -e ".[testing]"
 alembic -c development.ini revision --autogenerate -m "init"
 alembic -c development.ini upgrade head
 initialize_minisecbgp_db development.ini
