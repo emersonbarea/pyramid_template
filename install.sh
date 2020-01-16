@@ -57,7 +57,7 @@ configure_Postgres() {
 
 install_app() {
 
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Application ...'
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         pip3 install -e .
         alembic -c development.ini revision --autogenerate -m "init"
         alembic -c development.ini upgrade head
@@ -66,13 +66,57 @@ install_app() {
 
 }
 
-run_app() {
+configure_uwsgi() {
 
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Starting Application ...'
-        pserve development.ini --reload
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring uWSGI deamon ...'
+        printf '%s\n%s\n%s\n\n%s\n%s%s\n%s\n%s%s\n%s%s%s%s%s\n\n%s\n%s\n' \
+               '[Unit]' 'Description=uwsgi daemon' 'After=network.target' '[Service]' \
+               'User=' $WHOAMI 'Group=www-data' 'WorkingDirectory=' $BUILD_DIR \
+               'ExecStart=' $BUILD_DIR '/venv/bin/uwsgi --ini-paste-logged ' $BUILD_DIR '/development.ini' \
+               '[Install]' 'WantedBy=multi-user.target' | sudo tee /etc/systemd/system/uwsgi.service
 
 }
 
+configure_nginx() {
+
+        printf '\n\e[1;33m%-6s\e[m\n' 'Configuring Nginx...'
+        printf '%s%s%s\n%s%s%s\n%s\n\n%s\n%s\n%s%s%s\n%s%s%s\n%s%s%s\n%s\n%s\n' \
+               'upstream ' $PROJECT_NAME ' {' \
+               '    server unix:///tmp/' $PROJECT_NAME '.sock;' \
+               '}' \
+               'server {' \
+               '    listen 80;' \
+               '    server_name ' $IP_ADDRESSES ';' \
+               '    access_log ' $BUILD_DIR '/access.log;' \
+               '    location / {
+                proxy_set_header        Host $http_host;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Forwarded-Proto $scheme;
+                client_max_body_size    10m;
+                client_body_buffer_size 128k;
+                proxy_connect_timeout   60s;
+                proxy_send_timeout      90s;
+                proxy_read_timeout      90s;
+                proxy_buffering         off;
+                proxy_temp_file_write_size 64k;
+                proxy_pass http://' $PROJECT_NAME ';
+                proxy_redirect          off;' '    }' '}' | sudo tee /etc/nginx/sites-available/$PROJECT_NAME
+
+        sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled
+        sudo nginx -t
+
+}
+
+restart_services() {
+
+        printf '\n\e[1;33m%-6s\e[m\n' 'Restarting all services...'
+        sudo systemctl daemon-reload
+        sudo systemctl restart uwsgi
+        sudo systemctl enable uwsgi
+        sudo systemctl restart nginx
+
+}
 
 PROJECT_NAME=pyramid_template
 BUILD_DIR=$(pwd)
@@ -87,4 +131,6 @@ virtualenv;
 install_Python_reqs;
 configure_Postgres;
 install_app;
-run_app;
+configure_uwsgi;
+configure_nginx;
+restart_services;
