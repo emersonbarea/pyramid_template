@@ -4,4 +4,4 @@ __pycache__/
 *.swp
 venv/
 ghub.sh
-alembic/versions/*.py
+*/alembic/versions/*.py
