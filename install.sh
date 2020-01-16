@@ -24,15 +24,17 @@ update() {
 install_Linux_reqs() {
 
         printf '\n\e[1;32m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
-        sudo apt install python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
+        sudo apt install nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
+        printf '\n\e[1;32m%-6s\n\n%s\n%s\n%s\n%s\n%s\n\n%s\n\n\e[m' \
+               'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3 pip' '    - Python3 venv' '    - Postgresql'
 
 }
 
 virtualenv() {
 
         printf '\n\e[1;32m%-6s\e[m\n' '-- Creating Python3 Virtualenv ...'
-        python3 -m venv $BUILD_DIR/venv
-        source $BUILD_DIR/venv/bin/activate
+        python3 -m venv "$BUILD_DIR"/venv
+        source "$BUILD_DIR"/venv/bin/activate
 
 }
 
@@ -53,7 +55,30 @@ configure_Postgres() {
 
 }
 
+install_app() {
+
+        printf '\n\e[1;32m%-6s\e[m\n' '-- Installing Application ...'
+        pip3 install -e .
+        alembic -c development.ini revision --autogenerate -m "init"
+        alembic -c development.ini upgrade head
+        initialize_minisecbgp_db development.ini
+        pytest
+
+}
+
+run_app() {
+
+        printf '\n\e[1;32m%-6s\e[m\n' '-- Starting Application ...'
+        pserve development.ini --reload
+
+}
+
+
+PROJECT_NAME=pyramid_template
 BUILD_DIR=$(pwd)
+IP_ADDRESSES=$(hostname --all-ip-addresses || hostname -I)
+IP_ADDRESSES_EDITED=$(echo $IP_ADDRESSES | sed "s/ /', '/g")
+WHOAMI=$(whoami)
 
 welcome;
 update;
@@ -61,3 +86,5 @@ install_Linux_reqs;
 virtualenv;
 install_Python_reqs;
 configure_Postgres;
+install_app;
+run_app;
