@@ -4,4 +4,7 @@ __pycache__/
 *.swp
 venv/
 ghub.sh
+run.sh
+run_full.sh
 */alembic/versions/*.py
+
