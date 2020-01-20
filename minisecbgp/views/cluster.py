@@ -66,54 +66,21 @@ def create(request):
 
     form = ClusterDataForm(request.POST)
 
+    print('teste')
+
     if request.method == 'POST' and form.validate():
         try:
             entry = models.Cluster(node=form.node.data, username=form.username.data, master=form.master.data)
             entry.set_password(form.password_hash.data)
 
+            # insert row
             request.dbsession.add(entry)
             request.dbsession.flush()
 
-
-
-
-
-
-
-            # Topology graph
-            with open(self.graph_dir + 'nodes.js', 'w') as write_to_file:
-                write_to_file.write('var nodes = new vis.DataSet([\n')
-                for AS in self.sr_unique_as:
-                    write_to_file.write('{id: %s, label: "%s"},\n' % (AS, AS))
-                write_to_file.write(']);')
+            # topology graph
+            with open('minisecbgp:templates/cluster/showCluster.jinja2', 'w') as write_to_file:
+                write_to_file.write('          nodes.push({id: "%s"\n' % (form.node.data))
             write_to_file.close()
-
-            with open(self.graph_dir + 'edges.js', 'w') as write_to_file:
-                write_to_file.write('var edges = new vis.DataSet([\n')
-                for row in self.df_from_file.itertuples():
-                    if row[0] in self.sr_unique_as.values and row[
-                        1] in self.sr_unique_as.values:  # do not link stub ASes if necessary
-                        color = 'red' if row[2] == 0 else 'black'
-                        write_to_file.write('{from: %s, to: %s, color:{color:"%s"}},\n' % (row[0], row[1], color))
-                write_to_file.write(']);')
-            write_to_file.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'
