@@ -1,0 +1,58 @@
+{% extends "cluster.jinja2" %}
+
+{% block contentCluster %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
+      <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
+
+      <style type="text/css">
+        #mynetwork {
+            width: 600x;
+            height: 600px;
+            border: 1px solid lightgray;
+        }
+      </style>
+
+      <div id="mynetwork"></div>
+
+
+      <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/edges.js')}}"></script>
+
+      <script type="text/javascript">
+          // create a network
+          var container = document.getElementById('mynetwork');
+
+          // provide the DIR variable path
+          var DIR = "{{request.static_url('minisecbgp:static/vis-js/img/')}}";
+
+          nodes = [];
+          nodes.push({id: 'network', label: 'network', image: DIR + 'network.png', shape: 'image'});
+          nodes.push({id: 'master', label: 'hostname: lptch\nIP address: 192.168.15.15\nusername: tocha\nstatus: OK', image: DIR + 'server.png', shape: 'image'});
+          nodes.push({id: 'xpto', font: {color: 'red'}, label: 'hostname: xpto\nIP address: 192.168.15.11\nusername: xpto\nstatus: FAILED', image: DIR + 'computer.png', shape: 'image'});
+
+          edges = [];
+          edges.push({from: 'network', to: 'master', length: 300});
+          edges.push({from: 'network', to: 'xpto', length: 300});
+
+          // provide the data in the vis format
+          var data = {
+              nodes: nodes,
+              edges: edges
+          };
+          var options = {};
+
+          // initialize your network!
+          var network = new vis.Network(container, data, options);
+      </script>
+
+    </div>
+  </div>
+</div>  
+
+{% endblock contentCluster %}
+
+

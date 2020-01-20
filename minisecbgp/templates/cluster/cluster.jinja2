@@ -15,15 +15,12 @@
           <ul class="nav">
             {% if request.user.role == 'admin' %}
               <li>
-                <a href="{{ request.route_url('userAction',action='create') }}">Create User</a>
+                <a href="{{ request.route_url('clusterAction',action='create') }}">Add Node</a>
               </li>
               <li>
-                <a href="{{ request.route_url('userAction',action='delete') }}">Delete User</a>
+                <a href="{{ request.route_url('clusterAction',action='delete') }}">Delete Node</a>
               </li>
             {% endif %}
-            <li>
-              <a href="{{ request.route_url('userAction',action='edit') }}">Change Password</a>
-            </li>
           </ul>
         </div>
       </div>
@@ -34,6 +31,6 @@
     <p> {{ message }} </p>
   </div>
 
-  {% block contentUser %} {% endblock contentUser %}
+  {% block contentCluster %} {% endblock contentCluster %}
 
 {% endblock contentDashboard %}

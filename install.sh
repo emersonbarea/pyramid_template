@@ -66,6 +66,20 @@ install_app() {
 
 }
 
+configure_graph() {
+
+        '\n\e[1;33m%-6s\e[m\n' '-- Configuring graph ...'
+        printf '%s%s$s\n' \
+'var nodes = new vis.DataSet([
+{id: 1, label: "' $HOSTNAME '"},
+]);' | sudo tee $BUILD_DIR/minisecbgp/static/vis-js/js/nodes.js
+
+        printf '%s%s$s\n' \
+'var edges = new vis.DataSet([
+]);' | sudo tee $BUILD_DIR/minisecbgp/static/vis-js/js/edges.js
+
+}
+
 configure_uwsgi() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring uWSGI deamon ...'
@@ -129,7 +143,16 @@ restart_services() {
 
 }
 
-PROJECT_NAME=pyramid_template
+configure_graph() {
+
+        printf '\n\e[1;33m%-6s\e[m\n' 'Configuring topology graph...'
+        sed -i -- "s/\/\/ add here new nodes/nodes.push({id: 'master', label: 'hostname: ${HOSTNAME}\\\nIP address: ${IP_ADDRESSES_EDITED}\\\nusername: ${WHOAMI}\\\nstatus: OK', image: DIR + 'server.png', shape: 'image'});\n              \/\/ add here new nodes/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
+        sed -i -- "s/\/\/ add here new edges/edges.push({from: 'network', to: 'master', length: 300});\n              \/\/ add here new edges/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
+
+}
+
+HOSTNAME=$(hostname)
+PROJECT_NAME=MiniSecBGP
 BUILD_DIR=$(pwd)
 IP_ADDRESSES=$(hostname --all-ip-addresses || hostname -I)
 IP_ADDRESSES_EDITED=$(echo $IP_ADDRESSES | sed "s/ /', '/g")
