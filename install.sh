@@ -49,7 +49,7 @@ configure_Postgres() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring Postgres ...'
 
-        sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;"  &> /dev/null
+        sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;" &> /dev/null
         sudo -u postgres psql -c "DROP EXTENSION adminpack;" &> /dev/null
         sudo -u postgres dropdb dbminisecbgp &> /dev/null
         sudo -u postgres psql -c "DROP USER minisecbgp;" &> /dev/null
@@ -65,7 +65,7 @@ install_app() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         pip3 install -e .
-        rm $BUILD_DIR/minisecbgp/alembic/versions/*.py  &> /dev/null
+        rm $BUILD_DIR/minisecbgp/alembic/versions/*.py &> /dev/null
         alembic -c development.ini revision --autogenerate -m "init"
         alembic -c development.ini upgrade head
         initialize_minisecbgp_db development.ini
@@ -135,6 +135,7 @@ server {
         }
 }' | sudo tee /etc/nginx/sites-available/$PROJECT_NAME
 
+        rm /etc/nginx/sites-enabled/$PROJECT_NAME &> /dev/null
         sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled
         sudo nginx -t
 
