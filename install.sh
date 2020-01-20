@@ -155,6 +155,7 @@ restart_services() {
 configure_graph() {
 
         printf '\n\e[1;33m%-6s\e[m\n' 'Configuring topology graph...'
+        cp $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2_template $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
         sed -i -- "s/\/\/ add here new nodes/nodes.push({id: 'master', label: 'hostname: ${HOSTNAME}\\\nIP address: ${IP_ADDRESSES_EDITED}\\\nusername: ${WHOAMI}\\\nstatus: OK', image: DIR + 'server.png', shape: 'image'});\n          \/\/ add here new nodes/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
         sed -i -- "s/\/\/ add here new edges/edges.push({from: 'network', to: 'master', length: 300});\n          \/\/ add here new edges/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
 
