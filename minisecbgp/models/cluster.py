@@ -13,7 +13,8 @@ class Cluster(Base):
     node = Column(String(50), nullable=False, unique=True)
     username = Column(String(50), nullable=False)
     password_hash = Column(String(200), nullable=False)
-    master = Column(Integer, nullable=False)
+    master = Column(Integer, nullable=False)    # 0 = 'worker', 1 = 'master'
+    status = Column(Integer, nullable=False)    # 0 = 'OK', 1 = 'wait', 2 = 'failed'
 
     def set_password(self, pw):
         pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())

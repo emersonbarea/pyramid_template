@@ -49,8 +49,9 @@ configure_Postgres() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring Postgres ...'
 
-        sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;" &> /dev/null
         sudo -u postgres psql -c "DROP EXTENSION adminpack;" &> /dev/null
+        sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;" &> /dev/null
+        sudo -u postgres psql -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'dbminisecbgp';" &> /dev/null
         sudo -u postgres dropdb dbminisecbgp &> /dev/null
         sudo -u postgres psql -c "DROP USER minisecbgp;" &> /dev/null
 
@@ -70,20 +71,6 @@ install_app() {
         alembic -c development.ini upgrade head
         initialize_minisecbgp_db development.ini
         pytest
-
-}
-
-configure_graph() {
-
-        '\n\e[1;33m%-6s\e[m\n' '-- Configuring graph ...'
-        printf '%s%s$s\n' \
-'var nodes = new vis.DataSet([
-{id: 1, label: "' $HOSTNAME '"},
-]);' | sudo tee $BUILD_DIR/minisecbgp/static/vis-js/js/nodes.js
-
-        printf '%s%s$s\n' \
-'var edges = new vis.DataSet([
-]);' | sudo tee $BUILD_DIR/minisecbgp/static/vis-js/js/edges.js
 
 }
 
@@ -151,14 +138,6 @@ restart_services() {
 
 }
 
-configure_graph() {
-
-        printf '\n\e[1;33m%-6s\e[m\n' 'Configuring topology graph...'
-        cp $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2_template $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
-        sed -i -- "s/\/\/ add here new nodes/nodes.push({id: 'master', label: 'hostname: ${HOSTNAME}\\\nIP address: ${IP_ADDRESSES_EDITED}\\\nusername: ${WHOAMI}\\\nstatus: OK', image: DIR + 'server.png', shape: 'image'});\n          \/\/ add here new nodes/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
-        sed -i -- "s/\/\/ add here new edges/edges.push({from: 'network', to: 'master', length: 300});\n          \/\/ add here new edges/g" $BUILD_DIR/minisecbgp/templates/cluster/showCluster.jinja2
-
-}
 
 HOSTNAME=$(hostname)
 PROJECT_NAME=MiniSecBGP
@@ -177,4 +156,3 @@ install_app;
 configure_uwsgi;
 configure_nginx;
 restart_services;
-configure_graph;

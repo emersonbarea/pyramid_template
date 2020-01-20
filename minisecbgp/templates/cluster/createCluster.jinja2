@@ -49,19 +49,6 @@
           {% endif %}
         </div>
 
-        <div class="form-field">
-          {{ form.master.label }}
-          <div class="radio">
-
-            {% for subfield in form.master %}
-              <tr>
-                {{ subfield }}
-                {{ subfield.label }}
-              </tr>
-            {% endfor %}
-          </div>
-        </div>
-
         <div class="form-button">
           <button type="submit" name="form.submitted" value="Create" class="btn btn-primary">Add Node</button>
         </div>

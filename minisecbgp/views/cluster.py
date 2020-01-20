@@ -27,10 +27,6 @@ class ClusterDataForm(Form):
                                   validators=[InputRequired(),
                                               Length(min=5, max=30, message=('Password must be between 5 and 30 '
                                                                              'characters long.'))])
-    master = RadioField('Server type *',
-                        coerce=int,
-                        validators=[InputRequired()],
-                        choices=[(0, 'worker'), (1, 'master')])
 
 
 @view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/cluster.jinja2')
@@ -52,7 +48,9 @@ def show(request):
     if user is None:
         raise HTTPForbidden
 
-    return {}
+    nodes = request.dbsession.query(models.Cluster).all()
+
+    return dict(nodes=nodes)
 
 
 @view_config(route_name='clusterAction', match_param='action=create', renderer='minisecbgp:templates/cluster'
@@ -64,21 +62,13 @@ def create(request):
 
     form = ClusterDataForm(request.POST)
 
-    print('teste')
-
     if request.method == 'POST' and form.validate():
         try:
-            entry = models.Cluster(node=form.node.data, username=form.username.data, master=form.master.data)
+            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0)
             entry.set_password(form.password_hash.data)
 
-            # insert row
             request.dbsession.add(entry)
             request.dbsession.flush()
-
-            # topology graph
-            with open('minisecbgp:templates/cluster/showCluster.jinja2', 'w') as write_to_file:
-                write_to_file.write('          nodes.push({id: "%s"\n' % (form.node.data))
-            write_to_file.close()
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'

@@ -1,0 +1,83 @@
+{% extends "cluster.jinja2" %}
+
+{% block contentCluster %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
+      <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
+
+      <style type="text/css">
+        #mynetwork {
+            width: 600x;
+            height: 600px;
+            border: 1px solid lightgray;
+        }
+      </style>
+
+      <div id="mynetwork"></div>
+
+      <script type="text/javascript">
+          // create a network
+          var container = document.getElementById('mynetwork');
+
+          // provide the DIR variable path
+          var DIR = "{{request.static_url('minisecbgp:static/vis-js/img/')}}";
+
+          nodes = [];
+          edges = [];
+
+          nodes.push({id: 'network', label: 'network', image: DIR + 'network.png', shape: 'image'});
+
+          {% for node in nodes %}
+
+            if ({{ node.master }} == 0) {
+              var IMAGE = "computer.png";
+            } else {
+              var IMAGE = "server.png";
+            }
+
+            if ({{ node.status }} == 0) {
+              var STATUS = "OK";
+              var COLOR = "green";
+            } else if ({{ node.status }} == 1) {
+              var STATUS = "WAIT";
+              var COLOR = "orange";
+            } else {
+              var STATUS = "FAILED";
+              var COLOR = "red";
+            }
+
+            nodes.push({
+                        id: {{ node.id|tojson }},
+                      font: {color: COLOR},
+                     label: 'hostname: {{ node.node|tojson }}\nusername: {{ node.username|tojson }}\nstatus: ' + STATUS,
+                     image: DIR + IMAGE,
+                     shape: 'image'
+                     });
+
+            edges.push({from: 'network', to: {{ node.id|tojson }}, length: 300});
+
+          {% endfor %}
+
+          // provide the data in the vis format
+          var data = {
+              nodes: nodes,
+              edges: edges
+          };
+          var options = {};
+
+          // initialize your network!
+          var network = new vis.Network(container, data, options);
+      </script>
+
+      <p align="center">status: OK = server connection is ok. WAIT = server is installing app. FAILED = server network connection failed</p>
+      <p align="center">* status checks every 5 minutes</p>
+
+    </div>
+  </div>
+</div>  
+
+{% endblock contentCluster %}
