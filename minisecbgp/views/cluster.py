@@ -31,7 +31,7 @@ class ClusterDataForm(Form):
 
 class ClusterDataFormSelectField(Form):
     cluster_list = SelectField('user_list', coerce=int,
-                            validators=[InputRequired()])
+                               validators=[InputRequired()])
 
 
 @view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/cluster.jinja2')
