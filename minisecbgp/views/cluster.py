@@ -13,8 +13,6 @@ from wtforms.validators import (
 )
 from .. import models
 
-import os
-
 
 class ClusterDataForm(Form):
     node = StringField('Node name/IP address*',

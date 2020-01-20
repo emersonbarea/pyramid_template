@@ -1,5 +1,6 @@
 import argparse
 import sys
+import socket
 
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy.exc import OperationalError
@@ -15,6 +16,10 @@ def setup_models(dbsession):
     viewer = models.User(username='viewer', role='viewer')
     viewer.set_password('viewer')
     dbsession.add(viewer)
+
+    host = models.Cluster(node=socket.gethostname(), username='minisecbgp', master=1)
+    host.set_password('minisecbgp')
+    dbsession.add(host)
 
 
 def parse_args(argv):
