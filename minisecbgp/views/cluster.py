@@ -5,7 +5,7 @@ from wtforms import (
     Form,
     StringField,
     PasswordField,
-    RadioField,
+    SelectField,
 )
 from wtforms.validators import (
     InputRequired,
@@ -27,6 +27,11 @@ class ClusterDataForm(Form):
                                   validators=[InputRequired(),
                                               Length(min=5, max=30, message=('Password must be between 5 and 30 '
                                                                              'characters long.'))])
+
+
+class ClusterDataFormSelectField(Form):
+    cluster_list = SelectField('user_list', coerce=int,
+                            validators=[InputRequired()])
 
 
 @view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/cluster.jinja2')
@@ -64,7 +69,7 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0)
+            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0, status=1)
             entry.set_password(form.password_hash.data)
 
             request.dbsession.add(entry)
@@ -79,7 +84,41 @@ def create(request):
             message = ('Node "%s" already exists in cluster.' % form.node.data)
             css_class = 'errorMessage'
 
-        request.override_renderer = 'minisecbgp:templates/cluster/cluster.jinja2'
-        return {'message': message, 'css_class': css_class}
+        request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
+        nodes = request.dbsession.query(models.Cluster).all()
+
+        return dict(nodes=nodes)
+
+    return {'form': form}
+
+
+@view_config(route_name='clusterAction', match_param='action=delete', renderer='minisecbgp:templates/cluster'
+                                                                               '/deleteCluster.jinja2')
+def delete(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    form = ClusterDataFormSelectField(request.POST)
+    form.cluster_list.choices = [(row.id, row.node) for row in request.dbsession.query(models.Cluster).filter(models.Cluster.id != 1)]
+
+    if request.method == 'POST' and form.validate():
+        value = dict(form.cluster_list.choices).get(form.cluster_list.data)
+        try:
+            request.dbsession.query(models.Cluster).filter(models.Cluster.id == form.cluster_list.data).delete()
+
+            message = ('Cluster node "%s" successfully deleted.' % value)
+            css_class = 'successMessage'
+
+        except IntegrityError as e:
+            request.dbsession.rollback()
+
+            message = ('Cluster node "%s" does not exist.' % form.cluster_list.data)
+            css_class = 'errorMessage'
+
+        request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
+        nodes = request.dbsession.query(models.Cluster).all()
+
+        return dict(nodes=nodes)
 
     return {'form': form}
