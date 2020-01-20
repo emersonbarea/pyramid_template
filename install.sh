@@ -52,7 +52,6 @@ configure_Postgres() {
         sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;" &> /dev/null
         sudo -u postgres psql -c "DROP EXTENSION adminpack;" &> /dev/null
         sudo -u postgres dropdb dbminisecbgp &> /dev/null
-        sleep 3
         sudo -u postgres psql -c "DROP USER minisecbgp;" &> /dev/null
 
         sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password 'postgres';"
