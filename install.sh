@@ -168,3 +168,4 @@ install_app;
 configure_uwsgi;
 configure_nginx;
 restart_services;
+configure_graph;
