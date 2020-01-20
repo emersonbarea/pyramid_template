@@ -48,10 +48,16 @@ install_Python_reqs() {
 configure_Postgres() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring Postgres ...'
+
+        sudo -u postgres psql -c "REVOKE CONNECT ON DATABASE "dbminisecbgp" FROM public;"  &> /dev/null
+        sudo -u postgres psql -c "DROP EXTENSION adminpack;" &> /dev/null
+        sudo -u postgres dropdb dbminisecbgp &> /dev/null
+        sudo -u postgres psql -c "DROP USER minisecbgp;" &> /dev/null
+
         sudo -u postgres psql -U postgres -d postgres -c "alter user postgres with password 'postgres';"
         sudo -u postgres psql -c "CREATE EXTENSION adminpack;"
         sudo -u postgres psql -c "CREATE USER minisecbgp WITH ENCRYPTED PASSWORD 'minisecbgp';"
-        sudo -u postgres createdb -O minisecbgp dbMinisecbgp
+        sudo -u postgres createdb -O minisecbgp dbminisecbgp
 
 }
 
@@ -59,6 +65,7 @@ install_app() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         pip3 install -e .
+        rm $BUILD_DIR/minisecbgp/alembic/versions/*.py  &> /dev/null
         alembic -c development.ini revision --autogenerate -m "init"
         alembic -c development.ini upgrade head
         initialize_minisecbgp_db development.ini
