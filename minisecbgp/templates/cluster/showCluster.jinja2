@@ -6,6 +6,8 @@
   <div class="row-fluid">
     <div class="span12">
 
+      <meta http-equiv="refresh" content="60;URL= '{{ current_url }}'">
+
       <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
       <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
 
@@ -20,61 +22,58 @@
       <div id="mynetwork"></div>
 
       <script type="text/javascript">
-          // create a network
-          var container = document.getElementById('mynetwork');
 
-          // provide the DIR variable path
-          var DIR = "{{request.static_url('minisecbgp:static/vis-js/img/')}}";
+        // provide the DIR variable path
+        var DIR = "{{request.static_url('minisecbgp:static/vis-js/img/')}}";
 
-          nodes = [];
-          edges = [];
+        var nodes = new vis.DataSet([
 
-          nodes.push({id: 'network', label: 'network', image: DIR + 'network.png', shape: 'image'});
+          {id: 'network',
+           label: 'network',
+           image: DIR + 'network.png',
+           shape: 'image',
+           url: '{{ current_url }}',
+          },
 
           {% for node in nodes %}
-
-            if ({{ node.master }} == 0) {
-              var IMAGE = "computer.png";
-            } else {
-              var IMAGE = "server.png";
-            }
-
-            if ({{ node.status }} == 0) {
-              var STATUS = "OK";
-              var COLOR = "green";
-            } else if ({{ node.status }} == 1) {
-              var STATUS = "WAIT";
-              var COLOR = "orange";
-            } else {
-              var STATUS = "FAILED";
-              var COLOR = "red";
-            }
-
-            nodes.push({
-                        id: {{ node.id|tojson }},
-                      font: {color: COLOR},
-                     label: 'hostname: {{ node.node|tojson }}\nusername: {{ node.username|tojson }}\nstatus: ' + STATUS,
-                     image: DIR + IMAGE,
-                     shape: 'image'
-                     });
-
-            edges.push({from: 'network', to: {{ node.id|tojson }}, length: 300});
-
+            {id: {{ node.id|tojson }},
+             font: {color: ( {{ node.status }} == 0 ? 'green' : ( {{ node.status }} == 1 ? 'orange' : 'red'))},
+             label: 'hostname: {{ node.node|tojson }}\nusername: {{ node.username|tojson }}\nstatus: ' + ( {{ node.status }} == 0 ? 'OK' : ( {{ node.status }} == 1 ? 'Wait' : 'Failed')),
+             image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : 'server.png' ),
+             shape: 'image',
+             url: 'http://www.google.com'
+            },
           {% endfor %}
 
-          // provide the data in the vis format
-          var data = {
-              nodes: nodes,
-              edges: edges
-          };
-          var options = {};
+        ]);
 
-          // initialize your network!
-          var network = new vis.Network(container, data, options);
+	    var edges = new vis.DataSet([
+
+          {% for node in nodes %}
+            {from: 'network', to: {{ node.id|tojson }} },
+          {% endfor %}
+
+	    ]);
+
+        // create a network
+        var container = document.getElementById('mynetwork');
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var options = {};
+        var network = new vis.Network(container, data, options);
+
+        network.on("selectNode", function (params) {
+            if (params.nodes.length === 1) {
+                var node = nodes.get(params.nodes[0]);
+                window.open(node.url, '_self');
+            }
+        });
+
       </script>
 
-      <p align="center">status: OK = server connection is ok. WAIT = server is installing app. FAILED = server network connection failed</p>
-      <p align="center">* status checks every 5 minutes</p>
+      <p align="center">* server status checks every minute</p>
 
     </div>
   </div>

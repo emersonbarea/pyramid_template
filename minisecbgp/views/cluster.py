@@ -17,15 +17,15 @@ from .. import models
 class ClusterDataForm(Form):
     node = StringField('Node name/IP address*',
                        validators=[InputRequired(),
-                                   Length(min=5, max=30, message=('Node name/IP address must be between 5 and 30 '
+                                   Length(min=1, max=50, message=('Node name/IP address must be between 1 and 50 '
                                                                   'characters long.'))])
     username = StringField('Cluster node Username *',
                            validators=[InputRequired(),
-                                       Length(min=5, max=30, message=('Username must be between 5 and 30 characters '
+                                       Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
                                                                       'long.'))])
     password_hash = PasswordField('Cluster node Password *',
                                   validators=[InputRequired(),
-                                              Length(min=5, max=30, message=('Password must be between 5 and 30 '
+                                              Length(min=1, max=50, message=('Password must be between 1 and 50 '
                                                                              'characters long.'))])
 
 
@@ -55,7 +55,11 @@ def show(request):
 
     nodes = request.dbsession.query(models.Cluster).all()
 
-    return dict(nodes=nodes)
+    dictionary = dict()
+    dictionary['nodes'] = nodes
+    dictionary['current_url'] = request.route_url('clusterAction', action='show')
+
+    return dictionary
 
 
 @view_config(route_name='clusterAction', match_param='action=create', renderer='minisecbgp:templates/cluster'
@@ -87,7 +91,13 @@ def create(request):
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
         nodes = request.dbsession.query(models.Cluster).all()
 
-        return dict(nodes=nodes)
+        dictionary = dict()
+        dictionary['nodes'] = nodes
+        dictionary['message'] = message
+        dictionary['css_class'] = css_class
+        dictionary['current_url'] = request.route_url('clusterAction', action='show')
+
+        return dictionary
 
     return {'form': form}
 
@@ -119,6 +129,12 @@ def delete(request):
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
         nodes = request.dbsession.query(models.Cluster).all()
 
-        return dict(nodes=nodes)
+        dictionary = dict()
+        dictionary['nodes'] = nodes
+        dictionary['message'] = message
+        dictionary['css_class'] = css_class
+        dictionary['current_url'] = request.route_url('clusterAction', action='show')
+
+        return dictionary
 
     return {'form': form}
