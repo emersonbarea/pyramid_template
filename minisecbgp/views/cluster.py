@@ -34,21 +34,8 @@ class ClusterDataFormSelectField(Form):
                                validators=[InputRequired()])
 
 
-@view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/cluster.jinja2')
-def user(request):
-    user = request.user
-    if user is None:
-        raise HTTPForbidden
-
-    #testezica.testezica()
-    #print('teste')
-
-    return {}
-
-
-@view_config(route_name='clusterAction', match_param='action=show', renderer='minisecbgp:templates/cluster'
-                                                                             '/showCluster.jinja2')
-def show(request):
+@view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/showCluster.jinja2')
+def cluster(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -57,7 +44,8 @@ def show(request):
 
     dictionary = dict()
     dictionary['nodes'] = nodes
-    dictionary['current_url'] = request.route_url('clusterAction', action='show')
+    dictionary['cluster_url'] = request.route_url('cluster')
+    dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
     return dictionary
 
@@ -73,7 +61,7 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0, status=1)
+            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0, ping=1, ssh=1, app=1)
             entry.set_password(form.password_hash.data)
 
             request.dbsession.add(entry)
@@ -95,7 +83,8 @@ def create(request):
         dictionary['nodes'] = nodes
         dictionary['message'] = message
         dictionary['css_class'] = css_class
-        dictionary['current_url'] = request.route_url('clusterAction', action='show')
+        dictionary['cluster_url'] = request.route_url('cluster')
+        dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
         return dictionary
 
@@ -133,8 +122,17 @@ def delete(request):
         dictionary['nodes'] = nodes
         dictionary['message'] = message
         dictionary['css_class'] = css_class
-        dictionary['current_url'] = request.route_url('clusterAction', action='show')
+        dictionary['cluster_url'] = request.route_url('cluster')
+        dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
         return dictionary
 
     return {'form': form}
+
+
+@view_config(route_name='clusterDetail', renderer='minisecbgp:templates/cluster/detailCluster.jinja2')
+def clusterDetail(request):
+
+    entry = request.dbsession.query(models.Cluster).filter_by(id=request.matchdict["id"]).first()
+
+    return{'entry': entry}

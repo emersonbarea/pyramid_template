@@ -6,7 +6,7 @@
   <div class="row-fluid">
     <div class="span12">
 
-      <meta http-equiv="refresh" content="60;URL= '{{ current_url }}'">
+      <meta http-equiv="refresh" content="60;URL= '{{ cluster_url }}'">
 
       <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
       <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
@@ -32,16 +32,16 @@
            label: 'network',
            image: DIR + 'network.png',
            shape: 'image',
-           url: '{{ current_url }}',
+           url: '{{ cluster_url }}',
           },
 
           {% for node in nodes %}
-            {id: {{ node.id|tojson }},
-             font: {color: ( {{ node.status }} == 0 ? 'green' : ( {{ node.status }} == 1 ? 'orange' : 'red'))},
-             label: 'hostname: {{ node.node|tojson }}\nusername: {{ node.username|tojson }}\nstatus: ' + ( {{ node.status }} == 0 ? 'OK' : ( {{ node.status }} == 1 ? 'Wait' : 'Failed')),
+            {id: {{ node.id }},
+             font: {color: ( {{ node.app }} == 0 ? 'green' : ( {{ node.app }} == 1 ? 'red' : 'orange'))},
+             label: 'node: {{ node.node }}\nstatus: ' + ( {{ node.app }} == 0 ? 'OK' : ( {{ node.app }} == 1 ? 'error' : 'wait')),
              image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : 'server.png' ),
              shape: 'image',
-             url: 'http://www.google.com'
+             url: '{{ cluster_detail_url }}{{ node.id }}'
             },
           {% endfor %}
 

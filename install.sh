@@ -32,7 +32,7 @@ install_Linux_reqs() {
 
 virtualenv() {
 
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Creating Python3 Virtualenv ...'
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Creating Python 3 Virtualenv ...'
         python3 -m venv "$BUILD_DIR"/venv
         source "$BUILD_DIR"/venv/bin/activate
 
@@ -40,7 +40,7 @@ virtualenv() {
 
 install_Python_reqs() {
 
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Python prerequisites ...'
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Python 3 prerequisites ...'
         pip3 install wheel
         pip3 install -r requirements.txt;
 }

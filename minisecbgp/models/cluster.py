@@ -14,7 +14,9 @@ class Cluster(Base):
     username = Column(String(50), nullable=False)
     password_hash = Column(String(200), nullable=False)
     master = Column(Integer, nullable=False)    # 0 = 'worker', 1 = 'master'
-    status = Column(Integer, nullable=False)    # 0 = 'OK', 1 = 'wait', 2 = 'failed'
+    ping = Column(Integer, nullable=False)      # 0 = 'OK', 1 = 'error'
+    ssh = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error'
+    app = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
 
     def set_password(self, pw):
         pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())

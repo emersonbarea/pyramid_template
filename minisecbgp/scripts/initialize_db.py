@@ -17,7 +17,7 @@ def setup_models(dbsession):
     viewer.set_password('viewer')
     dbsession.add(viewer)
 
-    host = models.Cluster(node=socket.gethostname(), username='minisecbgp', master=1, status=1)
+    host = models.Cluster(node=socket.gethostname(), username='minisecbgp', master=1, ping=1, ssh=1, app=1)
     host.set_password('minisecbgp')
     dbsession.add(host)
 

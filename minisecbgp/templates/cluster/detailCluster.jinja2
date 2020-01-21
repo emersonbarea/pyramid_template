@@ -1,0 +1,52 @@
+{% extends "cluster.jinja2" %}
+
+{% block contentCluster %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Node Detail</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+
+      <p><b>Node ID:</b> {{ entry.id }}</p>
+      <p><b>Hostname / IP Address:</b> {{ entry.node }}</p>
+      <p><b>Username:</b> {{ entry.username }}</p>
+      <p><b>Server type:</b>
+        {% if entry.master == 0 %}
+          Worker
+        {% else %}
+          Master
+        {% endif %}
+      </p>
+      <p><b>Ping:</b>
+        {% if entry.ping == 0 %}
+          <font color="green">OK</font>
+        {% else %}
+          <font color="red">ERROR</font>
+        {% endif %}
+      </p>
+      <p><b>SSH:</b>
+        {% if entry.ssh == 0 %}
+          <font color="green">OK</font>
+        {% else %}
+          <font color="red">ERROR</font>
+        {% endif %}
+      </p>
+      <p><b>Application MiniSecBGP:</b>
+        {% if entry.app == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.app == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}
+      </p>
+
+    </div>
+  </div>
+</div>
+
+{% endblock contentCluster %}

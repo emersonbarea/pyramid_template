@@ -8,3 +8,4 @@ def includeme(config):
     config.add_route('userAction', '/user/{action}')
     config.add_route('cluster', '/cluster')
     config.add_route('clusterAction', '/cluster/{action}')
+    config.add_route('clusterDetail', '/cluster/detail/{id}')
