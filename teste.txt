@@ -20,6 +20,7 @@ PasteScript==3.2.0
 plaster==1.0
 plaster-pastedeploy==0.7
 pluggy==0.13.1
+psutil==5.6.7
 psycopg2==2.8.4
 py==1.8.0
 pycparser==2.19

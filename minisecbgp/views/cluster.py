@@ -11,7 +11,10 @@ from wtforms.validators import (
     InputRequired,
     Length,
 )
-from .. import models
+from minisecbgp import models
+from minisecbgp.scripts.serviceStatus import (
+    ping,
+)
 
 
 class ClusterDataForm(Form):
@@ -23,10 +26,10 @@ class ClusterDataForm(Form):
                            validators=[InputRequired(),
                                        Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
                                                                       'long.'))])
-    password_hash = PasswordField('Cluster node Password *',
-                                  validators=[InputRequired(),
-                                              Length(min=1, max=50, message=('Password must be between 1 and 50 '
-                                                                             'characters long.'))])
+    password = PasswordField('Cluster node Password *',
+                             validators=[InputRequired(),
+                                         Length(min=1, max=50, message=('Password must be between 1 and 50 characters '
+                                                                        'long.'))])
 
 
 class ClusterDataFormSelectField(Form):
@@ -61,10 +64,19 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            entry = models.Cluster(node=form.node.data, username=form.username.data, master=0, ping=1, ssh=1, app=1)
-            entry.set_password(form.password_hash.data)
-
-            request.dbsession.add(entry)
+            node = models.Cluster(node=form.node.data,
+                                  username=form.username.data,
+                                  master=0,
+                                  serv_ping=2,
+                                  serv_ssh=2,
+                                  serv_app=2,
+                                  conf_user=2,
+                                  conf_ssh=2,
+                                  conf_containernet=2,
+                                  conf_metis=2,
+                                  conf_maxinet=2
+                                  )
+            request.dbsession.add(node)
             request.dbsession.flush()
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
@@ -75,6 +87,11 @@ def create(request):
 
             message = ('Node "%s" already exists in cluster.' % form.node.data)
             css_class = 'errorMessage'
+
+        # command = ''
+        # ssh.ssh(node.node, node.username, form.password.data, command)
+
+        ping.ping(request, form.node.data)
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
         nodes = request.dbsession.query(models.Cluster).all()
@@ -99,7 +116,8 @@ def delete(request):
         raise HTTPForbidden
 
     form = ClusterDataFormSelectField(request.POST)
-    form.cluster_list.choices = [(row.id, row.node) for row in request.dbsession.query(models.Cluster).filter(models.Cluster.id != 1)]
+    form.cluster_list.choices = [(row.id, row.node) for row in
+                                 request.dbsession.query(models.Cluster).filter(models.Cluster.id != 1)]
 
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)
@@ -132,7 +150,6 @@ def delete(request):
 
 @view_config(route_name='clusterDetail', renderer='minisecbgp:templates/cluster/detailCluster.jinja2')
 def clusterDetail(request):
-
     entry = request.dbsession.query(models.Cluster).filter_by(id=request.matchdict["id"]).first()
 
-    return{'entry': entry}
+    return {'entry': entry}

@@ -7,8 +7,7 @@ welcome() {
                    Some requirements must be met:
                    - Ubuntu 18 Server LTS (Bionic Beaver)
                    - Internet access
-                   - "sudo" user
-                   Note: the user "minisecbgp" will be created, so it should not exist previously.'
+                   - "sudo" user'
 }
 
 update() {

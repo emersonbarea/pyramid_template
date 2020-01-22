@@ -1,4 +1,3 @@
-import bcrypt
 from sqlalchemy import (
     Column,
     Integer,
@@ -12,18 +11,12 @@ class Cluster(Base):
     id = Column(Integer, primary_key=True)
     node = Column(String(50), nullable=False, unique=True)
     username = Column(String(50), nullable=False)
-    password_hash = Column(String(200), nullable=False)
-    master = Column(Integer, nullable=False)    # 0 = 'worker', 1 = 'master'
-    ping = Column(Integer, nullable=False)      # 0 = 'OK', 1 = 'error'
-    ssh = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error'
-    app = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
-
-    def set_password(self, pw):
-        pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())
-        self.password_hash = pwhash.decode('utf8')
-
-    def check_password(self, pw):
-        if self.password_hash is not None:
-            expected_hash = self.password_hash.encode('utf8')
-            return bcrypt.checkpw(pw.encode('utf8'), expected_hash)
-        return False
+    master = Column(Integer, nullable=False)             # 0 = 'worker', 1 = 'master'
+    serv_ping = Column(Integer, nullable=False)          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    serv_ssh = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    serv_app = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_user = Column(Integer, nullable=False)          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_ssh = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_containernet = Column(Integer, nullable=False)  # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_metis = Column(Integer, nullable=False)         # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_maxinet = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'

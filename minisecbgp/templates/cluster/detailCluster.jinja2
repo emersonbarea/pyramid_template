@@ -11,34 +11,94 @@
   <div class="row-fluid">
     <div class="span12">
 
-      <p><b>Node ID:</b> {{ entry.id }}</p>
-      <p><b>Hostname / IP Address:</b> {{ entry.node }}</p>
-      <p><b>Username:</b> {{ entry.username }}</p>
-      <p><b>Server type:</b>
+      <p><b>Node ID :</b> {{ entry.id }}</p>
+      <p><b>Hostname / IP Address :</b> {{ entry.node }}</p>
+      <p><b>Username :</b> {{ entry.username }}</p>
+      <p><b>Server type :</b>
         {% if entry.master == 0 %}
           Worker
         {% else %}
           Master
         {% endif %}
       </p>
-      <p><b>Ping:</b>
-        {% if entry.ping == 0 %}
+
+      <hr>
+      <h4 align="center">Services status</h4>
+
+      <p><b>Ping :</b>
+        {% if entry.serv_ping == 0 %}
           <font color="green">OK</font>
-        {% else %}
+        {% elif entry.serv_ping == 1 %}
           <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
         {% endif %}
       </p>
-      <p><b>SSH:</b>
-        {% if entry.ssh == 0 %}
+      <p><b>SSH :</b>
+        {% if entry.serv_ssh == 0 %}
           <font color="green">OK</font>
-        {% else %}
+        {% elif entry.serv_ssh == 1 %}
           <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}      </p>
+      <p><b>MiniSecBGP :</b>
+        {% if entry.serv_app == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.serv_app == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
         {% endif %}
       </p>
-      <p><b>Application MiniSecBGP:</b>
-        {% if entry.app == 0 %}
+
+      <hr>
+      <h4 align="center">Config / install status</h4>
+
+      <p><b>User "minisecbgp" :</b>
+        {% if entry.conf_user == 0 %}
           <font color="green">OK</font>
-        {% elif entry.app == 1 %}
+        {% elif entry.conf_user == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}
+      </p>
+
+      <p><b>SSH config (for remote connection) :</b>
+        {% if entry.conf_ssh == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.conf_ssh == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}
+      </p>
+
+      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
+        {% if entry.conf_containernet == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.conf_containernet == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}
+      </p>
+
+      <p><b><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview" target="_blank">Metis :</a></b>
+        {% if entry.conf_metis == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.conf_metis == 1 %}
+          <font color="red">ERROR</font>
+        {% else %}
+          <font color="orange">Waiting (Install)</font>
+        {% endif %}
+      </p>
+
+      <p><b><a href="https://maxinet.github.io/" target="_blank">Maxinet :</a></b>
+        {% if entry.conf_maxinet == 0 %}
+          <font color="green">OK</font>
+        {% elif entry.conf_maxinet == 1 %}
           <font color="red">ERROR</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>

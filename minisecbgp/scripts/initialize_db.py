@@ -17,9 +17,19 @@ def setup_models(dbsession):
     viewer.set_password('viewer')
     dbsession.add(viewer)
 
-    host = models.Cluster(node=socket.gethostname(), username='minisecbgp', master=1, ping=1, ssh=1, app=1)
-    host.set_password('minisecbgp')
-    dbsession.add(host)
+    node = models.Cluster(node=socket.gethostname(),
+                          username='minisecbgp',
+                          master=1,
+                          serv_ping=2,
+                          serv_ssh=2,
+                          serv_app=2,
+                          conf_user=2,
+                          conf_ssh=2,
+                          conf_containernet=2,
+                          conf_metis=2,
+                          conf_maxinet=2
+                          )
+    dbsession.add(node)
 
 
 def parse_args(argv):

@@ -38,11 +38,13 @@
         </div>
 
         <div class="form-field">
-          {{ form.password_hash.label }}
-          {{ form.password_hash }}
-          {% if form.password_hash.errors %}
+          {{ form.password.label }}
+          {{ form.password }}
+          <p>Obs., the password will not be stored anywhere.</p>
+          <p>It will be used to connect to the remote host using SSH only once.</p>
+          {% if form.password.errors %}
             <ul class="errorMessage">
-              {% for error in form.password_hash.errors %}
+              {% for error in form.password.errors %}
                 <li>{{ error }}</li>
               {% endfor %}
             </ul>

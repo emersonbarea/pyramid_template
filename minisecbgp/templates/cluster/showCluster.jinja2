@@ -37,8 +37,8 @@
 
           {% for node in nodes %}
             {id: {{ node.id }},
-             font: {color: ( {{ node.app }} == 0 ? 'green' : ( {{ node.app }} == 1 ? 'red' : 'orange'))},
-             label: 'node: {{ node.node }}\nstatus: ' + ( {{ node.app }} == 0 ? 'OK' : ( {{ node.app }} == 1 ? 'error' : 'wait')),
+             font: {color: ( {{ node.serv_app }} == 0 ? 'green' : ( {{ node.serv_app }} == 1 ? 'red' : 'orange'))},
+             label: 'node: {{ node.node }}\nstatus: ' + ( {{ node.serv_app }} == 0 ? 'OK' : ( {{ node.serv_app }} == 1 ? 'error' : 'wait')),
              image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : 'server.png' ),
              shape: 'image',
              url: '{{ cluster_detail_url }}{{ node.id }}'
@@ -50,7 +50,7 @@
 	    var edges = new vis.DataSet([
 
           {% for node in nodes %}
-            {from: 'network', to: {{ node.id|tojson }} },
+            {from: 'network', to: {{ node.id|tojson }}, length: 250 },
           {% endfor %}
 
 	    ]);
