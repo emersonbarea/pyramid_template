@@ -1,3 +1,5 @@
+import subprocess
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.exc import IntegrityError
@@ -12,9 +14,6 @@ from wtforms.validators import (
     Length,
 )
 from minisecbgp import models
-from minisecbgp.scripts.serviceStatus import (
-    ping,
-)
 
 
 class ClusterDataForm(Form):
@@ -88,10 +87,17 @@ def create(request):
             message = ('Node "%s" already exists in cluster.' % form.node.data)
             css_class = 'errorMessage'
 
-        # command = ''
-        # ssh.ssh(node.node, node.username, form.password.data, command)
+        # test services
+        #subprocess.Popen(['python3', 'minisecbgp/scripts/ping.py', request, form.node.data])
 
-        ping.ping(request, form.node.data)
+        #ping.ping(request, form.node.data)
+
+        #subprocess.Popen(['ping.ping(request, form.node.data)'], stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+        #subprocess.Popen(['python3', '-c', 'from minisecbgp.scripts import ping; ping.ping(request, form.node.data)'])
+        #ssh.ssh(request, node.node, node.username, form.password.data, command='')
+
+        # install MiniSecBGP
+        #MiniSecBGP.ping(request, form.node.data)
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
         nodes = request.dbsession.query(models.Cluster).all()

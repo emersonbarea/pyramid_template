@@ -3,11 +3,11 @@ import os
 from minisecbgp import models
 
 
-def ping(request, host):
+def ping(request, node):
     ping_str = "-c 1 -W 15"
-    result = os.system("ping " + ping_str + " " + host)
+    result = os.system("ping " + ping_str + " " + node)
     try:
-        entry = request.dbsession.query(models.Cluster).filter_by(node=host).first()
+        entry = request.dbsession.query(models.Cluster).filter_by(node=node).first()
         if result:
             entry.serv_ping = 1
         else:
