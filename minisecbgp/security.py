@@ -5,7 +5,7 @@ from pyramid.security import (
     Everyone,
 )
 
-from .models import User
+from minisecbgp.models import User
 
 
 class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
@@ -23,11 +23,13 @@ class MyAuthenticationPolicy(AuthTktAuthenticationPolicy):
             principals.append('role:' + user.role)
         return principals
 
+
 def get_user(request):
     user_id = request.unauthenticated_userid
     if user_id is not None:
         user = request.dbsession.query(User).get(user_id)
         return user
+
 
 def includeme(config):
     settings = config.get_settings()

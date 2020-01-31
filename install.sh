@@ -13,7 +13,9 @@ welcome() {
 update() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Updating Linux ...'
-        sudo apt update;
+        printf '[sudo] senha para '$WHOAMI':'
+        read -s PASSWORD
+        echo "$PASSWORD" | sudo -S apt update;
         sudo apt upgrade -y;
         sudo apt -f install -y;
         sudo apt autoremove -y;
@@ -26,6 +28,18 @@ install_Linux_reqs() {
         sudo apt install sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
         printf '\n\e[1;32m%-6s\n\n%s\n%s\n%s\n%s\n%s\n\n%s\n\n\e[m' \
                'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3 pip' '    - Python3 venv' '    - Postgresql'
+
+}
+
+create_user() {
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Creating "minisecbgpuser" user...'
+        sudo userdel -r minisecbgpuser 2> /dev/null
+        sudo useradd -m -p $(mkpasswd -m sha-512 -S saltsalt -s <<< $PASSWORD) -s /bin/bash minisecbgpuser
+        printf '%s\n' 'minisecbgpuser     ALL=NOPASSWD: ALL' | sudo tee --append /etc/sudoers
+        sudo -u minisecbgpuser ssh-keygen -t rsa -N "" -f /home/minisecbgpuser/.ssh/id_rsa
+        sudo -u minisecbgpuser cat /home/minisecbgpuser/.ssh/id_rsa.pub | \
+        sudo -u minisecbgpuser tee --append /home/minisecbgpuser/.ssh/authorized_keys
+        sudo -u minisecbgpuser chmod 755 /home/minisecbgpuser/.ssh/authorized_keys
 
 }
 
@@ -71,7 +85,7 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
-        serv_nodes minisecbgp.ini lpttch '' ''
+        serv_nodes minisecbgp.ini lpttch '' '' '' ''
         pytest
 
 }

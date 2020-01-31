@@ -2,13 +2,13 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.security import (
     remember,
     forget,
-    )
+)
 from pyramid.view import (
     forbidden_view_config,
     view_config,
 )
 
-from ..models import User
+from minisecbgp.models import User
 
 
 @view_config(route_name='login', renderer='minisecbgp:templates/home.jinja2')

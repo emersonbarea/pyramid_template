@@ -17,18 +17,18 @@ def setup_models(dbsession):
     viewer.set_password('viewer')
     dbsession.add(viewer)
 
-    node = models.Cluster(node=socket.gethostname(),
-                          username='minisecbgp',
-                          master=1,
-                          serv_ping=2,
-                          serv_ssh=2,
-                          serv_app=2,
-                          conf_user=2,
-                          conf_ssh=2,
-                          conf_containernet=2,
-                          conf_metis=2,
-                          conf_maxinet=2
-                          )
+    node = models.Node(node=socket.gethostname(),
+                       username='minisecbgp',
+                       master=1,
+                       serv_ping=2,
+                       serv_ssh=2,
+                       serv_app=2,
+                       conf_user=2,
+                       conf_ssh=2,
+                       conf_containernet=2,
+                       conf_metis=2,
+                       conf_maxinet=2
+                       )
     dbsession.add(node)
 
 

@@ -1,22 +1,20 @@
-import socket
 import paramiko
 
 
-def ssh(request, node, username, password, command):
+def ssh(node, username, password, command):
     try:
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(node, username=username, password=password, timeout=15)
-        stdin, stdout, stderr = ssh.exec_command(command)
-    except paramiko.ssh_exception.AuthenticationException as e:
-        return e
-    except paramiko.ssh_exception.NoValidConnectionsError as e:
-        return e
-    except socket.error as e:
-        return e
-    except Exception as e:
-        return e
+        client_ssh = paramiko.SSHClient()
+        client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client_ssh.connect(node, username=username, password=password, timeout=15)
+        stdin, stdout, stderr = client_ssh.exec_command(command)
 
+        service_ssh = 0
+        out_ssh = stdout.read()
+        command_error = stderr.read()
+
+        return service_ssh, out_ssh, command_error
+    except Exception as error:
+        service_ssh = 1
+        return service_ssh, None, error
     finally:
-        ssh.close()
-
+        client_ssh.close()

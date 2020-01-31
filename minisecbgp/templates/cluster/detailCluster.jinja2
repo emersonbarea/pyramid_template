@@ -34,11 +34,11 @@
           <font color="orange">Waiting (Install)</font>
         {% endif %}
       </p>
-      <p><b>SSH :</b>
+      <p><b>SSH (connection made with the original user - tested only once):</b>
         {% if entry.serv_ssh == 0 %}
           <font color="green">OK</font>
         {% elif entry.serv_ssh == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.serv_ssh_status }} </font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}      </p>
@@ -46,7 +46,7 @@
         {% if entry.serv_app == 0 %}
           <font color="green">OK</font>
         {% elif entry.serv_app == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.serv_app_status }} </font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}

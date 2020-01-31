@@ -3,16 +3,8 @@ import subprocess
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.exc import IntegrityError
-from wtforms import (
-    Form,
-    StringField,
-    PasswordField,
-    SelectField,
-)
-from wtforms.validators import (
-    InputRequired,
-    Length,
-)
+from wtforms import Form, StringField, PasswordField, SelectField
+from wtforms.validators import InputRequired, Length
 from minisecbgp import models
 
 
@@ -42,7 +34,7 @@ def cluster(request):
     if user is None:
         raise HTTPForbidden
 
-    nodes = request.dbsession.query(models.Cluster).all()
+    nodes = request.dbsession.query(models.Node).all()
 
     dictionary = dict()
     dictionary['nodes'] = nodes
@@ -63,20 +55,24 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            node = models.Cluster(node=form.node.data,
-                                  username=form.username.data,
-                                  master=0,
-                                  serv_ping=2,
-                                  serv_ssh=2,
-                                  serv_app=2,
-                                  conf_user=2,
-                                  conf_ssh=2,
-                                  conf_containernet=2,
-                                  conf_metis=2,
-                                  conf_maxinet=2
-                                  )
+            node = models.Node(node=form.node.data,
+                               username=form.username.data,
+                               master=0,
+                               serv_ping=2,
+                               serv_ssh=2,
+                               serv_app=2,
+                               conf_user=2,
+                               conf_ssh=2,
+                               conf_containernet=2,
+                               conf_metis=2,
+                               conf_maxinet=2
+                               )
             request.dbsession.add(node)
             request.dbsession.flush()
+
+            # test services
+            arguments = ['minisecbgp.ini', form.node.data, form.username.data, form.password.data, '']
+            subprocess.Popen(['serv_nodes'] + arguments)
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'
@@ -87,13 +83,8 @@ def create(request):
             message = ('Node "%s" already exists in cluster.' % form.node.data)
             css_class = 'errorMessage'
 
-        # test services
-        #arguments = ['minisecbgp.ini', form.node.data, form.username.data, form.password.data]
-        arguments = ['minisecbgp.ini', '', '', '']
-        #subprocess.Popen(['serv_nodes'] + arguments)
-
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
-        nodes = request.dbsession.query(models.Cluster).all()
+        nodes = request.dbsession.query(models.Node).all()
 
         dictionary = dict()
         dictionary['nodes'] = nodes
@@ -116,12 +107,12 @@ def delete(request):
 
     form = ClusterDataFormSelectField(request.POST)
     form.cluster_list.choices = [(row.id, row.node) for row in
-                                 request.dbsession.query(models.Cluster).filter(models.Cluster.id != 1)]
+                                 request.dbsession.query(models.Node).filter(models.Node.id != 1)]
 
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)
         try:
-            request.dbsession.query(models.Cluster).filter(models.Cluster.id == form.cluster_list.data).delete()
+            request.dbsession.query(models.Node).filter(models.Node.id == form.cluster_list.data).delete()
 
             message = ('Cluster node "%s" successfully deleted.' % value)
             css_class = 'successMessage'
@@ -133,7 +124,7 @@ def delete(request):
             css_class = 'errorMessage'
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
-        nodes = request.dbsession.query(models.Cluster).all()
+        nodes = request.dbsession.query(models.Node).all()
 
         dictionary = dict()
         dictionary['nodes'] = nodes
@@ -149,6 +140,6 @@ def delete(request):
 
 @view_config(route_name='clusterDetail', renderer='minisecbgp:templates/cluster/detailCluster.jinja2')
 def clusterDetail(request):
-    entry = request.dbsession.query(models.Cluster).filter_by(id=request.matchdict["id"]).first()
+    entry = request.dbsession.query(models.Node).filter_by(id=request.matchdict["id"]).first()
 
     return {'entry': entry}
