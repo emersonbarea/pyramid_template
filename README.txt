@@ -16,15 +16,15 @@ Getting Started
 
     - Generate your first revision.
 
-        env/bin/alembic -c development.ini revision --autogenerate -m "init"
+        env/bin/alembic -c minisecbgp.ini revision --autogenerate -m "init"
 
     - Upgrade to that revision.
 
-        env/bin/alembic -c development.ini upgrade head
+        env/bin/alembic -c minisecbgp.ini upgrade head
 
 - Load default data into the database using a script.
 
-    env/bin/initialize_minisecbgp_db development.ini
+    env/bin/initialize_minisecbgp_db minisecbgp.ini
 
 - Run your project's tests.
 
@@ -32,4 +32,4 @@ Getting Started
 
 - Run your project.
 
-    env/bin/pserve development.ini
+    env/bin/pserve minisecbgp.ini

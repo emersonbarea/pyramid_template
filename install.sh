@@ -23,7 +23,7 @@ update() {
 install_Linux_reqs() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
-        sudo apt install nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
+        sudo apt install sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
         printf '\n\e[1;32m%-6s\n\n%s\n%s\n%s\n%s\n%s\n\n%s\n\n\e[m' \
                'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3 pip' '    - Python3 venv' '    - Postgresql'
 
@@ -32,6 +32,8 @@ install_Linux_reqs() {
 virtualenv() {
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Creating Python 3 Virtualenv ...'
+        deactivate &> /dev/null
+        rm -rf "$BUILD_DIR"/venv
         python3 -m venv "$BUILD_DIR"/venv
         source "$BUILD_DIR"/venv/bin/activate
 
@@ -66,9 +68,10 @@ install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         pip3 install -e .
         rm $BUILD_DIR/minisecbgp/alembic/versions/*.py &> /dev/null
-        alembic -c development.ini revision --autogenerate -m "init"
-        alembic -c development.ini upgrade head
-        initialize_minisecbgp_db development.ini
+        alembic -c minisecbgp.ini revision --autogenerate -m "init"
+        alembic -c minisecbgp.ini upgrade head
+        initialize_minisecbgp_db minisecbgp.ini
+        serv_nodes minisecbgp.ini lpttch '' ''
         pytest
 
 }
@@ -85,7 +88,7 @@ After=network.target
 User=' $WHOAMI '
 Group=www-data
 WorkingDirectory=' $BUILD_DIR '
-ExecStart=' $BUILD_DIR '/venv/bin/uwsgi --ini-paste-logged ' $BUILD_DIR '/development.ini
+ExecStart=' $BUILD_DIR '/venv/bin/uwsgi --ini-paste-logged ' $BUILD_DIR '/minisecbgp.ini
 
 [Install]
 WantedBy=multi-user.target' | sudo tee /etc/systemd/system/uwsgi.service
@@ -121,7 +124,7 @@ server {
         }
 }' | sudo tee /etc/nginx/sites-available/$PROJECT_NAME
 
-        rm /etc/nginx/sites-enabled/$PROJECT_NAME &> /dev/null
+        sudo rm /etc/nginx/sites-enabled/$PROJECT_NAME &> /dev/null
         sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled
         sudo nginx -t
 

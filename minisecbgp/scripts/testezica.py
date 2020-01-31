@@ -1,2 +1,0 @@
-def testezica():
-    print('testezicaksfdjkjfsfjsddfsjfdks')

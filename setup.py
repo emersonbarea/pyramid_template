@@ -63,6 +63,7 @@ setup(
         ],
         'console_scripts': [
             'initialize_minisecbgp_db=minisecbgp.scripts.initialize_db:main',
+            'serv_nodes=minisecbgp.scripts.serv_nodes:main',
         ],
     },
 )

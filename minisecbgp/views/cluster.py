@@ -88,16 +88,9 @@ def create(request):
             css_class = 'errorMessage'
 
         # test services
-        #subprocess.Popen(['python3', 'minisecbgp/scripts/ping.py', request, form.node.data])
-
-        #ping.ping(request, form.node.data)
-
-        #subprocess.Popen(['ping.ping(request, form.node.data)'], stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
-        #subprocess.Popen(['python3', '-c', 'from minisecbgp.scripts import ping; ping.ping(request, form.node.data)'])
-        #ssh.ssh(request, node.node, node.username, form.password.data, command='')
-
-        # install MiniSecBGP
-        #MiniSecBGP.ping(request, form.node.data)
+        #arguments = ['minisecbgp.ini', form.node.data, form.username.data, form.password.data]
+        arguments = ['minisecbgp.ini', '', '', '']
+        #subprocess.Popen(['serv_nodes'] + arguments)
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
         nodes = request.dbsession.query(models.Cluster).all()
