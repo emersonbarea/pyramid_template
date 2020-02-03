@@ -16,8 +16,13 @@ class Node(Base):
     serv_app = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     serv_app_status = Column(String(255))
     conf_user = Column(Integer, nullable=False)          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_user_status = Column(String(255))
     conf_ssh = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_ssh_status = Column(String(255))
     conf_containernet = Column(Integer, nullable=False)  # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_containernet_status = Column(String(255))
     conf_metis = Column(Integer, nullable=False)         # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_metis_status = Column(String(255))
     conf_maxinet = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_maxinet_status = Column(String(255))
 

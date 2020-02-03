@@ -71,8 +71,8 @@ def create(request):
             request.dbsession.flush()
 
             # test services
-            arguments = ['minisecbgp.ini', form.node.data, form.username.data, form.password.data, '']
-            subprocess.Popen(['serv_nodes'] + arguments)
+            arguments = ['minisecbgp.ini', '0', form.node.data, form.username.data, form.password.data, '']
+            subprocess.Popen(['tests'] + arguments)
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'

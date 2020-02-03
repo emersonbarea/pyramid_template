@@ -71,23 +71,48 @@ def service_ssh(dbsession, argv):
 
 
 def create_remote_user(dbsession, argv):
-    # argv[2] --> argv[0] = hostname
-    # argv[3] --> argv[1] = username
-    # argv[4] --> argv[2] = password
-    # argv[5] --> argv[3] = command
+    # argv[3] --> argv[0] = hostname
+    # argv[4] --> argv[1] = username
+    # argv[5] --> argv[2] = password
+    # argv[6] --> argv[3] = command
     argv[3] = 'echo %s | sudo -S apt install whois -y;' \
               'sudo userdel -r minisecbgpuser 2> /dev/null;' \
               'sudo useradd -m -p $(mkpasswd -m sha-512 -S saltsalt -s <<< %s) -s /bin/bash minisecbgpuser;' \
               'echo "minisecbgpuser    ALL=NOPASSWD: ALL" | sudo tee --append /etc/sudoers;' \
-              'sudo -u minisecbgpuser ssh-keygen -t rsa -N "" -f /home/minisecbgpuser/.ssh/id_rsa' % (argv[2], argv[2])
-    service_ssh(dbsession, argv)
+              'sudo -u minisecbgpuser ssh-keygen -t rsa -N "" -f /home/minisecbgpuser/.ssh/id_rsa;' \
+              'sudo -u minisecbgpuser cat /home/minisecbgpuser/.ssh/id_rsa.pub | ' \
+              'sudo -u minisecbgpuser tee --append /home/minisecbgpuser/.ssh/authorized_keys;' \
+              'sudo -u minisecbgpuser chmod 755 /home/minisecbgpuser/.ssh/authorized_keys' % (argv[2], argv[2])
+    node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
+    entry = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
+    if entry[0] == 0 and entry[2]:
+        node.serv_ssh = 0
+        node.serv_ssh_status = ''
+        node.conf_user = 1
+        node.conf_user_status = str(entry[2])
+    elif entry[0] == 1 and entry[2]:
+        node.serv_ssh = 1
+        node.serv_ssh_status = str(entry[2])
+        node.conf_user = 2
+        node.conf_user_status = ''
+    else:
+        node.serv_ssh = 0
+        node.serv_ssh_status = ''
+        node.conf_user = 0
+        node.conf_user_status = ''
+    try:
+        dbsession.flush()
+    except Exception as error:
+        print('Database error for minisecbgpuser account creation on node: %s - %s' % node.node, error)
 
+    service_ssh(dbsession, argv)
+    node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
 
 
 def install_minisecbgp(dbsession, argv):
-    # argv[2] --> argv[0] = hostname
-    # argv[3] --> argv[1] = username
-    # argv[4] --> argv[2] = password
+    # argv[3] --> argv[0] = hostname
+    # argv[4] --> argv[1] = username
+    # argv[5] --> argv[2] = password
     os.system('sshpass -p "%s" scp -o StrictHostKeyChecking=no ./minisecbgp/scripts/MiniSecBGP/install.sh '
               '%s@%s:/home/%s' % (argv[2], argv[1], argv[0], argv[1]))
 
@@ -104,10 +129,11 @@ def parse_args(argv):
 def main(argv=sys.argv):
     # argv[0] = python program
     # argv[1] = configuration file .ini
-    # argv[2] --> argv[0] = hostname
-    # argv[3] --> argv[1] = username
-    # argv[4] --> argv[2] = password
-    # argv[5] --> argv[3] = command
+    # argv[2] = 0 = creating node | 1 = job scheduled
+    # argv[3] --> argv[0] = hostname
+    # argv[4] --> argv[1] = username
+    # argv[5] --> argv[2] = password
+    # argv[6] --> argv[3] = command
 
     args = parse_args(argv[0:2])
     setup_logging(args.config_uri)
@@ -115,9 +141,10 @@ def main(argv=sys.argv):
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            service_ping(dbsession, argv[2:])
-            service_ssh(dbsession, argv[2:])
-            create_remote_user(dbsession, argv[2:])
-            #install_minisecbgp(dbsession, argv[2:])
+            service_ping(dbsession, argv[3:])
+            service_ssh(dbsession, argv[3:])
+            if argv[2] == '0':
+                create_remote_user(dbsession, argv[3:])
+                #install_minisecbgp(dbsession, argv[3:])
     except OperationalError:
         print('Database error')
