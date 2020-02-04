@@ -57,9 +57,9 @@
 
       <p><b>User "minisecbgp" :</b>
         {% if entry.conf_user == 0 %}
-          <font color="green">OK</font>
+          <font color="green">OK: {{ entry.conf_user_status }}</font>
         {% elif entry.conf_user == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.conf_user_status }}</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}
@@ -67,9 +67,9 @@
 
       <p><b>SSH config (for remote connection) :</b>
         {% if entry.conf_ssh == 0 %}
-          <font color="green">OK</font>
+          <font color="green">OK: {{ entry.conf_ssh_status }}</font>
         {% elif entry.conf_ssh == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.conf_ssh_status }}</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}
@@ -77,9 +77,9 @@
 
       <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
         {% if entry.conf_containernet == 0 %}
-          <font color="green">OK</font>
+          <font color="green">OK: {{ entry.conf_containernet_status }}</font>
         {% elif entry.conf_containernet == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.conf_containernet_status }}</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}
@@ -87,9 +87,9 @@
 
       <p><b><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview" target="_blank">Metis :</a></b>
         {% if entry.conf_metis == 0 %}
-          <font color="green">OK</font>
+          <font color="green">OK: {{ entry.conf_metis_status }}</font>
         {% elif entry.conf_metis == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.conf_metis_status }}</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}
@@ -97,9 +97,9 @@
 
       <p><b><a href="https://maxinet.github.io/" target="_blank">Maxinet :</a></b>
         {% if entry.conf_maxinet == 0 %}
-          <font color="green">OK</font>
+          <font color="green">OK: {{ entry.conf_maxinet_status }}</font>
         {% elif entry.conf_maxinet == 1 %}
-          <font color="red">ERROR</font>
+          <font color="red">ERROR: {{ entry.conf_maxinet_status }}</font>
         {% else %}
           <font color="orange">Waiting (Install)</font>
         {% endif %}

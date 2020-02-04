@@ -42,28 +42,20 @@ def service_ssh(dbsession, argv):
     # argv[5] --> argv[3] = command
     if argv[0]:
         node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
-        entry = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
-        if entry[0] == 0:
-            node.serv_ssh = 0
-            node.serv_ssh_status = ''
-        else:
-            node.serv_ssh = 1
-            node.serv_ssh_status = str(entry[2])
         try:
+            node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
+            node.conf_ssh = 2
+            node.conf_ssh_status = ''
             dbsession.flush()
         except Exception as error:
             print('Database error for ssh service verification on node: %s - %s' % node.node, error)
     else:
         nodes = dbsession.query(models.Node).all()
         for node in nodes:
-            entry = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
-            if entry[0] == 0:
-                node.serv_ssh = 0
-                node.serv_ssh_status = ''
-            else:
-                node.serv_ssh = 1
-                node.serv_ssh_status = str(entry[2])
             try:
+                node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
+                node.conf_ssh = 2
+                node.conf_ssh_status = ''
                 dbsession.flush()
             except Exception as error:
                 print('Database error for ssh service verification on node: %s - %s' % node.node, error)

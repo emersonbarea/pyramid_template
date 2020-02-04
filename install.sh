@@ -73,6 +73,7 @@ install_app() {
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
         tests minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD ''
+        config minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD ''
         pytest
 }
 
