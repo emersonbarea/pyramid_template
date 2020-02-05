@@ -10,6 +10,7 @@ welcome() {
                    - "sudo" user'
 }
 
+
 update() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Updating Linux ...'
         printf '[sudo] senha para '$WHOAMI':'
@@ -20,6 +21,7 @@ update() {
         sudo apt autoremove -y;
 }
 
+
 install_Linux_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
         sudo apt install whois sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
@@ -27,16 +29,6 @@ install_Linux_reqs() {
                'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3 pip' '    - Python3 venv' '    - Postgresql'
 }
 
-#create_user() {
-#        printf '\n\e[1;33m%-6s\e[m\n' '-- Creating "minisecbgpuser" user...'
-#        sudo userdel -r "$PROJECT_USER" 2> /dev/null
-#        sudo useradd -m -p $(mkpasswd -m sha-512 -S saltsalt -s <<< "$PASSWORD") -s /bin/bash "$PROJECT_USER"
-#        printf '%s\n' $PROJECT_USER'     ALL=NOPASSWD: ALL' | sudo tee --append /etc/sudoers
-#        sudo -u "$PROJECT_USER" ssh-keygen -t rsa -N "" -f "$PROJECT_USER_HOME"/.ssh/id_rsa
-#        sudo -u "$PROJECT_USER" cat "$PROJECT_USER_HOME"/.ssh/id_rsa.pub | \
-#          sudo -u "$PROJECT_USER" tee --append "$PROJECT_USER_HOME"/.ssh/authorized_keys
-#        sudo -u "$PROJECT_USER" chmod 755 "$PROJECT_USER_HOME"/.ssh/authorized_keys
-#}
 
 virtualenv() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Creating Python 3 Virtualenv ...'
@@ -46,11 +38,13 @@ virtualenv() {
         source "$LOCAL_HOME"/venv/bin/activate
 }
 
+
 install_Python_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Python 3 prerequisites ...'
         pip3 install wheel
         pip3 install -r "$LOCAL_HOME"/requirements.txt;
 }
+
 
 configure_Postgres() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring Postgres ...'
@@ -65,6 +59,7 @@ configure_Postgres() {
         sudo -u postgres createdb -O minisecbgp dbminisecbgp
 }
 
+
 install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         pip3 install -e .
@@ -72,10 +67,11 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
-        tests minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD ''
-        config minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD ''
+        tests minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD
+        config minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD
         pytest
 }
+
 
 configure_uwsgi() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring uWSGI deamon ...'
@@ -91,6 +87,7 @@ ExecStart=' $LOCAL_HOME '/venv/bin/uwsgi --ini-paste-logged ' $LOCAL_HOME '/mini
 [Install]
 WantedBy=multi-user.target' | sudo tee /etc/systemd/system/uwsgi.service
 }
+
 
 configure_nginx() {
         printf '\n\e[1;33m%-6s\e[m\n' 'Configuring Nginx...'
@@ -123,6 +120,7 @@ server {
         sudo nginx -t
 }
 
+
 restart_services() {
         printf '\n\e[1;33m%-6s\e[m\n' 'Restarting all services...'
         sudo systemctl daemon-reload
@@ -138,13 +136,10 @@ IP_ADDRESSES_EDITED=$(echo $IP_ADDRESSES | sed "s/ /', '/g")
 WHOAMI=$(whoami)
 LOCAL_HOME=$(pwd)
 PROJECT_NAME=MiniSecBGP
-#PROJECT_USER=minisecbgpuser
-#PROJECT_USER_HOME=/home/$PROJECT_USER
 
 welcome;
 update;
 install_Linux_reqs;
-#create_user;
 virtualenv;
 install_Python_reqs;
 configure_Postgres;

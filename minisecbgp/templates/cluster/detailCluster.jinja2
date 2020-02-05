@@ -11,6 +11,8 @@
   <div class="row-fluid">
     <div class="span12">
 
+      <meta http-equiv="refresh" content="60;URL= '{{ cluster_url }}'">
+
       <p><b>Node ID :</b> {{ entry.id }}</p>
       <p><b>Hostname / IP Address :</b> {{ entry.node }}</p>
       <p><b>Username :</b> {{ entry.username }}</p>
@@ -68,7 +70,7 @@
         {% endif %}
       </p>
 
-      <p><b>SSH config (for remote connection) :</b>
+      <p><b>SSH config (minisecbgpuser connection) :</b>
         {% if entry.conf_ssh == 0 %}
           <font color="green">OK: {{ entry.conf_ssh_status }}</font>
         {% elif entry.conf_ssh == 1 %}
@@ -78,41 +80,51 @@
         {% endif %}
       </p>
 
-      <p><b><a href="http://mininet.org/" target="_blank">Mininet :</a></b>
-        {% if entry.conf_mininet == 0 %}
-          <font color="green">OK: {{ entry.conf_mininet_status }}</font>
-        {% elif entry.conf_mininet == 1 %}
-          <font color="red">ERROR: {{ entry.conf_mininet_status }}</font>
+      <p><b>Install remote prerequisites :</b>
+        {% if entry.install_remote_prerequisites == 0 %}
+          <font color="green">OK: {{ entry.install_remote_prerequisites_status }}</font>
+        {% elif entry.install_remote_prerequisites == 1 %}
+          <font color="red">ERROR: {{ entry.install_remote_prerequisites_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
-      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
-        {% if entry.conf_containernet == 0 %}
-          <font color="green">OK: {{ entry.conf_containernet_status }}</font>
-        {% elif entry.conf_containernet == 1 %}
-          <font color="red">ERROR: {{ entry.conf_containernet_status }}</font>
+      <p><b><a href="http://mininet.org/" target="_blank">Mininet :</a></b>
+        {% if entry.install_mininet == 0 %}
+          <font color="green">OK: {{ entry.install_mininet_status }}</font>
+        {% elif entry.install_mininet == 1 %}
+          <font color="red">ERROR: {{ entry.install_mininet_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
       <p><b><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview" target="_blank">Metis :</a></b>
-        {% if entry.conf_metis == 0 %}
-          <font color="green">OK: {{ entry.conf_metis_status }}</font>
-        {% elif entry.conf_metis == 1 %}
-          <font color="red">ERROR: {{ entry.conf_metis_status }}</font>
+        {% if entry.install_metis == 0 %}
+          <font color="green">OK: {{ entry.install_metis_status }}</font>
+        {% elif entry.install_metis == 1 %}
+          <font color="red">ERROR: {{ entry.install_metis_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
       <p><b><a href="https://maxinet.github.io/" target="_blank">Maxinet :</a></b>
-        {% if entry.conf_maxinet == 0 %}
-          <font color="green">OK: {{ entry.conf_maxinet_status }}</font>
-        {% elif entry.conf_maxinet == 1 %}
-          <font color="red">ERROR: {{ entry.conf_maxinet_status }}</font>
+        {% if entry.install_maxinet == 0 %}
+          <font color="green">OK: {{ entry.install_maxinet_status }}</font>
+        {% elif entry.install_maxinet == 1 %}
+          <font color="red">ERROR: {{ entry.install_maxinet_status }}</font>
+        {% else %}
+          <font color="orange">Wait (Installing)</font>
+        {% endif %}
+      </p>
+
+      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
+        {% if entry.install_containernet == 0 %}
+          <font color="green">OK: {{ entry.install_containernet_status }}</font>
+        {% elif entry.install_containernet == 1 %}
+          <font color="red">ERROR: {{ entry.install_containernet_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}

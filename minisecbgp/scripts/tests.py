@@ -39,11 +39,11 @@ def service_ssh(dbsession, argv):
     # argv[2] --> argv[0] = hostname
     # argv[3] --> argv[1] = username
     # argv[4] --> argv[2] = password
-    # argv[5] --> argv[3] = command
+    command = ''
     if argv[0]:
         node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
         try:
-            node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
+            node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], command)
             node.conf_ssh = 2
             node.conf_ssh_status = ''
             dbsession.flush()
@@ -53,7 +53,7 @@ def service_ssh(dbsession, argv):
         nodes = dbsession.query(models.Node).all()
         for node in nodes:
             try:
-                node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], argv[3])
+                node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], command)
                 node.conf_ssh = 2
                 node.conf_ssh_status = ''
                 dbsession.flush()
@@ -77,7 +77,6 @@ def main(argv=sys.argv):
     # argv[3] --> argv[0] = hostname
     # argv[4] --> argv[1] = username
     # argv[5] --> argv[2] = password
-    # argv[6] --> argv[3] = command
 
     args = parse_args(argv[0:2])
     setup_logging(args.config_uri)
