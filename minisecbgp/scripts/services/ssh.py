@@ -11,13 +11,16 @@ def ssh(node, username, password, command):
 
         serv_ssh = 0
         serv_ssh_status = None
-        command_result = str(result.recv_exit_status())         # 0 = command successful | 1 = command error
-        command_result_error = str(result.recv_stderr(240))     # info or error resultant from command
+        if str(result.recv_exit_status()) != '1':               # 0 = command successful | 1 = command error
+            command_result = '0'
+        else:
+            command_result = str(result.recv_exit_status())
+        command_result_error = str(result.recv_stderr(200))     # info or error resultant from command
 
         return serv_ssh, serv_ssh_status, command_result, command_result_error
     except Exception as error:
         serv_ssh = 1
-        serv_ssh_status = str(error)
+        serv_ssh_status = str(error)[:240]
         command_result = 2
         command_result_error = None
 

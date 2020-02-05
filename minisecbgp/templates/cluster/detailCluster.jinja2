@@ -31,24 +31,27 @@
         {% elif entry.serv_ping == 1 %}
           <font color="red">ERROR</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
+
       <p><b>SSH (connection made with the original user - tested only once):</b>
         {% if entry.serv_ssh == 0 %}
           <font color="green">OK</font>
         {% elif entry.serv_ssh == 1 %}
           <font color="red">ERROR: {{ entry.serv_ssh_status }} </font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
-        {% endif %}      </p>
+          <font color="orange">Wait (Installing)</font>
+        {% endif %}
+      </p>
+
       <p><b>MiniSecBGP :</b>
         {% if entry.serv_app == 0 %}
           <font color="green">OK</font>
         {% elif entry.serv_app == 1 %}
           <font color="red">ERROR: {{ entry.serv_app_status }} </font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
@@ -61,7 +64,7 @@
         {% elif entry.conf_user == 1 %}
           <font color="red">ERROR: {{ entry.conf_user_status }}</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
@@ -71,7 +74,17 @@
         {% elif entry.conf_ssh == 1 %}
           <font color="red">ERROR: {{ entry.conf_ssh_status }}</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
+        {% endif %}
+      </p>
+
+      <p><b><a href="http://mininet.org/" target="_blank">Mininet :</a></b>
+        {% if entry.conf_mininet == 0 %}
+          <font color="green">OK: {{ entry.conf_mininet_status }}</font>
+        {% elif entry.conf_mininet == 1 %}
+          <font color="red">ERROR: {{ entry.conf_mininet_status }}</font>
+        {% else %}
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
@@ -81,7 +94,7 @@
         {% elif entry.conf_containernet == 1 %}
           <font color="red">ERROR: {{ entry.conf_containernet_status }}</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
@@ -91,7 +104,7 @@
         {% elif entry.conf_metis == 1 %}
           <font color="red">ERROR: {{ entry.conf_metis_status }}</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 
@@ -101,7 +114,7 @@
         {% elif entry.conf_maxinet == 1 %}
           <font color="red">ERROR: {{ entry.conf_maxinet_status }}</font>
         {% else %}
-          <font color="orange">Waiting (Install)</font>
+          <font color="orange">Wait (Installing)</font>
         {% endif %}
       </p>
 

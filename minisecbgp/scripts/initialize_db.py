@@ -25,6 +25,7 @@ def setup_models(dbsession):
                        serv_app=2,
                        conf_user=2,
                        conf_ssh=2,
+                       conf_mininet=2,
                        conf_containernet=2,
                        conf_metis=2,
                        conf_maxinet=2

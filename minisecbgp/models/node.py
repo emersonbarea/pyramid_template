@@ -19,6 +19,8 @@ class Node(Base):
     conf_user_status = Column(String(255))
     conf_ssh = Column(Integer, nullable=False)           # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     conf_ssh_status = Column(String(255))
+    conf_mininet = Column(Integer, nullable=False)       # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+    conf_mininet_status = Column(String(255))
     conf_containernet = Column(Integer, nullable=False)  # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     conf_containernet_status = Column(String(255))
     conf_metis = Column(Integer, nullable=False)         # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
