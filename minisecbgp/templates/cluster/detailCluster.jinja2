@@ -16,11 +16,13 @@
       <p><b>Node ID :</b> {{ entry.id }}</p>
       <p><b>Hostname / IP Address :</b> {{ entry.node }}</p>
       <p><b>Username :</b> {{ entry.username }}</p>
-      <p><b>Server type :</b>
+      <p><b>Node type :</b>
         {% if entry.master == 0 %}
           Worker
-        {% else %}
+        {% elif entry.master == 1 %}
           Master
+        {% else %}
+          Web Admin
         {% endif %}
       </p>
 

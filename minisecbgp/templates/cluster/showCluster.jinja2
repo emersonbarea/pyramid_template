@@ -38,8 +38,8 @@
           {% for node in nodes %}
             {id: {{ node.id }},
              font: {color: ( {{ node.serv_app }} == 0 ? 'green' : ( {{ node.serv_app }} == 1 ? 'red' : 'orange'))},
-             label: 'node: {{ node.node }}\nstatus: ' + ( {{ node.serv_app }} == 0 ? 'OK' : ( {{ node.serv_app }} == 1 ? 'error' : 'wait')),
-             image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : 'server.png' ),
+             label: ( {{ node.master }} == 0 ? 'worker' : ( {{ node.master }} == 1 ? 'master' : 'webadmin')) + '\nnode: {{ node.node }}\nstatus: ' + ( {{ node.serv_app }} == 0 ? 'OK' : ( {{ node.serv_app }} == 1 ? 'error' : 'wait')),
+             image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : ( {{ node.master }} == 1 ? 'server.png' : 'webadmin.png')),
              shape: 'image',
              url: '{{ cluster_detail_url }}{{ node.id }}'
             },

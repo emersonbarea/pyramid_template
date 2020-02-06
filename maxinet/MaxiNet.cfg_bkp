@@ -1,0 +1,20 @@
+[all]
+password = MiniSecBGP
+controller = <MASTER>:6633
+logLevel = ERROR
+port_ns = 9090
+port_sshd = 5345
+runWith1500MTU = False
+useMultipleIPs = 0
+deactivateTSO = True
+sshuser = minisecbgpuser
+usesudo = True
+useSTT = False
+
+[FrontendServer]
+ip = <MASTER>
+threadpool = 256
+
+[WORKER]
+ip = WORKER
+share = 1

@@ -13,6 +13,8 @@ class ClusterDataForm(Form):
                        validators=[InputRequired(),
                                    Length(min=1, max=50, message=('Node name/IP address must be between 1 and 50 '
                                                                   'characters long.'))])
+    node_type = StringField('Node type *')
+
     username = StringField('Cluster node Username *',
                            validators=[InputRequired(),
                                        Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
@@ -51,13 +53,21 @@ def create(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
-    form = ClusterDataForm(request.POST)
+    master = request.dbsession.query(models.Node).filter(models.Node.master == 1).first()
+    if master:
+        form = ClusterDataForm(request.POST, node_type='worker')
+        nodeTypeMessage = ' - WORKER'
+        nodeType = '0'
+    else:
+        form = ClusterDataForm(request.POST, node_type='master')
+        nodeTypeMessage = ' - MASTER'
+        nodeType = '1'
 
     if request.method == 'POST' and form.validate():
         try:
             node = models.Node(node=form.node.data,
                                username=form.username.data,
-                               master=0,
+                               master=nodeType,
                                serv_ping=2,
                                serv_ssh=2,
                                serv_app=2,
@@ -98,7 +108,7 @@ def create(request):
 
         return dictionary
 
-    return {'form': form}
+    return {'form': form, 'nodeTypeMessage': nodeTypeMessage}
 
 
 @view_config(route_name='clusterAction', match_param='action=delete', renderer='minisecbgp:templates/cluster'
@@ -110,7 +120,7 @@ def delete(request):
 
     form = ClusterDataFormSelectField(request.POST)
     form.cluster_list.choices = [(row.id, row.node) for row in
-                                 request.dbsession.query(models.Node).filter(models.Node.id != 1)]
+                                 request.dbsession.query(models.Node).filter(models.Node.master != 3)]
 
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)

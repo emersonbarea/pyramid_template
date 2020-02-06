@@ -73,7 +73,9 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            entry = models.User(username=form.username.data, role=form.role.data)
+            entry = models.User(username=form.username.data,
+                                role=form.role.data
+                                )
             entry.set_password(form.password_hash.data)
             request.dbsession.add(entry)
             request.dbsession.flush()

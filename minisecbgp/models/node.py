@@ -9,7 +9,7 @@ class Node(Base):
     id = Column(Integer, primary_key=True)
     node = Column(String(50), nullable=False, unique=True)
     username = Column(String(50), nullable=False)
-    master = Column(Integer, nullable=False)                            # 0 = 'worker', 1 = 'master'
+    master = Column(Integer, nullable=False)                            # 0 = 'worker', 1 = 'master', 2 = 'webadmin'
     serv_ping = Column(Integer, nullable=False)                         # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     serv_ssh = Column(Integer, nullable=False)                          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     serv_ssh_status = Column(String(255))

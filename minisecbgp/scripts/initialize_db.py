@@ -19,7 +19,7 @@ def setup_models(dbsession):
 
     node = models.Node(node=socket.gethostname(),
                        username='minisecbgp',
-                       master=1,
+                       master=3,
                        serv_ping=2,
                        serv_ssh=2,
                        serv_app=2,
