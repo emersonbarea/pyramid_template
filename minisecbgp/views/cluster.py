@@ -26,7 +26,7 @@ class ClusterDataForm(Form):
 
 
 class ClusterDataFormSelectField(Form):
-    cluster_list = SelectField('user_list', coerce=int,
+    cluster_list = SelectField('cluster_list', coerce=int,
                                validators=[InputRequired()])
 
 
@@ -66,11 +66,13 @@ def create(request):
     if request.method == 'POST' and form.validate():
         try:
             node = models.Node(node=form.node.data,
+                               status=2,
+                               hostname=2,
                                username=form.username.data,
                                master=nodeType,
-                               serv_ping=2,
-                               serv_ssh=2,
-                               serv_app=2,
+                               service_ping=2,
+                               service_ssh=2,
+                               service_app=2,
                                conf_user=2,
                                conf_ssh=2,
                                install_remote_prerequisites=2,
@@ -82,9 +84,17 @@ def create(request):
             request.dbsession.add(node)
             request.dbsession.flush()
 
-            # test services
-            arguments = ['minisecbgp.ini', '0', form.node.data, form.username.data, form.password.data]
+            arguments = ['--config_file=minisecbgp.ini',
+                         '--execution_type=create_node',
+                         '--hostname=%s' % form.node.data,
+                         '--username=%s' % form.username.data,
+                         '--password=%s' % form.password.data]
             subprocess.Popen(['tests'] + arguments)
+
+            arguments = ['--config_file=minisecbgp.ini',
+                         '--hostname=%s' % form.node.data,
+                         '--username=%s' % form.username.data,
+                         '--password=%s' % form.password.data]
             subprocess.Popen(['config'] + arguments)
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
@@ -120,7 +130,7 @@ def delete(request):
 
     form = ClusterDataFormSelectField(request.POST)
     form.cluster_list.choices = [(row.id, row.node) for row in
-                                 request.dbsession.query(models.Node).filter(models.Node.master != 3)]
+                                 request.dbsession.query(models.Node).filter(models.Node.master != 1)]
 
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)

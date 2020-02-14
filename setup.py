@@ -64,6 +64,7 @@ setup(
         'console_scripts': [
             'initialize_minisecbgp_db=minisecbgp.scripts.initialize_db:main',
             'tests=minisecbgp.scripts.tests:main',
+            'validate_hostname=minisecbgp.scripts.validate_hostname:main',
             'config=minisecbgp.scripts.config:main',
         ],
     },

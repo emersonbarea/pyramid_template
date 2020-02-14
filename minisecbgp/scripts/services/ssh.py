@@ -5,25 +5,24 @@ def ssh(node, username, password, command):
     try:
         client_ssh = paramiko.SSHClient()
         client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client_ssh.connect(node, username=username, password=password, timeout=15)
-        result = client_ssh.get_transport().open_session()
-        result.exec_command(command)
-
-        serv_ssh = 0
-        serv_ssh_status = None
-        if str(result.recv_exit_status()) != '1':               # 0 = command successful | 1 = command error
-            command_result = '0'
+        client_ssh.connect(node, username=username, password=password, timeout=15, allow_agent=False,
+                           look_for_keys=False)
+        stdin, stdout, stderr = client_ssh.exec_command(command)
+        service_ssh = 0
+        service_ssh_status = ''
+        command_output = stdout.read().decode('utf-8').replace('\n', '')
+        command_error_warning = stderr.read().decode('utf-8').replace('\n', '')
+        if stdout.channel.recv_exit_status() == 0:
+            command_status = 0
         else:
-            command_result = str(result.recv_exit_status())
-        command_result_error = str(result.recv_stderr(200))     # info or error resultant from command
-
-        return serv_ssh, serv_ssh_status, command_result, command_result_error
+            command_status = 1
+        return service_ssh, service_ssh_status, command_output, command_error_warning, command_status
     except Exception as error:
-        serv_ssh = 1
-        serv_ssh_status = str(error)[:240]
-        command_result = 2
-        command_result_error = None
-
-        return serv_ssh, serv_ssh_status, command_result, command_result_error
+        service_ssh = 1
+        service_ssh_status = str(error)
+        command_output = ''
+        command_error_warning = ''
+        command_status = 2
+        return service_ssh, service_ssh_status, command_output, command_error_warning, command_status
     finally:
         client_ssh.close()

@@ -1,4 +1,5 @@
 import argparse
+import getpass
 import sys
 import socket
 
@@ -18,11 +19,13 @@ def setup_models(dbsession):
     dbsession.add(viewer)
 
     node = models.Node(node=socket.gethostname(),
-                       username='minisecbgp',
-                       master=3,
-                       serv_ping=2,
-                       serv_ssh=2,
-                       serv_app=2,
+                       status=2,
+                       hostname=2,
+                       username=getpass.getuser(),
+                       master=1,
+                       service_ping=2,
+                       service_ssh=2,
+                       service_app=2,
                        conf_user=2,
                        conf_ssh=2,
                        install_remote_prerequisites=2,

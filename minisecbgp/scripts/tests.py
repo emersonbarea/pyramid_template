@@ -1,90 +1,104 @@
 import argparse
+import getopt
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy.exc import OperationalError
 
-from minisecbgp.scripts.services import ping, ssh
 from minisecbgp import models
+from minisecbgp.scripts.services import ssh, local_command
 
 
-def service_ping(dbsession, argv):
-    # argv[2] --> argv[0] = hostname
-    if argv[0]:
-        node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
-        entry = ping.ping(argv[0])
-        if entry == 0:
-            node.serv_ping = 0
+class TestClusterNode(object):
+    def __init__(self, dbsession, execution_type, hostname, username, password):
+        self.dbsession = dbsession
+        self.execution_type = execution_type
+        self.hostname = hostname
+        self.username = username
+        self.password = password
+        if self.username:
+            nodes = [self.dbsession.query(models.Node).filter(models.Node.node == self.hostname).first()]
         else:
-            node.serv_ping = 1
+            nodes = self.dbsession.query(models.Node).all()
+        self.nodes = nodes
+
+    def test_ping(self):
         try:
-            dbsession.flush()
+            for server in self.nodes:
+                service_ping = 0
+                command = 'ping %s -c 1 -W 15' % server.node
+                result = local_command.local_command(command)
+                if result[0] != 0:
+                    service_ping = 1
+                server.service_ping = service_ping
+                return
         except Exception as error:
-            print('Database error for ping service verification on node: %s - %s' % node.node, error)
-    else:
-        nodes = dbsession.query(models.Node).all()
-        for node in nodes:
-            entry = ping.ping(node.node)
-            if entry == 0:
-                node.serv_ping = 0
-            else:
-                node.serv_ping = 1
-            try:
-                dbsession.flush()
-            except Exception as error:
-                print('Database error for ping service verification on node: %s - %s' % node.node, error)
+            print('Database error for ping test on node: %s - %s' % (self.nodes.node, error))
 
-
-def service_ssh(dbsession, argv):
-    # argv[2] --> argv[0] = hostname
-    # argv[3] --> argv[1] = username
-    # argv[4] --> argv[2] = password
-    command = ''
-    if argv[0]:
-        node = dbsession.query(models.Node).filter(models.Node.node == argv[0]).first()
+    def test_ssh(self):
         try:
-            node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], command)
-            node.conf_ssh = 2
-            node.conf_ssh_status = ''
-            dbsession.flush()
+            if self.execution_type == 'create_node':
+                username = self.username
+            elif self.execution_type == 'job_scheduled':
+                username = 'minisecbgpuser'
+            for server in self.nodes:
+                command = ''
+                service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
+                    ssh.ssh(server.node, username, self.password, command)
+                server.service_ssh = service_ssh
+                server.service_ssh_status = service_ssh_status
         except Exception as error:
-            print('Database error for ssh service verification on node: %s - %s' % node.node, error)
-    else:
-        nodes = dbsession.query(models.Node).all()
-        for node in nodes:
-            try:
-                node.serv_ssh, node.serv_ssh_status, discard, discard = ssh.ssh(argv[0], argv[1], argv[2], command)
-                node.conf_ssh = 2
-                node.conf_ssh_status = ''
-                dbsession.flush()
-            except Exception as error:
-                print('Database error for ssh service verification on node: %s - %s' % node.node, error)
+            print('Database error for ssh test on node: %s - %s' % (self.nodes.node, error))
 
 
-def parse_args(argv):
+def parse_args(config_file):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'config_uri',
         help='Configuration file, e.g., minisecbgp.ini',
     )
-    return parser.parse_args(argv[1:])
+    return parser.parse_args(config_file.split())
 
 
-def main(argv=sys.argv):
-    # argv[0] = python program
-    # argv[1] = configuration file .ini
-    # argv[2] = 0 = creating node | 1 = job scheduled
-    # argv[3] --> argv[0] = hostname
-    # argv[4] --> argv[1] = username
-    # argv[5] --> argv[2] = password
+def main(argv=sys.argv[1:]):
+    try:
+        opts, args = getopt.getopt(argv, 'h:', ["config_file=", "execution_type=", "hostname=", "username=", "password="])
+    except getopt.GetoptError:
+        print('config.py '
+              '--config_file=<pyramid config file .ini> '
+              '--execution_type=create_node|job_scheduled '
+              '--hostname=<cluster node name or IP address> '
+              '--username=<cluster node username> '
+              '--password=<cluster node user password>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('config.py '
+                  '--config_file=<pyramid config file .ini> '
+                  '--execution_type=create_node|job_scheduled '
+                  '--hostname=<cluster node name or IP address> '
+                  '--username=<cluster node username> '
+                  '--password=<cluster node user password>')
+            sys.exit()
+        elif opt == '--config_file':
+            config_file = arg
+        elif opt == '--execution_type' and (arg == 'create_node' or arg == 'job_scheduled'):
+            execution_type = arg
+        elif opt == '--hostname':
+            hostname = arg
+        elif opt == '--username':
+            username = arg
+        elif opt == '--password':
+            password = arg
 
-    args = parse_args(argv[0:2])
+    args = parse_args(config_file)
     setup_logging(args.config_uri)
     env = bootstrap(args.config_uri)
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            service_ping(dbsession, argv[3:])
-            service_ssh(dbsession, argv[3:])
+            ccn = TestClusterNode(dbsession, execution_type, hostname, username, password)
+            ccn.test_ping()
+            ccn.test_ssh()
     except OperationalError:
         print('Database error')

@@ -24,7 +24,7 @@ update() {
 
 install_Linux_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
-        sudo apt install whois sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all -y;
+        sudo apt install git aptitude whois sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all ansible -y;
         printf '\n\e[1;32m%-6s\n\n%s\n%s\n%s\n%s\n%s\n\n%s\n\n\e[m' \
                'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3 pip' '    - Python3 venv' '    - Postgresql'
 }
@@ -41,7 +41,7 @@ virtualenv() {
 
 install_Python_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Python 3 prerequisites ...'
-        pip3 install wheel
+        pip3 install --upgrade --force-reinstall -U wheel
         pip3 install -r "$LOCAL_HOME"/requirements.txt;
 }
 
@@ -67,9 +67,8 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
-        tests minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD
-        config minisecbgp.ini '0' $HOSTNAME $WHOAMI $PASSWORD
-        pytest
+        tests --config_file=minisecbgp.ini --execution_type='create_node' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+        config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
 
 
