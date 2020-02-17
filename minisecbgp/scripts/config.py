@@ -389,6 +389,7 @@ class ConfigClusterNode(object):
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node.node, error))
 
     def install_containernet(self):
+        '''
         try:
             if self.node.status == 0:
                 if self.node.master == 1:                   # install Containernet only on master node
@@ -423,6 +424,22 @@ class ConfigClusterNode(object):
                         return
                     except Exception as error:
                         print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+            else:
+                self.node.install_containernet = \
+                    self.node.service_app = 1
+                self.node.install_containernet_status = \
+                    self.node.service_app_status = 'Aborted'
+                return
+        except Exception as error:
+            print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+        '''
+
+        try:
+            if self.node.status == 0:
+                self.node.install_containernet = \
+                    self.node.service_app = 0
+                self.node.install_containernet_status = \
+                    self.node.service_app_status = 'Not implemented'
             else:
                 self.node.install_containernet = \
                     self.node.service_app = 1
