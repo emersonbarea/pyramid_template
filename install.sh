@@ -121,8 +121,9 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
+        initialize_CAIDA_AS_Relationship
         tests --config_file=minisecbgp.ini --execution_type='create_node' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
-        config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+        #config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
 
 

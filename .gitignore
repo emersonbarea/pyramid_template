@@ -9,3 +9,4 @@ run_full.sh
 */alembic/versions/*.py
 showCluster.jinja2_bkp
 access.log
+20200201.as-rel2.txt

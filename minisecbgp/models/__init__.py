@@ -7,6 +7,7 @@ import zope.sqlalchemy
 # Base.metadata prior to any initialization routines
 from .user import User  # flake8: noqa
 from .node import Node
+from .topology import Topology, RealisticTopology, UrlDownload, ScheduledDownload
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

@@ -2,6 +2,7 @@ import argparse
 import getpass
 import sys
 import socket
+from datetime import date
 
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy.exc import OperationalError
@@ -34,6 +35,14 @@ def setup_models(dbsession):
                        install_maxinet=2
                        )
     dbsession.add(node)
+
+    urlDownload = models.UrlDownload(url='http://data.caida.org/datasets/as-relationships/serial-2/',
+                                            string_file_search='.as-rel2.txt.bz2')
+    dbsession.add(urlDownload)
+
+    scheduleDownload = models.ScheduledDownload(loop=30,
+                                                date=date.today())
+    dbsession.add(scheduleDownload)
 
 
 def parse_args(argv):
