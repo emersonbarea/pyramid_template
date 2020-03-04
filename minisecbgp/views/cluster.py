@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
@@ -76,10 +77,9 @@ def create(request):
                                conf_user=2,
                                conf_ssh=2,
                                install_remote_prerequisites=2,
-                               install_mininet=2,
+                               install_containernet=2,
                                install_metis=2,
-                               install_maxinet=2,
-                               install_containernet=2
+                               install_maxinet=2
                                )
             request.dbsession.add(node)
             request.dbsession.flush()

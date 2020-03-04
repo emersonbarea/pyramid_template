@@ -2,12 +2,66 @@
 
 # author: Emerson Barea (emerson.barea@gmail.com)
 
+if [ "$1" == "--help" ] || [ "$1" == "-h" ] ; then
+  printf "\nInvoke without any parameter for complete and unguided installation of MiniSecBGP and its dependencies.\n\n"
+	exit 0
+fi
+
+if [ "$1" != "" ] ; then
+	printf "\nWrong parameter '$1'.\nInvoke without any parameter for complete and unguided installation of MiniSecBGP and its dependencies.\n\n"
+	exit 0
+fi
+
 welcome() {
-        printf '\n%s\n' 'This script installs and configures all MiniSecBGP environment.
-                   Some requirements must be met:
-                   - Ubuntu 18 Server LTS (Bionic Beaver)
-                   - Internet access
-                   - "sudo" user'
+	printf "\nMiniSecBGP 1.0 installer\n
+	This script install MiniSecBGP 1.0 and all requirements to the home directory of \"minisecbgpuser\" user on Ubuntu Server 18.04 LTS
+	It will automatically remove existing \"minisecbgpuser\" user and erase all data in '/home/minisecbgpuser' directory
+
+	Execute 'install.sh -h' or 'install.sh --help' to help\n
+
+	This installer will now configure:
+	  - erase and recreate \"minisecbgpuser\" user and home directory (username = \"minisecbgpuser\" | password = <current user password>)
+	  - configure user \"minisecbgpuser\" in sudoers
+
+	This installer will now install:
+	  - upgrade Operational System
+	  - install MiniSecBGP requirements
+	    - Containernet 2.2.1
+	    - Metis 5.1
+	    - Pyro 4
+	    - MaxiNet 1.2
+ 	  - install MiniSecBGP application
+
+	Obs.: thank you MaxiNet install program (https://raw.githubusercontent.com/MaxiNet/MaxiNet/master/installer.sh)\n\n"
+
+	read -n1 -r -p "Press ANY key to continue or CTRL+C to abort." abort
+}
+
+network_address() {
+        if [ "${#IP_ARRAY[@]}" -gt 1 ] ; then
+          printf '\n%s' 'This computer has '${#IP_ARRAY[@]}' IP addresses configured on network interfaces:'
+          for ip in "${IP_ARRAY[@]}"
+          do
+            printf '\n- %s' $ip
+          done
+          printf '\n%s' 'Choose the IP address to use for the MiniSecBGP installation. (Ex.: '${IP_ARRAY[0]}'): '
+
+          read temp_ip
+
+          for i in "${IP_ARRAY[@]}"
+          do
+            if [ "$temp_ip" == "$i" ]; then
+              var_ip="$temp_ip"
+            fi
+          done
+
+          if ! [[ "$var_ip" ]] ; then
+            printf '\e[1;31m%-6s\e[m\n' 'error: Choose and write only one of the valid IP addresses from the list above. (Ex.: '${IP_ARRAY[0]}')'
+            network_address;
+          fi
+        else
+          var_ip="${IP_ARRAY[0]}"
+        fi
 }
 
 
@@ -96,7 +150,7 @@ configure_nginx() {
 }
 server {
         listen 80;
-        server_name ' $IP_ADDRESSES ';
+        server_name ' $var_ip ';
         access_log ' $LOCAL_HOME '/access.log;
         location / {
                 proxy_set_header        Host $http_host;
@@ -131,12 +185,13 @@ restart_services() {
 
 HOSTNAME=$(hostname)
 IP_ADDRESSES=$(hostname --all-ip-addresses || hostname -I)
-IP_ADDRESSES_EDITED=$(echo $IP_ADDRESSES | sed "s/ /', '/g")
+IP_ARRAY=($IP_ADDRESSES)
 WHOAMI=$(whoami)
 LOCAL_HOME=$(pwd)
 PROJECT_NAME=MiniSecBGP
 
 welcome;
+network_address;
 update;
 install_Linux_reqs;
 virtualenv;

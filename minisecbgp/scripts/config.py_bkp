@@ -22,7 +22,6 @@ class ConfigClusterNode(object):
         self.nodes = nodes
 
     def validate_hostname(self):
-        print('Validating unique hostname ...')
         try:
             hostname = 0
             command = 'hostname'
@@ -50,7 +49,6 @@ class ConfigClusterNode(object):
             print('Database error for hostname validation on node: %s - %s' % (self.node.node, error))
 
     def create_minisecbgpuser(self):
-        print('Creating user "minisecbgpuser" ...')
         try:
             if self.node.status != 1:
                 conf_user = 0
@@ -80,23 +78,24 @@ class ConfigClusterNode(object):
                 self.node.conf_user = \
                     self.node.conf_ssh = \
                     self.node.install_remote_prerequisites = \
-                    self.node.install_containernet = \
+                    self.node.install_mininet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
                 self.node.conf_user_status = \
                     self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
-                    self.node.install_containernet_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node.node, error))
 
     def configure_ssh(self):
-        print('Configuring ssh ...')
         try:
             if self.node.status == 0:
                 conf_ssh = 0
@@ -146,28 +145,42 @@ class ConfigClusterNode(object):
             else:
                 self.node.conf_ssh = \
                     self.node.install_remote_prerequisites = \
-                    self.node.install_containernet = \
+                    self.node.install_mininet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
                 self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
-                    self.node.install_containernet_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for ssh configuration on node: %s - %s' % (self.node.node, error))
 
     def install_remote_prerequisites(self):
-        print('Installing Linux prerequisites ...')
         try:
             if self.node.status == 0:
                 install_remote_prerequisites = 0
                 install_remote_prerequisites_status = ''
-                commands = ['sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
-                            'pip3 install --upgrade --force-reinstall -U Pyro4']
+                if self.node.master == 1:
+                    command = 'pip3 install --upgrade --force-reinstall -U ryu'
+                    service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
+                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                    if service_ssh == 1:
+                        self.node.status = self.node.install_remote_prerequisites = service_ssh
+                        self.node.install_remote_prerequisites_status = service_ssh_status[:240]
+                        return
+                    else:
+                        if command_status != 0:
+                            install_remote_prerequisites = 1
+                            install_remote_prerequisites_status = install_remote_prerequisites_status + command_error_warning[45]
+
+                commands = ['sudo apt install python3-pip cmake -y',
+                            'pip3 install --upgrade --force-reinstall -U Pyro4 docker']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
@@ -178,68 +191,69 @@ class ConfigClusterNode(object):
                     else:
                         if command_status != 0:
                             install_remote_prerequisites = 1
-                            install_remote_prerequisites_status = install_remote_prerequisites_status + command_error_warning[
-                                                                                                        :45]
+                            install_remote_prerequisites_status = install_remote_prerequisites_status + command_error_warning[:45]
                 self.node.status = self.node.install_remote_prerequisites = install_remote_prerequisites
                 self.node.install_remote_prerequisites_status = install_remote_prerequisites_status[:240]
                 return
             else:
                 self.node.install_remote_prerequisites = \
-                    self.node.install_containernet = \
+                    self.node.install_mininet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
                 self.node.install_remote_prerequisites_status = \
-                    self.node.install_containernet_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for remote prerequisites installation on node: %s - %s' % (self.node.node, error))
 
-    def install_containernet(self):
-        print('Installing Containernet (take a coffee !!!) ...')
+    def install_mininet(self):
         try:
             if self.node.status == 0:
-                install_containernet = 0
-                install_containernet_status = ''
-                commands = [
-                    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
-                    'cd /home/minisecbgpuser/containernet/ansible; '
-                    'sudo ansible-playbook -i "localhost," -c local install.yml']
+                install_mininet = 0
+                install_mininet_status = ''
+                commands = ['git clone git://github.com/mininet/mininet /home/minisecbgpuser/mininet',
+                            'cd /home/minisecbgpuser/mininet; '
+                            'git checkout -b 2.3.0d4 2.3.0d4; '
+                            'sudo /home/minisecbgpuser/mininet/util/install.sh -nfv']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
-                        self.node.status = self.node.install_containernet = service_ssh
-                        self.node.install_containernet_status = service_ssh_status[:240]
+                        self.node.status = self.node.install_mininet = service_ssh
+                        self.node.install_mininet_status = service_ssh_status[:240]
                         return
                     else:
                         if command_status != 0:
-                            install_containernet = 1
-                            install_containernet_status = install_containernet_status + command_error_warning[:240]
-                self.node.status = self.node.install_containernet = install_containernet
-                self.node.install_containernet_status = install_containernet_status[:240]
+                            install_mininet = 1
+                            install_mininet_status = install_mininet_status + command_error_warning[:60]
+                self.node.status = self.node.install_mininet = install_mininet
+                self.node.install_mininet_status = install_mininet_status[:240]
                 return
             else:
-                self.node.install_containernet = \
+                self.node.install_mininet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
-                self.node.install_containernet_status = \
+                self.node.install_mininet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
-            print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+            print('Database error for Mininet installation on node: %s - %s' % (self.node.node, error))
 
     def install_metis(self):
-        print('Installing Metis ...')
         try:
             if self.node.status == 0:
-                if self.node.master == 1:  # install Metis only on master node
+                if self.node.master == 1:                   # install Metis only on master node
                     try:
                         install_metis = 0
                         install_metis_status = ''
@@ -282,16 +296,17 @@ class ConfigClusterNode(object):
             else:
                 self.node.install_metis = \
                     self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
                 self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for Metis installation on node: %s - %s' % (self.node.node, error))
 
     def install_maxinet(self):
-        print('Installing Maxinet ...')
         try:
             if self.node.status == 0:
                 master = self.dbsession.query(models.Node).filter(models.Node.master == 1).first()
@@ -359,17 +374,80 @@ class ConfigClusterNode(object):
                             install_maxinet = result[0]
                             install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
-                self.node.service_app = self.node.status = self.node.install_maxinet = install_maxinet
-                self.node.service_app_status = self.node.install_maxinet_status = install_maxinet_status[:240]
+                self.node.status = self.node.install_maxinet = install_maxinet
+                self.node.install_maxinet_status = install_maxinet_status[:240]
                 return
             else:
                 self.node.install_maxinet = \
+                    self.node.install_containernet = \
                     self.node.service_app = 1
                 self.node.install_maxinet_status = \
+                    self.node.install_containernet_status = \
                     self.node.service_app_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node.node, error))
+
+    def install_containernet(self):
+        '''
+        try:
+            if self.node.status == 0:
+                if self.node.master == 1:                   # install Containernet only on master node
+                    try:
+                        install_containernet = 0
+                        install_containernet_status = ''
+                        commands = ['git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
+                                    'cd /home/minisecbgpuser/containernet/ansible; '
+                                    'sudo ansible-playbook -i "localhost," -c local install.yml; '
+                                    'cd ..; '
+                                    'sudo python setup.py install']
+                        for command in commands:
+                            service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
+                                ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                            if service_ssh == 1:
+                                self.node.status = self.node.install_containernet = service_ssh
+                                self.node.install_containernet_status = service_ssh_status[:240]
+                                return
+                            else:
+                                if command_status != 0:
+                                    install_containernet = 1
+                                    install_containernet_status = install_containernet_status + command_error_warning[:60]
+                        self.node.service_app = self.node.status = self.node.install_containernet = install_containernet
+                        self.node.service_app_status = self.node.install_containernet_status = install_containernet_status[:240]
+                        return
+                    except Exception as error:
+                        print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+                else:
+                    try:
+                        self.node.service_app = self.node.status = self.node.install_containernet = 0
+                        self.node.install_containernet_status = 'Containernet installation is not necessary on Workers'
+                        return
+                    except Exception as error:
+                        print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+            else:
+                self.node.install_containernet = \
+                    self.node.service_app = 1
+                self.node.install_containernet_status = \
+                    self.node.service_app_status = 'Aborted'
+                return
+        except Exception as error:
+            print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
+        '''
+
+        try:
+            if self.node.status == 0:
+                self.node.install_containernet = \
+                    self.node.service_app = 0
+                self.node.install_containernet_status = \
+                    self.node.service_app_status = 'Not implemented'
+            else:
+                self.node.install_containernet = \
+                    self.node.service_app = 1
+                self.node.install_containernet_status = \
+                    self.node.service_app_status = 'Aborted'
+                return
+        except Exception as error:
+            print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
 
 
 def parse_args(config_file):
@@ -423,8 +501,9 @@ def main(argv=sys.argv[1:]):
             ccn.create_minisecbgpuser()
             ccn.configure_ssh()
             ccn.install_remote_prerequisites()
-            ccn.install_containernet()
+            ccn.install_mininet()
             ccn.install_metis()
             ccn.install_maxinet()
+            ccn.install_containernet()
     except OperationalError:
         print('Database error')

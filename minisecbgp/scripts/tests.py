@@ -23,6 +23,7 @@ class TestClusterNode(object):
         self.nodes = nodes
 
     def test_ping(self):
+        print('Testing ping ...')
         try:
             for server in self.nodes:
                 service_ping = 0
@@ -36,6 +37,7 @@ class TestClusterNode(object):
             print('Database error for ping test on node: %s - %s' % (self.nodes.node, error))
 
     def test_ssh(self):
+        print('Testing ssh ...')
         try:
             if self.execution_type == 'create_node':
                 username = self.username

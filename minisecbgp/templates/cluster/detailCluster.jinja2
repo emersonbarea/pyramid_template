@@ -99,11 +99,11 @@
         {% endif %}
       </p>
 
-      <p><b><a href="http://mininet.org/" target="_blank">Mininet :</a></b>
-        {% if entry.install_mininet == 0 %}
-          <font color="green">OK: {{ entry.install_mininet_status }}</font>
-        {% elif entry.install_mininet == 1 %}
-          <font color="red">ERROR: {{ entry.install_mininet_status }}</font>
+      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
+        {% if entry.install_containernet == 0 %}
+          <font color="green">OK: {{ entry.install_containernet_status }}</font>
+        {% elif entry.install_containernet == 1 %}
+          <font color="red">ERROR: {{ entry.install_containernet_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}
@@ -124,16 +124,6 @@
           <font color="green">OK: {{ entry.install_maxinet_status }}</font>
         {% elif entry.install_maxinet == 1 %}
           <font color="red">ERROR: {{ entry.install_maxinet_status }}</font>
-        {% else %}
-          <font color="orange">Wait (Installing)</font>
-        {% endif %}
-      </p>
-
-      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
-        {% if entry.install_containernet == 0 %}
-          <font color="green">OK: {{ entry.install_containernet_status }}</font>
-        {% elif entry.install_containernet == 1 %}
-          <font color="red">ERROR: {{ entry.install_containernet_status }}</font>
         {% else %}
           <font color="orange">Wait (Installing)</font>
         {% endif %}
