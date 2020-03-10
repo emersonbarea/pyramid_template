@@ -7,7 +7,7 @@ import requests
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
-from sqlalchemy import select
+from sqlalchemy import select, func
 from wtforms import Form, SelectField, StringField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired, Length
@@ -39,7 +39,7 @@ class ScheduledDownload(Form):
                                 ('1', 'daily'),
                                 ('7', 'weekly'),
                                 ('30', 'monthly')])
-    date = DateField('Date of execution of the first schedule', format='%Y-%m-%d')
+    date = DateField('Date of the first scheduled download', format='%Y-%m-%d')
 
 
 class TopologyDataForm(Form):
@@ -52,9 +52,15 @@ def realisticTopology(request):
     if user is None:
         raise HTTPForbidden
 
-    topologies = request.dbsession.query(models.Topology).filter(models.Topology.type == 0).all()
-
     dictionary = dict()
+    topologies = request.dbsession.query(models.Topology).filter(models.Topology.type == 0).all()
+    updating = request.dbsession.query(models.TempCaidaDatabases).first()
+    if updating.updating == 1:
+        message = 'Warning: there is an update process running in the background. Wait for it finish to see the new topology installed.'
+        css_class = 'warningMessage'
+        dictionary['message'] = message
+        dictionary['css_class'] = css_class
+
     dictionary['topologies'] = topologies
     dictionary['realisticTopology_url'] = request.route_url('realisticTopology')
     dictionary['realisticTopologyDetail_url'] = request.route_url('realisticTopologyDetail', id_topology='')
@@ -95,7 +101,8 @@ def manualUpdate(request):
         if request.method == 'POST' and form.validate():
             updating.updating = 1
             file = dict(form.topology_list.choices).get(form.topology_list.data)
-            urllib.request.urlretrieve(parametersDownload.url + file + '.txt.bz2', './CAIDA_AS_Relationship/' + file + '.txt.bz2')
+            urllib.request.urlretrieve(parametersDownload.url + file + '.txt.bz2',
+                                       './CAIDA_AS_Relationship/' + file + '.txt.bz2')
             arguments = ['--config_file=minisecbgp.ini',
                          '--path=./CAIDA_AS_Relationship/',
                          '--file=%s.txt' % file,
@@ -195,20 +202,77 @@ def realisticTopologyDetail(request):
 
     # Full Topology
 
-    as1 = select([models.RealisticTopology.as1]) \
-        .where(models.RealisticTopology.id_topology == request.matchdict["id_topology"])
-    as2 = select([models.RealisticTopology.as2]) \
-        .where(models.RealisticTopology.id_topology == request.matchdict["id_topology"])
-    as_union = as1.union(as2).alias('as_union')
-    as_count = request.dbsession.query(as_union).distinct().count()
+    as_count = request.dbsession.query(
+        select([models.RealisticTopology.as1]).where(
+            models.RealisticTopology.id_topology == request.matchdict["id_topology"])
+            .union_all(
+            select([models.RealisticTopology.as2]).where(
+                models.RealisticTopology.id_topology == request.matchdict["id_topology"]))
+            .alias('as_union_all')
+    ).distinct().count()
 
-    p2c_parameter = request.dbsession.query(models.ParametersDownload.c2p).first()
-    p2p_parameter = request.dbsession.query(models.ParametersDownload.p2p).first()
-    p2c = request.dbsession.query(models.RealisticTopology.as1) \
-        .filter_by(id_topology=request.matchdict["id_topology"], agreement=p2c_parameter).count()
-    p2p = request.dbsession.query(models.RealisticTopology.as1) \
-        .filter_by(id_topology=request.matchdict["id_topology"], agreement=p2p_parameter).count()
+    p2c = request.dbsession.query(models.RealisticTopology) \
+        .filter_by(id_topology=request.matchdict["id_topology"],
+                   agreement=request.dbsession.query(models.ParametersDownload.c2p).first()).count()
+    p2p = request.dbsession.query(models.RealisticTopology) \
+        .filter_by(id_topology=request.matchdict["id_topology"],
+                   agreement=request.dbsession.query(models.ParametersDownload.p2p).first()).count()
 
     # Non Stub Topology
 
+    # as_stub_count = request.dbsession.execute('select count(xpto) from (select z from (select as1 from realistic_topology where id_topology = 2 union all select as2 from realistic_topology where id_topology = 2) as z group by z having count(*) = 1) as xpto').fetchall()
+    # as_stub_count = request.dbsession.query(as_union_all).distinct().count()
+
+    # bla = request.dbsession.query(as_union_all, func.count(as_union_all)).group_by(as_union_all).all()
+    # bla = request.dbsession.query(models.RealisticTopology.as1).group_by(models.RealisticTopology.as1).having(func.count(models.RealisticTopology.as1) == 1).count()
+    # print(bla)
+
+
+
+
+    #query = 'select count(non_stub_as) from (' \
+    #        'select union_all_as from (' \
+    #        'select as1 from realistic_topology where id_topology = %s ' \
+    #        'union all ' \
+    #        'select as2 from realistic_topology where id_topology = %s' \
+    #        ') as union_all_as ' \
+    #        'group by union_all_as having count(*) = 1' \
+    #        ') as non_stub_as' % (2, 2)
+    #as_stub_count = request.dbsession.execute(query).first()
+    #print('stub ASs: ', as_stub_count)
+
     return {'topology': topology, 'as_count': as_count, 'p2c': p2c, 'p2p': p2p}
+
+
+@view_config(route_name='realisticTopologyAction', match_param='action=delete',
+             renderer='minisecbgp:templates/topology/showRealisticTopology.jinja2')
+def delete(request):
+    user = request.user
+    if user is None or (user.role != 'admin'):
+        raise HTTPForbidden
+
+    try:
+        dictionary = dict()
+        if request.method == 'POST':
+            id_topology = request.params['id_topology']
+            topology = request.params['topology']
+
+            request.dbsession.query(models.RealisticTopology).filter(
+                models.RealisticTopology.id_topology == id_topology).delete()
+            request.dbsession.query(models.Topology).filter(
+                models.Topology.id == id_topology).delete()
+
+            topologies = request.dbsession.query(models.Topology).filter(models.Topology.type == 0).all()
+            dictionary['topologies'] = topologies
+
+            message = ('Topology "%s" successfully deleted.' % topology)
+            css_class = 'successMessage'
+            dictionary['message'] = message
+            dictionary['css_class'] = css_class
+    except Exception as error:
+        message = ('Topology "%s" does not exist.' % topology)
+        css_class = 'errorMessage'
+        dictionary['message'] = message
+        dictionary['css_class'] = css_class
+
+    return dictionary
