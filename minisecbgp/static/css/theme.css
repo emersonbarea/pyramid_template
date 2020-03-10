@@ -16,11 +16,19 @@ footer, .span12-home {
 }
 
 .successMessage {
+  text-align: center;
   color: #249a69;
   font-weight: bold;
 }
 
+.warningMessage {
+  text-align: center;
+  color: #ff8900;
+  font-weight: bold;
+}
+
 .errorMessage {
+  text-align: center;
   color: #c82603;
   font-weight: bold;
 }

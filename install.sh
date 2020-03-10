@@ -116,14 +116,18 @@ configure_Postgres() {
 
 install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
+        source "$LOCAL_HOME"/venv/bin/activate
         pip3 install -e .
         rm "$LOCAL_HOME"/minisecbgp/alembic/versions/*.py &> /dev/null
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
         initialize_minisecbgp_db minisecbgp.ini
-        initialize_CAIDA_AS_Relationship
+        initialize_CAIDA_AS_Relationship --config_file=minisecbgp.ini \
+          --path='./CAIDA_AS_Relationship/' \
+          --file='20200201.as-rel2.txt' \
+          --zip_file='20200201.as-rel2.txt.bz2'
         tests --config_file=minisecbgp.ini --execution_type='create_node' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
-        #config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+        config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
 
 

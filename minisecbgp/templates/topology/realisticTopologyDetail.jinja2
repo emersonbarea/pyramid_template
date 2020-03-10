@@ -1,0 +1,37 @@
+{% extends "realisticTopology.jinja2" %}
+
+{% block contentRealisticTopology %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Topology Detail: {{ topology.topology }} </h3>
+    </div>
+  </div>
+  <br>
+  <div class="row-fluid" style="text-align: center;">
+    <div class="span5">
+      <h4>Full Topology</h4>
+    </div>
+    <div class="span2"></div>
+    <div class="span5" style="text-align: center;">
+      <h4>Non Stub Topology</h4>
+    </div>
+  </div>
+  <br>
+  <div class="row-fluid" style="text-align: center;">
+    <div class="span5">
+      <p>ASs: {{ as_count }} </p>
+      <p>Provider to Customer links: {{ p2c }} </p>
+      <p>Peer to Peer links: {{ p2p }} </p>
+    </div>
+    <div class="span2" style="text-align: center;"> | </div>
+    <div class="span5" style="text-align: center;">
+      <p>ASs: </p>
+      <p>Provider to Customer links: </p>
+      <p>Peer to Peer links: </p>
+    </div>
+  </div>
+</div>
+
+{% endblock contentRealisticTopology %}

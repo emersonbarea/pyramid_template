@@ -9,3 +9,6 @@ def includeme(config):
     config.add_route('cluster', '/cluster')
     config.add_route('clusterAction', '/cluster/{action}')
     config.add_route('clusterDetail', '/cluster/detail/{id}')
+    config.add_route('realisticTopology', '/realisticTopology')
+    config.add_route('realisticTopologyAction', '/realisticTopology/{action}')
+    config.add_route('realisticTopologyDetail', '/topology/detail/{id_topology}')

@@ -199,7 +199,8 @@ class ConfigClusterNode(object):
             print('Database error for remote prerequisites installation on node: %s - %s' % (self.node.node, error))
 
     def install_containernet(self):
-        print('Installing Containernet (take a coffee !!!) ...')
+        print('Installing Containernet ...\n'
+              'take another coffee and wait again ...')
         try:
             if self.node.status == 0:
                 install_containernet = 0
