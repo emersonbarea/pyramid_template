@@ -114,6 +114,12 @@ configure_Postgres() {
 }
 
 
+install_Celery() {
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Celery ...'
+        pip3 install watchdog pyyaml argh celery
+}
+
+
 install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
         source "$LOCAL_HOME"/venv/bin/activate
@@ -121,13 +127,23 @@ install_app() {
         rm "$LOCAL_HOME"/minisecbgp/alembic/versions/*.py &> /dev/null
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
+
         initialize_minisecbgp_db minisecbgp.ini
+
         initialize_CAIDA_AS_Relationship --config_file=minisecbgp.ini \
           --path='./CAIDA_AS_Relationship/' \
           --file='20200201.as-rel2.txt' \
           --zip_file='20200201.as-rel2.txt.bz2'
+
         tests --config_file=minisecbgp.ini --execution_type='create_node' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
-        config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+
+	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
+* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/tests --config_file='$LOCAL_HOME'/minisecbgp.ini --execution_type="job_scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
+
+	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
+0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/realistic_topology_scheduled_download --config_file='$LOCAL_HOME'/minisecbgp.ini' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
+
+	      config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
 
 
@@ -202,6 +218,7 @@ install_Linux_reqs;
 virtualenv;
 install_Python_reqs;
 configure_Postgres;
+#install_Celery
 install_app;
 configure_uwsgi;
 configure_nginx;

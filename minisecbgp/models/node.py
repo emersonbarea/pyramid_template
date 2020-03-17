@@ -14,6 +14,7 @@ class Node(Base):
     service_ping = Column(Integer, nullable=False)                         # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     service_ssh = Column(Integer, nullable=False)                          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     service_ssh_status = Column(String(255))
+    all_services = Column(Integer, nullable=False)
     conf_user = Column(Integer, nullable=False)
     conf_user_status = Column(String(255))
     conf_ssh = Column(Integer, nullable=False)
@@ -26,5 +27,4 @@ class Node(Base):
     install_metis_status = Column(String(255))
     install_maxinet = Column(Integer, nullable=False)
     install_maxinet_status = Column(String(255))
-    service_app = Column(Integer, nullable=False)
-    service_app_status = Column(String(255))
+    all_install = Column(Integer, nullable=False)

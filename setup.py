@@ -18,7 +18,7 @@ requires = [
     'alembic',
     'pyramid_tm',
     'pyramid_retry',
-    'pyramid_debugtoolbar',
+    #'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'psycopg2',
     'wtforms',
@@ -67,6 +67,7 @@ setup(
             'tests = minisecbgp.scripts.tests:main',
             'validate_hostname = minisecbgp.scripts.validate_hostname:main',
             'config = minisecbgp.scripts.config:main',
+            'realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main'
         ],
     },
 )

@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from pyramid.view import view_config
@@ -6,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from wtforms import Form, StringField, PasswordField, SelectField
 from wtforms.validators import InputRequired, Length
 from minisecbgp import models
+
+from minisecbgp.scripts.services import local_command
 
 
 class ClusterDataForm(Form):
@@ -72,13 +75,14 @@ def create(request):
                                master=nodeType,
                                service_ping=2,
                                service_ssh=2,
-                               service_app=2,
+                               all_services=2,
                                conf_user=2,
                                conf_ssh=2,
                                install_remote_prerequisites=2,
                                install_containernet=2,
                                install_metis=2,
-                               install_maxinet=2
+                               install_maxinet=2,
+                               all_install=2
                                )
             request.dbsession.add(node)
             request.dbsession.flush()
@@ -95,6 +99,20 @@ def create(request):
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
             subprocess.Popen(['config'] + arguments)
+
+            home_dir = os.getcwd()
+            command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
+                      '* * * * * minisecbgpuser %s/venv/bin/tests ' \
+                      '--config_file=%s/minisecbgp.ini ' \
+                      '--execution_type=\\"job_scheduled\\" ' \
+                      '--hostname=\\"%s\\" ' \
+                      '--username=\\"\\" ' \
+                      '--password=\\"\\"" | ' \
+                      'sudo tee /etc/cron.d/minisecbgp_tests_%s\'' % \
+                      (form.node.data, home_dir, home_dir, form.node.data, form.node.data)
+            result = local_command.local_command(command)
+            if result[0] == 1:
+                print('Crontab error', str(result[2].decode()))
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'
@@ -135,6 +153,11 @@ def delete(request):
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)
         try:
             request.dbsession.query(models.Node).filter(models.Node.id == form.cluster_list.data).delete()
+
+            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/minisecbgp_tests_%s\'' % value
+            result = local_command.local_command(command)
+            if result[0] == 1:
+                print('Crontab delete error', str(result[2].decode()))
 
             message = ('Cluster node "%s" successfully deleted.' % value)
             css_class = 'successMessage'

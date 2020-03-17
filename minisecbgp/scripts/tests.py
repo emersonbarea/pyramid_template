@@ -31,8 +31,7 @@ class TestClusterNode(object):
                 result = local_command.local_command(command)
                 if result[0] != 0:
                     service_ping = 1
-                server.service_ping = service_ping
-                return
+                server.all_services = server.service_ping = service_ping
         except Exception as error:
             print('Database error for ping test on node: %s - %s' % (self.nodes.node, error))
 
@@ -47,7 +46,7 @@ class TestClusterNode(object):
                 command = ''
                 service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                     ssh.ssh(server.node, username, self.password, command)
-                server.service_ssh = service_ssh
+                server.all_services = server.service_ssh = service_ssh
                 server.service_ssh_status = service_ssh_status
         except Exception as error:
             print('Database error for ssh test on node: %s - %s' % (self.nodes.node, error))
@@ -66,7 +65,7 @@ def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, 'h:', ["config_file=", "execution_type=", "hostname=", "username=", "password="])
     except getopt.GetoptError:
-        print('config.py '
+        print('tests '
               '--config_file=<pyramid config file .ini> '
               '--execution_type=create_node|job_scheduled '
               '--hostname=<cluster node name or IP address> '
@@ -75,7 +74,7 @@ def main(argv=sys.argv[1:]):
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('config.py '
+            print('tests '
                   '--config_file=<pyramid config file .ini> '
                   '--execution_type=create_node|job_scheduled '
                   '--hostname=<cluster node name or IP address> '

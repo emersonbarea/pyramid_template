@@ -24,7 +24,7 @@
       <form class="form-horizontal" action="{{ request.route_url('realisticTopologyAction',action='delete') }}" method="post">
 
         <div class="span5">
-          <p>ASs: {{ as_count }} </p>
+          <p>Unique ASs: {{ as_count }} </p>
           <p>Provider to Customer links: {{ p2c }} </p>
           <p>Peer to Peer links: {{ p2p }} </p>
         </div>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="span5">
-          <p>ASs: {{ as_stub_count }} </p>
+          <p>Non stub unique ASs: {{ as_stub_count }} </p>
           <p>Provider to Customer links: </p>
           <p>Peer to Peer links: </p>
         </div>

@@ -30,17 +30,17 @@ class ConfigClusterNode(object):
                 ssh.ssh(self.hostname, self.username, self.password, command)
             hostname_status = command_output
             if service_ssh == 1:
-                self.node.status = self.node.status = self.node.hostname = service_ssh
+                self.node.status = self.node.hostname = service_ssh
                 self.node.hostname_status = service_ssh_status[:240]
                 return
             else:
                 if command_status != 0:
-                    self.node.status = self.node.status = self.node.hostname = 1
+                    self.node.status = self.node.hostname = 1
                     self.node.hostname_status = command_error_warning[:240]
                     return
                 for server in self.nodes:
                     if server.hostname_status == command_output and server.id != self.node.id:
-                        self.node.status = self.node.status = self.node.hostname = 1
+                        self.node.status = self.node.hostname = 1
                         self.node.hostname_status = 'Hostname already configured on another cluster node: %s' % server.node
                         return
             self.node.hostname = hostname
@@ -56,6 +56,7 @@ class ConfigClusterNode(object):
                 conf_user = 0
                 conf_user_status = ''
                 commands = ['echo %s | sudo -S apt install whois -y' % self.password,
+                            'echo %s | sudo -S killall -9 -u minisecbgpuser 2>/dev/null || exit 0' % self.password,
                             'echo %s | sudo -S userdel -r minisecbgpuser 2>/dev/null || exit 0' % self.password,
                             'echo %s | sudo -S useradd -m -p $(mkpasswd -m sha-512 -S saltsalt -s <<< %s) -s /bin/bash minisecbgpuser' % (
                                 self.password, self.password),
@@ -72,7 +73,7 @@ class ConfigClusterNode(object):
                     else:
                         if command_status != 0:
                             conf_user = 1
-                            conf_user_status = conf_user_status + command_error_warning[:45]
+                            conf_user_status = conf_user_status + command_error_warning[:40]
                 self.node.status = self.node.conf_user = conf_user
                 self.node.conf_user_status = conf_user_status[:240]
                 return
@@ -83,14 +84,14 @@ class ConfigClusterNode(object):
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
-                    self.node.service_app = 1
+                    self.node.all_install = 1
                 self.node.conf_user_status = \
                     self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node.node, error))
@@ -149,13 +150,13 @@ class ConfigClusterNode(object):
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
-                    self.node.service_app = 1
+                    self.node.all_install = 1
                 self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for ssh configuration on node: %s - %s' % (self.node.node, error))
@@ -188,19 +189,19 @@ class ConfigClusterNode(object):
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
-                    self.node.service_app = 1
+                    self.node.all_install = 1
                 self.node.install_remote_prerequisites_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for remote prerequisites installation on node: %s - %s' % (self.node.node, error))
 
     def install_containernet(self):
         print('Installing Containernet ...\n'
-              'take another coffee and wait again ...')
+              'take a coffee and wait ...')
         try:
             if self.node.status == 0:
                 install_containernet = 0
@@ -227,11 +228,11 @@ class ConfigClusterNode(object):
                 self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
-                    self.node.service_app = 1
+                    self.node.all_install = 1
                 self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for Containernet installation on node: %s - %s' % (self.node.node, error))
@@ -283,10 +284,10 @@ class ConfigClusterNode(object):
             else:
                 self.node.install_metis = \
                     self.node.install_maxinet = \
-                    self.node.service_app = 1
+                    self.node.all_install = 1
                 self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for Metis installation on node: %s - %s' % (self.node.node, error))
@@ -360,14 +361,13 @@ class ConfigClusterNode(object):
                             install_maxinet = result[0]
                             install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
-                self.node.service_app = self.node.status = self.node.install_maxinet = install_maxinet
-                self.node.service_app_status = self.node.install_maxinet_status = install_maxinet_status[:240]
+                self.node.all_install = self.node.status = self.node.install_maxinet = install_maxinet
+                self.node.install_maxinet_status = install_maxinet_status[:240]
                 return
             else:
                 self.node.install_maxinet = \
-                    self.node.service_app = 1
-                self.node.install_maxinet_status = \
-                    self.node.service_app_status = 'Aborted'
+                    self.node.all_install = 1
+                self.node.install_maxinet_status = 'Aborted'
                 return
         except Exception as error:
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node.node, error))
@@ -386,7 +386,7 @@ def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, "h:", ["config_file=", "hostname=", "username=", "password="])
     except getopt.GetoptError as error:
-        print('config.py '
+        print('config '
               '--config_file=<pyramid config file .ini> '
               '--hostname=<cluster node name or IP address> '
               '--username=<cluster node username> '
@@ -394,7 +394,7 @@ def main(argv=sys.argv[1:]):
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('config.py '
+            print('config '
                   '--config_file=<pyramid config file .ini> '
                   '--hostname=<cluster node name or IP address> '
                   '--username=<cluster node username> '

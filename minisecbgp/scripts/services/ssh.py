@@ -6,7 +6,7 @@ def ssh(node, username, password, command):
         client_ssh = paramiko.SSHClient()
         client_ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client_ssh.connect(node, username=username, password=password, timeout=15, allow_agent=False,
-                           look_for_keys=False)
+                           look_for_keys=True)
         stdin, stdout, stderr = client_ssh.exec_command(command)
         service_ssh = 0
         service_ssh_status = ''

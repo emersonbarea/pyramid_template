@@ -56,16 +56,6 @@
         {% endif %}
       </p>
 
-      <p><b>MiniSecBGP :</b>
-        {% if entry.service_app == 0 %}
-          <font color="green">OK</font>
-        {% elif entry.service_app == 1 %}
-          <font color="red">ERROR: {{ entry.service_app_status }} </font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
-
       <hr>
       <h4 align="center">Config / install status</h4>
 
@@ -130,6 +120,9 @@
       </p>
 
     </div>
+
+    <p align="center">* server status checked every minute</p>
+
   </div>
 </div>
 

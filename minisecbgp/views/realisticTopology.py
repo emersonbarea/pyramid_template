@@ -7,7 +7,7 @@ import requests
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
-from sqlalchemy import select, func
+from sqlalchemy import select
 from wtforms import Form, SelectField, StringField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired, Length
@@ -36,10 +36,10 @@ class ParametersDataForm(Form):
 class ScheduledDownload(Form):
     loop = SelectField('Repeat period',
                        choices=[('0', 'Execute only one time'),
-                                ('1', 'daily'),
-                                ('7', 'weekly'),
-                                ('30', 'monthly')])
-    date = DateField('Date of the first scheduled download', format='%Y-%m-%d')
+                                ('1', 'update daily'),
+                                ('7', 'update weekly'),
+                                ('30', 'update monthly')])
+    date = DateField('Date of the next scheduled download', format='%Y-%m-%d')
 
 
 class TopologyDataForm(Form):
@@ -171,7 +171,7 @@ def schedule(request):
         dictionary = dict()
         if request.method == 'GET':
             form = ScheduledDownload(request.POST, obj=scheduledDownload)
-        else:
+        elif request.method == 'POST':
             form = ScheduledDownload(request.POST)
             if form.validate():
                 scheduledDownload.loop = form.loop.data

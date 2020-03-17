@@ -37,8 +37,8 @@
 
           {% for node in nodes %}
             {id: {{ node.id }},
-             font: {color: ( {{ node.status }} == 0 ? 'green' : ( {{ node.status }} == 1 ? 'red' : 'orange'))},
-             label: ( {{ node.master }} == 0 ? 'worker' : 'master') + '\nnode: {{ node.node }}\nstatus: ' + ( {{ node.status }} == 0 ? 'OK' : ( {{ node.status }} == 1 ? 'ERROR' : 'WAIT')),
+             font: {color: ( {{ node.all_install }} == 0 && {{ node.all_services }} == 0 ? 'green' : ( {{ node.all_install }} == 1 ? 'red' : 'orange'))},
+             label: ( {{ node.master }} == 0 ? 'worker' : 'master' ) + '\nnode: {{ node.node }} \nservices status: ' + ( {{ node.all_services }} == 0 ? 'OK' : ( {{ node.all_services }} == 1 ? 'ERROR' : 'Installing' ) ) + '\napp status: ' + ( {{ node.all_install }} == 0 ? 'OK' : ( {{ node.all_install }} == 1 ? 'ERROR' : 'Installing') ),
              image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : ( {{ node.master }} == 1 ? 'server.png' : 'webadmin.png')),
              shape: 'image',
              url: '{{ cluster_detail_url }}{{ node.id }}'
@@ -73,7 +73,7 @@
 
       </script>
 
-      <p align="center">* server status checks every minute</p>
+      <p align="center">* server status checked every minute</p>
 
     </div>
   </div>

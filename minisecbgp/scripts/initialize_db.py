@@ -28,13 +28,14 @@ def setup_models(dbsession):
                        master=1,
                        service_ping=2,
                        service_ssh=2,
-                       service_app=2,
+                       all_services=2,
                        conf_user=2,
                        conf_ssh=2,
                        install_remote_prerequisites=2,
                        install_containernet=2,
                        install_metis=2,
-                       install_maxinet=2)
+                       install_maxinet=2,
+                       all_install=2)
     dbsession.add(node)
 
     parametersDownload = models.ParametersDownload(url='http://data.caida.org/datasets/as-relationships/serial-2/',

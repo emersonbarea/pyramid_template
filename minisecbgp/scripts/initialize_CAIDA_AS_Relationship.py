@@ -22,7 +22,7 @@ class CaidaAsRelationship(object):
         file = open(path + output_file, 'w+')
         file.write(data)
         file.close()
-        if file != '20200201.as-rel2.txt.bz2':
+        if zip_file != '20200201.as-rel2.txt.bz2':
             os.remove(path + zip_file)
 
     @staticmethod
@@ -60,7 +60,7 @@ def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, 'h:', ["config_file=", "path=", "file=", "zip_file="])
     except getopt.GetoptError:
-        print('config.py '
+        print('config '
               '--config_file=<pyramid config file .ini> '
               '--path=<system path where compressed and decompressed files are> '
               '--file=<file name to save to database> '
@@ -68,7 +68,7 @@ def main(argv=sys.argv[1:]):
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('config.py '
+            print('config '
                   '--config_file=<pyramid config file .ini> '
                   '--path=<system path where compressed and decompressed files are> '
                   '--file=<file name to save to database> '
