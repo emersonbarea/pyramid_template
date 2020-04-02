@@ -62,12 +62,11 @@ setup(
             'main = minisecbgp:main'
         ],
         'console_scripts': [
-            'initialize_minisecbgp_db = minisecbgp.scripts.initialize_db:main',
-            'initialize_CAIDA_AS_Relationship = minisecbgp.scripts.initialize_CAIDA_AS_Relationship:main',
+            'initialize_db = minisecbgp.scripts.initialize_db:main',
+            'realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main',
             'tests = minisecbgp.scripts.tests:main',
-            'validate_hostname = minisecbgp.scripts.validate_hostname:main',
             'config = minisecbgp.scripts.config:main',
-            'realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main'
+            'topology = minisecbgp.scripts.topology:main'
         ],
     },
 )

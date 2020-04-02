@@ -87,24 +87,25 @@ def create(request):
             request.dbsession.add(node)
             request.dbsession.flush()
 
-            arguments = ['--config_file=minisecbgp.ini',
-                         '--execution_type=create_node',
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--execution-type=manual',
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['tests'] + arguments)
+            subprocess.Popen(['./venv/bin/tests'] + arguments)
 
-            arguments = ['--config_file=minisecbgp.ini',
+            arguments = ['--config-file=minisecbgp.ini',
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['config'] + arguments)
+
+            subprocess.Popen(['./venv/bin/config'] + arguments)
 
             home_dir = os.getcwd()
             command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
                       '* * * * * minisecbgpuser %s/venv/bin/tests ' \
-                      '--config_file=%s/minisecbgp.ini ' \
-                      '--execution_type=\\"job_scheduled\\" ' \
+                      '--config-file=%s/minisecbgp.ini ' \
+                      '--execution-type=\\"scheduled\\" ' \
                       '--hostname=\\"%s\\" ' \
                       '--username=\\"\\" ' \
                       '--password=\\"\\"" | ' \

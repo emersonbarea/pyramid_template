@@ -16,7 +16,7 @@
       <form class="form-horizontal" action="{{ request.route_url('realisticTopologyAction',action='showRealisticTopology') }}" method="post">
         <div class="form-field">
           {% for topology in topologies %}
-            <p><a href="{{ request.route_url('realisticTopologyDetail', id_topology = topology.id) }}"> {{ topology.topology }} </a></p>
+            <p><a href="{{ request.route_url('realisticTopologyDetail', id_topology = topology.id) }}" title="click to access topology details"> {{ topology.topology }} </a></p>
           {% endfor %}
         </div>
       </form>

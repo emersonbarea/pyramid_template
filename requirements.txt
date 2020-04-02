@@ -54,3 +54,4 @@ zope.deprecation==4.4.0
 zope.interface==4.7.1
 zope.sqlalchemy==1.2
 requests==2.23.0
+pandas==1.0.3

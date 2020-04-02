@@ -1,49 +1,83 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Index
 from .meta import Base
 from sqlalchemy.orm import relationship
+
+
+class TopologyType(Base):
+    __tablename__ = 'topology_type'
+    id = Column(Integer, primary_key=True)
+    topology_type = Column(String(50), nullable=False, unique=True)
+    topology = relationship('Topology', foreign_keys='Topology.id_topology_type')
 
 
 class Topology(Base):
     __tablename__ = 'topology'
     id = Column(Integer, primary_key=True)
+    id_topology_type = Column(Integer, ForeignKey('topology_type.id'))
     topology = Column(String(50), nullable=False, unique=True)
-    type = Column(Integer, nullable=False)              # 0 = realistic, 1 = synthetic
-    realistic_topology = relationship('RealisticTopology')
-    synthetic_topology = relationship('SyntheticTopology')
+    description = Column(String(50), nullable=False, unique=True)
+    autonomous_system = relationship('AutonomousSystem', foreign_keys='AutonomousSystem.id_topology')
 
 
-class RealisticTopology(Base):
-    __tablename__ = 'realistic_topology'
+class AutonomousSystem(Base):
+    __tablename__ = 'autonomous_system'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    as1 = Column(Integer, nullable=False)
-    as2 = Column(Integer, nullable=False)
-    agreement = Column(Integer, nullable=False)         # 0 = <peer-as>|<peer-as>, 1 = <provider-as>|<customer-as>
+    autonomous_system = Column(Integer, nullable=False)
+    stub = Column(Integer, nullable=False)
+    link_id_autonomous_system1 = relationship('Link', foreign_keys='Link.id_autonomous_system1')
+    link_id_autonomous_system2 = relationship('Link', foreign_keys='Link.id_autonomous_system2')
+    prefix = relationship('Prefix', foreign_keys='Prefix.id_autonomous_system')
+    UniqueConstraint('id_topology', 'autonomous_system', name='autonomous_system_unique1')
+    Index('IndexTopologyAS', id_topology, autonomous_system)
 
 
-class ParametersDownload(Base):
-    __tablename__ = 'parameters_download'
+class RealisticTopologyAgreements(Base):
+    __tablename__ = 'realistic_topology_agreement'
+    id = Column(Integer, primary_key=True)
+    agreement = Column(String(50), nullable=False, unique=True)
+    value = Column(String(50), nullable=False, unique=True)
+    link = relationship('Link')
+
+
+class Link(Base):
+    __tablename__ = 'link'
+    id = Column(Integer, primary_key=True)
+    id_agreement = Column(Integer, ForeignKey('realistic_topology_agreement.id'))
+    id_autonomous_system1 = Column(Integer, ForeignKey('autonomous_system.id'))
+    id_autonomous_system2 = Column(Integer, ForeignKey('autonomous_system.id'))
+    ip_autonomous_system1 = Column(Integer)
+    ip_autonomous_system2 = Column(Integer)
+    mask = Column(Integer)
+    description = Column(String(50))
+    bandwidth = Column(Integer)  # kbps
+    delay = Column(Integer)  # ms
+    load = Column(Integer)  # kbps
+
+
+class Prefix(Base):
+    __tablename__ = 'prefix'
+    id = Column(Integer, primary_key=True)
+    id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
+    prefix = Column(Integer, nullable=False)
+    mask = Column(Integer, nullable=False)
+
+
+class RealisticTopologyDownloadParameters(Base):
+    __tablename__ = 'realistic_topology_parameters'
     id = Column(Integer, primary_key=True)
     url = Column(String(100), nullable=False)
-    string_file_search = Column(String(100), nullable=False)
-    c2p = Column(String(50), nullable=False)
-    p2p = Column(String(50), nullable=False)
+    file_search_string = Column(String(100), nullable=False)
 
 
-class ScheduledDownload(Base):
-    __tablename__ = 'scheduled_download'
+class RealisticTopologyScheduleDownloads(Base):
+    __tablename__ = 'realistic_topology_scheduled_download'
     id = Column(Integer, primary_key=True)
-    loop = Column(Integer, nullable=False)              # repeat period: 1 = daily, 7 = weekly, 30 = monthly, 0 = never repeat
-    date = Column(Date)
+    loop = Column(Integer, nullable=False)  # repeat period: 0 = never repeat, 1 = daily, 7 = weekly, 30 = monthly
+    date = Column(Date, nullable=False)
 
 
-class TempCaidaDatabases(Base):
-    __tablename__ = 'temp_caida_databases'
+class RealisticTopologyDownloadingCaidaDatabase(Base):
+    __tablename__ = 'realistic_topology_downloading_caida_database'
     id = Column(Integer, primary_key=True)
-    updating = Column(Integer, nullable=False)          # 0 = not updating | 1 = updating now
-
-
-class SyntheticTopology(Base):
-    __tablename__ = 'synthetic_topology'
-    id = Column(Integer, primary_key=True)
-    id_topology = Column(Integer, ForeignKey('topology.id'))
+    downloading = Column(Integer, nullable=False)  # 0 = not downloading | 1 = downloading now

@@ -384,10 +384,10 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, "h:", ["config_file=", "hostname=", "username=", "password="])
+        opts, args = getopt.getopt(argv, "h:", ["config-file=", "hostname=", "username=", "password="])
     except getopt.GetoptError as error:
         print('config '
-              '--config_file=<pyramid config file .ini> '
+              '--config-file=<pyramid config file .ini> '
               '--hostname=<cluster node name or IP address> '
               '--username=<cluster node username> '
               '--password=<cluster node user password>')
@@ -395,12 +395,12 @@ def main(argv=sys.argv[1:]):
     for opt, arg in opts:
         if opt == '-h':
             print('config '
-                  '--config_file=<pyramid config file .ini> '
+                  '--config-file=<pyramid config file .ini> '
                   '--hostname=<cluster node name or IP address> '
                   '--username=<cluster node username> '
                   '--password=<cluster node user password>')
             sys.exit()
-        elif opt == '--config_file':
+        elif opt == '--config-file':
             config_file = arg
         elif opt == '--hostname':
             hostname = arg

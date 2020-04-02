@@ -11,6 +11,9 @@ from .. import models
 
 
 def setup_models(dbsession):
+
+    # User
+
     admin = models.User(username='admin',
                         role='admin')
     admin.set_password('admin')
@@ -20,6 +23,8 @@ def setup_models(dbsession):
                          role='viewer')
     viewer.set_password('viewer')
     dbsession.add(viewer)
+
+    # Node
 
     node = models.Node(node=socket.gethostname(),
                        status=2,
@@ -38,22 +43,30 @@ def setup_models(dbsession):
                        all_install=2)
     dbsession.add(node)
 
-    parametersDownload = models.ParametersDownload(url='http://data.caida.org/datasets/as-relationships/serial-2/',
-                                                   string_file_search='.as-rel2',
-                                                   c2p='-1',
-                                                   p2p='0')
-    dbsession.add(parametersDownload)
+    # Topology
 
-    scheduleDownload = models.ScheduledDownload(loop=0,
-                                                date=date.today())
-    dbsession.add(scheduleDownload)
+    topologyTypeRealistic = models.TopologyType(topology_type='Realistic')
+    topologyTypeSynthetic = models.TopologyType(topology_type='Synthetic')
+    dbsession.add(topologyTypeRealistic)
+    dbsession.add(topologyTypeSynthetic)
 
-    topology = models.Topology(topology='teste',
-                               type=1)
-    dbsession.add(topology)
+    topologyAgreementsC2P = models.RealisticTopologyAgreements(agreement='customer to provider',
+                                                               value='-1')
+    topologyAgreementsP2P = models.RealisticTopologyAgreements(agreement='provider to provider',
+                                                               value='0')
+    dbsession.add(topologyAgreementsC2P)
+    dbsession.add(topologyAgreementsP2P)
 
-    updating = models.TempCaidaDatabases(updating=0)
-    dbsession.add(updating)
+    downloadParameters = models.RealisticTopologyDownloadParameters(url='http://data.caida.org/datasets/as-relationships/serial-2/',
+                                                                    file_search_string='.as-rel2')
+    dbsession.add(downloadParameters)
+
+    scheduleDownloads = models.RealisticTopologyScheduleDownloads(loop=0,
+                                                                  date=date.today())
+    dbsession.add(scheduleDownloads)
+
+    downloading = models.RealisticTopologyDownloadingCaidaDatabase(downloading=0)
+    dbsession.add(downloading)
 
 
 def parse_args(argv):

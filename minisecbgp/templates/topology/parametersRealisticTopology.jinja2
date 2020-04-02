@@ -25,35 +25,11 @@
         </div>
 
         <div class="form-field">
-          {{ form.string_file_search.label }}
-          {{ form.string_file_search }}
-          {% if form.string_file_search.errors %}
+          {{ form.file_search_string.label }}
+          {{ form.file_search_string }}
+          {% if form.file_search_string.errors %}
             <ul class="errorMessage">
-              {% for error in form.string_file_search.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-
-        <div class="form-field">
-          {{ form.c2p.label }}
-          {{ form.c2p }}
-          {% if form.c2p.errors %}
-            <ul class="errorMessage">
-              {% for error in form.c2p.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-
-        <div class="form-field">
-          {{ form.p2p.label }}
-          {{ form.p2p }}
-          {% if form.p2p.errors %}
-            <ul class="errorMessage">
-              {% for error in form.p2p.errors %}
+              {% for error in form.file_search_string.errors %}
                 <li>{{ error }}</li>
               {% endfor %}
             </ul>

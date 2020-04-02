@@ -128,22 +128,24 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
 
-        initialize_minisecbgp_db minisecbgp.ini
+        initialize_db minisecbgp.ini
 
-        initialize_CAIDA_AS_Relationship --config_file=minisecbgp.ini \
-          --path='./CAIDA_AS_Relationship/' \
-          --file='20200201.as-rel2.txt' \
-          --zip_file='20200201.as-rel2.txt.bz2'
+        cp "$LOCAL_HOME"/CAIDA_AS_Relationship/20200201.as-rel2.txt.bz2 /tmp/
 
-        tests --config_file=minisecbgp.ini --execution_type='create_node' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+        topology --config-file=minisecbgp.ini \
+          --topology-type=realistic \
+          --file='20200201.as-rel2.txt.bz2'
+
+        tests --config-file=minisecbgp.ini --execution-type='manual' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
-* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/tests --config_file='$LOCAL_HOME'/minisecbgp.ini --execution_type="job_scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
+* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
-0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/realistic_topology_scheduled_download --config_file='$LOCAL_HOME'/minisecbgp.ini' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
+MINISECBGP_PATH='$LOCAL_HOME'/venv/bin/
+0 3 * * * minisecbgpuser realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
 
-	      config --config_file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+	      config --config-file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
 
 

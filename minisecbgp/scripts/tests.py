@@ -38,9 +38,9 @@ class TestClusterNode(object):
     def test_ssh(self):
         print('Testing ssh ...')
         try:
-            if self.execution_type == 'create_node':
+            if self.execution_type == 'manual':
                 username = self.username
-            elif self.execution_type == 'job_scheduled':
+            elif self.execution_type == 'scheduled':
                 username = 'minisecbgpuser'
             for server in self.nodes:
                 command = ''
@@ -63,11 +63,11 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config_file=", "execution_type=", "hostname=", "username=", "password="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "execution-type=", "hostname=", "username=", "password="])
     except getopt.GetoptError:
         print('tests '
-              '--config_file=<pyramid config file .ini> '
-              '--execution_type=create_node|job_scheduled '
+              '--config-file=<pyramid config file .ini> '
+              '--execution-type=manual|scheduled '
               '--hostname=<cluster node name or IP address> '
               '--username=<cluster node username> '
               '--password=<cluster node user password>')
@@ -75,15 +75,15 @@ def main(argv=sys.argv[1:]):
     for opt, arg in opts:
         if opt == '-h':
             print('tests '
-                  '--config_file=<pyramid config file .ini> '
-                  '--execution_type=create_node|job_scheduled '
+                  '--config-file=<pyramid config file .ini> '
+                  '--execution-type=manual|scheduled '
                   '--hostname=<cluster node name or IP address> '
                   '--username=<cluster node username> '
                   '--password=<cluster node user password>')
             sys.exit()
-        elif opt == '--config_file':
+        elif opt == '--config-file':
             config_file = arg
-        elif opt == '--execution_type' and (arg == 'create_node' or arg == 'job_scheduled'):
+        elif opt == '--execution-type' and (arg == 'manual' or arg == 'scheduled'):
             execution_type = arg
         elif opt == '--hostname':
             hostname = arg

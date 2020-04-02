@@ -1,5 +1,6 @@
 import argparse
 import getopt
+import os
 import subprocess
 import sys
 from datetime import timedelta, date
@@ -20,26 +21,28 @@ class DownloadTopology(object):
 
     def download_topology(self):
         try:
-            scheduledDownload = self.dbsession.query(models.ScheduledDownload).first()
+            scheduledDownload = self.dbsession.query(models.RealisticTopologyScheduleDownloads).first()
             if date.today() == scheduledDownload.date:
                 scheduledDownload.date = scheduledDownload.date + timedelta(days=scheduledDownload.loop)
-                parametersDownload = self.dbsession.query(models.ParametersDownload).first()
-                site = requests.get(parametersDownload.url)
-                databases = re.findall(r'\d{8}' + parametersDownload.string_file_search, site.text)
+                downloadParameters = self.dbsession.query(models.RealisticTopologyDownloadParameters).first()
+                site = requests.get(downloadParameters.url)
+                databases = re.findall(r'\d{8}' + downloadParameters.file_search_string, site.text)
                 databases = list(dict.fromkeys(databases))
                 databases.sort(reverse=True)
-                installed_databases = self.dbsession.query(models.Topology).filter_by(type=0).all()
+                installed_databases = self.dbsession.query(models.Topology).\
+                    filter(models.Topology.id_topology_type == self.dbsession.query(models.TopologyType.id).
+                           filter_by(topology_type='Realistic')).all()
                 for database in installed_databases:
                     if databases[0] == database.topology:
                         print('Topology already installed')
                         return
-                urllib.request.urlretrieve(parametersDownload.url + databases[0] + '.txt.bz2',
-                                           './CAIDA_AS_Relationship/' + databases[0] + '.txt.bz2')
-                arguments = ['--config_file=minisecbgp.ini',
-                             '--path=./CAIDA_AS_Relationship/',
-                             '--file=%s.txt' % databases[0],
-                             '--zip_file=%s.txt.bz2' % databases[0]]
-                subprocess.Popen(['./venv/bin/initialize_CAIDA_AS_Relationship'] + arguments)
+                urllib.request.urlretrieve(downloadParameters.url + databases[0] + '.txt.bz2',
+                                           '/tmp/' + databases[0] + '.txt.bz2')
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--topology-type=realistic',
+                             '--file=%s.txt.bz2' % databases[0]]
+                subprocess.Popen(['./venv/bin/topology'] + arguments)
+
         except Exception as error:
             print(error)
 
@@ -55,17 +58,17 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config_file="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file="])
     except getopt.GetoptError:
         print('realisticTopologyScheduledDownload '
-              '--config_file=<pyramid config file .ini> ')
+              '--config-file=<pyramid config file .ini> ')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('realisticTopologyScheduledDownload '
-                  '--config_file=<pyramid config file .ini> ')
+                  '--config-file=<pyramid config file .ini> ')
             sys.exit()
-        elif opt == '--config_file':
+        elif opt == '--config-file':
             config_file = arg
 
     args = parse_args(config_file)
