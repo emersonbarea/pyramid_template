@@ -16,8 +16,9 @@ from minisecbgp import models
 
 
 class DownloadTopology(object):
-    def __init__(self, dbsession):
+    def __init__(self, dbsession, topology_path):
         self.dbsession = dbsession
+        self.topology_path = topology_path
 
     def download_topology(self):
         try:
@@ -38,10 +39,10 @@ class DownloadTopology(object):
                         return
                 urllib.request.urlretrieve(downloadParameters.url + databases[0] + '.txt.bz2',
                                            '/tmp/' + databases[0] + '.txt.bz2')
-                arguments = ['--config-file=minisecbgp.ini',
+                arguments = ['--config-file=%s/minisecbgp.ini' % self.topology_path,
                              '--topology-type=realistic',
                              '--file=%s.txt.bz2' % databases[0]]
-                subprocess.Popen(['./venv/bin/topology'] + arguments)
+                subprocess.Popen(['%s./venv/bin/topology' % self.topology_path] + arguments)
 
         except Exception as error:
             print(error)
@@ -58,18 +59,22 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "topology-path="])
     except getopt.GetoptError:
         print('realisticTopologyScheduledDownload '
-              '--config-file=<pyramid config file .ini> ')
+              '--config-file=<pyramid config file .ini> '
+              '--topology-path=<path for topology script file>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('realisticTopologyScheduledDownload '
-                  '--config-file=<pyramid config file .ini> ')
+                  '--config-file=<pyramid config file .ini> '
+                  '--topology-path=<path for topology script file>')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
+        elif opt == '--topology-path':
+            topology_path = arg
 
     args = parse_args(config_file)
     setup_logging(args.config_uri)
@@ -77,7 +82,7 @@ def main(argv=sys.argv[1:]):
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            dt = DownloadTopology(dbsession)
+            dt = DownloadTopology(dbsession, topology_path)
             dt.download_topology()
     except OperationalError:
         print('Database error')

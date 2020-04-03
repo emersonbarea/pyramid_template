@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 import urllib
@@ -48,14 +49,14 @@ class TopologyDataForm(Form):
     topology_list = SelectField('Choose topology to download', coerce=int, validators=[InputRequired()])
 
 
-@view_config(route_name='realisticTopology', renderer='minisecbgp:templates/topology/showRealisticTopology.jinja2')
-def realisticTopology(request):
+@view_config(route_name='realisticTopologies', renderer='minisecbgp:templates/topology/realisticTopologiesShow.jinja2')
+def realisticTopologies(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
 
     dictionary = dict()
-    topologies = request.dbsession.query(models.Topology). \
+    all_topologies = request.dbsession.query(models.Topology). \
         filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
                filter_by(topology_type='Realistic')). \
         all()
@@ -67,15 +68,16 @@ def realisticTopology(request):
         dictionary['message'] = message
         dictionary['css_class'] = css_class
 
-    dictionary['topologies'] = topologies
-    dictionary['realisticTopology_url'] = request.route_url('realisticTopology')
-    dictionary['realisticTopologyDetail_url'] = request.route_url('realisticTopologyDetail', id_topology='')
+    dictionary['updating'] = downloading.downloading
+    dictionary['topologies'] = all_topologies
+    dictionary['realisticTopologies_url'] = request.route_url('realisticTopologies')
+    dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
 
     return dictionary
 
 
-@view_config(route_name='realisticTopologyAction', match_param='action=manualUpdate',
-             renderer='minisecbgp:templates/topology/manualUpdateRealisticTopology.jinja2')
+@view_config(route_name='realisticTopologiesAction', match_param='action=manualUpdate',
+             renderer='minisecbgp:templates/topology/realisticTopologiesManualUpdate.jinja2')
 def manualUpdate(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -108,23 +110,21 @@ def manualUpdate(request):
             dictionary['message'] = message
             dictionary['css_class'] = css_class
             dictionary['updating'] = downloading.downloading
-            request.override_renderer = 'minisecbgp:templates/topology/manualUpdateRealisticTopology.jinja2'
+            request.override_renderer = 'minisecbgp:templates/topology/realisticTopologiesManualUpdate.jinja2'
 
         if request.method == 'POST' and form.validate():
             file = dict(form.topology_list.choices).get(form.topology_list.data)
-            urllib.request.urlretrieve(downloadParameters.url + file + '.txt.bz2',
-                                       '/tmp/' + file + '.txt.bz2')
+            urllib.request.urlretrieve(downloadParameters.url + file + '.txt.bz2', '/tmp/' + file + '.txt.bz2')
             arguments = ['--config-file=minisecbgp.ini',
                          '--topology-type=realistic',
                          '--file=%s.txt.bz2' % file]
             subprocess.Popen(['./venv/bin/topology'] + arguments)
-            url = request.route_url('realisticTopology')
+            url = request.route_url('realisticTopologies')
+
             return HTTPFound(location=url)
 
         dictionary['form'] = form
-
         return dictionary
-
     except Exception as error:
         message = 'Error: MiniSecBGP has no access to the CAIDA AS-Relationship project repository. ' \
                   'Check your internet connection and set download parameters correctly in "Configuration" -> "Parameters" menu if necessary.'
@@ -132,8 +132,8 @@ def manualUpdate(request):
         return {'message': message, 'css_class': css_class}
 
 
-@view_config(route_name='realisticTopologyAction', match_param='action=agreements',
-             renderer='minisecbgp:templates/topology/agreementsRealisticTopology.jinja2')
+@view_config(route_name='realisticTopologiesAction', match_param='action=agreements',
+             renderer='minisecbgp:templates/topology/realisticTopologiesAgreements.jinja2')
 def agreements(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -172,8 +172,8 @@ def agreements(request):
         return dictionary
 
 
-@view_config(route_name='realisticTopologyAction', match_param='action=parameters',
-             renderer='minisecbgp:templates/topology/parametersRealisticTopology.jinja2')
+@view_config(route_name='realisticTopologiesAction', match_param='action=parameters',
+             renderer='minisecbgp:templates/topology/realisticTopologiesParameters.jinja2')
 def parameters(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -207,8 +207,8 @@ def parameters(request):
         return dictionary
 
 
-@view_config(route_name='realisticTopologyAction', match_param='action=schedule',
-             renderer='minisecbgp:templates/topology/scheduleRealisticTopology.jinja2')
+@view_config(route_name='realisticTopologiesAction', match_param='action=schedule',
+             renderer='minisecbgp:templates/topology/realisticTopologiesScheduler.jinja2')
 def schedule(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -240,57 +240,3 @@ def schedule(request):
         dictionary['css_class'] = css_class
 
         return dictionary
-
-
-@view_config(route_name='realisticTopologyDetail',
-             renderer='minisecbgp:templates/topology/detailRealisticTopology.jinja2')
-def realisticTopologyDetail(request):
-    user = request.user
-    if user is None:
-        raise HTTPForbidden
-
-    try:
-        topology = request.dbsession.query(models.Topology) \
-            .filter_by(id=request.matchdict["id_topology"]).first()
-
-        return {'topology': topology}
-
-    except Exception as error:
-        message = 'Error in detailing topology.'
-        css_class = 'errorMessage'
-
-        return {'message': message, 'css_class': css_class}
-
-
-@view_config(route_name='realisticTopologyAction', match_param='action=delete',
-             renderer='minisecbgp:templates/topology/showRealisticTopology.jinja2')
-def delete(request):
-    user = request.user
-    if user is None or (user.role != 'admin'):
-        raise HTTPForbidden
-
-    try:
-        dictionary = dict()
-        if request.method == 'POST':
-            # id_topology = request.params['id_topology']
-            # topology = request.params['topology']
-
-            autonomous_system = request.dbsession.query(models.AutonomousSystem).filter_by(
-                id_topology=request.params['id_topology'])
-            print(autonomous_system)
-            topologies = request.dbsession.query(models.Topology).filter(models.Topology.type == 0).all()
-            dictionary['topologies'] = topologies
-
-            topology = 'teste'
-
-            message = ('Topology "%s" successfully deleted.' % topology)
-            css_class = 'successMessage'
-            dictionary['message'] = message
-            dictionary['css_class'] = css_class
-    except Exception as error:
-        message = ('Topology "%s" does not exist.' % topology)
-        css_class = 'errorMessage'
-        dictionary['message'] = message
-        dictionary['css_class'] = css_class
-
-    return dictionary

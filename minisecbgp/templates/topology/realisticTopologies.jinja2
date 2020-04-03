@@ -15,14 +15,14 @@
           <ul class="nav">
             {% if request.user.role == 'admin' %}
               <li>
-                <a href="{{ request.route_url('realisticTopologyAction',action='manualUpdate') }}">Manual Update</a>
+                <a href="{{ request.route_url('realisticTopologiesAction',action='manualUpdate') }}">Manual Update</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Configuration</a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologyAction',action='agreements') }}">Agreements<br></a>
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologyAction',action='parameters') }}">Parameters<br></a>
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologyAction',action='schedule') }}">Schedule<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='agreements') }}">Agreements<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='parameters') }}">Parameters<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='schedule') }}">Schedule<br></a>
                 </div>
               </li>
             {% endif %}

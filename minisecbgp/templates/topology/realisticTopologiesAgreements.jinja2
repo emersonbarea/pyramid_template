@@ -1,4 +1,4 @@
-{% extends "realisticTopology.jinja2" %}
+{% extends "realisticTopologies.jinja2" %}
 
 {% block contentRealisticTopology %}
 
@@ -10,7 +10,7 @@
   </div>
   <div class="row-fluid" style="text-align: center;">
     <div class="span12">
-      <form action="{{ request.route_url('realisticTopologyAction',action='agreements') }}" method="post">
+      <form action="{{ request.route_url('realisticTopologiesAction',action='agreements') }}" method="post">
 
         <div class="span6">
           <h4> Agreement </h4>

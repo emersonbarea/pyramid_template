@@ -1,0 +1,38 @@
+{% extends "../layout/dashboard.layout.jinja2" %}
+
+{% block contentDashboard %}
+
+  <div class="navbar">
+    <h2 align="center">Topologies</h2>
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            {% if request.user.role == 'admin' %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Specific Topology</a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologies') }}">Realistic<br></a>
+                  <a class="dropdown-item" href="#">Synthetic<br></a>
+                  <a class="dropdown-item" href="#">ICT Providers<br></a>
+                </div>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class=" {{ css_class }} ">
+    <p> {{ message }} </p>
+  </div>
+
+  {% block contentTopologies %} {% endblock contentTopologies %}
+
+{% endblock contentDashboard %}

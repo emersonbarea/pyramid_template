@@ -17,6 +17,7 @@ class Topology(Base):
     topology = Column(String(50), nullable=False, unique=True)
     description = Column(String(50), nullable=False, unique=True)
     autonomous_system = relationship('AutonomousSystem', foreign_keys='AutonomousSystem.id_topology')
+    Index('IndexId_topology_type', id_topology_type)
 
 
 class AutonomousSystem(Base):
@@ -30,14 +31,7 @@ class AutonomousSystem(Base):
     prefix = relationship('Prefix', foreign_keys='Prefix.id_autonomous_system')
     UniqueConstraint('id_topology', 'autonomous_system', name='autonomous_system_unique1')
     Index('IndexTopologyAS', id_topology, autonomous_system)
-
-
-class RealisticTopologyAgreements(Base):
-    __tablename__ = 'realistic_topology_agreement'
-    id = Column(Integer, primary_key=True)
-    agreement = Column(String(50), nullable=False, unique=True)
-    value = Column(String(50), nullable=False, unique=True)
-    link = relationship('Link')
+    Index('IndexId_topology', id_topology)
 
 
 class Link(Base):
@@ -53,6 +47,9 @@ class Link(Base):
     bandwidth = Column(Integer)  # kbps
     delay = Column(Integer)  # ms
     load = Column(Integer)  # kbps
+    Index('IndexId_autonomous_system1', id_autonomous_system1)
+    Index('IndexId_autonomous_system2', id_autonomous_system2)
+    Index('IndexId_agreement', id_agreement)
 
 
 class Prefix(Base):
@@ -61,6 +58,15 @@ class Prefix(Base):
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     prefix = Column(Integer, nullable=False)
     mask = Column(Integer, nullable=False)
+    Index('IndexId_autonomous_system', id_autonomous_system)
+
+
+class RealisticTopologyAgreements(Base):
+    __tablename__ = 'realistic_topology_agreement'
+    id = Column(Integer, primary_key=True)
+    agreement = Column(String(50), nullable=False, unique=True)
+    value = Column(String(50), nullable=False, unique=True)
+    link = relationship('Link')
 
 
 class RealisticTopologyDownloadParameters(Base):

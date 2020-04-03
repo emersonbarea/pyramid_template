@@ -107,8 +107,8 @@ class Topology(object):
         df_autonomous_system = autonomous_systems.reset_index()[['id', 'autonomous_system']].copy()
 
         # links
-        df_link = df_from_file.reset_index()[['AS1', 'AS2']].copy()
-        df_link.columns = ['autonomous_system1', 'autonomous_system2']
+        df_link = df_from_file.reset_index()[['AS1', 'AS2', 'pp_cp']].copy()
+        df_link.columns = ['autonomous_system1', 'autonomous_system2', 'id_agreement']
 
         # links for autonomous_system 1
         df_link.set_index('autonomous_system1', inplace=True)
@@ -124,6 +124,13 @@ class Topology(object):
         df_autonomous_system2.set_index('autonomous_system2', inplace=True)
         df_link = pd.concat([df_link, df_autonomous_system2], axis=1, join='inner')
 
+        # agreements
+        df_link.reset_index()
+        df_link.set_index('id_agreement', inplace=True)
+        agreements = dbsession.query(models.RealisticTopologyAgreements).all()
+        for agreement in agreements:
+            df_link.rename(index={int(agreement.value): agreement.id}, inplace=True)
+
         prefix_ip = 16777216
         list_ip_autonomous_system1 = list()
         list_ip_autonomous_system2 = list()
@@ -138,6 +145,7 @@ class Topology(object):
         df_link['ip_autonomous_system2'] = list_ip_autonomous_system2
         df_link['mask'] = list_mask
 
+        df_link = df_link.reset_index().copy()
         df_link.to_sql('link', con=dbsession.bind, if_exists='append', index=False)
 
     @staticmethod

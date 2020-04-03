@@ -1,6 +1,6 @@
-{% extends "realisticTopology.jinja2" %}
+{% extends "topologies.jinja2" %}
 
-{% block contentRealisticTopology %}
+{% block contentTopologies %}
 
 <div id="aum" class="container-fluid">
   <div class="row-fluid">
@@ -21,12 +21,15 @@
         <h4>Non Stub Topology</h4>
       </div>
 
-      <form class="form-horizontal" action="{{ request.route_url('realisticTopologyAction',action='delete') }}" method="post">
+      <form class="form-horizontal" action="{{ request.route_url('topologiesAction',action='delete') }}" method="post">
 
         <div class="span5">
           <p>Unique ASs: {{ as_count }} </p>
           <p>Provider to Customer links: {{ p2c }} </p>
           <p>Peer to Peer links: {{ p2p }} </p>
+          <div class="form-group">
+            <p><button type="button" class="btn btn-primary">View map</button></p>
+          </div>
         </div>
 
         <div class="span2">
@@ -37,12 +40,23 @@
           <p>Non stub unique ASs: {{ as_stub_count }} </p>
           <p>Provider to Customer links: </p>
           <p>Peer to Peer links: </p>
+          <div class="form-group">
+            <p><button type="button" class="btn btn-primary">View map</button></p>
+          </div>
         </div>
 
         <div class="form-group">
           <input type="hidden" name="id_topology" value= {{ topology.id }}>
           <input type="hidden" name="topology" value= {{ topology.topology }}>
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Delete Topology</button>
+        </div>
+
+        <div class="form-group">
+          <p>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmationModal">Delete Topology</button>
+            <button type="button" class="btn btn-primary">Autonomous System</button>
+            <button type="button" class="btn btn-primary">Link</button>
+            <button type="button" class="btn btn-primary">BGP Prefix</button>
+          </p>
         </div>
 
 	    <div class="modal fade"  style="text-align: left;" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -68,4 +82,4 @@
   </div>
 </div>
 
-{% endblock contentRealisticTopology %}
+{% endblock contentTopologies %}

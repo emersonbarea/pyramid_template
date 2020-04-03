@@ -130,11 +130,11 @@ install_app() {
 
         initialize_db minisecbgp.ini
 
-        cp "$LOCAL_HOME"/CAIDA_AS_Relationship/20200201.as-rel2.txt.bz2 /tmp/
+        cp "$LOCAL_HOME"/CAIDA_AS_Relationship/20191201.as-rel2.txt.bz2 /tmp/
 
         topology --config-file=minisecbgp.ini \
           --topology-type=realistic \
-          --file='20200201.as-rel2.txt.bz2'
+          --file='20191201.as-rel2.txt.bz2'
 
         tests --config-file=minisecbgp.ini --execution-type='manual' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 
@@ -142,8 +142,7 @@ install_app() {
 * * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
-MINISECBGP_PATH='$LOCAL_HOME'/venv/bin/
-0 3 * * * minisecbgpuser realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
+0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
 
 	      config --config-file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
