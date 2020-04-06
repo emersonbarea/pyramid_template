@@ -7,6 +7,16 @@ footer, .span12-home {
   padding-top: 60px;
 }
 
+.nav-tabs {
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: -webkit-box;
+  display: -moz-box;
+}
+.nav-tabs>li {
+  float: none;
+}
+
 /* Messages */
 .loginMessage {
   color: #c82603;

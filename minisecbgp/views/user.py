@@ -62,8 +62,7 @@ def user(request):
     return {}
 
 
-@view_config(route_name='userAction', match_param='action=create', renderer='minisecbgp:templates/user/createUser'
-                                                                            '.jinja2')
+@view_config(route_name='userAction', match_param='action=create', renderer='minisecbgp:templates/user/createUser.jinja2')
 def create(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -74,8 +73,7 @@ def create(request):
     if request.method == 'POST' and form.validate():
         try:
             entry = models.User(username=form.username.data,
-                                role=form.role.data
-                                )
+                                role=form.role.data)
             entry.set_password(form.password_hash.data)
             request.dbsession.add(entry)
             request.dbsession.flush()
@@ -126,8 +124,7 @@ def edit(request):
     return {'form': form, 'form_password': form_password}
 
 
-@view_config(route_name='userAction', match_param='action=delete', renderer='minisecbgp:templates/user/deleteUser'
-                                                                            '.jinja2')
+@view_config(route_name='userAction', match_param='action=delete', renderer='minisecbgp:templates/user/deleteUser.jinja2')
 def delete(request):
     user = request.user
     if user is None:

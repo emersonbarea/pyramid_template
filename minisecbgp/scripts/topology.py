@@ -104,7 +104,7 @@ class Topology(object):
         autonomous_systems = pd.read_sql(dbsession.query(models.AutonomousSystem).
                                          filter_by(id_topology=id_topology).statement,
                                          con=dbsession.bind)
-        df_autonomous_system = autonomous_systems.reset_index()[['id', 'autonomous_system']].copy()
+        df_autonomous_system = autonomous_systems.reset_index()[['id', 'autonomous_system', 'id_topology']].copy()
 
         # links
         df_link = df_from_file.reset_index()[['AS1', 'AS2', 'pp_cp']].copy()
@@ -113,13 +113,13 @@ class Topology(object):
         # links for autonomous_system 1
         df_link.set_index('autonomous_system1', inplace=True)
         df_autonomous_system1 = df_autonomous_system.copy()
-        df_autonomous_system1.columns = ['id_autonomous_system1', 'autonomous_system1']
+        df_autonomous_system1.columns = ['id_autonomous_system1', 'autonomous_system1', 'id_topology']
         df_autonomous_system1.set_index('autonomous_system1', inplace=True)
         df_link = pd.concat([df_link, df_autonomous_system1], axis=1, join='inner')
 
         # links for autonomous_system 2
         df_link.set_index('autonomous_system2', inplace=True)
-        df_autonomous_system2 = df_autonomous_system.copy()
+        df_autonomous_system2 = df_autonomous_system[['id', 'autonomous_system']].copy()
         df_autonomous_system2.columns = ['id_autonomous_system2', 'autonomous_system2']
         df_autonomous_system2.set_index('autonomous_system2', inplace=True)
         df_link = pd.concat([df_link, df_autonomous_system2], axis=1, join='inner')

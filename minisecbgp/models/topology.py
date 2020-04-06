@@ -25,7 +25,7 @@ class AutonomousSystem(Base):
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
     autonomous_system = Column(Integer, nullable=False)
-    stub = Column(Integer, nullable=False)
+    stub = Column(Integer, nullable=False)          # 0 = not stub | 1 = stub
     link_id_autonomous_system1 = relationship('Link', foreign_keys='Link.id_autonomous_system1')
     link_id_autonomous_system2 = relationship('Link', foreign_keys='Link.id_autonomous_system2')
     prefix = relationship('Prefix', foreign_keys='Prefix.id_autonomous_system')
@@ -37,6 +37,7 @@ class AutonomousSystem(Base):
 class Link(Base):
     __tablename__ = 'link'
     id = Column(Integer, primary_key=True)
+    id_topology = Column(Integer, ForeignKey('topology.id'))
     id_agreement = Column(Integer, ForeignKey('realistic_topology_agreement.id'))
     id_autonomous_system1 = Column(Integer, ForeignKey('autonomous_system.id'))
     id_autonomous_system2 = Column(Integer, ForeignKey('autonomous_system.id'))
@@ -50,6 +51,7 @@ class Link(Base):
     Index('IndexId_autonomous_system1', id_autonomous_system1)
     Index('IndexId_autonomous_system2', id_autonomous_system2)
     Index('IndexId_agreement', id_agreement)
+    Index('IndexId_topology1', id_topology)
 
 
 class Prefix(Base):

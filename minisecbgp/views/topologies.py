@@ -1,7 +1,18 @@
+import math
+
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPFound
+from wtforms import Form, StringField
+from wtforms.validators import InputRequired, Length
 
 from minisecbgp import models
+
+
+class AutonomousSystemDataForm(Form):
+    autonomous_system = StringField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
+                                    validators=[InputRequired(),
+                                                Length(min=1, max=32, message=('Autonomous System Number must be between 1 and 32 '
+                                                                               'characters long.'))])
 
 
 @view_config(route_name='topologies', renderer='minisecbgp:templates/topology/topologiesShow.jinja2')
@@ -23,7 +34,7 @@ def topologies(request):
 
     dictionary['updating'] = downloading.downloading
     dictionary['topologies'] = all_topologies
-    dictionary['realisticTopologies_url'] = request.route_url('realisticTopologies')
+    dictionary['topologies_url'] = request.route_url('topologies')
     dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
 
     return dictionary
@@ -43,16 +54,29 @@ def topologiesDetail(request):
         unique_as = request.dbsession.query(models.AutonomousSystem.id)\
             .filter_by(id_topology=request.matchdict["id_topology"]).count()
 
+        unique_as_stub = request.dbsession.query(models.AutonomousSystem.id) \
+            .filter(models.AutonomousSystem.stub == 0) \
+            .filter_by(id_topology=request.matchdict["id_topology"]).count()
 
+        query = 'select rta.agreement as agreement, count(l.id) as p2c ' \
+                'from link l, realistic_topology_agreement rta ' \
+                'where l.id_topology = %s ' \
+                'and l.id_agreement = rta.id ' \
+                'group by l.id_agreement, rta.agreement;' % request.matchdict["id_topology"]
+        p2cs = request.dbsession.bind.execute(query)
 
+        query_stub = 'select count(l.id) as p2c, rta.agreement as agreement ' \
+                     'from link l, realistic_topology_agreement rta ' \
+                     'where l.id_topology = %s ' \
+                     'and l.id_autonomous_system1 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
+                     'and l.id_autonomous_system2 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
+                     'and l.id_agreement = rta.id ' \
+                     'group by l.id_agreement, rta.agreement;' % (request.matchdict["id_topology"],
+                                                                  request.matchdict["id_topology"],
+                                                                  request.matchdict["id_topology"])
+        p2cs_stub = request.dbsession.bind.execute(query_stub)
 
-
-
-
-
-        
-
-        return {'topology': topology}
+        return {'topology': topology, 'unique_as': unique_as, 'p2cs': p2cs, 'unique_as_stub': unique_as_stub, 'p2cs_stub': p2cs_stub}
 
     except Exception as error:
         message = 'Error in detailing topology.'
@@ -103,9 +127,69 @@ def autonomousSystem(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
-    pass
+    try:
+        topology = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        autonomousSystems = request.dbsession.query(models.AutonomousSystem).\
+            filter_by(id_topology=topology.id).order_by(models.AutonomousSystem.autonomous_system.asc()).all()
+        number_of_autonomous_systems = request.dbsession.query(models.AutonomousSystem).\
+            filter_by(id_topology=topology.id).count()
+        tabs = number_of_autonomous_systems // 10000
+        accordions = (number_of_autonomous_systems % 10000) / 1000
+        accordions_dec, accordions_int = math.modf(accordions)
+        accordions_dec = accordions_dec * 1000
+        if accordions > 1:
+            print('if')
+            accordions_str = format((number_of_autonomous_systems % 10000) / 1000, '.3f')
+        else:
+            print('else')
+            accordions_str = str((accordions % 10000) / 1000)[-3:]
 
-    return {}
+        print('topology', topology.id,
+              'number_of_autonomous_systems', number_of_autonomous_systems,
+              'tabs', tabs,
+              'accordions', accordions,
+              'accordions_dec', accordions_dec,
+              'accordions_str', accordions_str)
+
+        dictionary = dict()
+        dictionary['topology'] = topology
+        dictionary['autonomousSystems'] = autonomousSystems
+        dictionary['tabs'] = tabs
+        dictionary['accordions'] = accordions
+        dictionary['accordions_str'] = accordions_str
+        dictionary['accordions_int'] = int(accordions_int)
+        dictionary['accordions_dec'] = int(accordions_dec)
+
+        form = AutonomousSystemDataForm(request.POST)
+        dictionary['form'] = form
+
+        if request.method == 'POST' and form.validate():
+            for autonomousSystemNumber in autonomousSystems:
+                if autonomousSystemNumber.autonomous_system == int(form.autonomous_system.data):
+                    message = 'The Autonomous System Number informed already exists in this topology.'
+                    css_class = 'errorMessage'
+                    dictionary['message'] = message
+                    dictionary['css_class'] = css_class
+                    return dictionary
+
+            autonomous_system = models.AutonomousSystem(autonomous_system=form.autonomous_system.data,
+                                                        stub=1,
+                                                        id_topology=topology.id)
+            request.dbsession.add(autonomous_system)
+            request.dbsession.flush()
+            message = 'The Autonomous System Number %s successfully created in this topology.' % form.autonomous_system.data
+            css_class = 'successMessage'
+            dictionary['message'] = message
+            dictionary['css_class'] = css_class
+            url = request.route_url('topologiesAction', action='autonomousSystem', id_topology=topology.id)
+
+            return HTTPFound(location=url)
+
+        return dictionary
+
+    except Exception as error:
+        print(error)
 
 
 @view_config(route_name='topologiesAction', match_param='action=link',
@@ -115,9 +199,13 @@ def link(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
-    pass
+    try:
+        topology = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+    except Exception as error:
+        print(error)
 
-    return {}
+    return {'topology': topology}
 
 
 @view_config(route_name='topologiesAction', match_param='action=prefix',
@@ -127,6 +215,10 @@ def prefix(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
-    pass
+    try:
+        topology = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+    except Exception as error:
+        print(error)
 
-    return {}
+    return {'topology': topology}

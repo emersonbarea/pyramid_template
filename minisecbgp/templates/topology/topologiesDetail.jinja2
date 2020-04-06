@@ -3,7 +3,7 @@
 {% block contentDashboard %}
 
   <div class="navbar">
-    <h2 align="center">Topologies</h2>
+    <h2 align="center">Topology Detail</h2>
     <div class="navbar-inner">
       <div class="container">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -14,14 +14,15 @@
         <div class="nav-collapse collapse">
           <ul class="nav">
             {% if request.user.role == 'admin' %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Specific Topology</a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologies') }}">Realistic<br></a>
-                  <a class="dropdown-item" href="#">Synthetic<br></a>
-                  <a class="dropdown-item" href="#">ICT Providers<br></a>
-                </div>
-              </li>
+            <li>
+              <a href="{{ request.route_url('topologiesAction', action='autonomousSystem', id_topology = topology.id) }}"> Autonomous System </a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('topologiesAction', action='link', id_topology = topology.id) }}">Link</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('topologiesAction', action='prefix', id_topology = topology.id) }}">BGP Prefix</a>
+            </li>
             {% endif %}
           </ul>
         </div>
@@ -48,15 +49,13 @@
           <h4>Non Stub Topology</h4>
         </div>
 
-        <form class="form-horizontal" action="{{ request.route_url('topologiesAction',action='delete') }}" method="post">
+        <form class="form-horizontal" action="{{ request.route_url('topologiesAction',action='delete', id_topology = topology.id) }}" method="post">
 
           <div class="span5">
-            <p>Unique ASs: {{ as_count }} </p>
-            <p>Provider to Customer links: {{ p2c }} </p>
-            <p>Peer to Peer links: {{ p2p }} </p>
-            <div class="form-group">
-              <p><button type="button" class="btn btn-primary">View map</button></p>
-            </div>
+            <p>Unique ASs: {{ unique_as }} </p>
+            {% for p2c in p2cs %}
+              <p>Link {{ p2c.agreement }}: {{ p2c.p2c }} </p>
+            {% endfor %}
           </div>
 
           <div class="span2">
@@ -64,12 +63,10 @@
           </div>
 
           <div class="span5">
-            <p>Non stub unique ASs: {{ as_stub_count }} </p>
-            <p>Provider to Customer links: </p>
-            <p>Peer to Peer links: </p>
-            <div class="form-group">
-              <p><button type="button" class="btn btn-primary">View map</button></p>
-            </div>
+            <p>Non stub unique ASs: {{ unique_as_stub }} </p>
+            {% for p2c_stub in p2cs_stub %}
+              <p> {{ p2c_stub.agreement }}: {{ p2c_stub.p2c }} </p>
+            {% endfor %}
           </div>
 
           <div class="form-group">
@@ -77,14 +74,13 @@
             <input type="hidden" name="topology" value= {{ topology.topology }}>
           </div>
 
-          <div class="form-group">
-            <p>
-              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmationModal">Delete Topology</button>
-              <button type="button" class="btn btn-primary">Autonomous System</button>
-              <button type="button" class="btn btn-primary">Link</button>
-              <button type="button" class="btn btn-primary">BGP Prefix</button>
-            </p>
-          </div>
+          {% if request.user.role == 'admin' %}
+            <div class="form-group">
+              <p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Delete Topology</button>
+              </p>
+            </div>
+          {% endif %}
 
           <div class="modal fade"  style="text-align: left;" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
