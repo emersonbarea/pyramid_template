@@ -10,7 +10,10 @@ def includeme(config):
     config.add_route('clusterAction', '/cluster/{action}')
     config.add_route('clusterDetail', '/cluster/detail/{id}')
     config.add_route('topologies', '/topologies')
+    config.add_route('autonomousSystem', '/topology/autonomousSystem/{id_topology}')
+    config.add_route('autonomousSystemAction', '/topology/autonomousSystem/{action}/{id_topology}/{id_autonomous_system}')
     config.add_route('topologiesDetail', '/topology/detail/{id_topology}')
     config.add_route('topologiesAction', '/topology/{action}/{id_topology}')
     config.add_route('realisticTopologies', '/realisticTopologies')
     config.add_route('realisticTopologiesAction', '/realisticTopologies/{action}')
+

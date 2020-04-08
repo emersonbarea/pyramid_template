@@ -120,7 +120,6 @@ def create(request):
 
         except IntegrityError as e:
             request.dbsession.rollback()
-
             message = ('Node "%s" already exists in cluster.' % form.node.data)
             css_class = 'errorMessage'
 
@@ -165,7 +164,6 @@ def delete(request):
 
         except IntegrityError as e:
             request.dbsession.rollback()
-
             message = ('Cluster node "%s" does not exist.' % form.cluster_list.data)
             css_class = 'errorMessage'
 

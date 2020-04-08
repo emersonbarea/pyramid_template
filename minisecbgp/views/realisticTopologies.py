@@ -1,4 +1,3 @@
-import os
 import re
 import subprocess
 import urllib
@@ -56,20 +55,17 @@ def realisticTopologies(request):
         raise HTTPForbidden
 
     dictionary = dict()
-    all_topologies = request.dbsession.query(models.Topology). \
+    dictionary['topologies'] = request.dbsession.query(models.Topology). \
         filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
                filter_by(topology_type='Realistic')). \
         all()
     downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
     if downloading.downloading == 1:
-        message = 'Warning: there is an update process running in the background. ' \
+        dictionary['message'] = 'Warning: there is an update process running in the background. ' \
                   'Wait for it finish to see the new topology installed and access topology detail.'
-        css_class = 'warningMessage'
-        dictionary['message'] = message
-        dictionary['css_class'] = css_class
+        dictionary['css_class'] = 'warningMessage'
 
     dictionary['updating'] = downloading.downloading
-    dictionary['topologies'] = all_topologies
     dictionary['realisticTopologies_url'] = request.route_url('realisticTopologies')
     dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
 
@@ -83,6 +79,7 @@ def manualUpdate(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    dictionary = dict()
     try:
         downloadParameters = request.dbsession.query(models.RealisticTopologyDownloadParameters).first()
         site = requests.get(downloadParameters.url)
@@ -100,15 +97,11 @@ def manualUpdate(request):
         form = TopologyDataForm(request.POST)
         form.topology_list.choices = [(i, database) for i, database in enumerate(databases)]
 
-        dictionary = dict()
-
         downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
         if downloading.downloading == 1:
-            message = 'Warning: there is an update process running in the background. ' \
+            dictionary['message'] = 'Warning: there is an update process running in the background. ' \
                       'Wait for it finish to access Manual Update again.'
-            css_class = 'warningMessage'
-            dictionary['message'] = message
-            dictionary['css_class'] = css_class
+            dictionary['css_class'] = 'warningMessage'
             dictionary['updating'] = downloading.downloading
             request.override_renderer = 'minisecbgp:templates/topology/realisticTopologiesManualUpdate.jinja2'
 
@@ -120,16 +113,15 @@ def manualUpdate(request):
                          '--file=%s.txt.bz2' % file]
             subprocess.Popen(['./venv/bin/topology'] + arguments)
             url = request.route_url('realisticTopologies')
-
             return HTTPFound(location=url)
-
         dictionary['form'] = form
-        return dictionary
+
     except Exception as error:
-        message = 'Error: MiniSecBGP has no access to the CAIDA AS-Relationship project repository. ' \
+        dictionary['message'] = 'Error: MiniSecBGP has no access to the CAIDA AS-Relationship project repository. ' \
                   'Check your internet connection and set download parameters correctly in "Configuration" -> "Parameters" menu if necessary.'
-        css_class = 'errorMessage'
-        return {'message': message, 'css_class': css_class}
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
 
 
 @view_config(route_name='realisticTopologiesAction', match_param='action=agreements',
@@ -139,37 +131,26 @@ def agreements(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    dictionary = dict()
     try:
-        dictionary = dict()
         form = AgreementsDataForm(request.POST)
         if request.method == 'POST':
             agreement = models.RealisticTopologyAgreements(agreement=form.agreement.data,
                                                            value=form.value.data)
             request.dbsession.add(agreement)
             request.dbsession.flush()
-
             form = AgreementsDataForm()
-            message = ('CAIDA AS-Relationship AS\'s agreement "%s" successfully registered.' % form.agreement.data)
-            css_class = 'successMessage'
-
-            dictionary['message'] = message
-            dictionary['css_class'] = css_class
-
-        agreementsBetweenASs = request.dbsession.query(models.RealisticTopologyAgreements).all()
-
-        dictionary['agreements'] = agreementsBetweenASs
+            dictionary['message'] = ('CAIDA AS-Relationship AS\'s agreement "%s" successfully registered.' % form.agreement.data)
+            dictionary['css_class'] = 'successMessage'
+        dictionary['agreements'] = request.dbsession.query(models.RealisticTopologyAgreements).all()
         dictionary['form'] = form
-
-        return dictionary
 
     except Exception as error:
         dictionary['form'] = form
-        message = 'Error in agreements configuration.'
-        css_class = 'errorMessage'
-        dictionary['message'] = message
-        dictionary['css_class'] = css_class
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
-        return dictionary
+    return dictionary
 
 
 @view_config(route_name='realisticTopologiesAction', match_param='action=parameters',
@@ -179,9 +160,9 @@ def parameters(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    dictionary = dict()
     try:
         parametersDownload = request.dbsession.query(models.RealisticTopologyDownloadParameters).first()
-        dictionary = dict()
         if request.method == 'GET':
             form = ParametersDataForm(request.POST, obj=parametersDownload)
         else:
@@ -189,22 +170,15 @@ def parameters(request):
             if form.validate():
                 parametersDownload.url = form.url.data
                 parametersDownload.file_search_string = form.file_search_string.data
-                message = 'Parameters successfully updated.'
-                css_class = 'successMessage'
-                dictionary['message'] = message
-                dictionary['css_class'] = css_class
-
+                dictionary['message'] = 'Parameters successfully updated.'
+                dictionary['css_class'] = 'successMessage'
         dictionary['form'] = form
 
-        return dictionary
-
     except Exception as error:
-        message = 'Error in download parameters update.'
-        css_class = 'errorMessage'
-        dictionary['message'] = message
-        dictionary['css_class'] = css_class
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
-        return dictionary
+    return dictionary
 
 
 @view_config(route_name='realisticTopologiesAction', match_param='action=schedule',
@@ -214,9 +188,9 @@ def schedule(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    dictionary = dict()
     try:
         scheduledDownload = request.dbsession.query(models.RealisticTopologyScheduleDownloads).first()
-        dictionary = dict()
         if request.method == 'GET':
             form = ScheduledDownload(request.POST, obj=scheduledDownload)
         elif request.method == 'POST':
@@ -224,19 +198,12 @@ def schedule(request):
             if form.validate():
                 scheduledDownload.loop = form.loop.data
                 scheduledDownload.date = form.date.data
-                message = 'Topology download scheduled successfully.'
-                css_class = 'successMessage'
-                dictionary['message'] = message
-                dictionary['css_class'] = css_class
-
+                dictionary['message'] = 'Topology download scheduled successfully.'
+                dictionary['css_class'] = 'successMessage'
         dictionary['form'] = form
 
-        return dictionary
-
     except Exception as error:
-        message = 'Error in topology download schedule configuration.'
-        css_class = 'errorMessage'
-        dictionary['message'] = message
-        dictionary['css_class'] = css_class
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
-        return dictionary
+    return dictionary
