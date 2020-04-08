@@ -32,7 +32,7 @@
       <div class="row-fluid">
         <div class="span12">
           <h3 align="center">Topology: {{ topology.topology }}</h3>
-          <h4 align="center">Show all Autonomous Systems</h4>
+          <h4 align="center">Show all BGP Prefixes</h4>
         </div>
       </div>
 
@@ -73,14 +73,14 @@
                     <div class="accordion-group">
                       <div class="accordion-heading">
                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab }}"
-                          href="#collapse{{ tab }}{{ accordion }}">Autonomous System range: {{ tab }}{{ accordion }}
+                          href="#collapse{{ tab }}{{ accordion }}">BGP Prefix range: {{ tab }}{{ accordion }}
                        </a>
                       </div>
                       <div id="collapse{{ tab }}{{ accordion }}" class="accordion-body collapse">
                         <div class="accordion-inner">
-                          {% for autonomous_system in autonomousSystems %}
+                          {% for prefix in prefixes %}
                             {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
-                              <p>AS {{ autonomous_system.autonomous_system }}</p>
+                              <p>AS {{ prefix.autonomous_system }} - BGP Prefix {{ prefix.prefix }}</p>
                             {% endif %}
                           {% endfor %}
                         </div>

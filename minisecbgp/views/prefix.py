@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired, Length
 from minisecbgp import models
 
 
-class AutonomousSystemDataForm(Form):
+class PrefixDataForm(Form):
     autonomous_system = StringField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
                                     validators=[InputRequired(),
                                                 Length(min=1, max=10, message=('Autonomous System Number must be between 1 and 32 bits '
@@ -21,8 +21,8 @@ class AutonomousSystemDataForm(Form):
     delete_button = SubmitField('Delete')
 
 
-@view_config(route_name='autonomousSystem', renderer='minisecbgp:templates/topology/autonomousSystem.jinja2')
-def autonomousSystem(request):
+@view_config(route_name='prefix', renderer='minisecbgp:templates/topology/prefix.jinja2')
+def prefix(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -120,9 +120,9 @@ def autonomousSystem(request):
     return dictionary
 
 
-@view_config(route_name='autonomousSystemAction', match_param='action=showAll',
-             renderer='minisecbgp:templates/topology/autonomousSystemShowAll.jinja2')
-def autonomousSystemShowAll(request):
+@view_config(route_name='prefixAction', match_param='action=showAll',
+             renderer='minisecbgp:templates/topology/prefixShowAll.jinja2')
+def prefixShowAll(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -141,6 +141,26 @@ def autonomousSystemShowAll(request):
         dictionary['number_of_accordions_in_last_tab'] = (number_of_autonomous_systems % 10000) // 1000
         form = AutonomousSystemDataForm(request.POST)
         dictionary['form'] = form
+
+        if request.method == 'POST' and form.validate():
+            for autonomousSystemNumber in autonomousSystems:
+                if autonomousSystemNumber.autonomous_system == int(form.autonomous_system.data):
+                    message = 'The Autonomous System Number informed already exists in this topology.'
+                    css_class = 'errorMessage'
+                    dictionary['message'] = message
+                    dictionary['css_class'] = css_class
+                    return dictionary
+
+            autonomous_system = models.AutonomousSystem(autonomous_system=form.autonomous_system.data,
+                                                        stub=1,
+                                                        id_topology=request.matchdict["id_topology"])
+            request.dbsession.add(autonomous_system)
+            request.dbsession.flush()
+            dictionary['message'] = 'The Autonomous System Number %s successfully created in this topology.' % form.autonomous_system.data
+            dictionary['css_class'] = 'successMessage'
+            url = request.route_url('topologiesAction', action='autonomousSystem', id_topology=request.matchdict["id_topology"])
+
+            return HTTPFound(location=url)
 
     except Exception as error:
         dictionary['message'] = error

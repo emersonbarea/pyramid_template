@@ -20,7 +20,7 @@
               <a href="#">Link</a>
             </li>
             <li>
-              <a href="#">BGP Prefix</a>
+              <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">BGP Prefix</a>
             </li>
           </ul>
         </div>
@@ -63,7 +63,7 @@
           <div class="span5">
             <p>Non stub unique ASs: {{ unique_as_stub }} </p>
             {% for p2c_stub in p2cs_stub %}
-              <p> {{ p2c_stub.agreement }}: {{ p2c_stub.p2c }} </p>
+              <p>Link {{ p2c_stub.agreement }}: {{ p2c_stub.p2c }} </p>
             {% endfor %}
           </div>
 
