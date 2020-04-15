@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Index, BigInteger
 from .meta import Base
 from sqlalchemy.orm import relationship
 
@@ -24,7 +24,7 @@ class AutonomousSystem(Base):
     __tablename__ = 'autonomous_system'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    autonomous_system = Column(Integer, nullable=False)
+    autonomous_system = Column(BigInteger, nullable=False)
     stub = Column(Integer, nullable=False)          # 0 = not stub | 1 = stub
     link_id_autonomous_system1 = relationship('Link', foreign_keys='Link.id_autonomous_system1')
     link_id_autonomous_system2 = relationship('Link', foreign_keys='Link.id_autonomous_system2')
@@ -41,8 +41,8 @@ class Link(Base):
     id_agreement = Column(Integer, ForeignKey('realistic_topology_agreement.id'))
     id_autonomous_system1 = Column(Integer, ForeignKey('autonomous_system.id'))
     id_autonomous_system2 = Column(Integer, ForeignKey('autonomous_system.id'))
-    ip_autonomous_system1 = Column(Integer)
-    ip_autonomous_system2 = Column(Integer)
+    ip_autonomous_system1 = Column(BigInteger)
+    ip_autonomous_system2 = Column(BigInteger)
     mask = Column(Integer)
     description = Column(String(50))
     bandwidth = Column(Integer)  # kbps
@@ -58,7 +58,7 @@ class Prefix(Base):
     __tablename__ = 'prefix'
     id = Column(Integer, primary_key=True)
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
-    prefix = Column(Integer, nullable=False)
+    prefix = Column(BigInteger, nullable=False)
     mask = Column(Integer, nullable=False)
     Index('IndexId_autonomous_system', id_autonomous_system)
 

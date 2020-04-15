@@ -23,7 +23,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">MiniSecBGPs</a>
+          <a class="brand">MiniSecBGP</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a href="javascript:window.open('','_self').close();">Close</a></li>
@@ -37,7 +37,7 @@
       <div class="row-fluid">
         <div class="span12">
           <h3 align="center">Topology: {{ topology.topology }}</h3>
-          <h4 align="center">Show all Autonomous Systems</h4>
+          <h4 align="center">Show all Links</h4>
         </div>
       </div>
 
@@ -78,23 +78,32 @@
                     <div class="accordion-group">
                       <div class="accordion-heading">
                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab }}"
-                          href="#collapse{{ tab }}{{ accordion }}">Autonomous System range: {{ tab }}{{ accordion }}
+                          href="#collapse{{ tab }}{{ accordion }}">Link range: {{ tab }}{{ accordion }}
                        </a>
                       </div>
                       <div id="collapse{{ tab }}{{ accordion }}" class="accordion-body collapse">
                         <div class="accordion-inner">
-                          {% for autonomous_system in autonomousSystems %}
-                            {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
-                              <p>AS <strong>{{ autonomous_system.autonomous_system }}</strong></p>
-                            {% endif %}
-                          {% endfor %}
+                          <table cellpadding="6px">
+                            {% for link in links %}
+                              {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
+                                <tr>
+                                  <td align="right">AS <strong>{{ link.autonomous_system1 }}</strong> ({{ link.ip_autonomous_system1 }}/{{ link.mask }})</td>
+                                  <td><strong><---></strong></td>
+                                  <td>AS <strong>{{ link.autonomous_system2 }}</strong> ({{ link.ip_autonomous_system2 }}/{{ link.mask }})</td>
+                                  <td>bw: {{ link.bandwidth }} Kbps</td>
+                                  <td>load: {{ link.load }} %</td>
+                                  <td>delay: {{ link.delay }} ms</td>
+                                  <td align="center">({{ link.agreement }})</td>
+                                </tr>
+                              {% endif %}
+                            {% endfor %}
+                          </table>
                         </div>
                       </div>
                     </div>
                     {% set begin_accordion.value = begin_accordion.value + 1000 %}
                     {% set end_accordion.value = end_accordion.value + 1000 %}
                   {% endfor %}
-
                 </div>
               </div>
             {% endfor %}

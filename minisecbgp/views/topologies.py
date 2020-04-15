@@ -51,16 +51,25 @@ def topologiesDetail(request):
                 'group by l.id_agreement, rta.agreement;' % request.matchdict["id_topology"]
         dictionary['p2cs'] = request.dbsession.bind.execute(query)
 
-        query_stub = 'select count(l.id) as p2c, rta.agreement as agreement ' \
-                     'from link l, realistic_topology_agreement rta ' \
-                     'where l.id_topology = %s ' \
-                     'and l.id_autonomous_system1 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
-                     'and l.id_autonomous_system2 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
-                     'and l.id_agreement = rta.id ' \
-                     'group by l.id_agreement, rta.agreement;' % (request.matchdict["id_topology"],
-                                                                  request.matchdict["id_topology"],
-                                                                  request.matchdict["id_topology"])
-        dictionary['p2cs_stub'] = request.dbsession.bind.execute(query_stub)
+        query = 'select count(l.id) as p2c, rta.agreement as agreement ' \
+                'from link l, realistic_topology_agreement rta ' \
+                'where l.id_topology = %s ' \
+                'and l.id_autonomous_system1 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
+                'and l.id_autonomous_system2 in (select id from autonomous_system where id_topology = %s and stub = 0) ' \
+                'and l.id_agreement = rta.id ' \
+                'group by l.id_agreement, rta.agreement;' % (request.matchdict["id_topology"],
+                                                             request.matchdict["id_topology"],
+                                                             request.matchdict["id_topology"])
+        dictionary['p2cs_stub'] = request.dbsession.bind.execute(query)
+
+        dictionary['prefixes'] = request.dbsession.query(models.AutonomousSystem, models.Prefix). \
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
+            filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
+
+        dictionary['prefixes_stub'] = request.dbsession.query(models.Prefix, models.AutonomousSystem).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
+            filter(models.AutonomousSystem.stub == 0). \
+            filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
 
     except Exception as error:
         dictionary['message'] = error

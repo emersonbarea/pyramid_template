@@ -24,6 +24,11 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand">MiniSecBGP</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="javascript:window.open('','_self').close();">Close</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -80,7 +85,7 @@
                         <div class="accordion-inner">
                           {% for prefix in prefixes %}
                             {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
-                              <p>AS {{ prefix.autonomous_system }} - BGP Prefix {{ prefix.prefix }}</p>
+                              <p>AS <strong>{{ prefix.autonomous_system }}</strong> - BGP Prefix <strong>{{ prefix.prefix }}/{{ prefix.mask }}</strong> </p>
                             {% endif %}
                           {% endfor %}
                         </div>

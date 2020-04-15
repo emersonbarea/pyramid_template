@@ -82,8 +82,9 @@ class Topology(object):
     @staticmethod
     def automatic_prefix(dbsession, id_topology):
         df_prefix = pd.read_sql(dbsession.query(models.AutonomousSystem.id).
-                                filter_by(id_topology=id_topology).statement,
-                                con=dbsession.bind)
+                                filter_by(id_topology=id_topology).
+                                order_by(models.AutonomousSystem.id.asc()).
+                                statement, con=dbsession.bind)
         df_prefix.columns = ['id_autonomous_system']
         prefix_ip = 335544320
         list_prefix = list()
@@ -91,7 +92,7 @@ class Topology(object):
         for row in df_prefix.itertuples():
             list_prefix.append(prefix_ip)
             list_mask.append(30)
-            prefix_ip = prefix_ip + 256
+            prefix_ip = prefix_ip + 4
 
         df_prefix['prefix'] = list_prefix
         df_prefix['mask'] = list_mask
@@ -102,8 +103,9 @@ class Topology(object):
     def automatic_link(dbsession, id_topology, df_from_file):
         # autonomous_system
         autonomous_systems = pd.read_sql(dbsession.query(models.AutonomousSystem).
-                                         filter_by(id_topology=id_topology).statement,
-                                         con=dbsession.bind)
+                                         filter_by(id_topology=id_topology).
+                                         order_by(models.AutonomousSystem.id.asc()).
+                                         statement, con=dbsession.bind)
         df_autonomous_system = autonomous_systems.reset_index()[['id', 'autonomous_system', 'id_topology']].copy()
 
         # links

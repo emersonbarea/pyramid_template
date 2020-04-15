@@ -35,7 +35,7 @@
   <div id="aum" class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
-        <h3 align="center">BGP Prefixes: {{ topology.topology }} </h3>
+        <h3 align="center">Links: {{ topology.topology }} </h3>
       </div>
     </div>
 
@@ -43,9 +43,9 @@
       <div class="span12" align="center">
 
         {% if request.user.role == 'admin' %}
-          <form action="{{ request.route_url('prefixAction',action='addEditDelete', id_topology = topology.id) }}" method="POST">
+          <form action="{{ request.route_url('linkAction',action='addEditDelete', id_topology = topology.id) }}" method="POST">
             <div class="form-field">
-              <p>Enter the ASN for which you want to create, edit or delete BGP Prefixes: {{ form.autonomous_system }}</p>
+              <p>Enter the ASN for which you want to create, edit or delete links: {{ form.autonomous_system }}</p>
               {% if form.autonomous_system.errors %}
                 <ul class="errorMessage">
                   {% for error in form.autonomous_system.errors %}
@@ -69,10 +69,10 @@
           <div class="form-button">
             <p>
               <button type="button" class="btn btn-primary"
-                      onclick="window.open('{{ request.route_url('prefixShowAll', id_topology = topology.id) }}','_blank')">Show all Topology BGP Prefixes
+                      onclick="window.open('{{ request.route_url('linkShowAll', id_topology = topology.id) }}','_blank')">Show all Topology links
               </button>
             </p>
-            <p>* Show all may take a while due to the large number of BGP prefixes.</p>
+            <p>* Show all may take a while due to the large number of links.</p>
           </div>
         </form>
 

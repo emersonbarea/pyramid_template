@@ -10,12 +10,12 @@ class AutonomousSystemDataForm(Form):
     autonomous_system = StringField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
                                     validators=[InputRequired(),
                                                 Length(min=1, max=10, message=('Autonomous System Number must be between 1 and 32 bits '
-                                                                               'characters long.'))])
+                                                                               'number long.'))])
     edit_autonomous_system = StringField('Digit a new valid ASN (16 bit or 32 bits ASN) to change the current ASN: ',
                                          validators=[InputRequired(),
                                                      Length(min=1, max=10,
                                                             message=('Autonomous System Number must be between 1 and 32 bits '
-                                                                     'characters long.'))])
+                                                                     'number long.'))])
     create_button = SubmitField('Create')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')
@@ -42,14 +42,17 @@ def autonomousSystem(request):
 
         if request.method == 'POST' and form.validate():
 
+            if (int(form.autonomous_system.data) > 4294967295) or (int(form.edit_autonomous_system.data) > 4294967295):
+                dictionary['message'] = 'Invalid Autonomous System Number. Please enter only 16 bits or 32 bits valid ASN.'
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
+
             if form.create_button.data:
 
                 for autonomousSystemNumber in autonomousSystems:
                     if autonomousSystemNumber.autonomous_system == int(form.autonomous_system.data):
-                        message = 'The Autonomous System Number %s already exists in this topology.' % form.autonomous_system.data
-                        css_class = 'errorMessage'
-                        dictionary['message'] = message
-                        dictionary['css_class'] = css_class
+                        dictionary['message'] = 'The Autonomous System Number %s already exists in this topology.' % form.autonomous_system.data
+                        dictionary['css_class'] = 'errorMessage'
                         return dictionary
 
                 autonomous_system = models.AutonomousSystem(autonomous_system=form.autonomous_system.data,
@@ -120,8 +123,7 @@ def autonomousSystem(request):
     return dictionary
 
 
-@view_config(route_name='autonomousSystemAction', match_param='action=showAll',
-             renderer='minisecbgp:templates/topology/autonomousSystemShowAll.jinja2')
+@view_config(route_name='autonomousSystemShowAll', renderer='minisecbgp:templates/topology/autonomousSystemShowAll.jinja2')
 def autonomousSystemShowAll(request):
     user = request.user
     if user is None:

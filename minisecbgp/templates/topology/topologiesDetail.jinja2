@@ -17,7 +17,7 @@
               <a href="{{ request.route_url('autonomousSystem', id_topology = topology.id) }}"> Autonomous System </a>
             </li>
             <li>
-              <a href="#">Link</a>
+              <a href="{{ request.route_url('link', id_topology = topology.id) }}">Link</a>
             </li>
             <li>
               <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">BGP Prefix</a>
@@ -50,10 +50,11 @@
         <form class="form-horizontal" action="{{ request.route_url('topologiesAction',action='delete', id_topology = topology.id) }}" method="post">
 
           <div class="span5">
-            <p>Unique ASs: {{ unique_as }} </p>
+            <p>Unique ASs: {{ unique_as }}</p>
             {% for p2c in p2cs %}
-              <p>Link {{ p2c.agreement }}: {{ p2c.p2c }} </p>
+              <p>Link {{ p2c.agreement }}: {{ p2c.p2c }}</p>
             {% endfor %}
+            <p>BGP Prefixes: {{ prefixes }}</p>
           </div>
 
           <div class="span2">
@@ -61,10 +62,11 @@
           </div>
 
           <div class="span5">
-            <p>Non stub unique ASs: {{ unique_as_stub }} </p>
+            <p>Unique ASs: {{ unique_as_stub }} </p>
             {% for p2c_stub in p2cs_stub %}
               <p>Link {{ p2c_stub.agreement }}: {{ p2c_stub.p2c }} </p>
             {% endfor %}
+            <p>BGP Prefixes: {{ prefixes_stub }} </p>
           </div>
 
           <div class="form-group">
