@@ -109,6 +109,8 @@
                   </div>
                   <div class="modal-body">
                     <p>Are you sure you want to delete this Prefix? </p>
+                  </div>
+                  <div class="modal-footer">
                     <div class="form-group">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                       {{ form.delete_button(class="btn btn-danger")}}
@@ -137,6 +139,8 @@
                         </ul>
                       {% endif %}
                     </div>
+                  </div>
+                  <div class="modal-footer">
                     <div class="form-group">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                       {{ form.edit_button(class="btn btn-primary") }}
@@ -151,6 +155,16 @@
 
       </div>
     </div>
+
+    <script>
+      const prefix = prefix_list.children[prefix_list.selectedIndex].textContent
+      prefix_edit.value = prefix
+      prefix_list.addEventListener('change', functionGetPrefix);
+      function functionGetPrefix(e) {
+        const prefix = prefix_list.children[prefix_list.selectedIndex].textContent
+        prefix_edit.value = prefix
+      }
+    </script>
 
   </div>
 

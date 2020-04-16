@@ -1,21 +1,17 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
-from wtforms import Form, StringField, SubmitField
+from wtforms import Form, StringField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length
+from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
 
 
 class AutonomousSystemDataForm(Form):
-    autonomous_system = StringField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
-                                    validators=[InputRequired(),
-                                                Length(min=1, max=10, message=('Autonomous System Number must be between 1 and 32 bits '
-                                                                               'number long.'))])
-    edit_autonomous_system = StringField('Digit a new valid ASN (16 bit or 32 bits ASN) to change the current ASN: ',
-                                         validators=[InputRequired(),
-                                                     Length(min=1, max=10,
-                                                            message=('Autonomous System Number must be between 1 and 32 bits '
-                                                                     'number long.'))])
+    autonomous_system = IntegerField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
+                                     widget=NumberInput(min=0, max=4294967295, step=1))
+    edit_autonomous_system = IntegerField('Enter a new valid ASN (16 bit or 32 bits ASN) to change the current ASN: ',
+                                          widget=NumberInput(min=0, max=4294967295, step=1))
     create_button = SubmitField('Create')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')

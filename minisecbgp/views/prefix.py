@@ -2,18 +2,16 @@ import ipaddress
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
-from wtforms import Form, StringField, SubmitField, SelectField
+from wtforms import Form, StringField, SubmitField, SelectField, IntegerField
 from wtforms.validators import InputRequired, Length
+from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
 
 
 class PrefixDataForm(Form):
-    autonomous_system = StringField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
-                                    validators=[InputRequired(),
-                                                Length(min=1, max=10, message=(
-                                                    'Autonomous System Number must be between 1 and 32 bits '
-                                                    'number long.'))])
+    autonomous_system = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                     widget=NumberInput(min=0, max=4294967295, step=1))
     prefix_list = SelectField('Or, if you want to edit or delete an existent IPv4 prefix and mask, choose them below: ',
                               coerce=int)
     prefix_add = StringField('If you want to add a new BGP IPv4 prefix, enter the IPv4 and mask here (Ex.: 10.0.0.0/30): ',

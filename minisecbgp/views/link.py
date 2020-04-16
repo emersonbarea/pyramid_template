@@ -2,43 +2,67 @@ import ipaddress
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
-from wtforms import Form, StringField, SubmitField, SelectField
+from wtforms import Form, StringField, SubmitField, SelectField, IntegerField, validators
 from wtforms.validators import InputRequired, Length
+from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
 
 
 class LinkDataForm(Form):
-    autonomous_system = StringField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
-                                    validators=[InputRequired(),
-                                                Length(min=1, max=10, message='Autonomous System Number must be between 1 and 32 bits '
-                                                                              'number long.')])
-    link_list = SelectField('Or, if you want to edit or delete an existent link, choose them below: ',
+    autonomous_system = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                     widget=NumberInput(min=0, max=4294967295, step=1))
+    link_list = SelectField('Or, if you want to edit or delete an existent link, choose it below: ',
                             coerce=int)
-    autonomous_system1 = StringField('Source ASN *',
-                                     validators=[Length(min=1, max=10, message='Autonomous System Number must be between 1 and 32 bits '
-                                                                               'number long.')])
+    autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                      widget=NumberInput(min=0, max=4294967295, step=1))
     ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1) *',
-                                        validators=[Length(min=9, max=15, message='The IPv4 prefix must be between 9 and 15 bytes long '
+                                        validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    autonomous_system2 = StringField('Destination ASN *',
-                                     validators=[Length(min=1, max=10, message='Autonomous System Number must be between 1 and 32 bits '
-                                                                               'number long.')])
+    autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                      widget=NumberInput(min=0, max=4294967295, step=1))
     ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2) *',
-                                        validators=[Length(min=9, max=15, message='The IPv4 prefix must be between 9 and 15 bytes long '
+                                        validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    mask = StringField('Mask (source and destination interfaces) (prefix length. Ex.30) *',
-                       validators=[Length(min=1, max=2, message='The mask (prefix length) must be between 1 and 2 bytes long '
-                                                                '(Ex.: 8 or 30).')])
+    mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30) *',
+                        widget=NumberInput(min=8, max=30, step=2))
     description = StringField('Description',
                               validators=[Length(min=0, max=50, message='The description must be between 0 and 50 bytes long.')])
-    bandwidth = StringField('Bandwidth (Kbps)',
-                            validators=[Length(min=0, max=50, message='The bandwidth must be between 0 and 50 bytes long.')])
-    delay = StringField('Delay (ms)',
-                        validators=[Length(min=0, max=50, message='The delay must be between 0 and 50 bytes long.')])
-    load = StringField('Load (%)',
-                       validators=[Length(min=0, max=50, message='The link load must be between 0 and 50 bytes long.')])
+    bandwidth = IntegerField('Bandwidth (Kbps): ',
+                             widget=NumberInput(min=0, max=1000000000, step=1),
+                             validators=[validators.Optional()])
+    delay = IntegerField('Delay (ms): ',
+                         widget=NumberInput(min=0, max=1000000000, step=1),
+                         validators=[validators.Optional()])
+    load = IntegerField('Load (%): ',
+                        widget=NumberInput(min=0, max=100, step=1),
+                        validators=[validators.Optional()])
     agreement_list = SelectField('Agreement *', coerce=int)
+
+    edit_autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                           widget=NumberInput(min=0, max=4294967295, step=1))
+    edit_ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1) *',
+                                             validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
+                                                                                       '(Ex.: 1.1.1.1 or 200.200.200.201).')])
+    edit_autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+                                           widget=NumberInput(min=0, max=4294967295, step=1))
+    edit_ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2) *',
+                                             validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
+                                                                                       '(Ex.: 1.1.1.1 or 200.200.200.201).')])
+    edit_mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30) *',
+                             widget=NumberInput(min=8, max=30, step=2))
+    edit_description = StringField('Description',
+                                   validators=[Length(min=0, max=50, message='The description must be between 0 and 50 bytes long.')])
+    edit_bandwidth = IntegerField('Bandwidth (Kbps): ',
+                                  widget=NumberInput(min=0, max=1000000000, step=1),
+                                  validators=[validators.Optional()])
+    edit_delay = IntegerField('Delay (ms): ',
+                              widget=NumberInput(min=0, max=1000000000, step=1),
+                              validators=[validators.Optional()])
+    edit_load = IntegerField('Load (%): ',
+                             widget=NumberInput(min=0, max=100, step=1),
+                             validators=[validators.Optional()])
+    edit_agreement_list = SelectField('Agreement *', coerce=int)
     add_button = SubmitField('Add')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')
@@ -119,6 +143,104 @@ def linkAddEditDelete(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    def fillSelectFields():
+        query = 'select l.id as id_link, ' \
+                'rta.agreement as agreement, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
+                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
+                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
+                'l.mask as mask, ' \
+                'l.description as description, ' \
+                'l.bandwidth as bandwidth, ' \
+                'l.delay as delay, ' \
+                'l.load as load ' \
+                'from link l, realistic_topology_agreement rta ' \
+                'where l.id_agreement = rta.id ' \
+                'and (l.id_autonomous_system1 = %s or l.id_autonomous_system2 = %s) ' \
+                'order by l.id_autonomous_system2;' % (autonomousSystem.id, autonomousSystem.id)
+        links_temp = request.dbsession.bind.execute(query)
+        links = list()
+        for l in links_temp:
+            links.append({'id_link': l.id_link,
+                          'link': 'AS ' + str(l.autonomous_system1) +
+                                  ' ( ' + str(ipaddress.ip_address(l.ip_autonomous_system1)) +
+                                  ' / ' + str(l.mask) +
+                                  ' ) <--> AS ' + str(l.autonomous_system2) +
+                                  ' ( ' + str(ipaddress.ip_address(l.ip_autonomous_system2)) +
+                                  ' / ' + str(l.mask) +
+                                  ' ) -- ( Bw : ' + (str(l.bandwidth) if l.bandwidth else '__') +
+                                  ' Kbps ) -- ( Load : ' + (str(l.load) if l.load else '__') +
+                                  ' % ) -- ( Delay : ' + (str(l.delay) if l.delay else '__') +
+                                  ' ms ) -- ( Agreement : ' + l.agreement +
+                                  ' ) -- ( Description : ' + (l.description if l.description else '__') + ' )'})
+        dictionary['links'] = links
+        form.link_list.choices = [(row['id_link'], row['link']) for row in links]
+        form.agreement_list.choices = [(row.id, row.agreement) for row in
+                                       request.dbsession.query(models.RealisticTopologyAgreements)]
+        form.edit_agreement_list.choices = [(row.id, row.agreement) for row in
+                                            request.dbsession.query(models.RealisticTopologyAgreements)]
+
+    def clearFields():
+        form.ip_autonomous_system1.data = ''
+        form.autonomous_system2.data = ''
+        form.ip_autonomous_system2.data = ''
+        form.mask.data = ''
+        form.description.data = ''
+        form.bandwidth.data = ''
+        form.delay.data = ''
+        form.load.data = ''
+        fillSelectFields()
+
+    def insert(id_topology, id_agreement, autonomous_system1, autonomous_system2, ip_autonomous_system1,
+               ip_autonomous_system2, mask, description, bandwidth, delay, load, message):
+        as1_id = request.dbsession.query(models.AutonomousSystem). \
+            filter(models.AutonomousSystem.id_topology == id_topology). \
+            filter(models.AutonomousSystem.autonomous_system == autonomous_system1).first()
+        as2_id = request.dbsession.query(models.AutonomousSystem). \
+            filter(models.AutonomousSystem.id_topology == id_topology). \
+            filter(models.AutonomousSystem.autonomous_system == autonomous_system2).first()
+        if not as1_id or not as2_id:
+            dictionary[
+                'message'] = 'Confirm if Autonomous System Numbers informed really exists in this topology: ASN %s and %s' % \
+                             (autonomous_system1, autonomous_system2)
+            dictionary['css_class'] = 'errorMessage'
+            return dictionary
+        ip1 = ipaddress.ip_address(ip_autonomous_system1)
+        ip1_to_int = int(ipaddress.ip_address(ip_autonomous_system1))
+        ip2 = ipaddress.ip_address(ip_autonomous_system2)
+        ip2_to_int = int(ipaddress.ip_address(ip_autonomous_system2))
+        network1 = ipaddress.ip_network(str(ip_autonomous_system1) + '/' + str(mask), strict=False)
+        network2 = ipaddress.ip_network(str(ip_autonomous_system2) + '/' + str(mask), strict=False)
+        if (network1 != network2) or \
+                (ip1 == ip2) or \
+                (ip1 not in list(network2.hosts())) or \
+                (ip2 not in list(network1.hosts())):
+            dictionary['message'] = 'Error detected in IP address: %s/%s - %s/%s' % (
+            ip1, mask, ip2, mask)
+            dictionary['css_class'] = 'errorMessage'
+            return dictionary
+        entry = 'insert into link (id_topology, id_agreement, id_autonomous_system1, id_autonomous_system2, ' \
+                'ip_autonomous_system1, ip_autonomous_system2, mask, description, bandwidth, delay, load) values ' \
+                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' % (
+                 id_topology, id_agreement,
+                 as1_id.id, as2_id.id, ip1_to_int, ip2_to_int, mask,
+                 '\'' + str(description) + '\'' if description else 'Null',
+                 bandwidth if bandwidth else 'Null',
+                 delay if delay else 'Null',
+                 load if load else 'Null')
+        request.dbsession.bind.execute(entry)
+        clearFields()
+        dictionary['message'] = message
+        dictionary['css_class'] = 'successMessage'
+
+    def delete(id_link):
+        entry = 'delete from link where id = %s' % id_link
+        request.dbsession.bind.execute(entry)
+        clearFields()
+        dictionary['message'] = 'Link successfully removed'
+        dictionary['css_class'] = 'successMessage'
+
     dictionary = dict()
     try:
         topology = request.dbsession.query(models.Topology) \
@@ -146,107 +268,50 @@ def linkAddEditDelete(request):
             return dictionary
         dictionary['autonomous_system'] = form.autonomous_system.data
         form.autonomous_system1.data = dictionary['autonomous_system']
+        form.edit_autonomous_system1.data = dictionary['autonomous_system']
 
-        query = 'select l.id as id_link, ' \
-                'rta.agreement as agreement, ' \
-                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
-                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
-                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
-                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
-                'l.mask as mask, l.description as description, ' \
-                'coalesce(cast(l.bandwidth as varchar), \'__\') as bandwidth, ' \
-                'coalesce(cast(l.delay as varchar), \'__\') as delay, ' \
-                'coalesce(cast(l.load as varchar), \'__\') as load ' \
-                'from link l, realistic_topology_agreement rta ' \
-                'where l.id_agreement = rta.id ' \
-                'and (l.id_autonomous_system1 = %s or l.id_autonomous_system2 = %s) ' \
-                'order by l.id_autonomous_system2;' % (autonomousSystem.id, autonomousSystem.id)
-        links_temp = request.dbsession.bind.execute(query)
-        links = list()
-        for l in links_temp:
-            links.append({'id_link': l.id_link,
-                          'link': 'AS ' + str(l.autonomous_system1) + ' (' + str(ipaddress.ip_address(l.ip_autonomous_system1)) + ') <--> AS ' +
-                                  str(l.autonomous_system2) + ' (' + str(ipaddress.ip_address(l.ip_autonomous_system2)) + ') - Bw: ' +
-                                  l.bandwidth + ' Kbps - Load: ' + l.load + ' % - Delay: ' + l.delay + ' ms -- (' + l.agreement + ')'})
-        dictionary['links'] = links
-        form.link_list.choices = [(row['id_link'], row['link']) for row in links]
-
-        form.agreement_list.choices = [(row.id, row.agreement) for row in
-                                       request.dbsession.query(models.RealisticTopologyAgreements)]
+        fillSelectFields()
 
         if request.method == 'POST':
 
             if form.add_button.data:
-                if form.prefix_add.validate(form.prefix_add.data):
-                    ipaddress.ip_network(form.prefix_add.data)
-                    entry = models.Prefix(id_autonomous_system=autonomousSystem.id,
-                                          prefix=int(ipaddress.ip_address(form.prefix_add.data.split('/')[0])),
-                                          mask=int(form.prefix_add.data.split('/')[1]))
-                    request.dbsession.add(entry)
-                    request.dbsession.flush()
-                    prefixes_temp = request.dbsession.query(models.Prefix). \
-                        filter_by(id_autonomous_system=autonomousSystem.id).\
-                        order_by(models.Prefix.prefix.asc()).all()
-                    prefixes = list()
-                    for p in prefixes_temp:
-                        prefixes.append({'id_prefix': p.id,
-                                         'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
-                    form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
-                    dictionary['message'] = 'BGP Prefix %s added successfully' % form.prefix_add.data
-                    dictionary['css_class'] = 'successMessage'
-                    form.prefix_add.data = ''
+                if form.autonomous_system1.validate(form.autonomous_system1.data) and \
+                        form.ip_autonomous_system1.validate(form.ip_autonomous_system1.data) and \
+                        form.autonomous_system2.validate(form.autonomous_system2.data) and \
+                        form.ip_autonomous_system2.validate(form.ip_autonomous_system2.data) and \
+                        form.mask.validate(form.mask.data) and \
+                        form.description.validate(form.description.data) and \
+                        form.bandwidth.validate(form.bandwidth.data) and \
+                        form.delay.validate(form.delay.data) and \
+                        form.load.validate(form.load.data) and \
+                        form.agreement_list.validate(form.agreement_list.data):
+
+                    insert(request.matchdict["id_topology"], form.agreement_list.data, form.autonomous_system1.data,
+                           form.autonomous_system2.data, form.ip_autonomous_system1.data, form.ip_autonomous_system2.data,
+                           form.mask.data, form.description.data, form.bandwidth.data, form.delay.data, form.load.data,
+                           'Link successfully created')
+
             elif form.edit_button.data:
-                if form.prefix_edit.validate(form.prefix_edit.data):
-                    ipaddress.ip_network(form.prefix_edit.data)
-                    value = dict(form.prefix_list.choices).get(form.prefix_list.data)
-                    request.dbsession.query(models.Prefix).filter(models.Prefix.id == form.prefix_list.data).delete()
-                    entry = models.Prefix(id_autonomous_system=autonomousSystem.id,
-                                          prefix=int(ipaddress.ip_address(form.prefix_edit.data.split('/')[0])),
-                                          mask=int(form.prefix_edit.data.split('/')[1]))
-                    request.dbsession.add(entry)
-                    request.dbsession.flush()
-                    prefixes_temp = request.dbsession.query(models.Prefix). \
-                        filter_by(id_autonomous_system=autonomousSystem.id). \
-                        order_by(models.Prefix.prefix.asc()).all()
-                    prefixes = list()
-                    for p in prefixes_temp:
-                        prefixes.append({'id_prefix': p.id,
-                                         'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
-                    form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
-                    dictionary['message'] = 'BGP Prefix %s successfully updated to %s.' % (value, form.prefix_edit.data)
-                    dictionary['css_class'] = 'successMessage'
+                if form.edit_autonomous_system1.validate(form.edit_autonomous_system1.data) and \
+                        form.edit_ip_autonomous_system1.validate(form.edit_ip_autonomous_system1.data) and \
+                        form.edit_autonomous_system2.validate(form.edit_autonomous_system2.data) and \
+                        form.edit_ip_autonomous_system2.validate(form.edit_ip_autonomous_system2.data) and \
+                        form.edit_mask.validate(form.edit_mask.data) and \
+                        form.edit_description.validate(form.edit_description.data) and \
+                        form.edit_bandwidth.validate(form.edit_bandwidth.data) and \
+                        form.edit_delay.validate(form.edit_delay.data) and \
+                        form.edit_load.validate(form.edit_load.data) and \
+                        form.edit_agreement_list.validate(form.edit_agreement_list.data):
+
+                    delete(form.link_list.data)
+
+                    insert(request.matchdict["id_topology"], form.edit_agreement_list.data, form.edit_autonomous_system1.data,
+                           form.edit_autonomous_system2.data, form.edit_ip_autonomous_system1.data, form.edit_ip_autonomous_system2.data,
+                           form.edit_mask.data, form.edit_description.data, form.edit_bandwidth.data, form.edit_delay.data,
+                           form.edit_load.data, 'Link successfully updated')
 
             elif form.delete_button.data:
-                delete = 'delete from link where id = %s' % form.link_list.data
-                request.dbsession.bind.execute(delete)
-                query = 'select l.id as id_link, ' \
-                        'rta.agreement as agreement, ' \
-                        '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
-                        'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
-                        '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
-                        'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
-                        'l.mask as mask, l.description as description, ' \
-                        'coalesce(cast(l.bandwidth as varchar), \'__\') as bandwidth, ' \
-                        'coalesce(cast(l.delay as varchar), \'__\') as delay, ' \
-                        'coalesce(cast(l.load as varchar), \'__\') as load ' \
-                        'from link l, realistic_topology_agreement rta ' \
-                        'where l.id_agreement = rta.id ' \
-                        'and (l.id_autonomous_system1 = %s or l.id_autonomous_system2 = %s) ' \
-                        'order by l.id_autonomous_system2;' % (autonomousSystem.id, autonomousSystem.id)
-                links_temp = request.dbsession.bind.execute(query)
-                links = list()
-                for l in links_temp:
-                    links.append({'id_link': l.id_link,
-                                  'link': 'AS ' + str(l.autonomous_system1) + ' (' +
-                                          str(ipaddress.ip_address(l.ip_autonomous_system1)) + ') <--> AS ' +
-                                          str(l.autonomous_system2) + ' (' +
-                                          str(ipaddress.ip_address(l.ip_autonomous_system2)) + ') - Bw: ' +
-                                          l.bandwidth + ' Kbps - Load: ' + l.load + ' % - Delay: ' +
-                                          l.delay + ' ms -- (' + l.agreement + ')'})
-                dictionary['links'] = links
-                form.link_list.choices = [(row['id_link'], row['link']) for row in links]
-                dictionary['message'] = 'Link removed successfully'
-                dictionary['css_class'] = 'successMessage'
+                delete(form.link_list.data)
 
     except Exception as error:
         dictionary['message'] = error

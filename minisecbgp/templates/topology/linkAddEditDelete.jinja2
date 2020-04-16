@@ -184,7 +184,7 @@
             <div class="row-fluid">
               <div class="form-field">
                 {{ form.link_list.label }}
-                {{ form.link_list }}
+                {{ form.link_list(onchange="getLinkList(this)") }}
                 {% if form.link_list.errors %}
                   <ul class="errorMessage">
                     {% for error in form.link_list.errors %}
@@ -210,6 +210,8 @@
                   </div>
                   <div class="modal-body">
                     <p>Are you sure you want to delete this Link? </p>
+                  </div>
+                  <div class="modal-footer">
                     <div class="form-group">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                       {{ form.delete_button(class="btn btn-danger")}}
@@ -219,23 +221,117 @@
               </div>
             </div>
 
-            <div class="modal fade" id="editModal" tabindex='-1' role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" align="left">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edit Link</h4>
-                  </div>
-                  <div class="modal-body">
-                    <div class="form-field">
-                      colocar os campos aqui
-                    </div>
-                    <div class="form-group">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                      {{ form.edit_button(class="btn btn-primary") }}
-                    </div>
-                  </div>
-                </div>
+            <div class="modal hide fade" id="editModal" tabindex="-1">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Edit Link</h4>
+              </div>
+              <div class="modal-body">
+
+                {{ form.edit_autonomous_system1.label }}
+                {{ form.edit_autonomous_system1(disabled=True) }}
+                {% if form.edit_autonomous_system1.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_autonomous_system1.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_ip_autonomous_system1.label }}
+                {{ form.edit_ip_autonomous_system1 }}
+                {% if form.edit_ip_autonomous_system1.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_ip_autonomous_system1.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_autonomous_system2.label }}
+                {{ form.edit_autonomous_system2 }}
+                {% if form.edit_autonomous_system2.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_autonomous_system2.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_ip_autonomous_system2.label }}
+                {{ form.edit_ip_autonomous_system2 }}
+                {% if form.edit_ip_autonomous_system2.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_ip_autonomous_system2.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_mask.label }}
+                {{ form.edit_mask }}
+                {% if form.edit_mask.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_mask.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_description.label }}
+                {{ form.edit_description }}
+                {% if form.edit_description.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_description.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_bandwidth.label }}
+                {{ form.edit_bandwidth }}
+                {% if form.edit_bandwidth.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_bandwidth.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_delay.label }}
+                {{ form.edit_delay }}
+                {% if form.edit_delay.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_delay.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_load.label }}
+                {{ form.edit_load }}
+                {% if form.edit_load.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_load.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {{ form.edit_agreement_list.label }}
+                {{ form.edit_agreement_list }}
+                {% if form.edit_agreement_list.errors %}
+                  <ul class="errorMessage">
+                    {% for error in form.edit_agreement_list.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                {{ form.edit_button(class="btn btn-primary") }}
               </div>
             </div>
 
@@ -244,6 +340,53 @@
 
       </div>
     </div>
+
+    <script>
+      functionGetLink();
+
+      link_list.addEventListener('change', functionGetLink);
+
+      function functionGetLink() {
+        const id_link = document.getElementById('link_list');
+        const link = link_list.children[link_list.selectedIndex].textContent
+
+        var res = link.split(' ');
+        edit_ip_autonomous_system1.value = res[3]
+        edit_autonomous_system2.value = res[9]
+        edit_ip_autonomous_system2.value = res[11]
+        edit_mask.value = res[5]
+
+        var description = link.split('Description : ');
+        var res = description[1].split(' )');
+        res[0] == '__' ? edit_description.value = '' : edit_description.value = res[0];
+
+        var bandwidth = link.split('Bw : ');
+        var res = bandwidth[1].split(' ');
+        res[0] == '__' ? edit_bandwidth.value = '' : edit_bandwidth.value = res[0];
+
+        var load = link.split('Load : ');
+        var res = load[1].split(' ');
+        res[0] == '__' ? edit_load.value = '' : edit_load.value = res[0];
+
+        var delay = link.split('Delay : ');
+        var res = delay[1].split(' ');
+        res[0] == '__' ? edit_delay.value = '' : edit_delay.value = res[0];
+
+        var agreement = link.split('Agreement : ');
+        var res = agreement[1].split(' )');
+        functionSelectField('edit_agreement_list', res[0]);
+      }
+
+      function functionSelectField(selectId, findName) {
+        var select = document.getElementById(selectId)
+	    for (var i = 0; i < select.options.length; i++) {
+          if (select.options[i].textContent == findName) {
+              document.getElementById(selectId).selectedIndex = i;
+              break;
+          }
+	    }
+      }
+    </script>
 
   </div>
 
