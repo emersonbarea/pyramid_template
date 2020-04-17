@@ -3,7 +3,7 @@ import ipaddress
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from wtforms import Form, StringField, SubmitField, SelectField, IntegerField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, IPAddress
 from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models

@@ -1,0 +1,70 @@
+import os
+import uuid
+import shutil
+
+from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPForbidden
+from wtforms import Form, SelectField
+from wtforms.validators import InputRequired
+
+from minisecbgp import models
+
+
+class TopologyDataForm(Form):
+    topology_list = SelectField('Choose topology to download', coerce=int, validators=[InputRequired()])
+
+
+@view_config(route_name='manualTopologies', renderer='minisecbgp:templates/topology/manualTopologiesShow.jinja2')
+def manualTopologies(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    dictionary['topologies'] = request.dbsession.query(models.Topology). \
+        filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
+               filter_by(topology_type='Manual')).all()
+    downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
+    if downloading.downloading == 1:
+        dictionary['message'] = 'Warning: there is an update process running in the background. ' \
+                  'Wait for it finish to see the new topology installed and access topology detail.'
+        dictionary['css_class'] = 'warningMessage'
+
+    dictionary['updating'] = downloading.downloading
+    dictionary['manualTopologies_url'] = request.route_url('manualTopologies')
+    dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
+
+    return dictionary
+
+
+@view_config(route_name='manualTopologiesAction', match_param='action=upload',
+             renderer='minisecbgp:templates/topology/manualTopologiesUpload.jinja2')
+def upload(request):
+    user = request.user
+    if user is None or (user.role != 'admin'):
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        if request.method == 'POST':
+            filename = request.POST['topology_file'].filename
+            if not filename.endswith('.MiniSecBGP'):
+                dictionary['message'] = 'File %s has a invalid file extension name. ' \
+                                        'Please verify and upload again.' % filename
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
+
+            input_file = request.POST['topology_file'].file
+            file_path = os.path.join('/tmp', '%s.MiniSecBGP' % uuid.uuid4())
+            temp_file_path = file_path + '~'
+            input_file.seek(0)
+            with open(temp_file_path, 'wb') as output_file:
+                shutil.copyfileobj(input_file, output_file)
+            os.rename(temp_file_path, file_path)
+            dictionary['message'] = 'File %s successfully uploaded.' % filename
+            dictionary['css_class'] = 'successMessage'
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary

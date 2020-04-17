@@ -88,8 +88,7 @@ def manualUpdate(request):
         databases.sort(reverse=True)
         installed_databases = request.dbsession.query(models.Topology). \
             filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
-                   filter_by(topology_type='Realistic')). \
-            all()
+                   filter_by(topology_type='Realistic')).all()
         for database in installed_databases:
             if database.topology in databases:
                 databases.remove(database.topology)
@@ -111,7 +110,7 @@ def manualUpdate(request):
             arguments = ['--config-file=minisecbgp.ini',
                          '--topology-type=realistic',
                          '--file=%s.txt.bz2' % file]
-            subprocess.Popen(['./venv/bin/topology'] + arguments)
+            subprocess.Popen(['./venv/bin/realistic_topology'] + arguments)
             url = request.route_url('realisticTopologies')
             return HTTPFound(location=url)
         dictionary['form'] = form

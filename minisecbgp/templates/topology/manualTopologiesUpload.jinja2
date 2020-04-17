@@ -1,0 +1,32 @@
+{% extends "manualTopologies.jinja2" %}
+
+{% block contentManualTopology %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Upload Topology File</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+
+      <form action="{{ request.route_url('manualTopologiesAction',action='upload') }}" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+        <div class="form-field">
+          <br>
+          <label for="topology_file">
+            <p>Choose a valid <strong>MiniSecBGP</strong> topology file to upload (Ex.: topology1.MiniSecBGP):</p>
+          </label>
+          <p><input id="topology_file" name="topology_file" type="file" value="" /></p>
+          <br>
+        </div>
+        <div class="form-button">
+          <p><button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button></p>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock contentManualTopology %}

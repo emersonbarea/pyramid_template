@@ -3,7 +3,7 @@
 {% block contentDashboard %}
 
   <div class="navbar">
-    <h2 align="center">Topologies</h2>
+    <h2 align="center">Manual Topology</h2>
     <div class="navbar-inner">
       <div class="container">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -14,13 +14,8 @@
         <div class="nav-collapse collapse">
           <ul class="nav">
             {% if request.user.role == 'admin' %}
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Topology Type</a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ request.route_url('manualTopologies') }}">Manual<br></a>
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologies') }}">Realistic<br></a>
-                  <a class="dropdown-item" href="#">Synthetic<br></a>
-                </div>
+              <li>
+                <a href="{{ request.route_url('manualTopologiesAction',action='upload') }}">Upload Topology File</a>
               </li>
             {% endif %}
           </ul>
@@ -33,6 +28,6 @@
     <p> {{ message }} </p>
   </div>
 
-  {% block contentTopologies %} {% endblock contentTopologies %}
+  {% block contentManualTopology %} {% endblock contentManualTopology %}
 
 {% endblock contentDashboard %}

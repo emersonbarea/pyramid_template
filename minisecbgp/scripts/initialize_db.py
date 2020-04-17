@@ -45,10 +45,9 @@ def setup_models(dbsession):
 
     # Topology
 
-    topologyTypeRealistic = models.TopologyType(topology_type='Realistic')
-    topologyTypeSynthetic = models.TopologyType(topology_type='Synthetic')
-    dbsession.add(topologyTypeRealistic)
-    dbsession.add(topologyTypeSynthetic)
+    topologyTypes = ['Realistic', 'Synthetic', 'Manual']
+    for topologyType in topologyTypes:
+        dbsession.add(models.TopologyType(topology_type=topologyType))
 
     topologyAgreementsC2P = models.RealisticTopologyAgreements(agreement='customer to provider',
                                                                value='-1')

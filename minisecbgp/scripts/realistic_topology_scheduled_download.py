@@ -42,7 +42,7 @@ class DownloadTopology(object):
                 arguments = ['--config-file=%s/minisecbgp.ini' % self.topology_path,
                              '--topology-type=realistic',
                              '--file=%s.txt.bz2' % databases[0]]
-                subprocess.Popen(['%s./venv/bin/topology' % self.topology_path] + arguments)
+                subprocess.Popen(['%s./venv/bin/realistic_topology' % self.topology_path] + arguments)
 
         except Exception as error:
             print(error)

@@ -66,7 +66,7 @@ setup(
             'realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main',
             'tests = minisecbgp.scripts.tests:main',
             'config = minisecbgp.scripts.config:main',
-            'topology = minisecbgp.scripts.topology:main'
+            'realistic_topology = minisecbgp.scripts.realistic_topology:main'
         ],
     },
 )

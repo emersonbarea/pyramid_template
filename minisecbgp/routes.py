@@ -22,4 +22,6 @@ def includeme(config):
     config.add_route('topologiesAction', '/topology/{action}/{id_topology}')
     config.add_route('realisticTopologies', '/realisticTopologies')
     config.add_route('realisticTopologiesAction', '/realisticTopologies/{action}')
+    config.add_route('manualTopologies', '/manualTopologies')
+    config.add_route('manualTopologiesAction', '/manualTopologies/{action}')
 
