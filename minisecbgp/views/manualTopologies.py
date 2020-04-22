@@ -1,5 +1,6 @@
+import datetime
 import os
-import uuid
+import re
 import shutil
 
 from pyramid.view import view_config
@@ -55,7 +56,7 @@ def upload(request):
                 return dictionary
 
             input_file = request.POST['topology_file'].file
-            file_path = os.path.join('/tmp', '%s.MiniSecBGP' % uuid.uuid4())
+            file_path = os.path.join('/tmp', '%s-%s' % (re.sub(r"[' ':.-]", "", str(datetime.datetime.now())), filename))
             temp_file_path = file_path + '~'
             input_file.seek(0)
             with open(temp_file_path, 'wb') as output_file:

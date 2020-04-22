@@ -130,9 +130,9 @@ install_app() {
 
         initialize_db minisecbgp.ini
 
-        cp "$LOCAL_HOME"/CAIDA_AS_Relationship/20191201.as-rel2.txt.bz2 /tmp/
+        cp "$LOCAL_HOME"/topology/20191201.as-rel2.txt.bz2 /tmp/
 
-        topology --config-file=minisecbgp.ini \
+        realistic_topology --config-file=minisecbgp.ini \
           --topology-type=realistic \
           --file='20191201.as-rel2.txt.bz2'
 
