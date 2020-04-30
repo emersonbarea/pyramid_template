@@ -2,9 +2,13 @@ import datetime
 import os
 import re
 import shutil
+import json
+import subprocess
+
+import pandas as pd
 
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPFound
 from wtforms import Form, SelectField
 from wtforms.validators import InputRequired
 
@@ -25,7 +29,7 @@ def manualTopologies(request):
     dictionary['topologies'] = request.dbsession.query(models.Topology). \
         filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
                filter_by(topology_type='Manual')).all()
-    downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
+    downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
         dictionary['message'] = 'Warning: there is an update process running in the background. ' \
                   'Wait for it finish to see the new topology installed and access topology detail.'
@@ -47,6 +51,14 @@ def upload(request):
 
     dictionary = dict()
     try:
+        downloading = request.dbsession.query(models.DownloadingTopology).first()
+        if downloading.downloading == 1:
+            dictionary['message'] = 'Warning: there is an update process running in the background. ' \
+                                    'Wait for it finish to see the new topology installed and access topology detail.'
+            dictionary['css_class'] = 'warningMessage'
+
+        dictionary['updating'] = downloading.downloading
+
         if request.method == 'POST':
             filename = request.POST['topology_file'].filename
             if not filename.endswith('.MiniSecBGP'):
@@ -62,8 +74,21 @@ def upload(request):
             with open(temp_file_path, 'wb') as output_file:
                 shutil.copyfileobj(input_file, output_file)
             os.rename(temp_file_path, file_path)
-            dictionary['message'] = 'File %s successfully uploaded.' % filename
-            dictionary['css_class'] = 'successMessage'
+
+            #arguments = ['--file=%s' % file_path]
+            #result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #command_result, command_result_error = result.communicate()
+            #if command_result:
+            #    dictionary['message'] = command_result
+            #    dictionary['css_class'] = 'errorMessage'
+            #    return dictionary
+
+            arguments = ['--file=%s' % file_path]
+            result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments)
+
+            url = request.route_url('manualTopologies')
+            return HTTPFound(location=url)
+
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'

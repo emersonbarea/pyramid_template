@@ -45,26 +45,41 @@ def setup_models(dbsession):
 
     # Topology
 
-    topologyTypes = ['Realistic', 'Synthetic', 'Manual']
-    for topologyType in topologyTypes:
-        dbsession.add(models.TopologyType(topology_type=topologyType))
+    topology_types = ['Realistic', 'Synthetic', 'Manual']
+    for topology_type in topology_types:
+        dbsession.add(models.TopologyType(topology_type=topology_type))
 
-    topologyAgreementsC2P = models.RealisticTopologyAgreements(agreement='customer to provider',
-                                                               value='-1')
-    topologyAgreementsP2P = models.RealisticTopologyAgreements(agreement='provider to provider',
-                                                               value='0')
-    dbsession.add(topologyAgreementsC2P)
-    dbsession.add(topologyAgreementsP2P)
+    link_agreement_c2p = models.LinkAgreement(agreement='customer to provider',
+                                              description='Customer ASes pay ISPs (providers) for access to the rest of '
+                                                          'the Internet, also known as transit. In this scenario, '
+                                                          'customers ASes does not retransmit the routes published '
+                                                          'by transit ISPs.')
 
-    downloadParameters = models.RealisticTopologyDownloadParameters(url='http://data.caida.org/datasets/as-relationships/serial-2/',
+    link_agreement_p2p = models.LinkAgreement(agreement='provider to provider',
+                                              description='A p2p link connects two ISPs who have agreed to exchange '
+                                                          'traffic on a quid pro quo basis.')
+    dbsession.add(link_agreement_c2p)
+    dbsession.add(link_agreement_p2p)
+
+    id_link_agreement_c2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='customer to provider')
+    realistic_topology_link_agreement_c2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_c2p,
+                                                                                  value='-1')
+    dbsession.add(realistic_topology_link_agreement_c2p)
+
+    id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='provider to provider')
+    realistic_topology_link_agreement_p2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_p2p,
+                                                                                  value='0')
+    dbsession.add(realistic_topology_link_agreement_p2p)
+
+    download_parameters = models.RealisticTopologyDownloadParameter(url='http://data.caida.org/datasets/as-relationships/serial-2/',
                                                                     file_search_string='.as-rel2')
-    dbsession.add(downloadParameters)
+    dbsession.add(download_parameters)
 
-    scheduleDownloads = models.RealisticTopologyScheduleDownloads(loop=0,
+    schedule_downloads = models.RealisticTopologyScheduleDownload(loop=0,
                                                                   date=date.today())
-    dbsession.add(scheduleDownloads)
+    dbsession.add(schedule_downloads)
 
-    downloading = models.RealisticTopologyDownloadingCaidaDatabase(downloading=0)
+    downloading = models.DownloadingTopology(downloading=0)
     dbsession.add(downloading)
 
 

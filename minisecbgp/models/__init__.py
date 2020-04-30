@@ -11,12 +11,20 @@ from .topology import (
     TopologyType,
     Topology,
     AutonomousSystem,
-    RealisticTopologyAgreements,
-    Link,
     Prefix,
-    RealisticTopologyDownloadParameters,
-    RealisticTopologyScheduleDownloads,
-    RealisticTopologyDownloadingCaidaDatabase)
+    Link,
+    LinkAgreement,
+    RealisticTopologyLinkAgreement,
+    RealisticTopologyDownloadParameter,
+    RealisticTopologyScheduleDownload,
+    DownloadingTopology,
+    TypeOfUser,
+    TypeOfService,
+    TypeOfUserAutonomousSystem,
+    TypeOfServiceAutonomousSystem,
+    Region,
+    InternetExchangePoint,
+    AutonomousSystemInternetExchangePoint)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

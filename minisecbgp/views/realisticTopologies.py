@@ -49,7 +49,7 @@ class TopologyDataForm(Form):
 
 
 @view_config(route_name='realisticTopologies', renderer='minisecbgp:templates/topology/realisticTopologiesShow.jinja2')
-def realisticTopologies(request):
+def realistic_topologies(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -59,7 +59,7 @@ def realisticTopologies(request):
         filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
                filter_by(topology_type='Realistic')). \
         all()
-    downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
+    downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
         dictionary['message'] = 'Warning: there is an update process running in the background. ' \
                   'Wait for it finish to see the new topology installed and access topology detail.'
@@ -72,16 +72,16 @@ def realisticTopologies(request):
     return dictionary
 
 
-@view_config(route_name='realisticTopologiesAction', match_param='action=manualUpdate',
-             renderer='minisecbgp:templates/topology/realisticTopologiesManualUpdate.jinja2')
-def manualUpdate(request):
+@view_config(route_name='realisticTopologiesAction', match_param='action=updateTopology',
+             renderer='minisecbgp:templates/topology/realisticTopologiesUpdateTopology.jinja2')
+def update_topology(request):
     user = request.user
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
     dictionary = dict()
     try:
-        downloadParameters = request.dbsession.query(models.RealisticTopologyDownloadParameters).first()
+        downloadParameters = request.dbsession.query(models.RealisticTopologyDownloadParameter).first()
         site = requests.get(downloadParameters.url)
         databases = re.findall(r'\d{8}' + downloadParameters.file_search_string, site.text)
         databases = list(dict.fromkeys(databases))
@@ -96,19 +96,18 @@ def manualUpdate(request):
         form = TopologyDataForm(request.POST)
         form.topology_list.choices = [(i, database) for i, database in enumerate(databases)]
 
-        downloading = request.dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
+        downloading = request.dbsession.query(models.DownloadingTopology).first()
         if downloading.downloading == 1:
             dictionary['message'] = 'Warning: there is an update process running in the background. ' \
                       'Wait for it finish to access Manual Update again.'
             dictionary['css_class'] = 'warningMessage'
             dictionary['updating'] = downloading.downloading
-            request.override_renderer = 'minisecbgp:templates/topology/realisticTopologiesManualUpdate.jinja2'
+            request.override_renderer = 'minisecbgp:templates/topology/realisticTopologiesUpdateTopology.jinja2'
 
         if request.method == 'POST' and form.validate():
             file = dict(form.topology_list.choices).get(form.topology_list.data)
             urllib.request.urlretrieve(downloadParameters.url + file + '.txt.bz2', '/tmp/' + file + '.txt.bz2')
             arguments = ['--config-file=minisecbgp.ini',
-                         '--topology-type=realistic',
                          '--file=%s.txt.bz2' % file]
             subprocess.Popen(['./venv/bin/realistic_topology'] + arguments)
             url = request.route_url('realisticTopologies')
@@ -124,30 +123,15 @@ def manualUpdate(request):
 
 
 @view_config(route_name='realisticTopologiesAction', match_param='action=agreements',
-             renderer='minisecbgp:templates/topology/realisticTopologiesAgreements.jinja2')
+             renderer='minisecbgp:templates/topology/realisticTopologiesLinksAgreements.jinja2')
 def agreements(request):
     user = request.user
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
     dictionary = dict()
-    try:
-        form = AgreementsDataForm(request.POST)
-        if request.method == 'POST':
-            agreement = models.RealisticTopologyAgreements(agreement=form.agreement.data,
-                                                           value=form.value.data)
-            request.dbsession.add(agreement)
-            request.dbsession.flush()
-            form = AgreementsDataForm()
-            dictionary['message'] = ('CAIDA AS-Relationship AS\'s agreement "%s" successfully registered.' % form.agreement.data)
-            dictionary['css_class'] = 'successMessage'
-        dictionary['agreements'] = request.dbsession.query(models.RealisticTopologyAgreements).all()
-        dictionary['form'] = form
-
-    except Exception as error:
-        dictionary['form'] = form
-        dictionary['message'] = error
-        dictionary['css_class'] = 'errorMessage'
+    dictionary['agreements'] = request.dbsession.query(models.LinkAgreement, models.RealisticTopologyLinkAgreement). \
+        filter(models.LinkAgreement.id == models.RealisticTopologyLinkAgreement.id_link_agreement).all()
 
     return dictionary
 
@@ -161,7 +145,7 @@ def parameters(request):
 
     dictionary = dict()
     try:
-        parametersDownload = request.dbsession.query(models.RealisticTopologyDownloadParameters).first()
+        parametersDownload = request.dbsession.query(models.RealisticTopologyDownloadParameter).first()
         if request.method == 'GET':
             form = ParametersDataForm(request.POST, obj=parametersDownload)
         else:
@@ -189,7 +173,7 @@ def schedule(request):
 
     dictionary = dict()
     try:
-        scheduledDownload = request.dbsession.query(models.RealisticTopologyScheduleDownloads).first()
+        scheduledDownload = request.dbsession.query(models.RealisticTopologyScheduleDownload).first()
         if request.method == 'GET':
             form = ScheduledDownload(request.POST, obj=scheduledDownload)
         elif request.method == 'POST':

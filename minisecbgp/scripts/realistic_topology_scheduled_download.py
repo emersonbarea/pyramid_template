@@ -1,6 +1,5 @@
 import argparse
 import getopt
-import os
 import subprocess
 import sys
 from datetime import timedelta, date
@@ -22,10 +21,10 @@ class DownloadTopology(object):
 
     def download_topology(self):
         try:
-            scheduledDownload = self.dbsession.query(models.RealisticTopologyScheduleDownloads).first()
+            scheduledDownload = self.dbsession.query(models.RealisticTopologyScheduleDownload).first()
             if date.today() == scheduledDownload.date:
                 scheduledDownload.date = scheduledDownload.date + timedelta(days=scheduledDownload.loop)
-                downloadParameters = self.dbsession.query(models.RealisticTopologyDownloadParameters).first()
+                downloadParameters = self.dbsession.query(models.RealisticTopologyDownloadParameter).first()
                 site = requests.get(downloadParameters.url)
                 databases = re.findall(r'\d{8}' + downloadParameters.file_search_string, site.text)
                 databases = list(dict.fromkeys(databases))
@@ -40,7 +39,6 @@ class DownloadTopology(object):
                 urllib.request.urlretrieve(downloadParameters.url + databases[0] + '.txt.bz2',
                                            '/tmp/' + databases[0] + '.txt.bz2')
                 arguments = ['--config-file=%s/minisecbgp.ini' % self.topology_path,
-                             '--topology-type=realistic',
                              '--file=%s.txt.bz2' % databases[0]]
                 subprocess.Popen(['%s./venv/bin/realistic_topology' % self.topology_path] + arguments)
 

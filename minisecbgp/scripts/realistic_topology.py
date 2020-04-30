@@ -12,7 +12,7 @@ from sqlalchemy.exc import OperationalError
 from minisecbgp import models
 
 
-class Topology(object):
+class RealisticTopology(object):
     def __init__(self, file):
         self.file = file
         self.output_file = self.file[:-4]
@@ -42,12 +42,6 @@ class Topology(object):
         pandas_unique_autonomous_systems = pandas_autonomous_systems.drop_duplicates(keep='first')  # all unique ASes (stub and not stub)
 
         return pandas_unique_autonomous_systems, pandas_stub_autonomous_systems, df_from_file
-
-    def brite(self):
-        pass
-
-    def imported(self):
-        pass
 
     def topology(self, dbsession):
         topology = models.Topology(topology=self.topology_name,
@@ -110,7 +104,7 @@ class Topology(object):
 
         # links
         df_link = df_from_file.reset_index()[['AS1', 'AS2', 'pp_cp']].copy()
-        df_link.columns = ['autonomous_system1', 'autonomous_system2', 'id_agreement']
+        df_link.columns = ['autonomous_system1', 'autonomous_system2', 'id_link_agreement']
 
         # links for autonomous_system 1
         df_link.set_index('autonomous_system1', inplace=True)
@@ -128,10 +122,11 @@ class Topology(object):
 
         # agreements
         df_link.reset_index()
-        df_link.set_index('id_agreement', inplace=True)
-        agreements = dbsession.query(models.RealisticTopologyAgreements).all()
+        df_link.set_index('id_link_agreement', inplace=True)
+        agreements = dbsession.query(models.LinkAgreement, models.RealisticTopologyLinkAgreement).\
+            filter(models.LinkAgreement.id == models.RealisticTopologyLinkAgreement.id_link_agreement)
         for agreement in agreements:
-            df_link.rename(index={int(agreement.value): agreement.id}, inplace=True)
+            df_link.rename(index={int(agreement.RealisticTopologyLinkAgreement.value): agreement.LinkAgreement.id}, inplace=True)
 
         prefix_ip = 16777216
         list_ip_autonomous_system1 = list()
@@ -152,7 +147,7 @@ class Topology(object):
 
     @staticmethod
     def downloading(dbsession, downloading):
-        entry = dbsession.query(models.RealisticTopologyDownloadingCaidaDatabase).first()
+        entry = dbsession.query(models.DownloadingTopology).first()
         entry.downloading = downloading
 
     def erase_file(self):
@@ -171,20 +166,20 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "topology-type=", "file="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "file="])
     except getopt.GetoptError:
-        print('* Usage: topology --config-file={path + minisecbgp.ini} '
-              '--topology-type={realistic {--file={compressed file name}}|brite|imported}')
+        print('* Usage: realistic_topology '
+              '--config-file=<pyramid config file .ini> '
+              '--file={compressed file name}')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('* Usage: topology --config-file={path + minisecbgp.ini} '
-                  '--topology-type={realistic {--file={compressed file name}}|brite|imported}')
+            print('* Usage: realistic_topology '
+                  '--config-file=<pyramid config file .ini> '
+                  '--file={compressed file name}')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-        elif opt == '--topology-type':
-            topology_type = arg
         elif opt == '--file':
             file = arg
 
@@ -192,7 +187,7 @@ def main(argv=sys.argv[1:]):
     setup_logging(args.config_uri)
     env = bootstrap(args.config_uri)
     try:
-        t = Topology(file)
+        t = RealisticTopology(file)
 
         with env['request'].tm:
             dbsession = env['request'].dbsession
@@ -200,13 +195,7 @@ def main(argv=sys.argv[1:]):
             t.downloading(dbsession, downloading)
 
         with env['request'].tm:
-            dbsession = env['request'].dbsession
-            if topology_type == 'realistic':
-                pandas_unique_autonomous_systems, pandas_stub_autonomous_systems, df_from_file = t.as_relationship()
-            elif topology_type == 'brite':
-                t.brite(dbsession)
-            elif topology_type == 'imported':
-                t.imported(dbsession)
+            pandas_unique_autonomous_systems, pandas_stub_autonomous_systems, df_from_file = t.as_relationship()
 
         with env['request'].tm:
             dbsession = env['request'].dbsession

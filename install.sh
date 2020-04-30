@@ -132,9 +132,7 @@ install_app() {
 
         cp "$LOCAL_HOME"/topology/20191201.as-rel2.txt.bz2 /tmp/
 
-        realistic_topology --config-file=minisecbgp.ini \
-          --topology-type=realistic \
-          --file='20191201.as-rel2.txt.bz2'
+        realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
 
         tests --config-file=minisecbgp.ini --execution-type='manual' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 

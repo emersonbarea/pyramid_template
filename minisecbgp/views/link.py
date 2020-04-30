@@ -3,7 +3,7 @@ import ipaddress
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from wtforms import Form, StringField, SubmitField, SelectField, IntegerField, validators
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import Length
 from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
@@ -97,7 +97,7 @@ def linkShowAll(request):
             .filter_by(id=request.matchdict["id_topology"]).first()
 
         query = 'select l.id as id_link, ' \
-                'rta.agreement as agreement, ' \
+                'la.agreement as agreement, ' \
                 '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
                 'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
                 '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
@@ -106,8 +106,8 @@ def linkShowAll(request):
                 'coalesce(cast(l.bandwidth as varchar), \'__\') as bandwidth, ' \
                 'coalesce(cast(l.delay as varchar), \'__\') as delay, ' \
                 'coalesce(cast(l.load as varchar), \'__\') as load ' \
-                'from link l, realistic_topology_agreement rta ' \
-                'where l.id_agreement = rta.id ' \
+                'from link l, link_agreement la ' \
+                'where l.id_link_agreement = la.id ' \
                 'and l.id_topology = %s ' \
                 'order by l.id_autonomous_system1, l.id_autonomous_system2;' % request.matchdict["id_topology"]
         links_temp = request.dbsession.bind.execute(query)
@@ -143,9 +143,40 @@ def linkAddEditDelete(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
+    def stub(autonomous_system1, autonomous_system2):
+        query = 'select count(id) as count ' \
+                'from link ' \
+                'where id_autonomous_system1 = %s ' \
+                'or id_autonomous_system2 = %s;' % (autonomous_system1, autonomous_system1)
+        count_autonomous_system1 = request.dbsession.bind.execute(query)
+        for stub_autonomous_system1 in count_autonomous_system1:
+            if stub_autonomous_system1.count > 1:
+                autonomous_system = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id=autonomous_system1).first()
+                autonomous_system.stub = 0
+            else:
+                autonomous_system = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id=autonomous_system1).first()
+                autonomous_system.stub = 1
+
+        query = 'select count(id) as count ' \
+                'from link ' \
+                'where id_autonomous_system1 = %s ' \
+                'or id_autonomous_system2 = %s;' % (autonomous_system2, autonomous_system2)
+        count_autonomous_system2 = request.dbsession.bind.execute(query)
+        for stub_autonomous_system2 in count_autonomous_system2:
+            if stub_autonomous_system2.count > 1:
+                autonomous_system = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id=autonomous_system2).first()
+                autonomous_system.stub = 0
+            else:
+                autonomous_system = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id=autonomous_system2).first()
+                autonomous_system.stub = 1
+
     def fillSelectFields():
         query = 'select l.id as id_link, ' \
-                'rta.agreement as agreement, ' \
+                'la.agreement as agreement, ' \
                 '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
                 'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
                 '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
@@ -155,8 +186,8 @@ def linkAddEditDelete(request):
                 'l.bandwidth as bandwidth, ' \
                 'l.delay as delay, ' \
                 'l.load as load ' \
-                'from link l, realistic_topology_agreement rta ' \
-                'where l.id_agreement = rta.id ' \
+                'from link l, link_agreement la ' \
+                'where l.id_link_agreement = la.id ' \
                 'and (l.id_autonomous_system1 = %s or l.id_autonomous_system2 = %s) ' \
                 'order by l.id_autonomous_system2;' % (autonomousSystem.id, autonomousSystem.id)
         links_temp = request.dbsession.bind.execute(query)
@@ -177,9 +208,9 @@ def linkAddEditDelete(request):
         dictionary['links'] = links
         form.link_list.choices = [(row['id_link'], row['link']) for row in links]
         form.agreement_list.choices = [(row.id, row.agreement) for row in
-                                       request.dbsession.query(models.RealisticTopologyAgreements)]
+                                       request.dbsession.query(models.LinkAgreement)]
         form.edit_agreement_list.choices = [(row.id, row.agreement) for row in
-                                            request.dbsession.query(models.RealisticTopologyAgreements)]
+                                            request.dbsession.query(models.LinkAgreement)]
 
     def clearFields():
         form.ip_autonomous_system1.data = ''
@@ -192,7 +223,7 @@ def linkAddEditDelete(request):
         form.load.data = ''
         fillSelectFields()
 
-    def insert(id_topology, id_agreement, autonomous_system1, autonomous_system2, ip_autonomous_system1,
+    def insert(id_topology, id_link_agreement, autonomous_system1, autonomous_system2, ip_autonomous_system1,
                ip_autonomous_system2, mask, description, bandwidth, delay, load, message):
         as1_id = request.dbsession.query(models.AutonomousSystem). \
             filter(models.AutonomousSystem.id_topology == id_topology). \
@@ -220,23 +251,26 @@ def linkAddEditDelete(request):
             ip1, mask, ip2, mask)
             dictionary['css_class'] = 'errorMessage'
             return dictionary
-        entry = 'insert into link (id_topology, id_agreement, id_autonomous_system1, id_autonomous_system2, ' \
+        entry = 'insert into link (id_topology, id_link_agreement, id_autonomous_system1, id_autonomous_system2, ' \
                 'ip_autonomous_system1, ip_autonomous_system2, mask, description, bandwidth, delay, load) values ' \
                 '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' % (
-                 id_topology, id_agreement,
+                 id_topology, id_link_agreement,
                  as1_id.id, as2_id.id, ip1_to_int, ip2_to_int, mask,
                  '\'' + str(description) + '\'' if description else 'Null',
                  bandwidth if bandwidth else 'Null',
                  delay if delay else 'Null',
                  load if load else 'Null')
         request.dbsession.bind.execute(entry)
+        stub(as1_id.id, as2_id.id)
         clearFields()
         dictionary['message'] = message
         dictionary['css_class'] = 'successMessage'
 
     def delete(id_link):
+        link_autonomous_systems = request.dbsession.query(models.Link).filter_by(id=id_link).first()
         entry = 'delete from link where id = %s' % id_link
         request.dbsession.bind.execute(entry)
+        stub(link_autonomous_systems.id_autonomous_system1, link_autonomous_systems.id_autonomous_system2)
         clearFields()
         dictionary['message'] = 'Link successfully removed'
         dictionary['css_class'] = 'successMessage'

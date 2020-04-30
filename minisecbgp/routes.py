@@ -18,6 +18,7 @@ def includeme(config):
     config.add_route('link', '/topology/link/{id_topology}')
     config.add_route('linkShowAll', '/topology/autonomousSystem/linkShowAll/{id_topology}')
     config.add_route('linkAction', '/topology/autonomousSystem/link/{action}/{id_topology}')
+    config.add_route('topologiesAgreement', '/topology/agreement')
     config.add_route('topologiesDetail', '/topology/detail/{id_topology}')
     config.add_route('topologiesAction', '/topology/{action}/{id_topology}')
     config.add_route('realisticTopologies', '/realisticTopologies')

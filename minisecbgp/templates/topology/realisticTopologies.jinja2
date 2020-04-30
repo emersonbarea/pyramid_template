@@ -15,14 +15,14 @@
           <ul class="nav">
             {% if request.user.role == 'admin' %}
               <li>
-                <a href="{{ request.route_url('realisticTopologiesAction',action='manualUpdate') }}">Manual Update</a>
+                <a href="{{ request.route_url('realisticTopologiesAction',action='updateTopology') }}">Update Topology</a>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Configuration</a>
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Default Configuration</a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='agreements') }}">Agreements<br></a>
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='parameters') }}">Parameters<br></a>
-                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='schedule') }}">Schedule<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='agreements') }}">Links Agreements<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='parameters') }}">Download Parameters<br></a>
+                  <a class="dropdown-item" href="{{ request.route_url('realisticTopologiesAction',action='schedule') }}">Schedule Download<br></a>
                 </div>
               </li>
             {% endif %}

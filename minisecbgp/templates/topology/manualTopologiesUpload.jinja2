@@ -17,11 +17,23 @@
           <label for="topology_file">
             <p>Choose a valid <strong>MiniSecBGP</strong> topology file to upload (Ex.: topology1.MiniSecBGP):</p>
           </label>
-          <p><input id="topology_file" name="topology_file" type="file" value="" /></p>
+          <p>
+            {% if updating != 1 %}
+              <input id="topology_file" name="topology_file" type="file" value="" />
+            {% else %}
+              <input name="topology_file" type="file" value="" disabled=True />
+            {% endif %}
+          </p>
           <br>
         </div>
         <div class="form-button">
-          <p><button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button></p>
+          <p>
+            {% if updating != 1 %}
+              <button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+            {% else %}
+              <button type="submit" name="submit" value="submit" class="btn btn-primary" disabled="True">Submit</button>
+            {% endif %}
+          </p>
         </div>
       </form>
 

@@ -1,0 +1,29 @@
+{% extends "realisticTopologies.jinja2" %}
+
+{% block contentRealisticTopology %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">CAIDA AS-Relationship AS's agreements</h3>
+    </div>
+  </div>
+  <div class="row-fluid" style="text-align: center;">
+      <div class="span12">
+        <table border="0" style="width: 100%;">
+          <tr>
+            <td><h4>Agreement</h4></td>
+            <td><h4>Identification</h4></td>
+          </tr>
+          {% for agreement in agreements %}
+            <tr>
+              <td style="width: 50%;"><p> {{ agreement.LinkAgreement.agreement }} </p></td>
+              <td style="width: 50%;"><p> {{ agreement.RealisticTopologyLinkAgreement.value }} </p></td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+  </div>
+</div>
+
+{% endblock contentRealisticTopology %}

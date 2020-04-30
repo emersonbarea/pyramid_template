@@ -5,12 +5,12 @@
 <div id="aum" class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-      <h3 align="center">Manual Update</h3>
+      <h3 align="center">Update Topology</h3>
     </div>
   </div>
   <div class="row-fluid">
     <div class="span12">
-      <form action="{{ request.route_url('realisticTopologiesAction',action='manualUpdate') }}" method="post">
+      <form action="{{ request.route_url('realisticTopologiesAction',action='updateTopology') }}" method="post">
 
         <div class="form-field">
           {% if updating != 1 %}
