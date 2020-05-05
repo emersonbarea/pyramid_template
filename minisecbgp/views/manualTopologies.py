@@ -75,17 +75,13 @@ def upload(request):
                 shutil.copyfileobj(input_file, output_file)
             os.rename(temp_file_path, file_path)
 
-            #arguments = ['--file=%s' % file_path]
-            #result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            #command_result, command_result_error = result.communicate()
-            #if command_result:
-            #    dictionary['message'] = command_result
-            #    dictionary['css_class'] = 'errorMessage'
-            #    return dictionary
-
             arguments = ['--file=%s' % file_path]
-            result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments)
-
+            result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            command_result, command_result_error = result.communicate()
+            if command_result:
+                dictionary['message'] = command_result
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
             url = request.route_url('manualTopologies')
             return HTTPFound(location=url)
 

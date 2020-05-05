@@ -6,15 +6,15 @@
       "region": "north",
       "internet_exchange_points": [
         {
-          "internet_exchange_point": "IX_A",
+          "internet_exchange_point": "IX-A",
           "region": "north"
         },
         {
-          "internet_exchange_point": "IX_A",
+          "internet_exchange_point": "IX-A",
           "region": "south"
         },
         {
-          "internet_exchange_point": "IX_B",
+          "internet_exchange_point": "IX-B",
           "region": "south"
         }
       ],
@@ -54,7 +54,7 @@
       "region": "north",
       "internet_exchange_points": [
         {
-          "internet_exchange_point": "IX_A",
+          "internet_exchange_point": "IX-A",
           "region": "north"
         }
       ],
@@ -88,9 +88,10 @@
       "region": "south",
       "internet_exchange_points": [
         {
-          "internet_exchange_point": "IX_A",
+          "internet_exchange_point": "IX-A",
           "region": "south"
-        }      ],
+        }
+      ],
       "type_of_users": [
         {
           "type_of_user": "business",

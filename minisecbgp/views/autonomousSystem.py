@@ -9,9 +9,11 @@ from minisecbgp import models
 
 class AutonomousSystemDataForm(Form):
     autonomous_system = IntegerField('Add new Autonomous System (only digit a new 16 or 32 bits ASN): ',
-                                     widget=NumberInput(min=0, max=4294967295, step=1))
+                                     widget=NumberInput(min=0, max=4294967295, step=1),
+                                     validators=[InputRequired()])
     edit_autonomous_system = IntegerField('Enter a new valid ASN (16 bit or 32 bits ASN) to change the current ASN: ',
-                                          widget=NumberInput(min=0, max=4294967295, step=1))
+                                          widget=NumberInput(min=0, max=4294967295, step=1),
+                                          validators=[InputRequired()])
     create_button = SubmitField('Create')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')

@@ -3,7 +3,7 @@ import ipaddress
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from wtforms import Form, StringField, SubmitField, SelectField, IntegerField, validators
-from wtforms.validators import Length
+from wtforms.validators import Length, InputRequired
 from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
@@ -11,7 +11,8 @@ from minisecbgp import models
 
 class LinkDataForm(Form):
     autonomous_system = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
-                                     widget=NumberInput(min=0, max=4294967295, step=1))
+                                     widget=NumberInput(min=0, max=4294967295, step=1),
+                                     validators=[InputRequired()])
     link_list = SelectField('Or, if you want to edit or delete an existent link, choose it below: ',
                             coerce=int)
     autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',

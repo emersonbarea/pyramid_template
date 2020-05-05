@@ -1,32 +1,6 @@
-{% extends "../layout/dashboard.layout.jinja2" %}
+{% extends "topologiesDetailBase.jinja2" %}
 
-{% block contentDashboard %}
-
-<div class="navbar" xmlns="http://www.w3.org/1999/html">
-    <h2 align="center">Topology Detail</h2>
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <div class="nav-collapse collapse">
-          <ul class="nav">
-            <li>
-              <a href="{{ request.route_url('autonomousSystem', id_topology = topology.id) }}"> Autonomous System </a>
-            </li>
-            <li>
-              <a href="{{ request.route_url('link', id_topology = topology.id) }}">Link</a>
-            </li>
-            <li>
-              <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">BGP Prefix</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+{% block contentTopologiesDetailBase %}
 
   <div class=" {{ css_class }} ">
     <p> {{ message }} </p>
@@ -390,4 +364,4 @@
 
   </div>
 
-{% endblock contentDashboard %}
+{% endblock contentTopologiesDetailBase %}

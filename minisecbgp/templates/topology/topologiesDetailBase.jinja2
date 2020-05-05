@@ -1,0 +1,45 @@
+{% extends "../layout/dashboard.layout.jinja2" %}
+
+{% block contentDashboard %}
+
+  <div class="navbar">
+    <h2 align="center">Topology Detail</h2>
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            <li>
+              <a href="{{ request.route_url('autonomousSystem', id_topology = topology.id) }}">Autonomous System (AS)</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('link', id_topology = topology.id) }}">Link</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Prefix</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Region</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point (IX)</a>
+            </li>
+            <li>
+              <a href="#">Users</a>
+            </li>
+            <li>
+              <a href="#">Services</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% block contentTopologiesDetailBase %} {% endblock contentTopologiesDetailBase %}
+
+{% endblock contentDashboard %}
