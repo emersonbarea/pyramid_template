@@ -29,10 +29,10 @@
         }
       ],
       "type_of_services": [
-        "application",
-        "hosting",
-        "access",
-        "transit"
+        "Application",
+        "Hosting",
+        "Access",
+        "Transit"
       ],
       "prefixes": [
         {
@@ -73,8 +73,8 @@
         }
       ],
       "type_of_services": [
-        "application",
-        "transit"
+        "Application",
+        "Transit"
       ],
       "prefixes": [
         {
@@ -103,11 +103,11 @@
         }
       ],
       "type_of_services": [
-        "application",
-        "hosting",
-        "access",
-        "content",
-        "transit"
+        "Application",
+        "Hosting",
+        "Access",
+        "Content",
+        "Transit"
       ],
       "prefixes": [
         {

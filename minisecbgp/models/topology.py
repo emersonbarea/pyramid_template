@@ -151,9 +151,10 @@ class Region(Base):
     __tablename__ = 'region'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    region = Column(String(50), nullable=False, unique=True)
+    region = Column(String(50), nullable=False)
     autonomous_system = relationship('AutonomousSystem', foreign_keys='AutonomousSystem.id_region')
     internet_exchange_point = relationship('InternetExchangePoint', foreign_keys='InternetExchangePoint.id_region')
+    UniqueConstraint('id_topology', 'region', name='region_unique1')
     Index('IndexId5_topology', id_topology)
 
 

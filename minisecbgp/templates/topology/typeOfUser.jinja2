@@ -9,7 +9,7 @@
   <div id="aum" class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
-        <h3 align="center">Internet eXchange Points (IX): {{ topology.topology }} </h3>
+        <h3 align="center">Types of User: {{ topology.topology }} </h3>
       </div>
     </div>
 
@@ -19,13 +19,10 @@
         {% if request.user.role == 'admin' %}
           <form action="#" method="POST">
             <div class="form-field">
-              <p>Choose a topology region to administer the IX: {{ form_region.region_list(onchange="myFunction1()") }}</p>
-            </div>
-            <div class="form-field">
-              <p>Enter the IX name you want to create, edit or delete: {{ form.internet_exchange_point(onchange="myFunction2()") }}</p>
-              {% if form.internet_exchange_point.errors %}
+              <p>Enter the Type of User name you want to create, edit or delete: {{ form.type_of_user(onchange="myFunction()") }}</p>
+              {% if form.type_of_user.errors %}
                 <ul class="errorMessage">
-                  {% for error in form.internet_exchange_point.errors %}
+                  {% for error in form.type_of_user.errors %}
                     <li>{{ error }}</li>
                   {% endfor %}
                 </ul>
@@ -48,7 +45,7 @@
                     <h4 class="modal-title">Confirmation</h4>
                   </div>
                   <div class="modal-body">
-                    <p>Are you sure you want to delete this Internet eXchange Point? </p>
+                    <p>Are you sure you want to delete this Type of User? </p>
                   </div>
                   <div class="modal-footer">
                     <div class="form-group">
@@ -65,17 +62,14 @@
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edit Internet eXchange Point</h4>
+                    <h4 class="modal-title">Edit Types of User</h4>
                   </div>
                   <div class="modal-body">
                     <div class="form-field">
-                      <p>Choose a topology region to administer the IX: {{ form_region.edit_region_list }}</p>
-                    </div>
-                    <div class="form-field">
-                      <p>Enter the new IX name to change the current value: {{ form.edit_internet_exchange_point }}</p>
-                      {% if form.edit_internet_exchange_point.errors %}
+                      <p>Enter the new Type of User name you want to edit the current value: {{ form.edit_type_of_user }}</p>
+                      {% if form.edit_type_of_user.errors %}
                         <ul class="errorMessage">
-                          {% for error in form.edit_internet_exchange_point.errors %}
+                          {% for error in form.edit_type_of_user.errors %}
                             <li>{{ error }}</li>
                           {% endfor %}
                         </ul>
@@ -99,10 +93,10 @@
           <div class="form-button">
             <p>
               <button type="button" class="btn btn-primary"
-                      onclick="window.open('{{ request.route_url('internetExchangeShowAll', id_topology = topology.id) }}','_blank')">Show all Internet eXchange Points
+                      onclick="window.open('{{ request.route_url('typeOfUserShowAll', id_topology = topology.id) }}','_blank')">Show all Topology Types of User
               </button>
             </p>
-            <p>* Show all may take a while due to the large number of Internet eXchange Points.</p>
+            <p>* Show all may take a while due to the large number of topology Types of User.</p>
           </div>
         </form>
 
@@ -110,11 +104,8 @@
     </div>
 
     <script>
-      function myFunction1() {
-        edit_region_list.value = region_list.value
-      }
-      function myFunction2() {
-        edit_internet_exchange_point.value = internet_exchange_point.value
+      function myFunction() {
+        edit_type_of_user.value = type_of_user.value
       }
     </script>
   </div>

@@ -23,16 +23,16 @@
               <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Prefix</a>
             </li>
             <li>
-              <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Region</a>
+              <a href="{{ request.route_url('region', id_topology = topology.id) }}">Region</a>
             </li>
             <li>
               <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point (IX)</a>
             </li>
             <li>
-              <a href="#">Users</a>
+              <a href="{{ request.route_url('typeOfUser', id_topology = topology.id) }}">Users</a>
             </li>
             <li>
-              <a href="#">Services</a>
+              <a href="{{ request.route_url('typeOfService', id_topology = topology.id) }}">Services</a>
             </li>
           </ul>
         </div>

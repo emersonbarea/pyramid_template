@@ -1,7 +1,7 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPForbidden, HTTPFound
-from wtforms import Form, StringField, SubmitField, IntegerField
-from wtforms.validators import InputRequired, Length
+from pyramid.httpexceptions import HTTPForbidden
+from wtforms import Form, SubmitField, IntegerField
+from wtforms.validators import InputRequired
 from wtforms.widgets.html5 import NumberInput
 
 from minisecbgp import models
