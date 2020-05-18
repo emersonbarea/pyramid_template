@@ -36,6 +36,11 @@ def region(request):
 
         if request.method == 'POST' and form.validate():
 
+            if form.region.data == '-- undefined region --':
+                dictionary['message'] = '"%s" is a reserved name.' % form.region.data
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
+
             if form.create_button.data:
 
                 entry = request.dbsession.query(models.Region). \
@@ -108,7 +113,8 @@ def regionShowAll(request):
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
         dictionary['regions'] = request.dbsession.query(models.Region).\
-            filter_by(id_topology=request.matchdict["id_topology"]).\
+            filter(models.Region.id_topology == request.matchdict["id_topology"]).\
+            filter(models.Region.region != '-- undefined region --').\
             order_by(models.Region.region.asc()).all()
         number_of_regions = request.dbsession.query(models.Region).\
             filter_by(id_topology=request.matchdict["id_topology"]).count()

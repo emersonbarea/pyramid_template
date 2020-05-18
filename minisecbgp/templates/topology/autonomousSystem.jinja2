@@ -19,6 +19,9 @@
         {% if request.user.role == 'admin' %}
           <form action="#" method="POST">
             <div class="form-field">
+              <p>Choose a topology region to administer the IX: {{ form_region.region_list(onchange="myFunction1()") }}</p>
+            </div>
+            <div class="form-field">
               <p>Enter the ASN you want to create, edit or delete: {{ form.autonomous_system(onchange="myFunction()") }}</p>
               {% if form.autonomous_system.errors %}
                 <ul class="errorMessage">
@@ -65,6 +68,9 @@
                     <h4 class="modal-title">Edit Autonomous System</h4>
                   </div>
                   <div class="modal-body">
+                    <div class="form-field">
+                      <p>Choose a topology region to change the ASN: {{ form_region.edit_region_list }}</p>
+                    </div>
                     <div class="form-field">
                       <p>Enter the new valid ASN (16 bit or 32 bits ASN) to change the current ASN: {{ form.edit_autonomous_system }}</p>
                       {% if form.edit_autonomous_system.errors %}

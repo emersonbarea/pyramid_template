@@ -56,9 +56,22 @@ class RealisticTopology(object):
         return id_topology
 
     @staticmethod
-    def autonomous_system(dbsession, id_topology, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems):
+    def region(dbsession, id_topology):
+        region = models.Region(region='-- undefined region --',
+                               id_topology=id_topology)
+        dbsession.add(region)
+
+    @staticmethod
+    def get_region_id(dbsession, id_topology):
+        id_region = dbsession.query(models.Region.id).filter_by(id_topology=id_topology).first()
+
+        return id_region
+
+    @staticmethod
+    def autonomous_system(dbsession, id_topology, id_region, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems):
         df_autonomous_system = pd.DataFrame({'autonomous_system': pandas_unique_autonomous_systems.values})
         df_autonomous_system = pd.concat([df_autonomous_system.assign(id_topology=id_topology) for id_topology in id_topology])
+        df_autonomous_system = pd.concat([df_autonomous_system.assign(id_region=id_region) for id_region in id_region])
 
         df_autonomous_system_stub = pd.DataFrame({'autonomous_system_stub': pandas_stub_autonomous_systems.values})
         df_autonomous_system_stub = pd.concat([df_autonomous_system_stub.assign(stub=1)])
@@ -69,7 +82,7 @@ class RealisticTopology(object):
 
         df_autonomous_system = pd.concat([df_autonomous_system, df_autonomous_system_stub], axis=1, join='outer')
         df_autonomous_system = df_autonomous_system.fillna(0).reset_index()
-        df_autonomous_system.columns = ['autonomous_system', 'id_topology', 'stub']
+        df_autonomous_system.columns = ['autonomous_system', 'id_topology', 'id_region', 'stub']
 
         df_autonomous_system.to_sql('autonomous_system', con=dbsession.bind, if_exists='append', index=False)
 
@@ -207,7 +220,15 @@ def main(argv=sys.argv[1:]):
 
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            t.autonomous_system(dbsession, id_topology, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems)
+            t.region(dbsession, id_topology)
+
+        with env['request'].tm:
+            dbsession = env['request'].dbsession
+            id_region = t.get_region_id(dbsession, id_topology)
+
+        with env['request'].tm:
+            dbsession = env['request'].dbsession
+            t.autonomous_system(dbsession, id_topology, id_region, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems)
 
         with env['request'].tm:
             dbsession = env['request'].dbsession

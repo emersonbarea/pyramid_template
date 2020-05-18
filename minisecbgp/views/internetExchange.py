@@ -53,15 +53,19 @@ def internetExchange(request):
         dictionary['form_region'] = form_region
 
         if request.method == 'POST':
+            region_name = dict(form_region.region_list.choices).get(form_region.region_list.data)
+            if region_name == '-- undefined region --':
+                region_name = 'undefined region'
+            else:
+                region_name = '%sern region' % region_name
 
             if form.create_button.data:
-                region_name = dict(form_region.region_list.choices).get(form_region.region_list.data)
                 region = request.dbsession.query(models.InternetExchangePoint). \
                     filter(models.InternetExchangePoint.id_region == form_region.region_list.data). \
                     filter(models.InternetExchangePoint.internet_exchange_point == form.internet_exchange_point.data).\
                     first()
                 if region:
-                    dictionary['message'] = 'The Internet eXchange Point %s already exists in the %sern region of the topology.' % \
+                    dictionary['message'] = 'The Internet eXchange Point %s already exists in the %s of the topology.' % \
                                             (form.internet_exchange_point.data, region_name)
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
@@ -70,20 +74,24 @@ def internetExchange(request):
                                                       internet_exchange_point=form.internet_exchange_point.data)
                 request.dbsession.add(region)
                 request.dbsession.flush()
-                dictionary['message'] = 'Internet eXchange Point %s successfully created in %sern region of the topology.' % \
+                dictionary['message'] = 'Internet eXchange Point %s successfully created in %s of the topology.' % \
                                         (form.internet_exchange_point.data, region_name)
                 dictionary['css_class'] = 'successMessage'
 
             elif form.edit_button.data:
-                region_name = dict(form_region.region_list.choices).get(form_region.region_list.data)
+                edit_region_name = dict(form_region.region_list.choices).get(form_region.edit_region_list.data)
+                if edit_region_name == '-- undefined region --':
+                    edit_region_name = 'undefined region'
+                else:
+                    edit_region_name = '%sern region' % edit_region_name
                 internet_exchange_point = request.dbsession.query(models.InternetExchangePoint). \
                     filter(models.InternetExchangePoint.id_region == form_region.edit_region_list.data). \
                     filter(models.InternetExchangePoint.internet_exchange_point == form.edit_internet_exchange_point.data). \
                     first()
                 if internet_exchange_point:
                     dictionary[
-                        'message'] = 'The Internet eXchange Point %s already exists in the %sern region of the topology.' % \
-                                     (form.edit_internet_exchange_point.data, region_name)
+                        'message'] = 'The Internet eXchange Point %s already exists in the %s of the topology.' % \
+                                     (form.edit_internet_exchange_point.data, edit_region_name)
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
                 internet_exchange_point = request.dbsession.query(models.InternetExchangePoint). \
@@ -94,17 +102,16 @@ def internetExchange(request):
                 internet_exchange_point.id_region = form_region.edit_region_list.data
                 request.dbsession.flush()
                 dictionary[
-                    'message'] = 'Internet eXchange Point %s successfully updated in %sern region of the topology.' % \
-                                 (form.internet_exchange_point.data, region_name)
+                    'message'] = 'Internet eXchange Point %s successfully updated in %s of the topology.' % \
+                                 (form.internet_exchange_point.data, edit_region_name)
                 dictionary['css_class'] = 'successMessage'
             elif form.delete_button.data:
-                region_name = dict(form_region.region_list.choices).get(form_region.region_list.data)
                 internet_exchange_point = request.dbsession.query(models.InternetExchangePoint.id). \
                     filter(models.InternetExchangePoint.id_topology == request.matchdict["id_topology"]). \
                     filter(models.InternetExchangePoint.id_region == form_region.region_list.data). \
                     filter_by(internet_exchange_point=form.internet_exchange_point.data).first()
                 if not internet_exchange_point:
-                    dictionary['message'] = 'Internet eXchange Point %s does not exists in the %sern region of the topology.' % \
+                    dictionary['message'] = 'Internet eXchange Point %s does not exists in the %s of the topology.' % \
                                      (form.internet_exchange_point.data, region_name)
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
@@ -112,7 +119,7 @@ def internetExchange(request):
                     filter_by(id_internet_exchange_point=internet_exchange_point.id).delete()
                 request.dbsession.query(models.InternetExchangePoint). \
                     filter_by(id=internet_exchange_point.id).delete()
-                dictionary['message'] = 'Internet eXchange Point %s in the %sern region successfully deleted.' % \
+                dictionary['message'] = 'Internet eXchange Point %s in the %s successfully deleted.' % \
                                         (form.internet_exchange_point.data, region_name)
                 dictionary['css_class'] = 'successMessage'
 

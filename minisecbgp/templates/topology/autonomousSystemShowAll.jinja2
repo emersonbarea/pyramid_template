@@ -85,7 +85,7 @@
                         <div class="accordion-inner">
                           {% for autonomous_system in autonomousSystems %}
                             {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
-                              <p>AS <strong>{{ autonomous_system.autonomous_system }}</strong></p>
+                              <p>AS <strong>{{ autonomous_system.AutonomousSystem.autonomous_system }}</strong> - Region: {{ autonomous_system.Region.region }}</p>
                             {% endif %}
                           {% endfor %}
                         </div>

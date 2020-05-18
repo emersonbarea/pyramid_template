@@ -2,10 +2,7 @@ import datetime
 import os
 import re
 import shutil
-import json
 import subprocess
-
-import pandas as pd
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound

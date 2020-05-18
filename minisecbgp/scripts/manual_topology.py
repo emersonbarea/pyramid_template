@@ -77,7 +77,7 @@ class ManualTopology(object):
                     list_prefix_mask.append(data['autonomous_systems'][row1]['prefixes'][row5]['mask'])
 
             # Region
-            list_region = list_region_autonomous_system + list_region_internet_exchange_point
+            list_region = list(['-- undefined region --']) + list_region_autonomous_system + list_region_internet_exchange_point
             df_region = pd.DataFrame({'region': list_region})
             df_region = df_region.drop_duplicates(keep='first')
             df_region = pd.concat([df_region.assign(id_topology=id_topology) for id_topology in id_topology])

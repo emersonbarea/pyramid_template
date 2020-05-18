@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
-from wtforms import Form, SubmitField, IntegerField
+from wtforms import Form, SubmitField, IntegerField, SelectField
 from wtforms.validators import InputRequired
 from wtforms.widgets.html5 import NumberInput
 
@@ -17,6 +17,13 @@ class AutonomousSystemDataForm(Form):
     create_button = SubmitField('Create')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')
+
+
+class TopologyRegionDataFormSelectField(Form):
+    region_list = SelectField('region_list', coerce=int,
+                              validators=[InputRequired()])
+    edit_region_list = SelectField('edit_region_list', coerce=int,
+                                   validators=[InputRequired()])
 
 
 @view_config(route_name='autonomousSystem', renderer='minisecbgp:templates/topology/autonomousSystem.jinja2')
@@ -38,6 +45,15 @@ def autonomousSystem(request):
         form = AutonomousSystemDataForm(request.POST)
         dictionary['form'] = form
 
+        form_region = TopologyRegionDataFormSelectField(request.POST)
+        form_region.region_list.choices = [(row.id, row.region) for row in
+                                           request.dbsession.query(models.Region).filter(
+                                               models.Region.id_topology == request.matchdict["id_topology"])]
+        form_region.edit_region_list.choices = [(row.id, row.region) for row in
+                                                request.dbsession.query(models.Region).filter(
+                                                    models.Region.id_topology == request.matchdict["id_topology"])]
+        dictionary['form_region'] = form_region
+
         if request.method == 'POST' and form.validate():
 
             if (int(form.autonomous_system.data) > 4294967295) or (int(form.edit_autonomous_system.data) > 4294967295):
@@ -52,10 +68,10 @@ def autonomousSystem(request):
                         dictionary['message'] = 'The Autonomous System Number %s already exists in this topology.' % form.autonomous_system.data
                         dictionary['css_class'] = 'errorMessage'
                         return dictionary
-
                 autonomous_system = models.AutonomousSystem(autonomous_system=form.autonomous_system.data,
                                                             stub=1,
-                                                            id_topology=request.matchdict["id_topology"])
+                                                            id_topology=request.matchdict["id_topology"],
+                                                            id_region=form_region.region_list.data)
                 request.dbsession.add(autonomous_system)
                 request.dbsession.flush()
                 dictionary[
@@ -67,6 +83,7 @@ def autonomousSystem(request):
 
                 autonomous_system = request.dbsession.query(models.AutonomousSystem). \
                     filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
+                    filter(models.AutonomousSystem.id_region == form_region.region_list.data). \
                     filter_by(autonomous_system=form.autonomous_system.data).first()
                 if not autonomous_system:
                     dictionary[
@@ -74,19 +91,16 @@ def autonomousSystem(request):
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
 
-                edit_autonomous_system = request.dbsession.query(models.AutonomousSystem.id). \
-                    filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
-                    filter_by(autonomous_system=form.edit_autonomous_system.data).first()
-
-                if edit_autonomous_system:
-                    dictionary[
-                        'message'] = 'Autonomous System Number %s already exists in this topology.' % form.edit_autonomous_system.data
-                    dictionary['css_class'] = 'errorMessage'
-                    return dictionary
+                edit_region_name = dict(form_region.region_list.choices).get(form_region.edit_region_list.data)
+                if edit_region_name == '-- undefined region --':
+                    edit_region_name = 'undefined region'
+                else:
+                    edit_region_name = '%sern region' % edit_region_name
 
                 autonomous_system.autonomous_system = form.edit_autonomous_system.data
-                dictionary['message'] = 'Autonomous System Number %s successfully changed to %s.' % \
-                                        (form.autonomous_system.data, form.edit_autonomous_system.data)
+                autonomous_system.id_region = form_region.edit_region_list.data
+                dictionary['message'] = 'Autonomous System Number %s successfully changed to %s in %s.' % \
+                                        (form.autonomous_system.data, form.edit_autonomous_system.data, edit_region_name)
                 dictionary['css_class'] = 'successMessage'
                 dictionary['form'] = AutonomousSystemDataForm()
 
@@ -131,8 +145,9 @@ def autonomousSystemShowAll(request):
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
-        autonomousSystems = request.dbsession.query(models.AutonomousSystem).\
-            filter_by(id_topology=request.matchdict["id_topology"]).\
+        autonomousSystems = request.dbsession.query(models.AutonomousSystem, models.Region).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
+            filter(models.AutonomousSystem.id_region == models.Region.id).\
             order_by(models.AutonomousSystem.autonomous_system.asc()).all()
         dictionary['autonomousSystems'] = autonomousSystems
         number_of_autonomous_systems = request.dbsession.query(models.AutonomousSystem).\
