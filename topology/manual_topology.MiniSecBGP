@@ -137,7 +137,7 @@
       "ip_destination": "10.0.0.2",
       "mask": "30",
       "description": "link test 1",
-      "agreement": "provider to provider",
+      "agreement": "p2p",
       "bandwidth": 1024,
       "delay": 50,
       "load": 90
@@ -149,7 +149,7 @@
       "ip_destination": "10.0.0.10",
       "mask": "30",
       "description": "link test 2",
-      "agreement": "provider to provider",
+      "agreement": "p2p",
       "bandwidth": null,
       "delay": null,
       "load": null
@@ -161,7 +161,7 @@
       "ip_destination": "10.0.0.6",
       "mask": "30",
       "description": "link test 3",
-      "agreement": "customer to provider",
+      "agreement": "p2c",
       "bandwidth": null,
       "delay": null,
       "load": null

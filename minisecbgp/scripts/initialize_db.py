@@ -61,12 +61,12 @@ def setup_models(dbsession):
     dbsession.add(link_agreement_c2p)
     dbsession.add(link_agreement_p2p)
 
-    id_link_agreement_c2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='provider to customer (p2c)')
+    id_link_agreement_c2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='p2c')
     realistic_topology_link_agreement_c2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_c2p,
                                                                                   value='-1')
     dbsession.add(realistic_topology_link_agreement_c2p)
 
-    id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='peer to peer (p2p)')
+    id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='p2p')
     realistic_topology_link_agreement_p2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_p2p,
                                                                                   value='0')
     dbsession.add(realistic_topology_link_agreement_p2p)
