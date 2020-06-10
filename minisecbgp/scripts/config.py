@@ -167,7 +167,8 @@ class ConfigClusterNode(object):
             if self.node.status == 0:
                 install_remote_prerequisites = 0
                 install_remote_prerequisites_status = ''
-                commands = ['sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
+                commands = ['sudo apt update',
+                            'sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
                             'pip3 install --upgrade --force-reinstall -U Pyro4']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
