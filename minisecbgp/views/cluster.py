@@ -184,6 +184,9 @@ def delete(request):
 
 @view_config(route_name='clusterDetail', renderer='minisecbgp:templates/cluster/detailCluster.jinja2')
 def clusterDetail(request):
+    dictionary = dict()
     entry = request.dbsession.query(models.Node).filter_by(id=request.matchdict["id"]).first()
+    dictionary['entry'] = entry
+    dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
-    return {'entry': entry}
+    return dictionary

@@ -55,7 +55,7 @@ def setup_models(dbsession):
                                                           'customers ASes does not retransmit the routes published '
                                                           'by transit ISPs. The format is: <provider-as> - <customer-as>')
 
-    link_agreement_p2p = models.LinkAgreement(agreement='peer to peer - or provider to provider (p2p)',
+    link_agreement_p2p = models.LinkAgreement(agreement='peer to peer (p2p)',
                                               description='A p2p link connects two ISPs who have agreed to exchange '
                                                           'traffic on a quid pro quo basis. The format is: <peer-as> - <peer-as>')
     dbsession.add(link_agreement_c2p)
@@ -66,7 +66,7 @@ def setup_models(dbsession):
                                                                                   value='-1')
     dbsession.add(realistic_topology_link_agreement_c2p)
 
-    id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='peer to peer - or provider to provider (p2p)')
+    id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='peer to peer (p2p)')
     realistic_topology_link_agreement_p2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_p2p,
                                                                                   value='0')
     dbsession.add(realistic_topology_link_agreement_p2p)
