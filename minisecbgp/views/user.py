@@ -54,7 +54,7 @@ class UserDataFormPassword(Form):
                                                 EqualTo('password_hash', message='Passwords must match.')])
 
 
-@view_config(route_name='user', renderer='minisecbgp:templates/user/typeOfUser.jinja2')
+@view_config(route_name='user', renderer='minisecbgp:templates/user/user.jinja2')
 def user(request):
     user = request.user
     if user is None:

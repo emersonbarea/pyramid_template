@@ -14,8 +14,10 @@
               <li><a href="{{ request.route_url('topologies') }}">All Topologies</a></li>
               <li><a href="{{ request.route_url('manualTopologies') }}"> &raquo; Manual</a></li>
               <li><a href="{{ request.route_url('realisticTopologies') }}"> &raquo; Realistic</a></li>
-              <li><a href="#"> &raquo; Synthetic</a></li>
-
+            <li class="nav-header">Analysis</li>
+              <li><a href="{{ request.route_url('hijack') }}">Hijack</a></li>
+              <li><a href="{{ request.route_url('hijackAffectedArea') }}"> &raquo; Affected Area</a></li>
+              <li><a href="{{ request.route_url('hijackRealisticAnalysis') }}"> &raquo; Realistic Analysis</a></li>
           </ul>
         </div><!--/.well -->
       </div><!--/span-->

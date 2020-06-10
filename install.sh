@@ -130,7 +130,7 @@ install_app() {
 
         initialize_db minisecbgp.ini
 
-        cp "$LOCAL_HOME"/topology/20191201.as-rel2.txt.bz2 /tmp/
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
 
         realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
 

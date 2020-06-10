@@ -15,7 +15,7 @@
         <div class="form-field">
           <br>
           <label for="topology_file">
-            <p>Choose a valid <strong>MiniSecBGP</strong> topology file to upload (Ex.: topology1.MiniSecBGP):</p>
+            <p>Choose a valid <strong>MiniSecBGP</strong> topology file to upload (Ex.: <a href="{{request.static_url('minisecbgp:static/topology/manual_topology1.MiniSecBGP')}}" target="_blank">manual_topology1.MiniSecBGP</a>):</p>
           </label>
           <p>
             {% if updating != 1 %}

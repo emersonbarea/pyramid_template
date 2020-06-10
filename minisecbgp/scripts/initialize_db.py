@@ -49,15 +49,16 @@ def setup_models(dbsession):
     for topology_type in topology_types:
         dbsession.add(models.TopologyType(topology_type=topology_type))
 
-    link_agreement_c2p = models.LinkAgreement(agreement='provider to customer (p2c)',
+    link_agreement_c2p = models.LinkAgreement(agreement='p2c',
                                               description='Customer ASes pay ISPs (providers) for access to the rest of '
                                                           'the Internet, also known as transit. In this scenario, '
                                                           'customers ASes does not retransmit the routes published '
                                                           'by transit ISPs. The format is: <provider-as> - <customer-as>')
 
-    link_agreement_p2p = models.LinkAgreement(agreement='peer to peer (p2p)',
+    link_agreement_p2p = models.LinkAgreement(agreement='p2p',
                                               description='A p2p link connects two ISPs who have agreed to exchange '
                                                           'traffic on a quid pro quo basis. The format is: <peer-as> - <peer-as>')
+
     dbsession.add(link_agreement_c2p)
     dbsession.add(link_agreement_p2p)
 
@@ -69,6 +70,8 @@ def setup_models(dbsession):
     id_link_agreement_p2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='p2p')
     realistic_topology_link_agreement_p2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_p2p,
                                                                                   value='0')
+    dbsession.add(realistic_topology_link_agreement_p2p)
+
     dbsession.add(realistic_topology_link_agreement_p2p)
 
     download_parameters = models.RealisticTopologyDownloadParameter(url='http://data.caida.org/datasets/as-relationships/serial-2/',

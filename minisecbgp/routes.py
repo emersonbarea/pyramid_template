@@ -33,4 +33,6 @@ def includeme(config):
     config.add_route('realisticTopologiesAction', '/realisticTopologies/{action}')
     config.add_route('manualTopologies', '/manualTopologies')
     config.add_route('manualTopologiesAction', '/manualTopologies/{action}')
-
+    config.add_route('hijack', '/hijack')
+    config.add_route('hijackAffectedArea', '/hijackAffectedArea')
+    config.add_route('hijackRealisticAnalysis', '/hijackRealisticAnalysis')
