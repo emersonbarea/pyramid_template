@@ -170,7 +170,7 @@ configure_nginx() {
 }
 server {
         listen 80;
-        server_name ' $var_ip ';
+        server_name [::]:80 default_server;
         access_log ' $LOCAL_HOME '/access.log;
         location / {
                 proxy_set_header        Host $http_host;
@@ -188,6 +188,8 @@ server {
                 proxy_redirect          off;
         }
 }' | sudo tee /etc/nginx/sites-available/$PROJECT_NAME
+	sudo rm /etc/nginx/sites-enabled/default &> /dev/null
+	sudo rm /etc/nginx/sites-available/default &> /dev/null
         sudo rm /etc/nginx/sites-enabled/$PROJECT_NAME &> /dev/null
         sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled
         sudo nginx -t
@@ -211,7 +213,7 @@ LOCAL_HOME=$(pwd)
 PROJECT_NAME=MiniSecBGP
 
 welcome;
-network_address;
+#network_address;
 update;
 install_Linux_reqs;
 virtualenv;
