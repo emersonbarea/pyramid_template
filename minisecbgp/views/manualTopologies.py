@@ -13,7 +13,7 @@ from minisecbgp import models
 
 
 class TopologyDataForm(Form):
-    topology_list = SelectField('Choose topology to download', coerce=int, validators=[InputRequired()])
+    topology_list = SelectField('Choose topology to download: ', coerce=int, validators=[InputRequired()])
 
 
 @view_config(route_name='manualTopologies', renderer='minisecbgp:templates/topology/manualTopologiesShow.jinja2')

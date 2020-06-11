@@ -16,21 +16,21 @@ from .. import models
 
 
 class UserDataForm(Form):
-    username = StringField('Username *',
+    username = StringField('Username: *',
                            validators=[InputRequired(),
                                        Length(min=5, max=30, message=('Username must be between 5 and 30 characters '
                                                                       'long.'))])
-    role = SelectField('Role *',
+    role = SelectField('Role: *',
                        validators=[InputRequired()],
                        choices=[('', ''),
                                 ('admin', 'admin'),
                                 ('viewer', 'viewer')])
 
-    password_hash = PasswordField('Password *',
+    password_hash = PasswordField('Password: *',
                                   validators=[InputRequired(),
                                               Length(min=5, max=10, message=('Password must be between 5 and 10 '
                                                                              'characters long.'))])
-    confirmPassword = PasswordField('Repeat Password *',
+    confirmPassword = PasswordField('Repeat Password: *',
                                     validators=[InputRequired(),
                                                 Length(min=5, max=10, message='Password must be between 5 and 10 '
                                                                               'characters long.'),
@@ -43,11 +43,11 @@ class UserDataFormSelectField(Form):
 
 
 class UserDataFormPassword(Form):
-    password_hash = PasswordField('Password *',
+    password_hash = PasswordField('Password: *',
                                   validators=[InputRequired(),
                                               Length(min=5, max=10, message=('Password must be between 5 and 10 '
                                                                              'characters long.'))])
-    confirmPassword = PasswordField('Repeat Password *',
+    confirmPassword = PasswordField('Repeat Password: *',
                                     validators=[InputRequired(),
                                                 Length(min=5, max=10, message='Password must be between 5 and 10 '
                                                                               'characters long.'),

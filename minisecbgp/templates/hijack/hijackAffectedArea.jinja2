@@ -1,24 +1,157 @@
-{% extends "../layout/dashboard.layout.jinja2" %}
+{% extends "hijack.jinja2" %}
 
-{% block contentDashboard %}
+{% block contentHijack %}
 
-  <div class="navbar">
-    <h2 align="center">Hijack Affected Area Delimitation</h2>
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Hijacking Affected Area Delimitation</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+
+      <div id="div_attacker" class="form-field">
+        {{ form.attacker.label }}
+        {{ form.attacker(onchange="attackerFunction()") }}
+        {% if form.attacker.errors %}
+          <ul class="errorMessage">
+            {% for error in form.attacker.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </div>
+
+      <div id="div_regionAttacker" class="form-field" style="display: none;">
+        {{ form.regionAttacker.label }}
+        {{ form.regionAttacker }}
+        {% if form.regionAttacker.errors %}
+          <ul class="errorMessage">
+            {% for error in form.regionAttacker.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_ASAttacker" class="form-field" style="display: none;">
+        {{ form.ASAttacker.label }}
+        {{ form.ASAttacker }}
+        {% if form.ASAttacker.errors %}
+          <ul class="errorMessage">
+            {% for error in form.ASAttacker.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_target" class="form-field" style="display: none;">
+        {{ form.target.label }}
+        {{ form.target(onchange="targetFunction()") }}
+        {% if form.target.errors %}
+          <ul class="errorMessage">
+            {% for error in form.target.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_regionTarget" class="form-field" style="display: none;">
+        {{ form.regionTarget.label }}
+        {{ form.regionTarget }}
+        {% if form.regionTarget.errors %}
+          <ul class="errorMessage">
+            {% for error in form.regionTarget.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_ASTarget" class="form-field" style="display: none;">
+        {{ form.ASTarget.label }}
+        {{ form.ASTarget }}
+        {% if form.ASTarget.errors %}
+          <ul class="errorMessage">
+            {% for error in form.ASTarget.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div class="form-button">
+        <p>
+          <p>{{ form.submit_button(class="btn btn-primary", disabled="True") }}</p>
+        </p>
+      </div>
+
     </div>
   </div>
 
-  <div class=" {{ css_class }} ">
-    <p> {{ message }} </p>
-  </div>
+  <script>
+    function attackerFunction() {
+      choose = document.getElementById("attacker").value;
+      if (choose == 'any') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_regionAttacker").style.display = "none";
+        document.getElementById("div_ASAttacker").style.display = "none";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+      } else if (choose == 'region') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_regionAttacker").style.display = "block";
+        document.getElementById("div_ASAttacker").style.display = "none";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+      } else if (choose == 'AS') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_regionAttacker").style.display = "none";
+        document.getElementById("div_ASAttacker").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+      } else {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_regionAttacker").style.display = "none";
+        document.getElementById("div_ASAttacker").style.display = "none";
+        document.getElementById("div_target").style.display = "none";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
 
-sdsfsfsdfsd
+    function targetFunction() {
+      choose = document.getElementById("target").value;
+      if (choose == 'any') {
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("submit_button").disabled = false;
+      } else if (choose == 'region') {
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "block";
+        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("submit_button").disabled = false;
+      } else if (choose == 'AS') {
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "block";
+        document.getElementById("submit_button").disabled = false;
+      } else {
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+  </script>
+</div>
 
-{% endblock contentDashboard %}
+{% endblock contentHijack %}

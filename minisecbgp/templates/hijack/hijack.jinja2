@@ -11,6 +11,17 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Analysis Type</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ request.route_url('hijackAffectedArea') }}">Affected Area<br></a>
+                <a class="dropdown-item" href="{{ request.route_url('hijackRealisticAnalysis') }}">Realistic Analysis<br></a>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -19,6 +30,6 @@
     <p> {{ message }} </p>
   </div>
 
-sdsfsfsdfsd
+  {% block contentHijack %} {% endblock contentHijack %}
 
 {% endblock contentDashboard %}

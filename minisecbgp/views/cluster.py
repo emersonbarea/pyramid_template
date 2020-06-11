@@ -12,17 +12,17 @@ from minisecbgp.scripts.services import local_command
 
 
 class ClusterDataForm(Form):
-    node = StringField('Node name/IP address*',
+    node = StringField('Node name/IP address: *',
                        validators=[InputRequired(),
                                    Length(min=1, max=50, message=('Node name/IP address must be between 1 and 50 '
                                                                   'characters long.'))])
-    node_type = StringField('Node type *')
+    node_type = StringField('Node type: *')
 
-    username = StringField('Cluster node Username *',
+    username = StringField('Cluster node Username: *',
                            validators=[InputRequired(),
                                        Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
                                                                       'long.'))])
-    password = PasswordField('Cluster node Password *',
+    password = PasswordField('Cluster node Password: *',
                              validators=[InputRequired(),
                                          Length(min=1, max=50, message=('Password must be between 1 and 50 characters '
                                                                         'long.'))])

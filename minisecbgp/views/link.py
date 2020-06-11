@@ -17,17 +17,17 @@ class LinkDataForm(Form):
                             coerce=int)
     autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
                                       widget=NumberInput(min=0, max=4294967295, step=1))
-    ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1) *',
+    ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1): *',
                                         validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
     autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
                                       widget=NumberInput(min=0, max=4294967295, step=1))
-    ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2) *',
+    ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2): *',
                                         validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30) *',
+    mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30): *',
                         widget=NumberInput(min=8, max=30, step=2))
-    description = StringField('Description',
+    description = StringField('Description: ',
                               validators=[Length(min=0, max=50, message='The description must be between 0 and 50 bytes long.')])
     bandwidth = IntegerField('Bandwidth (Kbps): ',
                              widget=NumberInput(min=0, max=1000000000, step=1),
@@ -38,7 +38,7 @@ class LinkDataForm(Form):
     load = IntegerField('Load (%): ',
                         widget=NumberInput(min=0, max=100, step=1),
                         validators=[validators.Optional()])
-    agreement_list = SelectField('Agreement *', coerce=int)
+    agreement_list = SelectField('Agreement: *', coerce=int)
 
     edit_autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
                                            widget=NumberInput(min=0, max=4294967295, step=1))
@@ -47,12 +47,12 @@ class LinkDataForm(Form):
                                                                                        '(Ex.: 1.1.1.1 or 200.200.200.201).')])
     edit_autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
                                            widget=NumberInput(min=0, max=4294967295, step=1))
-    edit_ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2) *',
+    edit_ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2): *',
                                              validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                        '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    edit_mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30) *',
+    edit_mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30): *',
                              widget=NumberInput(min=8, max=30, step=2))
-    edit_description = StringField('Description',
+    edit_description = StringField('Description: ',
                                    validators=[Length(min=0, max=50, message='The description must be between 0 and 50 bytes long.')])
     edit_bandwidth = IntegerField('Bandwidth (Kbps): ',
                                   widget=NumberInput(min=0, max=1000000000, step=1),
@@ -63,7 +63,7 @@ class LinkDataForm(Form):
     edit_load = IntegerField('Load (%): ',
                              widget=NumberInput(min=0, max=100, step=1),
                              validators=[validators.Optional()])
-    edit_agreement_list = SelectField('Agreement *', coerce=int)
+    edit_agreement_list = SelectField('Agreement: *', coerce=int)
     add_button = SubmitField('Add')
     edit_button = SubmitField('Save')
     delete_button = SubmitField('Delete')
