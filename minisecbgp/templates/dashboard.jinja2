@@ -27,16 +27,16 @@
   <div class="row-fluid">
     <div class="span4">
       <h2>Hijack</h2>
-      <p><a href="{{ request.route_url('hijack') }}">Hijacking</a> happens when an AS (Attacker) announces the prefix of another AS (Target) in BGP with no authorization, causing other ASs to believe that the prefix belongs to the attacker. The announcement can be intentionally (ex.: when an attacker gains administrative access to an AS's BGP router), or unintentionally (ex.: when a BGP administrator make some mistake).</p>
+      <p><a href="{{ request.route_url('hijack') }}">Hijacking</a> happens when an AS (attacker) announces the prefix of another AS (target) in BGP with no authorization, causing other ASs to believe that the prefix belongs to the attacker. The announcement can be intentionally (ex.: when an attacker gains administrative access to an AS's BGP router), or unintentionally (ex.: when a BGP administrator make some mistake).</p>
       <p><a class="btn" href="{{ request.route_url('hijack') }}">View details &raquo;</a></p>
     </div>
     <div class="span4">
       <h2>Attacker vs. Target Point of View</h2>
-      <p>The attacker hijack point of view concerns the AS with the shortest distance to the largest number of other ASs in the BGP. While the target hijack point of view concerns the AS capable of cheating the largest number of other ASs when hijacking a specific prefix.</p>
+      <p>The hijacking attacker's point of view is based on identifying the AS with the shortest distance to the largest number of other ASs in BGP. While the target's point of view corresponds to identifying the AS capable of deceiving the largest number of other ASs when hijacking its prefix.</p>
     </div><!--/span-->
     <div class="span4">
       <h2>Attraction vs. Interception of traffic</h2>
-      <p>Traffic attraction occurs when the attacker announces target's prefix to stealing traffic. In this case the traffic is not forwarded back to the target destination AS. In interception, the attacker diverts traffic to him (ex.: for analysis), but guarantees its delivery to the target AS.</p>
+      <p>Traffic attraction occurs when the attacker announces target's prefix to stealing traffic. In this case the traffic is not forwarded back to the target destination AS. In interception, the attacker diverts traffic to him (ex.: for analysis), but must guarantees traffic delivery to the target AS.</p>
     </div><!--/span-->
   </div><!--/row-->
   <div class="row-fluid">
