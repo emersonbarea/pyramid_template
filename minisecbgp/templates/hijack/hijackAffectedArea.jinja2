@@ -25,7 +25,7 @@
 
       <div id="div_regionAttacker" class="form-field" style="display: none;">
         {{ form.regionAttacker.label }}
-        {{ form.regionAttacker }}
+        {{ form.regionAttacker }} (use comma to separate between multiple regions. Ex.: north, south, east)
         {% if form.regionAttacker.errors %}
           <ul class="errorMessage">
             {% for error in form.regionAttacker.errors %}
@@ -37,7 +37,7 @@
 
       <div id="div_ASAttacker" class="form-field" style="display: none;">
         {{ form.ASAttacker.label }}
-        {{ form.ASAttacker }}
+        {{ form.ASAttacker }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
         {% if form.ASAttacker.errors %}
           <ul class="errorMessage">
             {% for error in form.ASAttacker.errors %}
@@ -46,6 +46,8 @@
           </ul>
         {% endif %}
       </div>
+
+      <div id="div_hr1" style="display: none;"><hr></div>
 
       <div id="div_target" class="form-field" style="display: none;">
         {{ form.target.label }}
@@ -61,7 +63,7 @@
 
       <div id="div_regionTarget" class="form-field" style="display: none;">
         {{ form.regionTarget.label }}
-        {{ form.regionTarget }}
+        {{ form.regionTarget }} (use comma to separate between multiple regions. Ex.: north, south, east)
         {% if form.regionTarget.errors %}
           <ul class="errorMessage">
             {% for error in form.regionTarget.errors %}
@@ -73,10 +75,60 @@
 
       <div id="div_ASTarget" class="form-field" style="display: none;">
         {{ form.ASTarget.label }}
-        {{ form.ASTarget }}
+        {{ form.ASTarget }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
         {% if form.ASTarget.errors %}
           <ul class="errorMessage">
             {% for error in form.ASTarget.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_hr2" style="display: none;"><hr></div>
+
+      <div id="div_prefix" class="form-field" style="display: none;">
+        {{ form.prefix.label }}
+        {{ form.prefix(onchange="prefixFunction()") }}
+        {% if form.prefix.errors %}
+          <ul class="errorMessage">
+            {% for error in form.prefix.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_regionPrefix" class="form-field" style="display: none;">
+        {{ form.regionPrefix.label }}
+        {{ form.regionPrefix }} (use comma to separate between multiple regions. Ex.: north, south, east)
+        {% if form.regionPrefix.errors %}
+          <ul class="errorMessage">
+            {% for error in form.regionPrefix.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_ASPrefix" class="form-field" style="display: none;">
+        {{ form.ASPrefix.label }}
+        {{ form.ASPrefix }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
+        {% if form.ASPrefix.errors %}
+          <ul class="errorMessage">
+            {% for error in form.ASPrefix.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div id="div_prefixPrefix" class="form-field" style="display: none;">
+        {{ form.prefixPrefix.label }}
+        {{ form.prefixPrefix }} (use comma to separate between multiple prefixes. Ex.: 10.0.0.0/24, 192.168.0.0/24)
+        {% if form.prefixPrefix.errors %}
+          <ul class="errorMessage">
+            {% for error in form.prefixPrefix.errors %}
               <li>{{ error }}</li>
             {% endfor %}
           </ul>
@@ -95,59 +147,138 @@
   <script>
     function attackerFunction() {
       choose = document.getElementById("attacker").value;
-      if (choose == 'any') {
+      if (choose == 'all') {
         document.getElementById("div_attacker").style.display = "block";
         document.getElementById("div_regionAttacker").style.display = "none";
+        regionAttacker.value = choose
         document.getElementById("div_ASAttacker").style.display = "none";
+        ASAttacker.value = choose
+        document.getElementById("div_hr1").style.display = "block";
         document.getElementById("div_target").style.display = "block";
-        document.getElementById("div_regionTarget").style.display = "none";
-        document.getElementById("div_ASTarget").style.display = "none";
       } else if (choose == 'region') {
         document.getElementById("div_attacker").style.display = "block";
         document.getElementById("div_regionAttacker").style.display = "block";
+        regionAttacker.value = ''
         document.getElementById("div_ASAttacker").style.display = "none";
+        ASAttacker.value = choose
+        document.getElementById("div_hr1").style.display = "block";
         document.getElementById("div_target").style.display = "block";
-        document.getElementById("div_regionTarget").style.display = "none";
-        document.getElementById("div_ASTarget").style.display = "none";
       } else if (choose == 'AS') {
         document.getElementById("div_attacker").style.display = "block";
         document.getElementById("div_regionAttacker").style.display = "none";
+        regionAttacker.value = choose
         document.getElementById("div_ASAttacker").style.display = "block";
+        ASAttacker.value = ''
+        document.getElementById("div_hr1").style.display = "block";
         document.getElementById("div_target").style.display = "block";
-        document.getElementById("div_regionTarget").style.display = "none";
-        document.getElementById("div_ASTarget").style.display = "none";
       } else {
         document.getElementById("div_attacker").style.display = "block";
         document.getElementById("div_regionAttacker").style.display = "none";
         document.getElementById("div_ASAttacker").style.display = "none";
+        document.getElementById("div_hr1").style.display = "none";
         document.getElementById("div_target").style.display = "none";
         document.getElementById("div_regionTarget").style.display = "none";
         document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("div_hr2").style.display = "none";
+        document.getElementById("div_prefix").style.display = "none";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        document.getElementById("div_ASPrefix").style.display = "none";
+        document.getElementById("div_prefixPrefix").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }
 
     function targetFunction() {
       choose = document.getElementById("target").value;
-      if (choose == 'any') {
+      if (choose == 'all') {
+        document.getElementById("div_hr1").style.display = "block";
         document.getElementById("div_target").style.display = "block";
         document.getElementById("div_regionTarget").style.display = "none";
+        regionTarget.value = choose
         document.getElementById("div_ASTarget").style.display = "none";
-        document.getElementById("submit_button").disabled = false;
+        ASTarget.value = choose
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
       } else if (choose == 'region') {
+        document.getElementById("div_hr1").style.display = "block";
         document.getElementById("div_target").style.display = "block";
         document.getElementById("div_regionTarget").style.display = "block";
+        regionTarget.value = ''
         document.getElementById("div_ASTarget").style.display = "none";
+        ASTarget.value = choose
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+      } else if (choose == 'AS') {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        regionTarget.value = choose
+        document.getElementById("div_ASTarget").style.display = "block";
+        ASTarget.value = ''
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+      } else {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_regionTarget").style.display = "none";
+        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("div_hr2").style.display = "none";
+        document.getElementById("div_prefix").style.display = "none";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        document.getElementById("div_ASPrefix").style.display = "none";
+        document.getElementById("div_prefixPrefix").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+
+    function prefixFunction() {
+      choose = document.getElementById("prefix").value;
+      if (choose == 'all') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        regionPrefix.value = choose
+        document.getElementById("div_ASPrefix").style.display = "none";
+        ASPrefix.value = choose
+        document.getElementById("div_prefixPrefix").style.display = "none";
+        prefixPrefix.value = choose
+        document.getElementById("submit_button").disabled = false;
+      } else if (choose == 'region') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+        document.getElementById("div_regionPrefix").style.display = "block";
+        regionPrefix.value = ''
+        document.getElementById("div_ASPrefix").style.display = "none";
+        ASPrefix.value = choose
+        document.getElementById("div_prefixPrefix").style.display = "none";
+        prefixPrefix.value = choose
         document.getElementById("submit_button").disabled = false;
       } else if (choose == 'AS') {
-        document.getElementById("div_target").style.display = "block";
-        document.getElementById("div_regionTarget").style.display = "none";
-        document.getElementById("div_ASTarget").style.display = "block";
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        regionPrefix.value = choose
+        document.getElementById("div_ASPrefix").style.display = "block";
+        ASPrefix.value = ''
+        document.getElementById("div_prefixPrefix").style.display = "none";
+        prefixPrefix.value = choose
+        document.getElementById("submit_button").disabled = false;
+      } else if (choose == 'prefix') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        regionPrefix.value = choose
+        document.getElementById("div_ASPrefix").style.display = "none";
+        ASPrefix.value = choose
+        document.getElementById("div_prefixPrefix").style.display = "block";
+        prefixPrefix.value = ''
         document.getElementById("submit_button").disabled = false;
       } else {
-        document.getElementById("div_target").style.display = "block";
-        document.getElementById("div_regionTarget").style.display = "none";
-        document.getElementById("div_ASTarget").style.display = "none";
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_prefix").style.display = "block";
+        document.getElementById("div_regionPrefix").style.display = "none";
+        document.getElementById("div_ASPrefix").style.display = "none";
+        document.getElementById("div_prefixPrefix").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }

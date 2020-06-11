@@ -7,28 +7,53 @@ from minisecbgp import models
 
 
 class AffectedAreaDataForm(Form):
-    attacker = SelectField('Define the <i>attacker</i>: *', choices=[('', '--'),
-                                                             ('any', 'Any AS'),
-                                                             ('region', 'All ASs from a specific region'),
-                                                             ('AS', 'Choose the ASN')])
-    regionAttacker = StringField('<i>Attacker</i> region name: *',
+
+    attacker = SelectField('Choose the <b><i>attacker</i></b> '
+                           '(Which AS will announce the hijacked prefix): *',
+                           choices=[('', '--'),
+                                    ('all', 'All ASs'),
+                                    ('region', 'All ASs from a region'),
+                                    ('AS', 'Specify the ASN')])
+    regionAttacker = StringField('<i>Attacker\'s</i> region name: *',
                                  validators=[InputRequired(),
                                              Length(min=1, max=100, message='Region name string must be between 1 and 100 characters long.')])
-    ASAttacker = StringField('<i>Attacker</i> ASN: *',
+    ASAttacker = StringField('<i>Attacker\'s</i> ASN: *',
                              validators=[InputRequired(),
                                          Length(min=1, max=100,
                                                 message='ASN string must be between 1 and 100 characters long.')])
-    target = SelectField('Define the <i>target</i>: *', choices=[('', '--'),
-                                                                ('any', 'Any AS'),
-                                                                ('region', 'All ASs from a specific topology region'),
-                                                                ('AS', 'Specify the ASN')])
-    regionTarget = StringField('<i>Target</i> region name: *',
+
+    target = SelectField('Choose the <b><i>target</i></b> '
+                         '(Check if this AS receives and accepts the hijacked route): *',
+                         choices=[('', '--'),
+                                  ('all', 'All ASs'),
+                                  ('region', 'All ASs from a region'),
+                                  ('AS', 'Specify the ASN')])
+    regionTarget = StringField('<i>Target\'s</i> region name: *',
                                validators=[InputRequired(),
                                            Length(min=1, max=100, message='Region name string must be between 1 and 100 characters long.')])
-    ASTarget = StringField('<i>Target</i> ASN: *',
+    ASTarget = StringField('<i>Target\'s</i> ASN: *',
                            validators=[InputRequired(),
                                        Length(min=1, max=100,
                                               message='ASN string must be between 1 and 100 characters long.')])
+
+    prefix = SelectField('Choose the <b><i>prefix</i></b> '
+                         '(Which prefix will be hijacked): *',
+                         choices=[('', '--'),
+                                  ('all', 'All AS\'s prefixes'),
+                                  ('region', 'All AS\'s prefixes from a region'),
+                                  ('AS', 'Specific AS\'s prefix'),
+                                  ('prefix', 'Choose a prefix')])
+    regionPrefix = StringField('Name of the region where all AS\'s prefixes will be hijacked: *',
+                               validators=[InputRequired(),
+                                           Length(min=1, max=100, message='Region name string must be between 1 and 100 characters long.')])
+    ASPrefix = StringField('ASN from which its prefix will be hijacked: *',
+                           validators=[InputRequired(),
+                                       Length(min=1, max=100,
+                                              message='ASN string must be between 1 and 100 characters long.')])
+    prefixPrefix = StringField('Specific prefix that will be hijacked: *',
+                               validators=[InputRequired(),
+                                           Length(min=1, max=100,
+                                                  message='Prefix string must be between 1 and 100 characters long.')])
     submit_button = SubmitField('Submit')
 
 
