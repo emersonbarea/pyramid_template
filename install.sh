@@ -37,33 +37,6 @@ welcome() {
 	read -n1 -r -p "Press ANY key to continue or CTRL+C to abort." abort
 }
 
-network_address() {
-        if [ "${#IP_ARRAY[@]}" -gt 1 ] ; then
-          printf '\n%s' 'This computer has '${#IP_ARRAY[@]}' IP addresses configured on network interfaces:'
-          for ip in "${IP_ARRAY[@]}"
-          do
-            printf '\n- %s' $ip
-          done
-          printf '\n%s' 'Choose the IP address to use for the MiniSecBGP installation. (Ex.: '${IP_ARRAY[0]}'): '
-
-          read temp_ip
-
-          for i in "${IP_ARRAY[@]}"
-          do
-            if [ "$temp_ip" == "$i" ]; then
-              var_ip="$temp_ip"
-            fi
-          done
-
-          if ! [[ "$var_ip" ]] ; then
-            printf '\e[1;31m%-6s\e[m\n' 'error: Choose and write only one of the valid IP addresses from the list above. (Ex.: '${IP_ARRAY[0]}')'
-            network_address;
-          fi
-        else
-          var_ip="${IP_ARRAY[0]}"
-        fi
-}
-
 
 update() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Updating Linux ...'
@@ -111,12 +84,6 @@ configure_Postgres() {
         sudo -u postgres psql -c "CREATE EXTENSION adminpack;"
         sudo -u postgres psql -c "CREATE USER minisecbgp WITH ENCRYPTED PASSWORD 'minisecbgp';"
         sudo -u postgres createdb -O minisecbgp dbminisecbgp
-}
-
-
-install_Celery() {
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Celery ...'
-        pip3 install watchdog pyyaml argh celery
 }
 
 
@@ -213,13 +180,11 @@ LOCAL_HOME=$(pwd)
 PROJECT_NAME=MiniSecBGP
 
 welcome;
-#network_address;
 update;
 install_Linux_reqs;
 virtualenv;
 install_Python_reqs;
 configure_Postgres;
-#install_Celery
 install_app;
 configure_uwsgi;
 configure_nginx;
