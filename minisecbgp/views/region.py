@@ -1,5 +1,6 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy.exc import IntegrityError
 from wtforms import Form, SubmitField, StringField
 from wtforms.validators import InputRequired, Length
 
@@ -89,11 +90,15 @@ def region(request):
                     dictionary['message'] = 'Region "%s" does not exist in this topology.' % form.region.data
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
-                request.dbsession.query(models.Region). \
-                    filter_by(id=entry.id).delete()
-                dictionary['message'] = ('Region "%s" successfully deleted.' % form.region.data)
-                dictionary['css_class'] = 'successMessage'
-                dictionary['form'] = RegionDataForm()
+                try:
+                    request.dbsession.query(models.Region). \
+                        filter_by(id=entry.id).delete()
+                    dictionary['message'] = ('Region "%s" successfully deleted.' % form.region.data)
+                    dictionary['css_class'] = 'successMessage'
+                    dictionary['form'] = RegionDataForm()
+                except IntegrityError:
+                    dictionary['message'] = ('The region "%s" cannot be deleted because it is used by some AS. You must resolve this dependency first to delete it.' % form.region.data)
+                    dictionary['css_class'] = 'errorMessage'
 
     except Exception as error:
         dictionary['message'] = error

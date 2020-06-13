@@ -80,6 +80,7 @@ class ManualTopology(object):
             list_region = list(['-- undefined region --']) + list_region_autonomous_system + list_region_internet_exchange_point
             df_region = pd.DataFrame({'region': list_region})
             df_region = df_region.drop_duplicates(keep='first')
+            df_region = df_region.dropna()
             df_region = pd.concat([df_region.assign(id_topology=id_topology) for id_topology in id_topology])
             df_region.to_sql('region', con=dbsession.bind, if_exists='append', index=False)
             # get Region ID
@@ -94,6 +95,7 @@ class ManualTopology(object):
                 df_internet_exchange_point.rename(index={region.region: region.id}, inplace=True)
             df_internet_exchange_point = df_internet_exchange_point.reset_index().copy()
             df_internet_exchange_point = df_internet_exchange_point.drop_duplicates(keep='first')
+            df_internet_exchange_point = df_internet_exchange_point.dropna()
             df_internet_exchange_point = pd.concat(
                 [df_internet_exchange_point.assign(id_topology=id_topology) for id_topology in id_topology])
             df_internet_exchange_point.to_sql('internet_exchange_point', con=dbsession.bind, if_exists='append', index=False)
@@ -104,6 +106,7 @@ class ManualTopology(object):
             df_autonomous_system = pd.DataFrame({'autonomous_system': list_autonomous_system,
                                                  'id_region': list_region_autonomous_system,
                                                  'stub': 0})
+            df_autonomous_system.fillna(value='-- undefined region --', inplace=True)
             df_autonomous_system.reset_index()
             df_autonomous_system.set_index('id_region', inplace=True)
             for region in regions:
@@ -155,6 +158,7 @@ class ManualTopology(object):
             # Type of User
             df_type_of_user = pd.DataFrame({'type_of_user': list_type_of_user})
             df_type_of_user = df_type_of_user.drop_duplicates(keep='first')
+            df_type_of_user = df_type_of_user.dropna()
             df_type_of_user = pd.concat(
                 [df_type_of_user.assign(id_topology=id_topology) for id_topology in id_topology])
             df_type_of_user.to_sql('type_of_user', con=dbsession.bind, if_exists='append', index=False)
@@ -186,6 +190,7 @@ class ManualTopology(object):
             # Type of Service
             df_type_of_service = pd.DataFrame({'type_of_service': list_type_of_service})
             df_type_of_service = df_type_of_service.drop_duplicates(keep='first')
+            df_type_of_service = df_type_of_service.dropna()
             df_type_of_service = pd.concat(
                 [df_type_of_service.assign(id_topology=id_topology) for id_topology in id_topology])
             df_type_of_service.to_sql('type_of_service', con=dbsession.bind, if_exists='append', index=False)

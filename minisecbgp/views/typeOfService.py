@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from wtforms import Form, SubmitField, StringField
 from wtforms.validators import InputRequired, Length
 
@@ -85,11 +86,15 @@ def typeOfService(request):
                     dictionary['message'] = 'Type of Service "%s" does not exist in this topology.' % form.type_of_service.data
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
-                request.dbsession.query(models.TypeOfService). \
-                    filter_by(id=entry.id).delete()
-                dictionary['message'] = ('Type of Service "%s" successfully deleted.' % form.type_of_service.data)
-                dictionary['css_class'] = 'successMessage'
-                dictionary['form'] = ServiceDataForm()
+                try:
+                    request.dbsession.query(models.TypeOfService). \
+                        filter_by(id=entry.id).delete()
+                    dictionary['message'] = ('Type of Service "%s" successfully deleted.' % form.type_of_service.data)
+                    dictionary['css_class'] = 'successMessage'
+                    dictionary['form'] = ServiceDataForm()
+                except IntegrityError:
+                    dictionary['message'] = ('The service "%s" cannot be deleted because it is used by some AS. You must resolve this dependency first to delete it.' % form.type_of_service.data)
+                    dictionary['css_class'] = 'errorMessage'
 
     except Exception as error:
         dictionary['message'] = error

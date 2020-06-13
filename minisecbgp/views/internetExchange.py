@@ -1,5 +1,6 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy.exc import IntegrityError
 from wtforms import Form, StringField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Length
 
@@ -115,13 +116,18 @@ def internetExchange(request):
                                      (form.internet_exchange_point.data, region_name)
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
-                request.dbsession.query(models.AutonomousSystemInternetExchangePoint). \
-                    filter_by(id_internet_exchange_point=internet_exchange_point.id).delete()
-                request.dbsession.query(models.InternetExchangePoint). \
-                    filter_by(id=internet_exchange_point.id).delete()
-                dictionary['message'] = 'Internet eXchange Point %s in the %s successfully deleted.' % \
-                                        (form.internet_exchange_point.data, region_name)
-                dictionary['css_class'] = 'successMessage'
+                #request.dbsession.query(models.AutonomousSystemInternetExchangePoint). \
+                #    filter_by(id_internet_exchange_point=internet_exchange_point.id).delete()
+                try:
+                    request.dbsession.query(models.InternetExchangePoint). \
+                        filter_by(id=internet_exchange_point.id).delete()
+                    dictionary['message'] = 'Internet eXchange Point %s in the %s successfully deleted.' % \
+                                            (form.internet_exchange_point.data, region_name)
+                    dictionary['css_class'] = 'successMessage'
+                except IntegrityError:
+                    request.dbsession.rollback()
+                    dictionary['message'] = ('Internet eXchange Point "%s" in the %s cannot be deleted because it is used by some AS. You must resolve this dependency first to delete it.' % (form.internet_exchange_point.data, region_name))
+                    dictionary['css_class'] = 'errorMessage'
 
             form_region = TopologyRegionDataFormSelectField()
             form_region.region_list.choices = [(row.id, row.region) for row in

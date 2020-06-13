@@ -19,10 +19,7 @@
         {% if request.user.role == 'admin' %}
           <form action="#" method="POST">
             <div class="form-field">
-              <p>Choose a topology region to administer the IX: {{ form_region.region_list(onchange="myFunction1()") }}</p>
-            </div>
-            <div class="form-field">
-              <p>Enter the ASN you want to create, edit or delete: {{ form.autonomous_system(onchange="myFunction()") }}</p>
+              <p>Enter the ASN you want to create, edit or delete: {{ form.autonomous_system }}</p>
               {% if form.autonomous_system.errors %}
                 <ul class="errorMessage">
                   {% for error in form.autonomous_system.errors %}
@@ -34,7 +31,7 @@
 
             <div class="form-button">
               <p>
-                {{ form.create_button(class="btn btn-primary")}}
+                {{ form.create_button(class="btn btn-primary") }}
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">Edit</button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Delete</button>
               </p>
@@ -108,12 +105,6 @@
 
       </div>
     </div>
-
-    <script>
-      function myFunction() {
-        edit_autonomous_system.value = autonomous_system.value
-      }
-    </script>
   </div>
 
 {% endblock contentTopologiesDetailBase %}

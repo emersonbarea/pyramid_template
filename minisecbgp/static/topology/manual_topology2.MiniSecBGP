@@ -1,0 +1,393 @@
+{
+  "topology_name": "Manual Topology 2",
+  "autonomous_systems": [
+    {
+      "autonomous_system": "65000",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": ["access"],
+      "prefixes": [
+        {
+          "prefix": "99.99.99.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "1000",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "10.0.0.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "1",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "1.1.1.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "2",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "2.2.2.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "3",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "3.3.3.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "4",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "4.4.4.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "5",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "5.5.5.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "6",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "6.6.6.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "7",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "7.7.7.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "8",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "8.8.8.0",
+          "mask": 24
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "source": "65000",
+      "destination": "1",
+      "ip_source": "192.168.0.1",
+      "ip_destination": "192.168.0.2",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65000",
+      "destination": "2",
+      "ip_source": "192.168.0.5",
+      "ip_destination": "192.168.0.6",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65000",
+      "destination": "5",
+      "ip_source": "192.168.0.9",
+      "ip_destination": "192.168.0.10",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "2",
+      "destination": "3",
+      "ip_source": "192.168.0.13",
+      "ip_destination": "192.168.0.14",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "1",
+      "destination": "3",
+      "ip_source": "192.168.0.17",
+      "ip_destination": "192.168.0.18",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "3",
+      "destination": "5",
+      "ip_source": "192.168.0.21",
+      "ip_destination": "192.168.0.22",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "1",
+      "destination": "1000",
+      "ip_source": "192.168.0.25",
+      "ip_destination": "192.168.0.26",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "3",
+      "destination": "4",
+      "ip_source": "192.168.0.29",
+      "ip_destination": "192.168.0.30",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "4",
+      "destination": "1000",
+      "ip_source": "192.168.0.33",
+      "ip_destination": "192.168.0.34",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "1000",
+      "destination": "6",
+      "ip_source": "192.168.0.38",
+      "ip_destination": "192.168.0.37",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "5",
+      "destination": "6",
+      "ip_source": "192.168.0.41",
+      "ip_destination": "192.168.0.42",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "6",
+      "destination": "7",
+      "ip_source": "192.168.0.45",
+      "ip_destination": "192.168.0.46",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "7",
+      "destination": "8",
+      "ip_source": "192.168.0.49",
+      "ip_destination": "192.168.0.50",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    }
+  ]
+}
