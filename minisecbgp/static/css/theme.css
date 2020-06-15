@@ -17,6 +17,13 @@ footer, .span12-home {
   float: none;
 }
 
+/* frame color */
+.frame-color {
+    border: 1px solid skyblue;
+    padding: 6px;
+    border-radius: 8px;
+}
+
 /* Messages */
 .loginMessage {
   color: #c82603;

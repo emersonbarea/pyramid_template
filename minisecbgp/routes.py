@@ -11,6 +11,7 @@ def includeme(config):
     config.add_route('clusterDetail', '/cluster/detail/{id}')
     config.add_route('topologies', '/topologies')
     config.add_route('autonomousSystem', '/topology/autonomousSystem/{id_topology}')
+    config.add_route('autonomousSystemAddEdit', '/topology/autonomousSystemAddEdit/{id_topology}')
     config.add_route('autonomousSystemShowAll', '/topology/autonomousSystemShowAll/{id_topology}')
     config.add_route('region', '/topology/region/{id_topology}')
     config.add_route('regionShowAll', '/topology/regionShowAll/{id_topology}')

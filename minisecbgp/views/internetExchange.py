@@ -116,8 +116,6 @@ def internetExchange(request):
                                      (form.internet_exchange_point.data, region_name)
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
-                #request.dbsession.query(models.AutonomousSystemInternetExchangePoint). \
-                #    filter_by(id_internet_exchange_point=internet_exchange_point.id).delete()
                 try:
                     request.dbsession.query(models.InternetExchangePoint). \
                         filter_by(id=internet_exchange_point.id).delete()

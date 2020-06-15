@@ -15,37 +15,37 @@ from minisecbgp import models
 
 
 class AgreementsDataForm(Form):
-    agreement = StringField('Agreement identification',
+    agreement = StringField('Agreement identification: ',
                             validators=[InputRequired(),
                                         Length(min=1, max=50,
                                                message='Agreement identificator must be between 1 and 50 characters long.')])
-    value = StringField('Value',
+    value = StringField('Value: ',
                         validators=[InputRequired(),
                                     Length(min=1, max=50,
                                            message='Agreement value must be between 1 and 50 characters long.')])
 
 
 class ParametersDataForm(Form):
-    url = StringField('URL',
+    url = StringField('URL: ',
                       validators=[InputRequired(),
                                   Length(min=1, max=100, message='URL must be between 1 and 100 characters long.')])
-    file_search_string = StringField('String used for file search',
+    file_search_string = StringField('String used for file search: ',
                                      validators=[InputRequired(),
                                                  Length(min=1, max=100,
                                                         message='String must be between 1 and 100 characters long.')])
 
 
 class ScheduledDownload(Form):
-    loop = SelectField('Repeat period',
+    loop = SelectField('Repeat period: ',
                        choices=[('0', 'Execute only one time'),
                                 ('1', 'update daily'),
                                 ('7', 'update weekly'),
                                 ('30', 'update monthly')])
-    date = DateField('Date of the next scheduled download', format='%Y-%m-%d')
+    date = DateField('Date of the next scheduled download: ', format='%Y-%m-%d')
 
 
 class TopologyDataForm(Form):
-    topology_list = SelectField('Choose topology to download', coerce=int, validators=[InputRequired()])
+    topology_list = SelectField('Choose topology to download: ', coerce=int, validators=[InputRequired()])
 
 
 @view_config(route_name='realisticTopologies', renderer='minisecbgp:templates/topology/realisticTopologiesShow.jinja2')
