@@ -17,7 +17,8 @@
     <form action="{{ request.route_url('autonomousSystemAddEdit', id_topology = topology.id) }}" method="POST">
       <div class="form-field">
         {{ form.autonomous_system.label }}
-        {{ form.autonomous_system(disabled=True) }}
+        {{ display_autonomous_system_form.display_autonomous_system(disabled=True) }}
+        {{ form.autonomous_system(type="hidden") }}
         {% if form.autonomous_system.errors %}
           <ul class="errorMessage">
             {% for error in form.autonomous_system.errors %}
@@ -61,9 +62,9 @@
       <div class="form-field ">
         <p>Number of users by type of Autonomous System:</p>
         <div class="frame-color">
-          {% if typeofuserform._fields.items() %}
+          {% if type_of_user_form._fields.items() %}
             <table style="width:100%">
-              {% for name, field in typeofuserform._fields.items() %}
+              {% for name, field in type_of_user_form._fields.items() %}
                 <div class="form-inline">
                   <tr>
                     <td>{{ field.label }}</td>
@@ -90,6 +91,114 @@
             There is no type of service registered. Go to <a href="{{ request.route_url('typeOfService', id_topology = topology.id) }}">
           Services</a> if you want to create one.
           {% endif %}
+        </div>
+      </div>
+
+      {% if autonomous_system %}
+        <p><hr></p>
+
+        <div class="form-field ">
+          <p>BGP Prefixes:</p>
+          <div class="frame-color">
+            {% if prefixes %}
+              <table style="width:100%">
+                <tr>
+                  <td align="center"><strong>Prefix</strong></td>
+                  <td align="center"><strong>Mask</strong></td>
+                </tr>
+                {% for p in prefixes %}
+                  <div class="form-inline">
+                    <tr>
+                      <td align="center">{{ p.prefix }}</td>
+                      <td align="center">{{ p.mask }}</td>
+                    </tr>
+                  </div>
+                {% endfor %}
+              </table>
+            {% else %}
+              This Autonomous System has no prefix registered. Go to <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">
+            Prefix</a> if you want to create one.
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if autonomous_system %}
+        <p><hr></p>
+
+        <div class="form-field ">
+          <p>Links:</p>
+          <div class="frame-color">
+            {% if links %}
+              <table style="width:100%">
+                <tr>
+                  <td align="center"><strong>AS Src</strong></td>
+                  <td align="center"><strong>AS Dst</strong></td>
+                  <td align="center"><strong>Description</strong></td>
+                  <td align="center"><strong>IP src</strong></td>
+                  <td align="center"><strong>IP dst</strong></td>
+                  <td align="center"><strong>Mask</strong></td>
+                  <td align="center"><strong>Bw(Kbps)</strong></td>
+                  <td align="center"><strong>Load(%)</strong></td>
+                  <td align="center"><strong>Delay(ms)</strong></td>
+                  <td align="center"><strong>Agreement</strong></td>
+                </tr>
+                {% for l in links %}
+                  <div class="form-inline">
+                    <tr>
+                      <td align="center">{{ l.autonomous_system1 }}</td>
+                      <td align="center">{{ l.autonomous_system2 }}</td>
+                      <td align="center">{{ l.description }}</td>
+                      <td align="center">{{ l.ip_autonomous_system1 }}</td>
+                      <td align="center">{{ l.ip_autonomous_system2 }}</td>
+                      <td align="center">{{ l.mask }}</td>
+                      <td align="center">{{ l.bandwidth }}</td>
+                      <td align="center">{{ l.load }}</td>
+                      <td align="center">{{ l.delay }}</td>
+                      <td align="center">{{ l.agreement }}</td>
+                    </tr>
+                  </div>
+                {% endfor %}
+              </table>
+            {% else %}
+              This Autonomous System has no link registered. Go to <a href="{{ request.route_url('link', id_topology = topology.id) }}">
+            Link</a> if you want to create one.
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <p><hr></p>
+
+      <div class="form-button" align="center">
+        <p>
+          {% if autonomous_system %}
+            {{ form.edit_button(class="btn btn-primary") }}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Delete</button>
+          {% else %}
+            {{ form.create_button(class="btn btn-primary") }}
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you really want to delete this Autonomous System?</p>
+              <p><strong>Attention: all links and prefixes of this AS will also be deleted!</strong></p>
+            </div>
+            <div class="modal-footer">
+              <div class="form-group">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                {{ form.delete_button(class="btn btn-danger") }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </form>

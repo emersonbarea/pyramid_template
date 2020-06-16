@@ -87,7 +87,7 @@ def create(request):
             message = ('User account "%s" already exists.' % form.username.data)
             css_class = 'errorMessage'
 
-        request.override_renderer = 'minisecbgp:templates/user/typeOfUser.jinja2'
+        request.override_renderer = 'minisecbgp:templates/user/user.jinja2'
         return {'message': message, 'css_class': css_class}
 
     return {'form': form}
@@ -118,7 +118,7 @@ def edit(request):
             message = ('User account "%s" password not updated.' % form.username.data)
             css_class = 'errorMessage'
 
-        request.override_renderer = 'minisecbgp:templates/user/typeOfUser.jinja2'
+        request.override_renderer = 'minisecbgp:templates/user/user.jinja2'
         return {'message': message, 'css_class': css_class}
 
     return {'form': form, 'form_password': form_password}
@@ -148,7 +148,7 @@ def delete(request):
             message = ('User account "%s" does not exist.' % form.user_list.data)
             css_class = 'errorMessage'
 
-        request.override_renderer = 'minisecbgp:templates/user/typeOfUser.jinja2'
+        request.override_renderer = 'minisecbgp:templates/user/user.jinja2'
         return {'message': message, 'css_class': css_class}
 
     return {'user': user, 'form': form}
