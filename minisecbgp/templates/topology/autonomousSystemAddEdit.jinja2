@@ -50,7 +50,8 @@
           {% if form.internet_exchange_point.choices %}
             {{ form.internet_exchange_point }}
           {% else %}
-            There is no IX registered. Go to <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point (IX)</a> if you want to create one.
+            There is no IX registered. Go to <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">
+          Internet eXchange Point (IX)</a> if you want to create one.
           {% endif %}
         </div>
       </div>
@@ -72,7 +73,8 @@
               {% endfor %}
             </table>
           {% else %}
-            There is no type of user registered. Go to <a href="{{ request.route_url('typeOfUser', id_topology = topology.id) }}">Users</a> if you want to create one.
+            There is no type of user registered. Go to <a href="{{ request.route_url('typeOfUser', id_topology = topology.id) }}">
+          Users</a> if you want to create one.
           {% endif %}
         </div>
       </div>
@@ -85,11 +87,15 @@
           {% if form.type_of_service.choices %}
             {{ form.type_of_service }}
           {% else %}
-            There is no type of service registered. Go to <a href="{{ request.route_url('typeOfService', id_topology = topology.id) }}">Services</a> if you want to create one.
+            There is no type of service registered. Go to <a href="{{ request.route_url('typeOfService', id_topology = topology.id) }}">
+          Services</a> if you want to create one.
           {% endif %}
         </div>
       </div>
     </form>
+
+    <p align="center">* Go to the correct page to create or edit <a href="{{ request.route_url('link', id_topology = topology.id) }}">
+      Links</a> and <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Prefixes</a>.</p>
 
   </div>
 
