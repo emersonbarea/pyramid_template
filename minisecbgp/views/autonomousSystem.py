@@ -16,7 +16,6 @@ class AutonomousSystemDataForm(Form):
     autonomous_system = IntegerField('Autonomous System Number: ',
                                      widget=NumberInput(min=0, max=4294967295, step=1),
                                      validators=[InputRequired()])
-    bla = StringField('bla')
     id_region = SelectField('Region where the AS is located: *', coerce=int,
                             validators=[InputRequired()])
     internet_exchange_point = MultiCheckboxField('Internet eXchange Point(s) to which the AS is connected: ',
@@ -89,7 +88,8 @@ def autonomousSystemAddEdit(request):
         form.internet_exchange_point.choices = [(row.id, row.ixp) for row in
                                                 request.dbsession.bind.execute(query)]
 
-        type_of_users = request.dbsession.query(models.TypeOfUser).all()
+        type_of_users = request.dbsession.query(models.TypeOfUser).\
+            filter_by(id_topology=request.matchdict["id_topology"]).all()
         TypeOfUserForm = type_of_user(type_of_users)
         typeofuserform = TypeOfUserForm(request.POST)
 
@@ -118,33 +118,21 @@ def autonomousSystemAddEdit(request):
 
             form.process()
 
-
-
-
-
-
-            form.bla.data = "skdfjklj"
-
-
-
-            # PRECISO FAZER A CONSULTA PARA RETORNAR O NÚMERO DE TIPO DE USUÁRIO DO AS E POPULAR OS CAMPOS CORRETOS !!!
-
-
-
-            query = 'select tou.id as id, ' \
-                    'tou.type_of_user as type_of_user, ' \
-                    '0 as number ' \
+            query = 'select \'type_of_user_\' || tou.id as id, ' \
+                    'coalesce((select touas.number ' \
+                    'from type_of_user_autonomous_system touas ' \
+                    'where touas.id_autonomous_system = %s ' \
+                    'and touas.id_type_of_user = tou.id), 0) as number ' \
                     'from type_of_user tou ' \
-                    'where tou.id_topology = %s' % request.matchdict["id_topology"]
-            #type_of_users = request.dbsession.bind.execute(query)
-
-
-
-
-
-
-
-
+                    'where tou.id_topology = %s' % (autonomous_system.id, request.matchdict["id_topology"])
+            result_proxy = request.dbsession.bind.execute(query)
+            type_of_user_autonomous_systems = list()
+            for row in result_proxy:
+                type_of_user_autonomous_systems.append(dict(row))
+            for name, field in typeofuserform._fields.items():
+                for touas in type_of_user_autonomous_systems:
+                    if touas['id'] == field.id:
+                        field.data = touas['number']
         else:
             dictionary['header_message'] = 'Create new Autonomous System'
 

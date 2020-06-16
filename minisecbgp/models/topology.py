@@ -114,7 +114,7 @@ class TypeOfUser(Base):
     __tablename__ = 'type_of_user'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    type_of_user = Column(String(50), nullable=False, unique=True)
+    type_of_user = Column(String(50), nullable=False)
     type_of_user_autonomous_system = relationship('TypeOfUserAutonomousSystem', foreign_keys='TypeOfUserAutonomousSystem.id_type_of_user')
     Index('IndexId3_topology', id_topology)
 
@@ -133,7 +133,7 @@ class TypeOfService(Base):
     __tablename__ = 'type_of_service'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    type_of_service = Column(String(50), nullable=False, unique=True)
+    type_of_service = Column(String(50), nullable=False)
     type_of_service_autonomous_system = relationship('TypeOfServiceAutonomousSystem', foreign_keys='TypeOfServiceAutonomousSystem.id_type_of_service')
     Index('IndexId4_topology', id_topology)
 

@@ -47,13 +47,10 @@
       <div class="form-field ">
         <p>{{ form.internet_exchange_point.label }}</p>
         <div class="form-inline form-check-inline frame-color">
-          {{ form.internet_exchange_point }}
-          {% if form.internet_exchange_point.errors %}
-            <ul class="errorMessage">
-              {% for error in form.internet_exchange_point.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
+          {% if form.internet_exchange_point.choices %}
+            {{ form.internet_exchange_point }}
+          {% else %}
+            There is no IX registered. Go to <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point (IX)</a> if you want to create one.
           {% endif %}
         </div>
       </div>
@@ -63,16 +60,20 @@
       <div class="form-field ">
         <p>Number of users by type of Autonomous System:</p>
         <div class="frame-color">
-          <table style="width:100%">
-            {% for name, field in typeofuserform._fields.items() %}
-              <div class="form-inline">
-                <tr>
-                  <td>{{ field.label }}</td>
-                  <td>{{ field }}</td>
-                </tr>
-              </div>
-            {% endfor %}
-          </table>
+          {% if typeofuserform._fields.items() %}
+            <table style="width:100%">
+              {% for name, field in typeofuserform._fields.items() %}
+                <div class="form-inline">
+                  <tr>
+                    <td>{{ field.label }}</td>
+                    <td>{{ field }}</td>
+                  </tr>
+                </div>
+              {% endfor %}
+            </table>
+          {% else %}
+            There is no type of user registered. Go to <a href="{{ request.route_url('typeOfUser', id_topology = topology.id) }}">Users</a> if you want to create one.
+          {% endif %}
         </div>
       </div>
 
@@ -81,14 +82,13 @@
       <div class="form-field">
         <p>{{ form.type_of_service.label }}</p>
         <div class="form-inline form-check-inline frame-color">
-          {{ form.type_of_service }}
+          {% if form.type_of_service.choices %}
+            {{ form.type_of_service }}
+          {% else %}
+            There is no type of service registered. Go to <a href="{{ request.route_url('typeOfService', id_topology = topology.id) }}">Services</a> if you want to create one.
+          {% endif %}
         </div>
       </div>
-
-      {{ form.bla.label }}
-      {{ form.bla }}
-
-
     </form>
 
   </div>
