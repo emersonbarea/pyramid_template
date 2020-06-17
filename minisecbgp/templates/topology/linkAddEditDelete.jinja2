@@ -9,7 +9,7 @@
   <div id="aum" class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
-        <h3 align="center">Links: {{ topology.topology }} </h3>
+        <h3 align="center">BGP Peering: {{ topology.topology }} </h3>
         <h4 align="center">Autonomous System Number: {{ autonomous_system }} </h4>
       </div>
     </div>
@@ -22,17 +22,14 @@
 
             {{ form.autonomous_system(class="hidden") }}
 
-            <div class="row-fluid">
-              <div class="form-field">
-              </br>
-                <p>
-                  Here, you can add a new link to this Autonomous System, edit an existent link or delete it.
-                  Choose what you want to do and follow the instructions:
-                </p>
-              </div>
+            <div class="form-field">
+              <p>
+                Here you can create a new BGP peering for this Autonomous System, edit an existing peer or delete it.
+                Choose what you want to do and follow the instructions:
+              </p>
             </div>
 
-            <hr>
+            <p><hr></p>
 
             <div class="row-fluid">
               <div class="form-field">

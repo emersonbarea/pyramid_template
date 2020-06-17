@@ -9,12 +9,24 @@
   <div id="aum" class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
-        <h3 align="center">Autonomous System: {{ topology.topology }} </h3>
+        <h3 align="center">Autonomous System (AS): {{ topology.topology }} </h3>
         <h4 align="center">{{ header_message }} </h4>
       </div>
     </div>
 
     <form action="{{ request.route_url('autonomousSystemAddEdit', id_topology = topology.id) }}" method="POST">
+
+      {{ form.autonomous_system(class="hidden") }}
+
+      <div class="form-field">
+        <p>
+          Here you can create a new BGP Autonomous System, edit an existing AS or delete it.
+          Choose what you want to do and follow the instructions:
+        </p>
+      </div>
+
+      <p><hr></p>
+
       <div class="form-field">
         {{ form.autonomous_system.label }}
         {{ display_autonomous_system_form.display_autonomous_system(disabled=True) }}
@@ -127,7 +139,7 @@
         <p><hr></p>
 
         <div class="form-field ">
-          <p>Links:</p>
+          <p>BGP Peers:</p>
           <div class="frame-color">
             {% if links %}
               <table style="width:100%">
@@ -161,8 +173,8 @@
                 {% endfor %}
               </table>
             {% else %}
-              This Autonomous System has no link registered. Go to <a href="{{ request.route_url('link', id_topology = topology.id) }}">
-            Link</a> if you want to create one.
+              This Autonomous System has no peering registered. Go to <a href="{{ request.route_url('link', id_topology = topology.id) }}">
+            Peer</a> if you want to create one.
             {% endif %}
           </div>
         </div>

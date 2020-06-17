@@ -10,42 +10,42 @@ from minisecbgp import models
 
 
 class LinkDataForm(Form):
-    autonomous_system = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+    autonomous_system = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Peering: ',
                                      widget=NumberInput(min=0, max=4294967295, step=1),
                                      validators=[InputRequired()])
-    link_list = SelectField('Or, if you want to edit or delete an existent link, choose it below: ',
+    link_list = SelectField('Or, if you want to edit or delete an existent peer, choose it below: ',
                             coerce=int)
-    autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+    autonomous_system1 = IntegerField('Peering source Autonomous System: ',
                                       widget=NumberInput(min=0, max=4294967295, step=1))
-    ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1): *',
+    ip_autonomous_system1 = StringField('IP address of the peering source interface (decimal. Ex.: 10.0.0.1): *',
                                         validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+    autonomous_system2 = IntegerField('Peering destination Autonomous System: ',
                                       widget=NumberInput(min=0, max=4294967295, step=1))
-    ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2): *',
+    ip_autonomous_system2 = StringField('IP address of the peering destination interface (decimal. Ex.: 10.0.0.2): *',
                                         validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                   '(Ex.: 1.1.1.1 or 200.200.200.201).')])
     mask = IntegerField('Mask (source and destination interfaces) (prefix length. Ex.30): *',
                         widget=NumberInput(min=8, max=30, step=2))
     description = StringField('Description: ',
                               validators=[Length(min=0, max=50, message='The description must be between 0 and 50 bytes long.')])
-    bandwidth = IntegerField('Bandwidth (Kbps): ',
+    bandwidth = IntegerField('Link bandwidth (Kbps): ',
                              widget=NumberInput(min=0, max=1000000000, step=1),
                              validators=[validators.Optional()])
-    delay = IntegerField('Delay (ms): ',
+    delay = IntegerField('Link delay (ms): ',
                          widget=NumberInput(min=0, max=1000000000, step=1),
                          validators=[validators.Optional()])
-    load = IntegerField('Load (%): ',
+    load = IntegerField('Link load (%): ',
                         widget=NumberInput(min=0, max=100, step=1),
                         validators=[validators.Optional()])
-    agreement_list = SelectField('Agreement: *', coerce=int)
+    agreement_list = SelectField('Peers agreement: *', coerce=int)
 
-    edit_autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+    edit_autonomous_system1 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Peering: ',
                                            widget=NumberInput(min=0, max=4294967295, step=1))
     edit_ip_autonomous_system1 = StringField('Source interface IP (decimal. Ex.: 10.0.0.1) *',
                                              validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '
                                                                                        '(Ex.: 1.1.1.1 or 200.200.200.201).')])
-    edit_autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Prefix: ',
+    edit_autonomous_system2 = IntegerField('Enter the ASN for which you want to create, edit or delete a BGP Peering: ',
                                            widget=NumberInput(min=0, max=4294967295, step=1))
     edit_ip_autonomous_system2 = StringField('Destination interface IP (decimal. Ex.: 10.0.0.2): *',
                                              validators=[Length(min=7, max=15, message='The IPv4 prefix must be between 7 and 15 bytes long '

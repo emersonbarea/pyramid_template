@@ -72,7 +72,7 @@ class AffectedAreaDataForm(Form):
 @view_config(route_name='hijack', renderer='minisecbgp:templates/hijack/hijackHistory.jinja2')
 def hijack(request):
     user = request.user
-    if user is None or (user.role != 'admin'):
+    if user is None:
         raise HTTPForbidden
 
     dictionary = dict()
@@ -83,7 +83,7 @@ def hijack(request):
 @view_config(route_name='hijackAffectedArea', renderer='minisecbgp:templates/hijack/hijackAffectedArea.jinja2')
 def hijackAffectedArea(request):
     user = request.user
-    if user is None or (user.role != 'admin'):
+    if user is None:
         raise HTTPForbidden
 
     dictionary = dict()
@@ -117,7 +117,7 @@ def hijackAffectedArea(request):
 @view_config(route_name='hijackRealisticAnalysis', renderer='minisecbgp:templates/hijack/hijackRealisticAnalysis.jinja2')
 def hijackRealisticAnalysis(request):
     user = request.user
-    if user is None or (user.role != 'admin'):
+    if user is None:
         raise HTTPForbidden
 
     dictionary = dict()

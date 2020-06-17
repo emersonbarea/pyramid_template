@@ -143,7 +143,6 @@ def autonomousSystemAddEdit(request):
                 dictionary['css_class'] = 'errorMessage'
 
         elif form.edit_button.data:
-            print('update button')
             try:
                 delete(autonomous_system.id)
                 insert(form.internet_exchange_point.data, form.type_of_service.data, type_of_user_form,

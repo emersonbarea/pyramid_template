@@ -9,7 +9,7 @@
   <div id="aum" class="container-fluid">
     <div class="row-fluid">
       <div class="span12">
-        <h3 align="center">Types of Service: {{ topology.topology }} </h3>
+        <h3 align="center">Types of Services: {{ topology.topology }} </h3>
       </div>
     </div>
 
@@ -93,10 +93,10 @@
           <div class="form-button">
             <p>
               <button type="button" class="btn btn-primary"
-                      onclick="window.open('{{ request.route_url('typeOfServiceShowAll', id_topology = topology.id) }}','_blank')">Show all Topology Types of Service
+                      onclick="window.open('{{ request.route_url('typeOfServiceShowAll', id_topology = topology.id) }}','_blank')">Show all Types of Services
               </button>
             </p>
-            <p>* Show all may take a while due to the large number of topology Types of Service.</p>
+            <p>* Show all types of services may take a while due to the large number of registries.</p>
           </div>
         </form>
 
