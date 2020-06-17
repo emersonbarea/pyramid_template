@@ -86,57 +86,6 @@ def link(request):
     return dictionary
 
 
-@view_config(route_name='linkShowAll', renderer='minisecbgp:templates/topology/linkShowAll.jinja2')
-def linkShowAll(request):
-    user = request.user
-    if user is None:
-        raise HTTPForbidden
-
-    dictionary = dict()
-    try:
-        dictionary['topology'] = request.dbsession.query(models.Topology) \
-            .filter_by(id=request.matchdict["id_topology"]).first()
-
-        query = 'select l.id as id_link, ' \
-                'la.agreement as agreement, ' \
-                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
-                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
-                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
-                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
-                'l.mask as mask, l.description as description, ' \
-                'coalesce(cast(l.bandwidth as varchar), \'__\') as bandwidth, ' \
-                'coalesce(cast(l.delay as varchar), \'__\') as delay, ' \
-                'coalesce(cast(l.load as varchar), \'__\') as load ' \
-                'from link l, link_agreement la ' \
-                'where l.id_link_agreement = la.id ' \
-                'and l.id_topology = %s ' \
-                'order by l.id_autonomous_system1, l.id_autonomous_system2;' % request.matchdict["id_topology"]
-        links_temp = request.dbsession.bind.execute(query)
-        links = list()
-        for l in links_temp:
-            links.append({'id_link': l.id_link,
-                          'agreement': l.agreement,
-                          'autonomous_system1': l.autonomous_system1,
-                          'ip_autonomous_system1': str(ipaddress.ip_address(l.ip_autonomous_system1)),
-                          'autonomous_system2': l.autonomous_system2,
-                          'ip_autonomous_system2': str(ipaddress.ip_address(l.ip_autonomous_system2)),
-                          'mask': l.mask,
-                          'bandwidth': l.bandwidth,
-                          'delay': l.delay,
-                          'load': l.load})
-        dictionary['links'] = links
-        number_of_links = request.dbsession.query(models.Link). \
-            filter_by(id_topology=request.matchdict["id_topology"]).count()
-        dictionary['tabs'] = number_of_links // 10000
-        dictionary['number_of_accordions_in_last_tab'] = (number_of_links % 10000) // 1000
-
-    except Exception as error:
-        dictionary['message'] = error
-        dictionary['css_class'] = 'errorMessage'
-
-    return dictionary
-
-
 @view_config(route_name='linkAction', match_param='action=addEditDelete',
              renderer='minisecbgp:templates/topology/linkAddEditDelete.jinja2')
 def linkAddEditDelete(request):
@@ -347,6 +296,104 @@ def linkAddEditDelete(request):
 
             elif form.delete_button.data:
                 delete(form.link_list.data)
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='linkShowAllTxt', renderer='minisecbgp:templates/topology/linkShowAllTxt.jinja2')
+def linkShowAllTxt(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+
+        query = 'select l.id as id_link, ' \
+                'la.agreement as agreement, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
+                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
+                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
+                'l.mask as mask, l.description as description, ' \
+                'coalesce(cast(l.bandwidth as varchar), \'_\') as bandwidth, ' \
+                'coalesce(cast(l.delay as varchar), \'_\') as delay, ' \
+                'coalesce(cast(l.load as varchar), \'_\') as load ' \
+                'from link l, link_agreement la ' \
+                'where l.id_link_agreement = la.id ' \
+                'and l.id_topology = %s ' \
+                'order by l.id_autonomous_system1, l.id_autonomous_system2;' % request.matchdict["id_topology"]
+        links_temp = request.dbsession.bind.execute(query)
+        links = list()
+        for l in links_temp:
+            links.append({'id_link': l.id_link,
+                          'agreement': l.agreement,
+                          'autonomous_system1': l.autonomous_system1,
+                          'ip_autonomous_system1': str(ipaddress.ip_address(l.ip_autonomous_system1)),
+                          'autonomous_system2': l.autonomous_system2,
+                          'ip_autonomous_system2': str(ipaddress.ip_address(l.ip_autonomous_system2)),
+                          'mask': l.mask,
+                          'bandwidth': l.bandwidth,
+                          'delay': l.delay,
+                          'load': l.load})
+        dictionary['links'] = links
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='linkShowAllHtml', renderer='minisecbgp:templates/topology/linkShowAllHtml.jinja2')
+def linkShowAllHtml(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+
+        query = 'select l.id as id_link, ' \
+                'la.agreement as agreement, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
+                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
+                '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
+                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
+                'l.mask as mask, l.description as description, ' \
+                'coalesce(cast(l.bandwidth as varchar), \'_\') as bandwidth, ' \
+                'coalesce(cast(l.delay as varchar), \'_\') as delay, ' \
+                'coalesce(cast(l.load as varchar), \'_\') as load ' \
+                'from link l, link_agreement la ' \
+                'where l.id_link_agreement = la.id ' \
+                'and l.id_topology = %s ' \
+                'order by l.id_autonomous_system1, l.id_autonomous_system2;' % request.matchdict["id_topology"]
+        links_temp = request.dbsession.bind.execute(query)
+        links = list()
+        for l in links_temp:
+            links.append({'id_link': l.id_link,
+                          'agreement': l.agreement,
+                          'autonomous_system1': l.autonomous_system1,
+                          'ip_autonomous_system1': str(ipaddress.ip_address(l.ip_autonomous_system1)),
+                          'autonomous_system2': l.autonomous_system2,
+                          'ip_autonomous_system2': str(ipaddress.ip_address(l.ip_autonomous_system2)),
+                          'mask': l.mask,
+                          'bandwidth': l.bandwidth,
+                          'delay': l.delay,
+                          'load': l.load})
+        dictionary['links'] = links
+        number_of_links = request.dbsession.query(models.Link). \
+            filter_by(id_topology=request.matchdict["id_topology"]).count()
+        dictionary['tabs'] = number_of_links // 10000
+        dictionary['number_of_accordions_in_last_tab'] = (number_of_links % 10000) // 1000
 
     except Exception as error:
         dictionary['message'] = error

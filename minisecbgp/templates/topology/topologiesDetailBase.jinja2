@@ -14,7 +14,10 @@
         <div class="nav-collapse collapse">
           <ul class="nav">
             <li>
-              <a href="{{ request.route_url('autonomousSystem', id_topology = topology.id) }}">Autonomous System (AS)</a>
+              <a href="{{ request.route_url('topologiesDetail', id_topology = topology.id) }}">Detail</a>
+            </li>
+            <li>
+              <a href="{{ request.route_url('autonomousSystem', id_topology = topology.id) }}">Autonomous System</a>
             </li>
             <li>
               <a href="{{ request.route_url('link', id_topology = topology.id) }}">Peer</a>
@@ -26,7 +29,7 @@
               <a href="{{ request.route_url('region', id_topology = topology.id) }}">Region</a>
             </li>
             <li>
-              <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point (IX)</a>
+              <a href="{{ request.route_url('internetExchange', id_topology = topology.id) }}">Internet eXchange Point</a>
             </li>
             <li>
               <a href="{{ request.route_url('typeOfUser', id_topology = topology.id) }}">Users</a>

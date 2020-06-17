@@ -290,8 +290,33 @@ def autonomousSystemAddEdit(request):
     return dictionary
 
 
-@view_config(route_name='autonomousSystemShowAll', renderer='minisecbgp:templates/topology/autonomousSystemShowAll.jinja2')
-def autonomousSystemShowAll(request):
+@view_config(route_name='autonomousSystemShowAllTxt', renderer='minisecbgp:templates/topology/autonomousSystemShowAllTxt.jinja2')
+def autonomousSystemShowAllTxt(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        autonomousSystems = request.dbsession.query(models.AutonomousSystem, models.Region).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
+            filter(models.AutonomousSystem.id_region == models.Region.id).\
+            order_by(models.AutonomousSystem.autonomous_system.asc()).all()
+        dictionary['autonomousSystems'] = autonomousSystems
+        form = AutonomousSystemDataForm(request.POST)
+        dictionary['form'] = form
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='autonomousSystemShowAllHtml', renderer='minisecbgp:templates/topology/autonomousSystemShowAllHtml.jinja2')
+def autonomousSystemShowAllHtml(request):
     user = request.user
     if user is None:
         raise HTTPForbidden

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>MiniSecBGP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Lightweight and Distributed Testbed for Security Analysis in BGP">
+    <meta="keywords" content="BGP, Security, Testbed, Mininet, MaxiNet">
+    <meta name="author" content="Emerson Barea">
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/bootstrap.css')}}" type="text/css"/>
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/theme.css')}}" type="text/css"/>
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/bootstrap-responsive.css')}}" type="text/css"/>
+    <link rel="icon" href="{{request.static_url('minisecbgp:static/ico/favico.png')}}">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand">MiniSecBGP</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="javascript:window.open('','_self').close();">Close</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="aum" class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+          <h3 align="center">Topology: {{ topology.topology }}</h3>
+          <h4 align="center">Show all Peers</h4>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+           <ul class="nav nav-tabs">
+            {% for t1 in range(tabs + 1) %}
+              {% if t1 == 0 %}
+                {% if tabs == 0 %}
+                  <li class="active"><a data-toggle="tab" href="#tab{{ t1 }}">1</a></li>
+                {% else %}
+                  <li class="active"><a data-toggle="tab" href="#tab{{ t1 }}">1</a></li>
+                  {% for t2 in range(tabs) %}
+                    {% if t2 + 1 == tabs %}
+                      <li><a data-toggle="tab" href="#tab{{ t2 + 1 }}">{{ t2 + 2 }}</a></li>
+                    {% else %}
+                      <li><a data-toggle="tab" href="#tab{{ t2 + 1 }}">{{ t2 + 2 }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+
+          <div class="tab-content">
+            {% set accordion_range = namespace(value=10) %}
+            {% set begin_accordion = namespace(value=0) %}
+            {% set end_accordion = namespace(value=1000) %}
+            {% for tab in range(tabs + 1) %}
+              <div id="tab{{ tab }}" class="tab-pane fade {{ 'in active' if tab == 0 }}">
+                <div class="accordion" id="accordion{{ tab }}">
+
+                  {% if tab == tabs %}
+                    {% set accordion_range.value = number_of_accordions_in_last_tab + 1 %}
+                  {% endif %}
+
+                  {% for accordion in range(accordion_range.value) %}
+                    <div class="accordion-group">
+                      <div class="accordion-heading">
+                       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab }}"
+                          href="#collapse{{ tab }}{{ accordion }}">Peering range: {{ tab }}{{ accordion }}
+                       </a>
+                      </div>
+                      <div id="collapse{{ tab }}{{ accordion }}" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                          <table cellpadding="6px">
+                            {% for link in links %}
+                              {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
+                                <tr>
+                                  <td align="right">AS <strong>{{ link.autonomous_system1 }}</strong> ({{ link.ip_autonomous_system1 }}/{{ link.mask }})</td>
+                                  <td><strong><---></strong></td>
+                                  <td>AS <strong>{{ link.autonomous_system2 }}</strong> ({{ link.ip_autonomous_system2 }}/{{ link.mask }})</td>
+                                  <td>bw: {{ link.bandwidth }} Kbps</td>
+                                  <td>load: {{ link.load }} %</td>
+                                  <td>delay: {{ link.delay }} ms</td>
+                                  <td align="center">({{ link.agreement }})</td>
+                                </tr>
+                              {% endif %}
+                            {% endfor %}
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    {% set begin_accordion.value = begin_accordion.value + 1000 %}
+                    {% set end_accordion.value = end_accordion.value + 1000 %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <a href="https://github.com/MiniSecBGP/MiniSecBGP" target="_blank">Github Project</a>
+      <p>MiniSecBGP</p>
+    </footer>
+
+    <script src="{{request.static_url('minisecbgp:static/js/jquery.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-transition.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-alert.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-modal.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-dropdown.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-scrollspy.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-tab.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-tooltip.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-popover.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-button.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-collapse.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-carousel.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-typeahead.js')}}"></script>
+
+  </body>
+</html>
