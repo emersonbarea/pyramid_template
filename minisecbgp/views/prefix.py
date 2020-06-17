@@ -45,42 +45,6 @@ def prefix(request):
     return dictionary
 
 
-@view_config(route_name='prefixShowAll', renderer='minisecbgp:templates/topology/prefixShowAll.jinja2')
-def prefixShowAll(request):
-    user = request.user
-    if user is None:
-        raise HTTPForbidden
-
-    dictionary = dict()
-    try:
-        dictionary['topology'] = request.dbsession.query(models.Topology) \
-            .filter_by(id=request.matchdict["id_topology"]).first()
-        prefixes_temp = request.dbsession.query(models.AutonomousSystem, models.Prefix). \
-            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
-            filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).\
-            order_by(models.AutonomousSystem.autonomous_system.asc()).\
-            order_by(models.Prefix.prefix.asc()).all()
-        prefixes = list()
-        for p in prefixes_temp:
-            prefixes.append({'id_prefix': p.Prefix.id,
-                             'prefix': str(ipaddress.ip_address(p.Prefix.prefix)),
-                             'mask': p.Prefix.mask,
-                             'id_autonomous_system': p.Prefix.id_autonomous_system,
-                             'autonomous_system': p.AutonomousSystem.autonomous_system,
-                             'id_topology': p.AutonomousSystem.id_topology})
-        dictionary['prefixes'] = prefixes
-        number_of_autonomous_systems = request.dbsession.query(models.AutonomousSystem). \
-            filter_by(id_topology=request.matchdict["id_topology"]).count()
-        dictionary['tabs'] = number_of_autonomous_systems // 10000
-        dictionary['number_of_accordions_in_last_tab'] = (number_of_autonomous_systems % 10000) // 1000
-
-    except Exception as error:
-        dictionary['message'] = error
-        dictionary['css_class'] = 'errorMessage'
-
-    return dictionary
-
-
 @view_config(route_name='prefixAction', match_param='action=addEditDelete',
              renderer='minisecbgp:templates/topology/prefixAddEditDelete.jinja2')
 def prefixAddEditDelete(request):
@@ -180,6 +144,74 @@ def prefixAddEditDelete(request):
                 form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
                 dictionary['message'] = 'BGP Prefix %s removed successfully' % value
                 dictionary['css_class'] = 'successMessage'
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='prefixShowAllTxt', renderer='minisecbgp:templates/topology/prefixShowAllTxt.jinja2')
+def prefixShowAllTxt(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        prefixes_temp = request.dbsession.query(models.AutonomousSystem, models.Prefix). \
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
+            filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).\
+            order_by(models.AutonomousSystem.autonomous_system.asc()).\
+            order_by(models.Prefix.prefix.asc()).all()
+        prefixes = list()
+        for p in prefixes_temp:
+            prefixes.append({'id_prefix': p.Prefix.id,
+                             'prefix': str(ipaddress.ip_address(p.Prefix.prefix)),
+                             'mask': p.Prefix.mask,
+                             'id_autonomous_system': p.Prefix.id_autonomous_system,
+                             'autonomous_system': p.AutonomousSystem.autonomous_system,
+                             'id_topology': p.AutonomousSystem.id_topology})
+        dictionary['prefixes'] = prefixes
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='prefixShowAllHtml', renderer='minisecbgp:templates/topology/prefixShowAllHtml.jinja2')
+def prefixShowAllHtml(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        prefixes_temp = request.dbsession.query(models.AutonomousSystem, models.Prefix). \
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
+            filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).\
+            order_by(models.AutonomousSystem.autonomous_system.asc()).\
+            order_by(models.Prefix.prefix.asc()).all()
+        prefixes = list()
+        for p in prefixes_temp:
+            prefixes.append({'id_prefix': p.Prefix.id,
+                             'prefix': str(ipaddress.ip_address(p.Prefix.prefix)),
+                             'mask': p.Prefix.mask,
+                             'id_autonomous_system': p.Prefix.id_autonomous_system,
+                             'autonomous_system': p.AutonomousSystem.autonomous_system,
+                             'id_topology': p.AutonomousSystem.id_topology})
+        dictionary['prefixes'] = prefixes
+        number_of_autonomous_systems = request.dbsession.query(models.AutonomousSystem). \
+            filter_by(id_topology=request.matchdict["id_topology"]).count()
+        dictionary['tabs'] = number_of_autonomous_systems // 10000
+        dictionary['number_of_accordions_in_last_tab'] = (number_of_autonomous_systems % 10000) // 1000
+
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'

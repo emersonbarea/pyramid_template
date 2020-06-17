@@ -42,11 +42,40 @@
         <form action="#" method="POST">
           <div class="form-button">
             <p>
-              <button type="button" class="btn btn-primary"
-                      onclick="window.open('{{ request.route_url('prefixShowAll', id_topology = topology.id) }}','_blank')">Show all BGP Prefixes
-              </button>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#showAllModal">Show all BGP Prefixes</button>
             </p>
             <p>* Show all BGP prefixes may take a while due to the large number of registries.</p>
+          </div>
+
+          <div class="modal fade" id="showAllModal" tabindex='-1' role="dialog" aria-labelledby="showAllModal" aria-hidden="true" align="left">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Report layout</h4>
+                </div>
+                <div class="modal-body">
+                  <p>Choose the report layout:</p>
+                  <p>- <a href="{{ request.route_url('prefixShowAllTxt', id_topology = topology.id) }}" target="_blank">
+                    Text report</a>: lighter, but simpler</p>
+                  <p>- <a href="{{ request.route_url('prefixShowAllHtml', id_topology = topology.id) }}" target="_blank">
+                    HTML report</a>: more elaborate, but with much heavier processing</p>
+                </div>
+                <div class="modal-footer">
+                  <div class="form-group">
+                    <button type="button" class="btn btn-primary"
+                            onclick="window.open('{{ request.route_url('prefixShowAllTxt', id_topology = topology.id) }}','_blank')">
+                      Text report
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            onclick="window.open('{{ request.route_url('prefixShowAllHtml', id_topology = topology.id) }}','_blank')">
+                      HTML report
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </form>
 
