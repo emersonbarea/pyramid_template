@@ -107,8 +107,8 @@ def region(request):
     return dictionary
 
 
-@view_config(route_name='regionShowAll', renderer='minisecbgp:templates/topology/regionShowAll.jinja2')
-def regionShowAll(request):
+@view_config(route_name='regionShowAllTxt', renderer='minisecbgp:templates/topology/regionShowAllTxt.jinja2')
+def regionShowAllTxt(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -117,14 +117,87 @@ def regionShowAll(request):
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
-        dictionary['regions'] = request.dbsession.query(models.Region).\
-            filter(models.Region.id_topology == request.matchdict["id_topology"]).\
-            filter(models.Region.region != '-- undefined region --').\
+        dictionary['regions'] = request.dbsession.query(models.Region). \
+            filter(models.Region.id_topology == request.matchdict["id_topology"]). \
             order_by(models.Region.region.asc()).all()
-        number_of_regions = request.dbsession.query(models.Region).\
+        query = 'select r.id as id_region, ' \
+                'r.region as region, ' \
+                'asys.autonomous_system as autonomous_system ' \
+                'from region r, ' \
+                'autonomous_system asys ' \
+                'where r.id_topology = %s ' \
+                'and r.id = asys.id_region ' \
+                'order by r.id, asys.autonomous_system' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        autonomous_systems_per_region = list()
+        for autonomous_system_per_region in result_proxy:
+            autonomous_systems_per_region.append({'id_region': autonomous_system_per_region.id_region,
+                                                  'region': autonomous_system_per_region.region,
+                                                  'autonomous_system': autonomous_system_per_region.autonomous_system})
+        dictionary['autonomous_systems_per_region'] = autonomous_systems_per_region
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='regionShowAllHtml', renderer='minisecbgp:templates/topology/regionShowAllHtml.jinja2')
+def regionShowAllHtml(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+
+        query = 'select row_number () over (order by r.id) as id_tab, ' \
+                'r.id as id_region, ' \
+                'r.region as region, ' \
+                '(select count(asys.id) ' \
+                'from autonomous_system asys ' \
+                'where asys.id_region = r.id) as number_of_autonomous_system_per_region ' \
+                'from region r ' \
+                'where r.id_topology = %s' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        regions = list()
+        for region in result_proxy:
+            regions.append({'id_tab': region.id_tab,
+                            'id_region': region.id_region,
+                            'region': region.region,
+                            'number_of_accordions_per_region': int(
+                                (str(region.number_of_autonomous_system_per_region)[:-3]) if (
+                                str(region.number_of_autonomous_system_per_region)[:-3]) else 0),
+                            'number_of_autonomous_system_last_accordion_per_region': int(
+                                str(region.number_of_autonomous_system_per_region)[-3:]),
+                            'number_of_autonomous_system_per_region': region.number_of_autonomous_system_per_region})
+        dictionary['regions'] = regions
+
+        query = 'select asys.id_region as id_region, ' \
+                'asys.autonomous_system as autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = %s ' \
+                'order by asys.autonomous_system' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        autonomous_systems_per_region = list()
+        for autonomous_system_per_region in result_proxy:
+            autonomous_systems_per_region.append({'id_region': autonomous_system_per_region.id_region,
+                                                  'autonomous_system': autonomous_system_per_region.autonomous_system})
+        dictionary['autonomous_systems_per_region'] = autonomous_systems_per_region
+
+        dictionary['tabs'] = request.dbsession.query(models.Region).\
             filter_by(id_topology=request.matchdict["id_topology"]).count()
-        dictionary['tabs'] = number_of_regions // 10000
-        dictionary['number_of_accordions_in_last_tab'] = (number_of_regions % 10000) // 1000
+
+        query = 'select asys.id_region as id_region, ' \
+                'count(asys.id) as number_of_autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = %s ' \
+                'group by asys.id_region' % request.matchdict["id_topology"]
+        dictionary['number_of_autonomous_system_per_region'] = request.dbsession.bind.execute(query)
+
         form = RegionDataForm(request.POST)
         dictionary['form'] = form
 

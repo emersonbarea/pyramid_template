@@ -43,65 +43,60 @@
 
       <div class="row-fluid">
         <div class="span12">
-           <ul class="nav nav-tabs">
-            {% for t1 in range(tabs + 1) %}
-              {% if t1 == 0 %}
-                {% if tabs == 0 %}
-                  <li class="active"><a data-toggle="tab" href="#tab{{ t1 }}">1</a></li>
-                {% else %}
-                  <li class="active"><a data-toggle="tab" href="#tab{{ t1 }}">1</a></li>
-                  {% for t2 in range(tabs) %}
-                    {% if t2 + 1 == tabs %}
-                      <li><a data-toggle="tab" href="#tab{{ t2 + 1 }}">{{ t2 + 2 }}</a></li>
-                    {% else %}
-                      <li><a data-toggle="tab" href="#tab{{ t2 + 1 }}">{{ t2 + 2 }}</a></li>
-                    {% endif %}
-                  {% endfor %}
-                {% endif %}
+          <ul class="nav nav-tabs">
+            {% for tab in regions %}
+              {% if tab['id_tab'] == 1 %}
+                <li class="active"><a data-toggle="tab" href="#tab{{ tab['id_tab'] }}">{{ tab['region'] }}</a></li>
+              {% else %}
+                <li><a data-toggle="tab" href="#tab{{ tab['id_tab'] }}">{{ tab['region'] }}</a></li>
               {% endif %}
             {% endfor %}
           </ul>
 
           <div class="tab-content">
-            {% set accordion_range = namespace(value=10) %}
-            {% set begin_accordion = namespace(value=0) %}
-            {% set end_accordion = namespace(value=1000) %}
-            {% for tab in range(tabs + 1) %}
-              <div id="tab{{ tab }}" class="tab-pane fade {{ 'in active' if tab == 0 }}">
-                <div class="accordion" id="accordion{{ tab }}">
+            {% for tab in regions %}
+              {% set accordion_count = namespace(value=0) %}
+              {% set accordion_region_loop = namespace(value=0) %}
+              <div id="tab{{ tab['id_tab'] }}" class="tab-pane fade {{ 'in active' if tab['id_tab'] == 1 }}">
+                <div class="accordion" id="accordion{{ tab['id_tab'] }}">
+                {% for autonomous_system_per_region in autonomous_systems_per_region %}
+                  {% if tab['id_region'] == autonomous_system_per_region['id_region'] %}
+                    {% if accordion_count.value != 0 %}
+                      {{ autonomous_system_per_region['autonomous_system'] }}
+                    {% else %}
 
-                  {% if tab == tabs %}
-                    {% set accordion_range.value = number_of_accordions_in_last_tab + 1 %}
-                  {% endif %}
+                      <div class="accordion-group">
+                        <div class="accordion-heading">
+                          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab['id_tab'] }}"
+                             href="#collapse{{ tab['id_tab'] }}{{ accordion_region_loop.value }}">Autonomous System range: {{ accordion_region_loop.value }}
+                          </a>
+                        </div>
+                        <div id="collapse{{ tab['id_tab'] }}{{ accordion_region_loop.value }}" class="accordion-body collapse">
+                          <div class="accordion-inner">
 
-                  {% for accordion in range(accordion_range.value) %}
-                    <div class="accordion-group">
-                      <div class="accordion-heading">
-                       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab }}"
-                          href="#collapse{{ tab }}{{ accordion }}">Region range: {{ tab }}{{ accordion }}
-                       </a>
-                      </div>
-                      <div id="collapse{{ tab }}{{ accordion }}" class="accordion-body collapse">
-                        <div class="accordion-inner">
-                          {% for region in regions %}
-                            {% if (loop.index >= begin_accordion.value) and (loop.index < end_accordion.value)%}
-                              <p>Region <strong>{{ region.region }}</strong></p>
-                            {% endif %}
-                          {% endfor %}
+                      {{ autonomous_system_per_region['autonomous_system'] }}
+
+                    {% endif %}
+
+                    {% set accordion_count.value = accordion_count.value + 1 %}
+                    {% if accordion_count.value == 1000 or
+                (accordion_count.value == tab['number_of_autonomous_system_last_accordion_per_region'] and
+                accordion_region_loop.value == tab['number_of_accordions_per_region']) %}
+
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    {% set begin_accordion.value = begin_accordion.value + 1000 %}
-                    {% set end_accordion.value = end_accordion.value + 1000 %}
-                  {% endfor %}
-
+                      {% set accordion_count.value = 0 %}
+                      {% set accordion_region_loop.value = accordion_region_loop.value + 1 %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
                 </div>
               </div>
             {% endfor %}
           </div>
         </div>
       </div>
-    </div>
 
     <footer>
       <a href="https://github.com/MiniSecBGP/MiniSecBGP" target="_blank">Github Project</a>
