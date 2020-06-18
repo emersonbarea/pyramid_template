@@ -145,8 +145,39 @@ def internetExchange(request):
     return dictionary
 
 
-@view_config(route_name='internetExchangeShowAll', renderer='minisecbgp:templates/topology/internetExchangeShowAll.jinja2')
-def internetExchangeShowAll(request):
+@view_config(route_name='internetExchangeShowAllTxt', renderer='minisecbgp:templates/topology/internetExchangeShowAllTxt.jinja2')
+def internetExchangeShowAllTxt(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+
+        dictionary['regions'] = request.dbsession.query(models.Region).\
+            filter_by(id_topology=request.matchdict["id_topology"]).\
+            order_by(models.Region.region.asc()).all()
+
+        dictionary['internet_exchange_points'] = request.dbsession.query(models.InternetExchangePoint).\
+            filter_by(id_topology=request.matchdict["id_topology"]).all()
+
+        dictionary['autonomous_systems'] = request.dbsession.query(
+            models.AutonomousSystemInternetExchangePoint, models.AutonomousSystem).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
+            filter(models.AutonomousSystemInternetExchangePoint.id_autonomous_system == models.AutonomousSystem.id).\
+            order_by(models.AutonomousSystem.autonomous_system.asc()).all()
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='internetExchangeShowAllHtml', renderer='minisecbgp:templates/topology/internetExchangeShowAllHtml.jinja2')
+def internetExchangeShowAllHtml(request):
     user = request.user
     if user is None:
         raise HTTPForbidden

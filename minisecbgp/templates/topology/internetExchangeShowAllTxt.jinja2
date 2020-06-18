@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>MiniSecBGP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Lightweight and Distributed Testbed for Security Analysis in BGP">
+    <meta="keywords" content="BGP, Security, Testbed, Mininet, MaxiNet">
+    <meta name="author" content="Emerson Barea">
+  </head>
+  <body>
+    <p>Topology: {{ topology.topology }}</p>
+    <p>Internet eXchange Points (IXP):</p>
+    <p>
+      {% for region in regions %}
+        <p><hr></p>
+        <p><strong>Region: {{ region.region }}</strong></p>
+        {% for ixp in internet_exchange_points %}
+          {% if region.id == ixp.id_region %}
+            <p> - Internet eXchange Point: <strong>{{ ixp.internet_exchange_point }}</strong></p>
+            AS:
+            {% for autonomous_system in autonomous_systems %}
+              {% if ixp.id == autonomous_system.AutonomousSystemInternetExchangePoint.id_internet_exchange_point %}
+                {{ autonomous_system.AutonomousSystem.autonomous_system }}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </p>
+  </body>
+</html>

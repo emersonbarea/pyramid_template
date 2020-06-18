@@ -103,8 +103,8 @@ def typeOfUser(request):
     return dictionary
 
 
-@view_config(route_name='typeOfUserShowAll', renderer='minisecbgp:templates/topology/typeOfUserShowAll.jinja2')
-def typeOfUserShowAll(request):
+@view_config(route_name='typeOfUserShowAllTxt', renderer='minisecbgp:templates/topology/typeOfUserShowAllTxt.jinja2')
+def typeOfUserShowAllTxt(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -113,15 +113,87 @@ def typeOfUserShowAll(request):
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
-        dictionary['type_of_users'] = request.dbsession.query(models.TypeOfUser).\
-            filter_by(id_topology=request.matchdict["id_topology"]).\
-            order_by(models.TypeOfUser.type_of_user.asc()).all()
-        number_of_types_of_user = request.dbsession.query(models.TypeOfUser).\
-            filter_by(id_topology=request.matchdict["id_topology"]).count()
-        dictionary['tabs'] = number_of_types_of_user // 10000
-        dictionary['number_of_accordions_in_last_tab'] = (number_of_types_of_user % 10000) // 1000
-        form = UserDataForm(request.POST)
-        dictionary['form'] = form
+        query = 'select tos.id as id_type_of_user, ' \
+                'tos.type_of_user as type_of_user, ' \
+                'sum(tosas.number) as total_number_of_user_by_type ' \
+                'from type_of_user tos, ' \
+                'type_of_user_autonomous_system tosas ' \
+                'where tos.id_topology = %s ' \
+                'and tos.id = tosas.id_type_of_user ' \
+                'group by tos.id, tos.type_of_user ' \
+                'order by tos.type_of_user;' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        type_of_users = list()
+        for type_of_user in result_proxy:
+            type_of_users.append({'id_type_of_user': type_of_user.id_type_of_user,
+                                  'type_of_user': type_of_user.type_of_user,
+                                  'total_number_of_user_by_type': type_of_user.total_number_of_user_by_type})
+        dictionary['type_of_users'] = type_of_users
+        dictionary['type_of_user_autonomous_systems'] = request.dbsession.query(models.AutonomousSystem, models.TypeOfUserAutonomousSystem).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
+            filter(models.AutonomousSystem.id == models.TypeOfUserAutonomousSystem.id_autonomous_system).\
+            order_by(models.AutonomousSystem.autonomous_system.asc()).all()
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='typeOfUserShowAllHtml', renderer='minisecbgp:templates/topology/typeOfUserShowAllHtml.jinja2')
+def typeOfUserShowAllHtml(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        query = 'select row_number () over (order by tos.type_of_user) as id_tab, ' \
+                'tos.id as id_type_of_user, ' \
+                'tos.type_of_user as type_of_user, ' \
+                'sum(tosas.number) as total_number_of_user_by_type, ' \
+                'count(tosas.id_autonomous_system) as number_of_autonomous_system_per_type_of_user ' \
+                'from type_of_user tos, ' \
+                'type_of_user_autonomous_system tosas ' \
+                'where tos.id_topology = %s ' \
+                'and tos.id = tosas.id_type_of_user ' \
+                'group by tos.id, tos.type_of_user' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        type_of_users = list()
+        for type_of_user in result_proxy:
+            type_of_users.append({'id_tab': type_of_user.id_tab,
+                                  'id_type_of_user': type_of_user.id_type_of_user,
+                                  'type_of_user': type_of_user.type_of_user,
+                                  'total_number_of_user_by_type': type_of_user.total_number_of_user_by_type,
+                                  'number_of_accordions_per_type_of_user': int(
+                                      (str(type_of_user.number_of_autonomous_system_per_type_of_user)[:-3]) if (
+                                          str(type_of_user.number_of_autonomous_system_per_type_of_user)[:-3]) else 0),
+                                  'number_of_autonomous_system_last_accordion_per_type_of_user': int(
+                                      str(type_of_user.number_of_autonomous_system_per_type_of_user)[-3:]),
+                                  'number_of_autonomous_system_per_type_of_user': type_of_user.number_of_autonomous_system_per_type_of_user})
+        dictionary['type_of_users'] = type_of_users
+
+        query = 'select tosas.id_type_of_user as id_type_of_user, ' \
+                'asys.autonomous_system as autonomous_system, ' \
+                'tos.type_of_user as type_of_user, ' \
+                'tosas.number as number ' \
+                'from autonomous_system asys, ' \
+                'type_of_user_autonomous_system tosas, ' \
+                'type_of_user tos ' \
+                'where asys.id_topology = %s ' \
+                'and asys.id = tosas.id_autonomous_system ' \
+                'and tosas.id_type_of_user = tos.id ' \
+                'order by tos.type_of_user, asys.autonomous_system' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        autonomous_systems_per_type_of_user = list()
+        for autonomous_system_per_type_of_user in result_proxy:
+            autonomous_systems_per_type_of_user.append({'id_type_of_user': autonomous_system_per_type_of_user.id_type_of_user,
+                                                        'autonomous_system': autonomous_system_per_type_of_user.autonomous_system,
+                                                        'type_of_user': autonomous_system_per_type_of_user.type_of_user,
+                                                        'number': autonomous_system_per_type_of_user.number})
+        dictionary['autonomous_systems_per_type_of_user'] = autonomous_systems_per_type_of_user
 
     except Exception as error:
         dictionary['message'] = error

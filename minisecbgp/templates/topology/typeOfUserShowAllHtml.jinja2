@@ -37,60 +37,69 @@
       <div class="row-fluid">
         <div class="span12">
           <h3 align="center">Topology: {{ topology.topology }}</h3>
-          <h4 align="center">Show all Internet eXchange Points (IX):</h4>
+          <h4 align="center">Show all Types of User</h4>
         </div>
       </div>
 
       <div class="row-fluid">
         <div class="span12">
           <ul class="nav nav-tabs">
-            {% for tab in range(tabs) %}
-              {% if tab == 0 %}
-                <li class="active"><a data-toggle="tab" href="#tab{{ tab }}">{{ region[tab]['region'] }}</a></li>
+            {% for tab in type_of_users %}
+              {% if tab['id_tab'] == 1 %}
+                <li class="active"><a data-toggle="tab" href="#tab{{ tab['id_tab'] }}">{{ tab['type_of_user'] }}</a></li>
               {% else %}
-                <li><a data-toggle="tab" href="#tab{{ tab }}">{{ region[tab]['region'] }}</a></li>
+                <li><a data-toggle="tab" href="#tab{{ tab['id_tab'] }}">{{ tab['type_of_user'] }}</a></li>
               {% endif %}
             {% endfor %}
           </ul>
 
           <div class="tab-content">
-            {% for tab in range(tabs) %}
-              <div id="tab{{ tab }}" class="tab-pane fade {{ 'in active' if tab == 0 }}">
-                <div class="accordion" id="accordion{{ tab }}">
+            {% for tab in type_of_users %}
+              {% set accordion_count = namespace(value=0) %}
+              {% set accordion_type_of_user_loop = namespace(value=0) %}
+              <div id="tab{{ tab['id_tab'] }}" class="tab-pane fade {{ 'in active' if tab['id_tab'] == 1 }}">
 
-                  {% for accordion in range(accordions) %}
-                    {% if region[tab]['id'] == internet_exchange_point[accordion]['Region'].id %}
+                <p>- Total number of users: {{ tab['total_number_of_user_by_type'] }}</p>
+
+                <div class="accordion" id="accordion{{ tab['id_tab'] }}">
+                {% for autonomous_system_per_type_of_user in autonomous_systems_per_type_of_user %}
+                  {% if tab['id_type_of_user'] == autonomous_system_per_type_of_user['id_type_of_user'] %}
+                    {% if accordion_count.value != 0 %}
+                      {{ autonomous_system_per_type_of_user['autonomous_system'] }}({{ autonomous_system_per_type_of_user['number'] }})
+                    {% else %}
+
                       <div class="accordion-group">
                         <div class="accordion-heading">
-                          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab }}"
-                             href="#collapse{{ accordion }}">Internet eXchange Point: {{ internet_exchange_point[accordion]['InternetExchangePoint'].internet_exchange_point }}
+                          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion{{ tab['id_tab'] }}"
+                             href="#collapse{{ tab['id_tab'] }}{{ accordion_type_of_user_loop.value }}">Autonomous System range: {{ accordion_type_of_user_loop.value }}
                           </a>
                         </div>
-                        <div id="collapse{{ accordion }}" class="accordion-body collapse">
+                        <div id="collapse{{ tab['id_tab'] }}{{ accordion_type_of_user_loop.value }}" class="accordion-body collapse">
                           <div class="accordion-inner">
-                            {% for autonomous_system in range(number_of_autonomous_systems) %}
-                              {% if region[tab]['id'] == autonomous_systems[autonomous_system].InternetExchangePoint.id_region and
-                                 autonomous_systems[autonomous_system].InternetExchangePoint.id == internet_exchange_point[accordion]['InternetExchangePoint'].id %}
-                                <p>
-                                  AS <strong>{{ autonomous_systems[autonomous_system].AutonomousSystem.autonomous_system }}</strong>
-                                </p>
-                              {% endif %}
-                            {% endfor %}
+
+                      AS(number of user): {{ autonomous_system_per_type_of_user['autonomous_system'] }}({{ autonomous_system_per_type_of_user['number'] }})
+
+                    {% endif %}
+
+                    {% set accordion_count.value = accordion_count.value + 1 %}
+                    {% if accordion_count.value == 1000 or
+                (accordion_count.value == tab['number_of_autonomous_system_last_accordion_per_type_of_user'] and
+                accordion_type_of_user_loop.value == tab['number_of_accordions_per_type_of_user']) %}
+
                           </div>
                         </div>
                       </div>
+                      {% set accordion_count.value = 0 %}
+                      {% set accordion_type_of_user_loop.value = accordion_type_of_user_loop.value + 1 %}
                     {% endif %}
-                  {% endfor %}
-
+                  {% endif %}
+                {% endfor %}
                 </div>
               </div>
             {% endfor %}
           </div>
-
         </div>
-        <p align="center">* empty Internet eXchange Points or Regions means there is no Autonomous System connected to it.</p>
       </div>
-
     </div>
 
     <footer>
