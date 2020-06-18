@@ -113,15 +113,14 @@ def typeOfUserShowAllTxt(request):
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
-        query = 'select tos.id as id_type_of_user, ' \
-                'tos.type_of_user as type_of_user, ' \
-                'sum(tosas.number) as total_number_of_user_by_type ' \
-                'from type_of_user tos, ' \
-                'type_of_user_autonomous_system tosas ' \
-                'where tos.id_topology = %s ' \
-                'and tos.id = tosas.id_type_of_user ' \
-                'group by tos.id, tos.type_of_user ' \
-                'order by tos.type_of_user;' % request.matchdict["id_topology"]
+        query = 'select tou.id as id_type_of_user, ' \
+                'tou.type_of_user as type_of_user, ' \
+                'coalesce ((select sum(touas.number) ' \
+                'from type_of_user_autonomous_system touas ' \
+                'where touas.id_type_of_user = tou.id), 0) as total_number_of_user_by_type ' \
+                'from type_of_user tou ' \
+                'where tou.id_topology = %s ' \
+                'order by tou.type_of_user;' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
         type_of_users = list()
         for type_of_user in result_proxy:
@@ -150,16 +149,13 @@ def typeOfUserShowAllHtml(request):
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology) \
             .filter_by(id=request.matchdict["id_topology"]).first()
-        query = 'select row_number () over (order by tos.type_of_user) as id_tab, ' \
-                'tos.id as id_type_of_user, ' \
-                'tos.type_of_user as type_of_user, ' \
-                'sum(tosas.number) as total_number_of_user_by_type, ' \
-                'count(tosas.id_autonomous_system) as number_of_autonomous_system_per_type_of_user ' \
-                'from type_of_user tos, ' \
-                'type_of_user_autonomous_system tosas ' \
-                'where tos.id_topology = %s ' \
-                'and tos.id = tosas.id_type_of_user ' \
-                'group by tos.id, tos.type_of_user' % request.matchdict["id_topology"]
+        query = 'select row_number () over (order by tou.type_of_user) as id_tab, ' \
+                'tou.id as id_type_of_user, ' \
+                'tou.type_of_user as type_of_user, ' \
+                'coalesce ((select sum(touas.number) from type_of_user_autonomous_system touas where touas.id_type_of_user = tou.id), 0) as total_number_of_user_by_type, ' \
+                'coalesce ((select count(touas.id_autonomous_system) from type_of_user_autonomous_system touas where touas.id_type_of_user = tou.id), 0) as number_of_autonomous_system_per_type_of_user ' \
+                'from type_of_user tou ' \
+                'where tou.id_topology = %s;' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
         type_of_users = list()
         for type_of_user in result_proxy:
@@ -175,17 +171,17 @@ def typeOfUserShowAllHtml(request):
                                   'number_of_autonomous_system_per_type_of_user': type_of_user.number_of_autonomous_system_per_type_of_user})
         dictionary['type_of_users'] = type_of_users
 
-        query = 'select tosas.id_type_of_user as id_type_of_user, ' \
+        query = 'select touas.id_type_of_user as id_type_of_user, ' \
                 'asys.autonomous_system as autonomous_system, ' \
-                'tos.type_of_user as type_of_user, ' \
-                'tosas.number as number ' \
+                'tou.type_of_user as type_of_user, ' \
+                'touas.number as number ' \
                 'from autonomous_system asys, ' \
-                'type_of_user_autonomous_system tosas, ' \
-                'type_of_user tos ' \
+                'type_of_user_autonomous_system touas, ' \
+                'type_of_user tou ' \
                 'where asys.id_topology = %s ' \
-                'and asys.id = tosas.id_autonomous_system ' \
-                'and tosas.id_type_of_user = tos.id ' \
-                'order by tos.type_of_user, asys.autonomous_system' % request.matchdict["id_topology"]
+                'and asys.id = touas.id_autonomous_system ' \
+                'and touas.id_type_of_user = tou.id ' \
+                'order by tou.type_of_user, asys.autonomous_system' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
         autonomous_systems_per_type_of_user = list()
         for autonomous_system_per_type_of_user in result_proxy:

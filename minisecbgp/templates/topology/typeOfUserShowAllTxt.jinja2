@@ -17,12 +17,14 @@
       {% for type_of_user in type_of_users %}
         <p>Type of User: <strong>{{ type_of_user['type_of_user'] }}</strong>
         - Total number of users: <strong>{{ type_of_user['total_number_of_user_by_type'] }}</strong></p>
-        AS(number of user):
-        {% for type_of_user_autonomous_system in type_of_user_autonomous_systems %}
-          {% if type_of_user['id_type_of_user'] == type_of_user_autonomous_system.TypeOfUserAutonomousSystem.id_type_of_user %}
-            {{ type_of_user_autonomous_system.AutonomousSystem.autonomous_system }}({{ type_of_user_autonomous_system.TypeOfUserAutonomousSystem.number }})
-          {% endif %}
-        {% endfor %}
+        <p>
+          AS(number of user):
+          {% for type_of_user_autonomous_system in type_of_user_autonomous_systems %}
+            {% if type_of_user['id_type_of_user'] == type_of_user_autonomous_system.TypeOfUserAutonomousSystem.id_type_of_user %}
+              {{ type_of_user_autonomous_system.AutonomousSystem.autonomous_system }}({{ type_of_user_autonomous_system.TypeOfUserAutonomousSystem.number }})
+            {% endif %}
+          {% endfor %}
+        </p>
       {% endfor %}
     </p>
   </body>

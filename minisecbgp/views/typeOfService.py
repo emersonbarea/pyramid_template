@@ -103,8 +103,8 @@ def typeOfService(request):
     return dictionary
 
 
-@view_config(route_name='typeOfServiceShowAll', renderer='minisecbgp:templates/topology/typeOfServiceShowAll.jinja2')
-def typeOfServiceShowAll(request):
+@view_config(route_name='typeOfServiceShowAllTxt', renderer='minisecbgp:templates/topology/typeOfServiceShowAllTxt.jinja2')
+def typeOfServiceShowAllTxt(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -116,12 +116,68 @@ def typeOfServiceShowAll(request):
         dictionary['type_of_services'] = request.dbsession.query(models.TypeOfService).\
             filter_by(id_topology=request.matchdict["id_topology"]).\
             order_by(models.TypeOfService.type_of_service.asc()).all()
-        number_of_types_of_service = request.dbsession.query(models.TypeOfService).\
-            filter_by(id_topology=request.matchdict["id_topology"]).count()
-        dictionary['tabs'] = number_of_types_of_service // 10000
-        dictionary['number_of_accordions_in_last_tab'] = (number_of_types_of_service % 10000) // 1000
-        form = ServiceDataForm(request.POST)
-        dictionary['form'] = form
+        dictionary['autonomous_systems'] = request.dbsession.query(models.AutonomousSystem, models.TypeOfServiceAutonomousSystem).\
+            filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
+            filter(models.AutonomousSystem.id == models.TypeOfServiceAutonomousSystem.id_autonomous_system).all()
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='typeOfServiceShowAllHtml', renderer='minisecbgp:templates/topology/typeOfServiceShowAllHtml.jinja2')
+def typeOfServiceShowAllHtml(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['topology'] = request.dbsession.query(models.Topology) \
+            .filter_by(id=request.matchdict["id_topology"]).first()
+        query = 'select row_number () over (order by tos.type_of_service) as id_tab, ' \
+                'tos.id as id_type_of_service, ' \
+                'tos.type_of_service as type_of_service, ' \
+                'count(tosas.id_autonomous_system) as number_of_autonomous_system_per_type_of_service ' \
+                'from type_of_service tos, ' \
+                'type_of_service_autonomous_system tosas ' \
+                'where tos.id_topology = %s ' \
+                'and tos.id = tosas.id_type_of_service ' \
+                'group by tos.id, tos.type_of_service' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        type_of_services = list()
+        for type_of_service in result_proxy:
+            type_of_services.append({'id_tab': type_of_service.id_tab,
+                                     'id_type_of_service': type_of_service.id_type_of_service,
+                                     'type_of_service': type_of_service.type_of_service,
+                                     'number_of_accordions_per_type_of_service': int(
+                                         (str(type_of_service.number_of_autonomous_system_per_type_of_service)[:-3]) if (
+                                             str(type_of_service.number_of_autonomous_system_per_type_of_service)[:-3]) else 0),
+                                     'number_of_autonomous_system_last_accordion_per_type_of_service': int(
+                                         str(type_of_service.number_of_autonomous_system_per_type_of_service)[-3:]),
+                                     'number_of_autonomous_system_per_type_of_service': type_of_service.number_of_autonomous_system_per_type_of_service})
+        dictionary['type_of_services'] = type_of_services
+
+        query = 'select tosas.id_type_of_service as id_type_of_service, ' \
+                'asys.autonomous_system as autonomous_system, ' \
+                'tos.type_of_service as type_of_service ' \
+                'from autonomous_system asys, ' \
+                'type_of_service_autonomous_system tosas, ' \
+                'type_of_service tos ' \
+                'where asys.id_topology = %s ' \
+                'and asys.id = tosas.id_autonomous_system ' \
+                'and tosas.id_type_of_service = tos.id ' \
+                'order by tos.type_of_service, asys.autonomous_system' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        autonomous_systems_per_type_of_service = list()
+        for autonomous_system_per_type_of_service in result_proxy:
+            autonomous_systems_per_type_of_service.append(
+                {'id_type_of_service': autonomous_system_per_type_of_service.id_type_of_service,
+                 'autonomous_system': autonomous_system_per_type_of_service.autonomous_system,
+                 'type_of_service': autonomous_system_per_type_of_service.type_of_service})
+        dictionary['autonomous_systems_per_type_of_service'] = autonomous_systems_per_type_of_service
 
     except Exception as error:
         dictionary['message'] = error
