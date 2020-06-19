@@ -1,8 +1,8 @@
 {
-  "topology_name": "Manual Topology 3",
+  "topology_name": "Minimal Topology Example",
   "autonomous_systems": [
     {
-      "autonomous_system": "1",
+      "autonomous_system": "65001",
       "region": null,
       "internet_exchange_points": [
         {
@@ -16,7 +16,7 @@
           "number": null
         }
       ],
-      "type_of_services": [null],
+      "type_of_services": ["access"],
       "prefixes": [
         {
           "prefix": "1.1.1.0",
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "autonomous_system": "2",
+      "autonomous_system": "65002",
       "region": null,
       "internet_exchange_points": [
         {
@@ -42,7 +42,7 @@
       "type_of_services": [null],
       "prefixes": [
         {
-          "prefix": "2.2.2.2",
+          "prefix": "2.2.2.0",
           "mask": 24
         }
       ]
@@ -50,8 +50,8 @@
   ],
   "links": [
     {
-      "source": "1",
-      "destination": "2",
+      "source": "65001",
+      "destination": "65002",
       "ip_source": "192.168.0.1",
       "ip_destination": "192.168.0.2",
       "mask": "30",
