@@ -125,6 +125,7 @@ class ManualTopology(object):
                  'internet_exchange_point': list_internet_exchange_point,
                  'id_internet_exchange_point': list_region_internet_exchange_point})
             df_autonomous_system_internet_exchange_point = df_autonomous_system_internet_exchange_point.drop_duplicates(keep='first')
+            df_autonomous_system_internet_exchange_point = df_autonomous_system_internet_exchange_point.dropna()
 
             df_autonomous_system_internet_exchange_point.reset_index()
             df_autonomous_system_internet_exchange_point.set_index('id_autonomous_system', inplace=True)
@@ -171,6 +172,7 @@ class ManualTopology(object):
                  'id_type_of_user': list_type_of_user,
                  'number': list_type_of_user_number})
             df_type_of_user_autonomous_system = df_type_of_user_autonomous_system.drop_duplicates(keep='first')
+            df_type_of_user_autonomous_system = df_type_of_user_autonomous_system.dropna()
 
             df_type_of_user_autonomous_system.reset_index()
             df_type_of_user_autonomous_system.set_index('id_autonomous_system', inplace=True)
@@ -202,6 +204,7 @@ class ManualTopology(object):
                 {'id_autonomous_system': list_type_of_service_autonomous_system,
                  'id_type_of_service': list_type_of_service})
             df_type_of_service_autonomous_system = df_type_of_service_autonomous_system.drop_duplicates(keep='first')
+            df_type_of_service_autonomous_system = df_type_of_service_autonomous_system.dropna()
 
             df_type_of_service_autonomous_system.reset_index()
             df_type_of_service_autonomous_system.set_index('id_autonomous_system', inplace=True)

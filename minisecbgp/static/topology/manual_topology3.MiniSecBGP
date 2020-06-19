@@ -1,0 +1,65 @@
+{
+  "topology_name": "Manual Topology 3",
+  "autonomous_systems": [
+    {
+      "autonomous_system": "1",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "1.1.1.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "2",
+      "region": null,
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "2.2.2.2",
+          "mask": 24
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "source": "1",
+      "destination": "2",
+      "ip_source": "192.168.0.1",
+      "ip_destination": "192.168.0.2",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2p",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    }
+  ]
+}

@@ -140,12 +140,9 @@ def typeOfServiceShowAllHtml(request):
         query = 'select row_number () over (order by tos.type_of_service) as id_tab, ' \
                 'tos.id as id_type_of_service, ' \
                 'tos.type_of_service as type_of_service, ' \
-                'count(tosas.id_autonomous_system) as number_of_autonomous_system_per_type_of_service ' \
-                'from type_of_service tos, ' \
-                'type_of_service_autonomous_system tosas ' \
-                'where tos.id_topology = %s ' \
-                'and tos.id = tosas.id_type_of_service ' \
-                'group by tos.id, tos.type_of_service' % request.matchdict["id_topology"]
+                'coalesce ((select count(tosas.id_autonomous_system) from type_of_service_autonomous_system tosas where tosas.id_type_of_service = tos.id), 0) as number_of_autonomous_system_per_type_of_service ' \
+                'from type_of_service tos ' \
+                'where tos.id_topology = %s;' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
         type_of_services = list()
         for type_of_service in result_proxy:
