@@ -127,6 +127,7 @@ def autonomousSystemAddEdit(request):
                 request.dbsession.bind.execute(entry)
 
                 new_autonomous_system = request.dbsession.query(models.AutonomousSystem).\
+                    filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]).\
                     filter_by(autonomous_system=form.autonomous_system.data).first()
 
                 insert(form.internet_exchange_point.data, form.type_of_service.data, type_of_user_form,
