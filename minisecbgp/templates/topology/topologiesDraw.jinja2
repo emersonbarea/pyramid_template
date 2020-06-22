@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>MiniSecBGP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Lightweight and Distributed Testbed for Security Analysis in BGP">
+    <meta="keywords" content="BGP, Security, Testbed, Mininet, MaxiNet">
+    <meta name="author" content="Emerson Barea">
+    <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
+    <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+      #mynetwork {
+        width: 100%;
+        height: 90vh;
+        border: 1px solid lightgray;
+      }
+    </style>
+  </head>
+
+  <body onload="clusterByRegion()">
+    <div>
+      <div align="center">
+        <p><strong>Topology: {{ topology.topology }} (full)</strong></p>
+        <p>click on the container to ungroup the ASs</p>
+      </div>
+    </div>
+    <div>
+      <div id="mynetwork"></div>
+      <script type="text/javascript">
+
+        // provide the DIR variable path
+        var DIR = "{{request.static_url('minisecbgp:static/vis-js/img/')}}";
+
+        var nodes = new vis.DataSet([
+          {% for node in nodes %}
+            {id: {{ node.id }},
+              label: '{{ node.label }}',
+              region: '{{ node.region }}',
+              color: '#{{ node.background_color }}',
+              font: {color: '#{{ node.text_color }}'},
+            },
+          {% endfor %}
+        ]);
+
+	    var edges = new vis.DataSet([
+          {% for edge in edges %}
+            {from: {{ edge.id_autonomous_system1 }}, to: {{ edge.id_autonomous_system2 }} },
+          {% endfor %}
+	    ]);
+
+        // create a network
+        var container = document.getElementById('mynetwork');
+        var data = {
+          nodes: nodes,
+          edges: edges
+        };
+        var options = {};
+        var network = new vis.Network(container, data, options);
+
+        network.on("selectNode", function(params) {
+          if (params.nodes.length == 1) {
+            if (network.isCluster(params.nodes[0]) == true) {
+              network.openCluster(params.nodes[0]);
+            }
+          }
+        });
+
+        function clusterByRegion() {
+          network.setData(data);
+          var regions = [
+            {% for region_group in regions_group %}
+              '{{ region_group.region }}',
+            {% endfor %}
+          ];
+          var background_colors = [
+            {% for region_group in regions_group %}
+              '#{{ region_group.background_color }}',
+            {% endfor %}
+          ];
+          var text_colors = [
+            {% for region_group in regions_group %}
+              '#{{ region_group.text_color }}',
+            {% endfor %}
+          ];
+          var clusterOptionsByData;
+          for (var i = 0; i < regions.length; i++) {
+            var region = regions[i];
+            var background_color = background_colors[i];
+            var text_color = text_colors[i];
+            clusterOptionsByData = {
+              joinCondition: function (childOptions) {
+                return childOptions.color.background == background_color;
+              },
+              processProperties: function (clusterOptions, childNodes, childEdges) {
+                var totalMass = 0;
+                for (var i = 0; i < childNodes.length; i++) {
+                  totalMass += childNodes[i].mass;
+                }
+                clusterOptions.mass = totalMass;
+                  return clusterOptions;
+              },
+              clusterNodeProperties: {id: 'cluster:' + region,
+              borderWidth: 3,
+              shape: 'database',
+              color: background_color,
+              font: {color: text_color},
+              label: 'Region: ' + regions[i]}
+            };
+            network.cluster(clusterOptionsByData);
+          }
+        }
+
+      </script>
+    </div>
+    <div align="center">
+      <p><input type="button" onclick="clusterByRegion()" value="Group the ASs again by Topology Region"></p>
+    </div>
+  </body>
+</html>

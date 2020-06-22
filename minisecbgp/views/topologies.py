@@ -112,11 +112,74 @@ def topologies_delete(request):
     dictionary = dict()
     try:
         if request.method == 'POST':
+            topology = request.dbsession.query(models.Topology.topology).\
+                filter_by(id=request.matchdict["id_topology"]).first()
+
             arguments = ['--id_topology=%s' % request.matchdict["id_topology"]]
             subprocess.Popen(['./venv/bin/delete_topology'] + arguments)
 
-            dictionary['message'] = ('Topology "%s" successfully deleted.' % request.params['topology'])
+            dictionary['message'] = ('Topology "%s" successfully deleted.' % topology.topology)
             dictionary['css_class'] = 'successMessage'
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='topologiesAction', match_param='action=draw',
+             renderer='minisecbgp:templates/topology/topologiesDraw.jinja2')
+def topologies_draw(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+
+    try:
+        topology = request.dbsession.query(models.Topology).filter_by(id=request.matchdict["id_topology"]).first()
+        dictionary['topology'] = topology
+
+        query = 'select asys.id as id, ' \
+                'asys.autonomous_system as label, ' \
+                'r.region as region, ' \
+                'c.background_color as background_color, ' \
+                'c.text_color as text_color ' \
+                'from autonomous_system asys, ' \
+                'region r, ' \
+                'color c ' \
+                'where asys.id_topology = %s ' \
+                'and asys.id_region = r.id ' \
+                'and r.id_color = c.id' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        autonomous_systems = list()
+        for autonomous_system in result_proxy:
+            autonomous_systems.append({'id': autonomous_system.id,
+                                       'label': autonomous_system.label,
+                                       'region': autonomous_system.region,
+                                       'background_color': autonomous_system.background_color,
+                                       'text_color': autonomous_system.text_color})
+        dictionary['nodes'] = autonomous_systems
+
+        query = 'select r.region as region, ' \
+                'c.background_color as background_color, ' \
+                'c.text_color as text_color ' \
+                'from region r, ' \
+                'color c ' \
+                'where r.id_topology = %s ' \
+                'and r.id_color = c.id' % request.matchdict["id_topology"]
+        result_proxy = request.dbsession.bind.execute(query)
+        regions_group = list()
+        for region_group in result_proxy:
+            regions_group.append({'region': region_group.region,
+                                  'background_color': region_group.background_color,
+                                  'text_color': region_group.text_color})
+        dictionary['regions_group'] = regions_group
+
+        links = request.dbsession.query(models.Link).\
+            filter_by(id_topology=request.matchdict["id_topology"]).all()
+        dictionary['edges'] = links
 
     except Exception as error:
         dictionary['message'] = error
