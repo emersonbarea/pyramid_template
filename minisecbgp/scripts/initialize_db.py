@@ -85,6 +85,58 @@ def setup_models(dbsession):
     downloading = models.DownloadingTopology(downloading=0)
     dbsession.add(downloading)
 
+    # color
+    colors = [{'background': 'FF0000', 'text': '000000'},
+              {'background': '00FF00', 'text': '000000'},
+              {'background': '0000FF', 'text': 'FFFFFF'},
+              {'background': 'FFFF00', 'text': '000000'},
+              {'background': '00FFFF', 'text': '000000'},
+              {'background': 'FF00FF', 'text': '000000'},
+              {'background': 'C0C0C0', 'text': '000000'},
+              {'background': '808080', 'text': '000000'},
+              {'background': '800000', 'text': 'FFFFFF'},
+              {'background': '808000', 'text': '000000'},
+              {'background': '008000', 'text': '000000'},
+              {'background': '800080', 'text': '000000'},
+              {'background': '008080', 'text': '000000'},
+              {'background': '000080', 'text': 'FFFFFF'},
+              {'background': 'FFFFFF', 'text': '000000'},
+              {'background': '000000', 'text': 'FFFFFF'},
+              {'background': 'FF8C00', 'text': '000000'},
+              {'background': '90EE90', 'text': '000000'},
+              {'background': 'D8BFD8', 'text': '000000'},
+              {'background': 'FFFACD', 'text': '000000'},
+              {'background': 'D2691E', 'text': '000000'},
+              {'background': '708090', 'text': '000000'},
+              {'background': '1E90FF', 'text': '000000'},
+              {'background': 'DC143C', 'text': '000000'},
+              {'background': 'FFA07A', 'text': '000000'},
+              {'background': 'EEE8AA', 'text': '000000'},
+              {'background': '32CD32', 'text': '000000'},
+              {'background': '5F9EA0', 'text': '000000'},
+              {'background': '00008B', 'text': 'FFFFFF'},
+              {'background': 'C71585', 'text': '000000'},
+              {'background': '2E8B57', 'text': '000000'},
+              {'background': '3CB371', 'text': '000000'},
+              {'background': '20B2AA', 'text': '000000'},
+              {'background': 'FF4500', 'text': '000000'},
+              {'background': 'BDB76B', 'text': '000000'},
+              {'background': 'AFEEEE', 'text': '000000'},
+              {'background': '87CEEB', 'text': '000000'},
+              {'background': '8A2BE2', 'text': '000000'},
+              {'background': '483D8B', 'text': 'FFFFFF'},
+              {'background': '9370DB', 'text': '000000'},
+              {'background': 'FFC0CB', 'text': '000000'},
+              {'background': 'FAEBD7', 'text': '000000'},
+              {'background': '660000', 'text': 'FFFFFF'},
+              {'background': '333300', 'text': 'FFFFFF'},
+              {'background': '003319', 'text': 'FFFFFF'},
+              {'background': '190033', 'text': 'FFFFFF'},
+              {'background': '404040', 'text': 'FFFFFF'}]
+    for color in colors:
+        dbsession.add(models.Color(background_color=color['background'],
+                                   text_color=color['text']))
+
 
 def parse_args(argv):
     parser = argparse.ArgumentParser()

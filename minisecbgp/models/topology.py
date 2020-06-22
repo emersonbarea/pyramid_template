@@ -41,7 +41,7 @@ class AutonomousSystem(Base):
     autonomous_system_internet_exchange_point = relationship('AutonomousSystemInternetExchangePoint', foreign_keys='AutonomousSystemInternetExchangePoint.id_autonomous_system')
     Index('IndexTopologyAS', id_topology, autonomous_system)
     Index('IndexId1_topology', id_topology)
-    Index('IndexId3_region', id_region)
+    Index('IndexId1_region', id_region)
 
 
 class Prefix(Base):
@@ -151,11 +151,13 @@ class Region(Base):
     __tablename__ = 'region'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
+    id_color = Column(Integer, ForeignKey('color.id'))
     region = Column(String(50), nullable=False)
     autonomous_system = relationship('AutonomousSystem', foreign_keys='AutonomousSystem.id_region')
     internet_exchange_point = relationship('InternetExchangePoint', foreign_keys='InternetExchangePoint.id_region')
     UniqueConstraint('id_topology', 'region', name='region_unique1')
     Index('IndexId5_topology', id_topology)
+    Index('IndexId_color', id_color)
 
 
 class InternetExchangePoint(Base):
@@ -166,7 +168,7 @@ class InternetExchangePoint(Base):
     internet_exchange_point = Column(String(50), nullable=False)
     autonomous_system_internet_exchange_point = relationship('AutonomousSystemInternetExchangePoint', foreign_keys='AutonomousSystemInternetExchangePoint.id_internet_exchange_point')
     Index('IndexId6_topology', id_topology)
-    Index('IndexId1_region', id_region)
+    Index('IndexId2_region', id_region)
 
 
 class AutonomousSystemInternetExchangePoint(Base):
@@ -176,3 +178,12 @@ class AutonomousSystemInternetExchangePoint(Base):
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     Index('IndexId_internet_exchange_point', id_internet_exchange_point)
     Index('IndexId4_autonomous_system', id_autonomous_system)
+
+
+class Color(Base):
+    __tablename__ = 'color'
+    id = Column(Integer, primary_key=True)
+    background_color = Column(String(50), nullable=False)
+    text_color = Column(String(50), nullable=False)
+    region = relationship('Region', foreign_keys='Region.id_color')
+

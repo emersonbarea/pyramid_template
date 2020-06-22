@@ -58,7 +58,8 @@ class RealisticTopology(object):
     @staticmethod
     def region(dbsession, id_topology):
         region = models.Region(region='-- undefined region --',
-                               id_topology=id_topology)
+                               id_topology=id_topology,
+                               id_color=1)
         dbsession.add(region)
 
     @staticmethod

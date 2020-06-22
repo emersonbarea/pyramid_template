@@ -1,5 +1,6 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from wtforms import Form, SubmitField, StringField
 from wtforms.validators import InputRequired, Length
@@ -51,8 +52,13 @@ def region(request):
                     dictionary['message'] = 'Region "%s" already exist in this topology.' % form.region.data
                     dictionary['css_class'] = 'errorMessage'
                     return dictionary
+
+                id_color = request.dbsession.query(func.max(models.Region.id_color) + 1).\
+                    filter_by(id_topology=request.matchdict["id_topology"]).first()
+
                 entry = models.Region(region=form.region.data,
-                                      id_topology=request.matchdict["id_topology"])
+                                      id_topology=request.matchdict["id_topology"],
+                                      id_color=id_color)
                 request.dbsession.add(entry)
                 request.dbsession.flush()
                 dictionary['message'] = 'Region "%s" successfully created in this topology.' % form.region.data

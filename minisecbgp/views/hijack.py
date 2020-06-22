@@ -23,7 +23,7 @@ class AffectedAreaDataForm(Form):
                                          Length(min=1, max=100,
                                                 message='ASN string must be between 1 and 100 characters long.')])
 
-    target = SelectField('Choose the <b><i>target</i></b> '
+    target = SelectField('Choose the <b><i>affected area</i></b> '
                          '(Check if this AS receives and accepts the hijacked route): *',
                          choices=[('', '--'),
                                   ('all', 'All ASs'),
@@ -37,7 +37,7 @@ class AffectedAreaDataForm(Form):
                                        Length(min=1, max=100,
                                               message='ASN string must be between 1 and 100 characters long.')])
 
-    prefix = SelectField('Choose the <b><i>prefix</i></b> '
+    prefix = SelectField('Choose the <b><i>prefix target</i></b> '
                          '(Which prefix will be hijacked): *',
                          choices=[('', '--'),
                                   ('target', 'Use the target\'s prefix'),

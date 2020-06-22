@@ -9,7 +9,7 @@ import ipaddress
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 from minisecbgp import models
 
@@ -33,6 +33,8 @@ class ManualTopology(object):
             df_topology.to_sql('topology', con=dbsession.bind, if_exists='append', index=False)
             # get Topology ID
             id_topology = dbsession.query(models.Topology.id).filter_by(topology=data['topology_name']).first()
+        except IntegrityError as error:
+            return 'The topology name "%s" already exists.' % data['topology_name']
         except Exception as error:
             return error
 
@@ -81,6 +83,12 @@ class ManualTopology(object):
             df_region = pd.DataFrame({'region': list_region})
             df_region = df_region.drop_duplicates(keep='first')
             df_region = df_region.dropna()
+            df_region = df_region.reset_index(drop=True)
+
+            colors = dbsession.query(models.Color.id).all()
+            df_region = pd.concat([df_region, pd.DataFrame({'id_color': colors})], axis=1)
+            df_region = df_region.dropna()
+
             df_region = pd.concat([df_region.assign(id_topology=id_topology) for id_topology in id_topology])
             df_region.to_sql('region', con=dbsession.bind, if_exists='append', index=False)
             # get Region ID

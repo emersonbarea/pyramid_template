@@ -24,7 +24,8 @@ from .topology import (
     TypeOfServiceAutonomousSystem,
     Region,
     InternetExchangePoint,
-    AutonomousSystemInternetExchangePoint)
+    AutonomousSystemInternetExchangePoint,
+    Color)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
