@@ -7,25 +7,42 @@
     <meta name="description" content="A Lightweight and Distributed Testbed for Security Analysis in BGP">
     <meta="keywords" content="BGP, Security, Testbed, Mininet, MaxiNet">
     <meta name="author" content="Emerson Barea">
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/bootstrap.css')}}" type="text/css"/>
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/theme.css')}}" type="text/css"/>
+    <link rel="stylesheet" href="{{request.static_url('minisecbgp:static/css/bootstrap-responsive.css')}}" type="text/css"/>
+    <link rel="icon" href="{{request.static_url('minisecbgp:static/ico/favico.png')}}">
     <script type="text/javascript" src="{{request.static_url('minisecbgp:static/vis-js/js/vis.js')}}"></script>
     <link href="{{request.static_url('minisecbgp:static/vis-js/css/vis-network.min.css')}}" rel="stylesheet" type="text/css" />
     <style type="text/css">
       #mynetwork {
         width: 100%;
-        height: 90vh;
+        height: 78vh;
         border: 1px solid lightgray;
       }
     </style>
   </head>
 
   <body onload="clusterByRegion()">
-    <div>
-      <div align="center">
-        <p><strong>Topology: {{ topology.topology }} (full)</strong></p>
-        <p>click on the container to ungroup the ASs</p>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="span4" align="left">
+            <p><img src="{{request.static_url('minisecbgp:static/img/to.png')}}" alt="To" style="width:20px;height:10px;">
+               provider to customer agreement</p>
+            <p><img src="{{request.static_url('minisecbgp:static/img/tofrom.png')}}" alt="To" style="width:20px;height:10px;">
+               peer to peer agreement</p>
+          </div>
+          <div class="span4" align="center">
+            <p><strong>Topology: {{ topology.topology }} (full)</strong></p>
+          </div>
+          <div class="span4" align="right">
+            <p>click on the container to ungroup</p>
+            <p><input type="button" onclick="clusterByRegion()" value="Group again"></p>
+          </div>
+        </div>
       </div>
     </div>
-    <div>
+
       <div id="mynetwork"></div>
       <script type="text/javascript">
 
@@ -45,7 +62,10 @@
 
 	    var edges = new vis.DataSet([
           {% for edge in edges %}
-            {from: {{ edge.id_autonomous_system1 }}, to: {{ edge.id_autonomous_system2 }} },
+            {from: {{ edge.id_autonomous_system1 }}, to: {{ edge.id_autonomous_system2 }},
+            arrows: ( {{ edge.id_link_agreement }} == 1 ? 'to' : ( {{ edge.id_link_agreement }} == 2 ? 'to, from' : '')),
+            color: { color: ( {{ edge.id_link_agreement }} == 1 ? '#AAAAAA' : ( {{ edge.id_link_agreement }} == 2 ? '#000000' : '#FFFFFF')) } },
+
           {% endfor %}
 	    ]);
 
@@ -113,8 +133,24 @@
 
       </script>
     </div>
-    <div align="center">
-      <p><input type="button" onclick="clusterByRegion()" value="Group the ASs again by Topology Region"></p>
-    </div>
+
+    <footer>
+      <a href="https://github.com/MiniSecBGP/MiniSecBGP" target="_blank">Github Project</a>
+      <p>MiniSecBGP</p>
+    </footer>
+
+    <script src="{{request.static_url('minisecbgp:static/js/jquery.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-transition.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-alert.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-modal.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-dropdown.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-scrollspy.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-tab.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-tooltip.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-popover.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-button.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-collapse.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-carousel.js')}}"></script>
+    <script src="{{request.static_url('minisecbgp:static/js/bootstrap-typeahead.js')}}"></script>
   </body>
 </html>
