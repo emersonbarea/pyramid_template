@@ -1,7 +1,5 @@
-#!/usr/bin/python
-"""
-This is the most simple example to showcase Containernet.
-"""
+#!/usr/bin/python3
+
 from mininet.net import Containernet
 from mininet.node import Controller
 from mininet.cli import CLI

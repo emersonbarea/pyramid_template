@@ -116,7 +116,7 @@ def topologies_delete(request):
                 filter_by(id=request.matchdict["id_topology"]).first()
 
             arguments = ['--id_topology=%s' % request.matchdict["id_topology"]]
-            subprocess.Popen(['./venv/bin/delete_topology'] + arguments)
+            subprocess.Popen(['MiniSecBGP_delete_topology'] + arguments)
 
             dictionary['message'] = ('Topology "%s" successfully deleted.' % topology.topology)
             dictionary['css_class'] = 'successMessage'

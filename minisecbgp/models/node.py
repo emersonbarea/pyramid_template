@@ -21,6 +21,8 @@ class Node(Base):
     conf_ssh_status = Column(String(255))
     install_remote_prerequisites = Column(Integer, nullable=False)
     install_remote_prerequisites_status = Column(String(255))
+    install_mininet = Column(Integer, nullable=False)
+    install_mininet_status = Column(String(255))
     install_containernet = Column(Integer, nullable=False)
     install_containernet_status = Column(String(255))
     install_metis = Column(Integer, nullable=False)

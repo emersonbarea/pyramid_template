@@ -12,7 +12,7 @@ from minisecbgp.scripts.services import local_command
 
 
 class ClusterDataForm(Form):
-    node = StringField('Node name/IP address: *',
+    node = StringField('Node IP address (Ex.: 192.168.1.1): *',
                        validators=[InputRequired(),
                                    Length(min=1, max=50, message=('Node name/IP address must be between 1 and 50 '
                                                                   'characters long.'))])
@@ -79,6 +79,7 @@ def create(request):
                                conf_user=2,
                                conf_ssh=2,
                                install_remote_prerequisites=2,
+                               install_mininet=2,
                                install_containernet=2,
                                install_metis=2,
                                install_maxinet=2,
@@ -92,14 +93,14 @@ def create(request):
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['./venv/bin/tests'] + arguments)
+            subprocess.Popen(['MiniSecBGP_tests'] + arguments)
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
 
-            subprocess.Popen(['./venv/bin/config'] + arguments)
+            subprocess.Popen(['MiniSecBGP_config'] + arguments)
 
             home_dir = os.getcwd()
             command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \

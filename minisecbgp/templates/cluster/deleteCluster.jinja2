@@ -11,6 +11,12 @@
   <div class="row-fluid">
     <div class="span12">
       <form class="form-horizontal" action="{{ request.route_url('clusterAction',action='delete') }}" method="post">
+
+        <div class="form-field">
+          <p><strong>Caution:</strong> before deleting a cluster node make sure you are not performing a
+            <a href="{{ request.route_url('hijackRealisticAnalysis') }}">Realistic Analysis</a>.</p>
+        </div>
+
         <div class="form-field">
           <p> Choose a node: </p>
           <p> {{ form.cluster_list }} </p>

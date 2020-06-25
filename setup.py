@@ -62,13 +62,13 @@ setup(
             'main = minisecbgp:main'
         ],
         'console_scripts': [
-            'initialize_db = minisecbgp.scripts.initialize_db:main',
-            'realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main',
-            'tests = minisecbgp.scripts.tests:main',
-            'config = minisecbgp.scripts.config:main',
-            'realistic_topology = minisecbgp.scripts.realistic_topology:main',
-            'delete_topology = minisecbgp.scripts.delete_topology:main',
-            'manual_topology = minisecbgp.scripts.manual_topology:main'
+            'MiniSecBGP_initialize_db = minisecbgp.scripts.initialize_db:main',
+            'MiniSecBGP_realistic_topology_scheduled_download = minisecbgp.scripts.realistic_topology_scheduled_download:main',
+            'MiniSecBGP_tests = minisecbgp.scripts.tests:main',
+            'MiniSecBGP_config = minisecbgp.scripts.config:main',
+            'MiniSecBGP_realistic_topology = minisecbgp.scripts.realistic_topology:main',
+            'MiniSecBGP_delete_topology = minisecbgp.scripts.delete_topology:main',
+            'MiniSecBGP_manual_topology = minisecbgp.scripts.manual_topology:main'
         ],
     },
 )

@@ -73,7 +73,7 @@ def upload(request):
             os.rename(temp_file_path, file_path)
 
             arguments = ['--file=%s' % file_path]
-            result = subprocess.Popen(['./venv/bin/manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.Popen(['MiniSecBGP_manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             command_result, command_result_error = result.communicate()
             if command_result:
                 dictionary['message'] = command_result

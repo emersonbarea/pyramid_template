@@ -37,6 +37,7 @@ def setup_models(dbsession):
                        conf_user=2,
                        conf_ssh=2,
                        install_remote_prerequisites=2,
+                       install_mininet=2,
                        install_containernet=2,
                        install_metis=2,
                        install_maxinet=2,

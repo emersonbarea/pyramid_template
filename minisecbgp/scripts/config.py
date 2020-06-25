@@ -60,6 +60,7 @@ class ConfigClusterNode(object):
                             'echo %s | sudo -S userdel -r minisecbgpuser 2>/dev/null || exit 0' % self.password,
                             'echo %s | sudo -S useradd -m -p $(mkpasswd -m sha-512 -S saltsalt -s <<< %s) -s /bin/bash minisecbgpuser' % (
                                 self.password, self.password),
+                            'echo %s | sudo -S bash -c "sed --i \'/minisecbgpuser/d\' /etc/sudoers | sudo -S tee --append /etc/sudoers"' % self.password,
                             'echo %s | sudo -S bash -c "echo \'minisecbgpuser   ALL=NOPASSWD: ALL\' | sudo -S tee --append /etc/sudoers"' % self.password,
                             'echo %s | sudo -S bash -c "echo \'%s           ALL=(minisecbgpuser) NOPASSWD: ALL\' | sudo -S tee --append /etc/sudoers"' % (
                                 self.password, self.username)]
@@ -73,7 +74,7 @@ class ConfigClusterNode(object):
                     else:
                         if command_status != 0:
                             conf_user = 1
-                            conf_user_status = conf_user_status + command_error_warning[:40]
+                            conf_user_status = conf_user_status + command_error_warning[:100]
                 self.node.status = self.node.conf_user = conf_user
                 self.node.conf_user_status = conf_user_status[:240]
                 return
@@ -81,6 +82,7 @@ class ConfigClusterNode(object):
                 self.node.conf_user = \
                     self.node.conf_ssh = \
                     self.node.install_remote_prerequisites = \
+                    self.node.install_mininet = \
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
@@ -88,6 +90,7 @@ class ConfigClusterNode(object):
                 self.node.conf_user_status = \
                     self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
@@ -147,12 +150,14 @@ class ConfigClusterNode(object):
             else:
                 self.node.conf_ssh = \
                     self.node.install_remote_prerequisites = \
+                    self.node.install_mininet = \
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
                     self.node.all_install = 1
                 self.node.conf_ssh_status = \
                     self.node.install_remote_prerequisites_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
@@ -168,11 +173,13 @@ class ConfigClusterNode(object):
                 install_remote_prerequisites = 0
                 install_remote_prerequisites_status = ''
                 commands = ['sudo apt update',
+                            'sudo apt upgrade -y',
                             'sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
                             'pip3 install --upgrade --force-reinstall -U Pyro4']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+
                     if service_ssh == 1:
                         self.node.status = self.node.install_remote_prerequisites = service_ssh
                         self.node.install_remote_prerequisites_status = service_ssh_status[:240]
@@ -187,11 +194,13 @@ class ConfigClusterNode(object):
                 return
             else:
                 self.node.install_remote_prerequisites = \
+                    self.node.install_mininet = \
                     self.node.install_containernet = \
                     self.node.install_metis = \
                     self.node.install_maxinet = \
                     self.node.all_install = 1
                 self.node.install_remote_prerequisites_status = \
+                    self.node.install_mininet_status = \
                     self.node.install_containernet_status = \
                     self.node.install_metis_status = \
                     self.node.install_maxinet_status = \
@@ -199,6 +208,46 @@ class ConfigClusterNode(object):
                 return
         except Exception as error:
             print('Database error for remote prerequisites installation on node: %s - %s' % (self.node.node, error))
+
+    def install_mininet(self):
+        print('Installing Mininet ...\n'
+              'take a coffee and wait ...')
+        try:
+            if self.node.status == 0:
+                install_mininet = 0
+                install_mininet_status = ''
+                commands = [
+                    'git clone git://github.com/mininet/mininet /home/minisecbgpuser/mininet',
+                    'sed -i -- \'s/iproute /iproute2 /g\' /home/minisecbgpuser/mininet/util/install.sh',
+                    'sudo /home/minisecbgpuser/mininet/util/install.sh -a']
+                for command in commands:
+                    service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
+                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                    if service_ssh == 1:
+                        self.node.status = self.node.install_mininet = service_ssh
+                        self.node.install_mininet_status = service_ssh_status[:240]
+                        return
+                    else:
+                        if command_status != 0:
+                            install_mininet = 1
+                            install_mininet_status = install_mininet_status + command_error_warning[:45]
+                self.node.status = self.node.install_mininet = install_mininet
+                self.node.install_mininet_status = install_mininet_status[:240]
+                return
+            else:
+                self.node.install_mininet = \
+                    self.node.install_containernet = \
+                    self.node.install_metis = \
+                    self.node.install_maxinet = \
+                    self.node.all_install = 1
+                self.node.install_mininet_status = \
+                    self.node.install_containernet_status = \
+                    self.node.install_metis_status = \
+                    self.node.install_maxinet_status = \
+                    self.node.all_install_status = 'Aborted'
+                return
+        except Exception as error:
+            print('Database error for Mininet installation on node: %s - %s' % (self.node.node, error))
 
     def install_containernet(self):
         print('Installing Containernet ...\n'
@@ -221,7 +270,7 @@ class ConfigClusterNode(object):
                     else:
                         if command_status != 0:
                             install_containernet = 1
-                            install_containernet_status = install_containernet_status + command_error_warning[:240]
+                            install_containernet_status = install_containernet_status + command_error_warning[:45]
                 self.node.status = self.node.install_containernet = install_containernet
                 self.node.install_containernet_status = install_containernet_status[:240]
                 return
@@ -269,7 +318,7 @@ class ConfigClusterNode(object):
                         else:
                             if command_status != 0:
                                 install_metis = 1
-                                install_metis_status = install_metis_status + command_error_warning[:80]
+                                install_metis_status = install_metis_status + command_error_warning[:40]
                         self.node.status = self.node.install_metis = install_metis
                         self.node.install_metis_status = install_metis_status[:240]
                         return
@@ -297,7 +346,6 @@ class ConfigClusterNode(object):
         print('Installing Maxinet ...')
         try:
             if self.node.status == 0:
-                master = self.dbsession.query(models.Node).filter(models.Node.master == 1).first()
                 install_maxinet = 0
                 install_maxinet_status = ''
                 commands = ['git clone git://github.com/MaxiNet/MaxiNet.git',
@@ -309,18 +357,18 @@ class ConfigClusterNode(object):
                         ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.install_maxinet = service_ssh
-                        self.node.install_maxinet_status = service_ssh_status[:240]
+                        self.node.install_maxinet_status = service_ssh_status[:10]
                         return
                     else:
                         if command_status != 0:
                             install_maxinet = 1
-                            install_maxinet_status = command_error_warning[:60]
+                            install_maxinet_status = command_error_warning[:10]
 
                 # configure MaxiNet.cfg on Master
                 command = 'sudo -u minisecbgpuser bash -c \'' \
                           'echo "[all]\n' \
                           'password = MiniSecBGP\n' \
-                          'controller = %s:6633\n' \
+                          'controller = MiniSecBGP_master:6633\n' \
                           'logLevel = ERROR\n' \
                           'port_ns = 9090\n' \
                           'port_sshd = 5345\n' \
@@ -331,36 +379,94 @@ class ConfigClusterNode(object):
                           'usesudo = True\n' \
                           'useSTT = False\n\n' \
                           '[FrontendServer]\n' \
-                          'ip = %s\n' \
-                          'threadpool = 256\n" | sudo tee /etc/MaxiNet.cfg\'' % \
-                          (master.hostname, master.hostname)
+                          'ip = MiniSecBGP_master\n' \
+                          'threadpool = 256\n" | sudo tee /etc/MaxiNet.cfg\''
                 result = local_command.local_command(command)
                 if result[0] == 1:
                     install_maxinet = result[0]
-                    install_maxinet_status = install_maxinet_status + str(result[2].decode()[:240])
+                    install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
                 for server in self.nodes:
                     command = 'sudo -u minisecbgpuser bash -c \'' \
                               'echo "[%s]\n' \
                               'ip = %s\n' \
                               'share = 1\n" | sudo tee --append /etc/MaxiNet.cfg\'' % \
-                              (server.hostname, server.hostname)
+                              (server.node, server.node)
                     result = local_command.local_command(command)
                     if result[0] == 1:
                         install_maxinet = result[0]
                         install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
-                # send MaxiNet.cfg to all Workers
+                # create MaxiNetFrontendServer and MaxiNetWorker services (on Master)
+                if self.node.master == 1:
+                    command = 'sudo -u minisecbgpuser bash -c \'' \
+                              'echo "[Unit]\n' \
+                              'Description=MaxiNetFrontendServer\n' \
+                              'After=syslog.target network.target\n\n' \
+                              '[Service]\n' \
+                              'ExecStart=/usr/local/bin/MaxiNetFrontendServer\n\n' \
+                              '[Install]\n' \
+                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetFrontendServer.service\';' \
+                              'sudo -u minisecbgpuser bash -c \'' \
+                              'echo "[Unit]\n' \
+                              'Description=MaxiNetWorker\n' \
+                              'After=syslog.target network.target MaxiNetFrontendServer.service\n\n' \
+                              '[Service]\n' \
+                              'ExecStart=/usr/local/bin/MaxiNetWorker\n\n' \
+                              '[Install]\n' \
+                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetWorker.service\''
+                    result = local_command.local_command(command)
+                    if result[0] == 1:
+                        install_maxinet = result[0]
+                        install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                # restart MaxiNet services (MaxiNetFrontendServer and MaxiNetWorker) on MiniSecBGP Master cluster node
+                command = 'sudo -u minisecbgpuser bash -c \'' \
+                          'sudo systemctl daemon-reload; ' \
+                          'sudo systemctl enable MaxiNetFrontendServer; ' \
+                          'sudo systemctl restart MaxiNetFrontendServer; ' \
+                          'sleep 5; ' \
+                          'sudo systemctl enable MaxiNetWorker; ' \
+                          'sudo systemctl restart MaxiNetWorker\''
+                result = local_command.local_command(command)
+                if result[0] == 1:
+                    install_maxinet = result[0]
+                    install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                # send MaxiNet.cfg and MaxiNetWorker.service files to all Workers cluster nodes. Restart MaxiNetWorker service.
+                command = 'grep MiniSecBGP_master /etc/hosts'
+                result = local_command.local_command(command)
+                MiniSecBGP_master = str(result[1].decode())
+
                 for server in self.nodes:
                     if server.master != 1:
                         command = 'sudo -u minisecbgpuser bash -c \'' \
-                                  'scp -o StrictHostKeyChecking=no /etc/MaxiNet.cfg minisecbgpuser@%s:/home/minisecbgpuser;' \
-                                  'ssh %s "sudo mv /home/minisecbgpuser/MaxiNet.cfg /etc/MaxiNet.cfg; exit" \'' \
+                                  'scp -o StrictHostKeyChecking=no /etc/MaxiNet.cfg minisecbgpuser@%s:/home/minisecbgpuser; ' \
+                                  'scp -o StrictHostKeyChecking=no /etc/systemd/system/MaxiNetWorker.service minisecbgpuser@%s:/home/minisecbgpuser\'' \
                                   % (server.node, server.node)
                         result = local_command.local_command(command)
                         if result[0] == 1:
                             install_maxinet = result[0]
                             install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                        commands = ['sudo sed --i \'/MiniSecBGP_master/d\' /etc/hosts | sudo tee --append /etc/hosts',
+                                    'echo "%s" | sudo tee --append /etc/hosts' % MiniSecBGP_master,
+                                    'sudo mv /home/minisecbgpuser/MaxiNet.cfg /etc/MaxiNet.cfg',
+                                    'sudo mv /home/minisecbgpuser/MaxiNetWorker.service /etc/systemd/system/MaxiNetWorker.service',
+                                    'sudo systemctl daemon-reload',
+                                    'sudo systemctl enable MaxiNetWorker',
+                                    'sudo systemctl restart MaxiNetWorker']
+                        for command in commands:
+                            service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
+                                ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        if service_ssh == 1:
+                            self.node.status = self.node.install_maxinet = service_ssh
+                            self.node.install_maxinet_status = install_maxinet_status + service_ssh_status[:10]
+                            return
+                        else:
+                            if command_status != 0:
+                                install_maxinet = 1
+                                install_maxinet_status = install_maxinet_status + command_error_warning[:10]
 
                 self.node.all_install = self.node.status = self.node.install_maxinet = install_maxinet
                 self.node.install_maxinet_status = install_maxinet_status[:240]
@@ -425,6 +531,7 @@ def main(argv=sys.argv[1:]):
             ccn.create_minisecbgpuser()
             ccn.configure_ssh()
             ccn.install_remote_prerequisites()
+            ccn.install_mininet()
             ccn.install_containernet()
             ccn.install_metis()
             ccn.install_maxinet()

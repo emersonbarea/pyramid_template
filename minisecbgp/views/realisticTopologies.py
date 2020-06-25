@@ -109,7 +109,7 @@ def update_topology(request):
             urllib.request.urlretrieve(downloadParameters.url + file + '.txt.bz2', '/tmp/' + file + '.txt.bz2')
             arguments = ['--config-file=minisecbgp.ini',
                          '--file=%s.txt.bz2' % file]
-            subprocess.Popen(['./venv/bin/realistic_topology'] + arguments)
+            subprocess.Popen(['MiniSecBGP_realistic_topology'] + arguments)
             url = request.route_url('realisticTopologies')
             return HTTPFound(location=url)
         dictionary['form'] = form

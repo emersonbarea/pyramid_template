@@ -14,6 +14,11 @@
       <form action="{{ request.route_url('clusterAction',action='create') }}" method="POST">
 
         <div class="form-field">
+          <p><strong>Caution:</strong> before creating a cluster node make sure you are not performing a
+            <a href="{{ request.route_url('hijackRealisticAnalysis') }}">Realistic Analysis</a>.</p>
+        </div>
+
+        <div class="form-field">
           {{ form.node.label }}
           {{ form.node }}
           {% if form.node.errors %}
