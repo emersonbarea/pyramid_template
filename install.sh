@@ -85,9 +85,18 @@ configure_hosts() {
 
 install_Linux_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux prerequisites ...'
-        sudo apt install git aptitude whois sshpass nginx uwsgi python-pip python3-pip postgresql postgresql-contrib postgresql-server-dev-all ansible -y;
+        sudo apt install git aptitude whois sshpass nginx uwsgi python3-pip python3-venv postgresql postgresql-contrib postgresql-server-dev-all ansible -y;
         printf '\n\e[1;32m%-6s\n\n%s\n%s\n%s\n%s\n%s\n\n%s\n\n\e[m' \
-               'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python' '    - Python3' '    - Postgresql'
+               'The following programs have been installed:' '    - Nginx' '    - uWsgi' '    - Python3' '    - Postgresql'
+}
+
+
+virtualenv() {
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Creating Python Virtualenv ...'
+        deactivate &> /dev/null
+        rm -rf "$LOCAL_HOME"/venv
+        python3 -m venv "$LOCAL_HOME"/venv
+        source "$LOCAL_HOME"/venv/bin/activate
 }
 
 
@@ -114,6 +123,7 @@ configure_Postgres() {
 
 install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing MiniSecBGP Application ...'
+        source "$LOCAL_HOME"/venv/bin/activate
         pip3 install -e .
         rm "$LOCAL_HOME"/minisecbgp/alembic/versions/*.py &> /dev/null
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
@@ -121,26 +131,26 @@ install_app() {
 
         MiniSecBGP_initialize_db minisecbgp.ini
 
-        #printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Sample Topologies ...'
-        #cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
-        #MiniSecBGP_realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
-        #cp "$LOCAL_HOME"/minisecbgp/static/topology/Minimal-Topology-Example.MiniSecBGP /tmp/
-        #MiniSecBGP_manual_topology --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
-        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology1.MiniSecBGP /tmp/
-        #MiniSecBGP_manual_topology --file='/tmp/manual_topology1.MiniSecBGP'
-        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology2.MiniSecBGP /tmp/
-        #MiniSecBGP_manual_topology --file='/tmp/manual_topology2.MiniSecBGP'
-        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology3.MiniSecBGP /tmp/
-        #MiniSecBGP_manual_topology --file='/tmp/manual_topology3.MiniSecBGP'
+        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Sample Topologies ...'
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
+        MiniSecBGP_realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/Minimal-Topology-Example.MiniSecBGP /tmp/
+        MiniSecBGP_manual_topology --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology1.MiniSecBGP /tmp/
+        MiniSecBGP_manual_topology --file='/tmp/manual_topology1.MiniSecBGP'
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology2.MiniSecBGP /tmp/
+        MiniSecBGP_manual_topology --file='/tmp/manual_topology2.MiniSecBGP'
+        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology3.MiniSecBGP /tmp/
+        MiniSecBGP_manual_topology --file='/tmp/manual_topology3.MiniSecBGP'
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
         MiniSecBGP_tests --config-file=minisecbgp.ini --execution-type='manual' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
-* * * * * minisecbgpuser MiniSecBGP_tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
+* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
-0 3 * * * minisecbgpuser MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
+0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
 
 	      MiniSecBGP_config --config-file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
 }
@@ -156,7 +166,7 @@ After=network.target
 User=' $WHOAMI '
 Group=www-data
 WorkingDirectory=' $LOCAL_HOME '
-ExecStart=' $LOCAL_HOME '/usr/bin/uwsgi --ini-paste-logged ' $LOCAL_HOME '/minisecbgp.ini
+ExecStart=' $LOCAL_HOME '/venv/bin/uwsgi --ini-paste-logged ' $LOCAL_HOME '/minisecbgp.ini
 [Install]
 WantedBy=multi-user.target' | sudo tee /etc/systemd/system/uwsgi.service
 }
@@ -217,6 +227,7 @@ network_address;
 update;
 configure_hosts;
 install_Linux_reqs;
+virtualenv;
 install_Python_reqs;
 configure_Postgres;
 install_app;
