@@ -129,7 +129,7 @@ install_app() {
         alembic -c minisecbgp.ini revision --autogenerate -m "init"
         alembic -c minisecbgp.ini upgrade head
 
-        MiniSecBGP_initialize_db minisecbgp.ini
+        MiniSecBGP_initialize_db --config-file="$LOCAL_HOME"/minisecbgp.ini --master-ip-address="$var_ip"
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Sample Topologies ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
@@ -144,7 +144,7 @@ install_app() {
         MiniSecBGP_manual_topology --file='/tmp/manual_topology3.MiniSecBGP'
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
-        MiniSecBGP_tests --config-file=minisecbgp.ini --execution-type='manual' --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+        MiniSecBGP_tests --config-file=minisecbgp.ini --execution-type='manual' --target-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
 * * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --hostname="'$HOSTNAME'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
@@ -152,7 +152,7 @@ install_app() {
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
 0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
 
-	      MiniSecBGP_config --config-file=minisecbgp.ini --hostname=$HOSTNAME --username=$WHOAMI --password=$PASSWORD
+	      MiniSecBGP_config --config-file=minisecbgp.ini --target-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 }
 
 

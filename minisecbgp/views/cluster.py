@@ -39,12 +39,46 @@ def cluster(request):
     if user is None:
         raise HTTPForbidden
 
-    nodes = request.dbsession.query(models.Node).all()
-
     dictionary = dict()
-    dictionary['nodes'] = nodes
-    dictionary['cluster_url'] = request.route_url('cluster')
-    dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
+
+    try:
+        nodes_temp = request.dbsession.query(models.Node).all()
+        nodes = list()
+        for n in nodes_temp:
+            nodes.append({'id': n.id,
+                          'node': str(ipaddress.ip_address(n.node)),
+                          'status': n.status,
+                          'hostname': n.hostname,
+                          'hostname_status': n.hostname_status,
+                          'username': n.username,
+                          'master': n.master,
+                          'service_ping': n.service_ping,
+                          'service_ssh': n.service_ssh,
+                          'service_ssh_status': n.service_ssh_status,
+                          'all_services': n.all_services,
+                          'conf_user': n.conf_user,
+                          'conf_user_status': n.conf_user_status,
+                          'conf_ssh': n.conf_ssh,
+                          'conf_ssh_status': n.conf_ssh_status,
+                          'install_remote_prerequisites': n.install_remote_prerequisites,
+                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
+                          'install_mininet': n.install_mininet,
+                          'install_mininet_status': n.install_mininet_status,
+                          'install_containernet': n.install_containernet,
+                          'install_containernet_status': n.install_containernet_status,
+                          'install_metis': n.install_metis,
+                          'install_metis_status': n.install_metis_status,
+                          'install_maxinet': n.install_maxinet,
+                          'install_maxinet_status': n.install_maxinet_status,
+                          'all_install': n.all_install})
+
+        dictionary['nodes'] = nodes
+        dictionary['cluster_url'] = request.route_url('cluster')
+        dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
     return dictionary
 
@@ -90,13 +124,13 @@ def create(request):
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--execution-type=manual',
-                         '--hostname=%s' % form.node.data,
+                         '--target-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
             subprocess.Popen(['./venv/bin/MiniSecBGP_tests'] + arguments)
 
             arguments = ['--config-file=minisecbgp.ini',
-                         '--hostname=%s' % form.node.data,
+                         '--target-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
 
@@ -125,7 +159,36 @@ def create(request):
             css_class = 'errorMessage'
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
-        nodes = request.dbsession.query(models.Node).all()
+
+        nodes_temp = request.dbsession.query(models.Node).all()
+        nodes = list()
+        for n in nodes_temp:
+            nodes.append({'id': n.id,
+                          'node': str(ipaddress.ip_address(n.node)),
+                          'status': n.status,
+                          'hostname': n.hostname,
+                          'hostname_status': n.hostname_status,
+                          'username': n.username,
+                          'master': n.master,
+                          'service_ping': n.service_ping,
+                          'service_ssh': n.service_ssh,
+                          'service_ssh_status': n.service_ssh_status,
+                          'all_services': n.all_services,
+                          'conf_user': n.conf_user,
+                          'conf_user_status': n.conf_user_status,
+                          'conf_ssh': n.conf_ssh,
+                          'conf_ssh_status': n.conf_ssh_status,
+                          'install_remote_prerequisites': n.install_remote_prerequisites,
+                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
+                          'install_mininet': n.install_mininet,
+                          'install_mininet_status': n.install_mininet_status,
+                          'install_containernet': n.install_containernet,
+                          'install_containernet_status': n.install_containernet_status,
+                          'install_metis': n.install_metis,
+                          'install_metis_status': n.install_metis_status,
+                          'install_maxinet': n.install_maxinet,
+                          'install_maxinet_status': n.install_maxinet_status,
+                          'all_install': n.all_install})
 
         dictionary = dict()
         dictionary['nodes'] = nodes
@@ -143,11 +206,11 @@ def create(request):
                                                                                '/deleteCluster.jinja2')
 def delete(request):
     user = request.user
-    if user is None:
+    if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
     form = ClusterDataFormSelectField(request.POST)
-    form.cluster_list.choices = [(row.id, row.node) for row in
+    form.cluster_list.choices = [(row.id, ipaddress.ip_address(row.node)) for row in
                                  request.dbsession.query(models.Node).filter(models.Node.master != 1)]
 
     if request.method == 'POST' and form.validate():
@@ -185,9 +248,47 @@ def delete(request):
 
 @view_config(route_name='clusterDetail', renderer='minisecbgp:templates/cluster/detailCluster.jinja2')
 def clusterDetail(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
     dictionary = dict()
-    entry = request.dbsession.query(models.Node).filter_by(id=request.matchdict["id"]).first()
-    dictionary['entry'] = entry
-    dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
+
+    try:
+        node_temp = request.dbsession.query(models.Node).\
+            filter_by(id=request.matchdict["id"]).first()
+        node = {'id': node_temp.id,
+                'node': str(ipaddress.ip_address(node_temp.node)),
+                'status': node_temp.status,
+                'hostname': node_temp.hostname,
+                'hostname_status': node_temp.hostname_status,
+                'username': node_temp.username,
+                'master': node_temp.master,
+                'service_ping': node_temp.service_ping,
+                'service_ssh': node_temp.service_ssh,
+                'service_ssh_status': node_temp.service_ssh_status,
+                'all_services': node_temp.all_services,
+                'conf_user': node_temp.conf_user,
+                'conf_user_status': node_temp.conf_user_status,
+                'conf_ssh': node_temp.conf_ssh,
+                'conf_ssh_status': node_temp.conf_ssh_status,
+                'install_remote_prerequisites': node_temp.install_remote_prerequisites,
+                'install_remote_prerequisites_status': node_temp.install_remote_prerequisites_status,
+                'install_mininet': node_temp.install_mininet,
+                'install_mininet_status': node_temp.install_mininet_status,
+                'install_containernet': node_temp.install_containernet,
+                'install_containernet_status': node_temp.install_containernet_status,
+                'install_metis': node_temp.install_metis,
+                'install_metis_status': node_temp.install_metis_status,
+                'install_maxinet': node_temp.install_maxinet,
+                'install_maxinet_status': node_temp.install_maxinet_status,
+                'all_install': node_temp.all_install}
+
+        dictionary['node'] = node
+        dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
     return dictionary

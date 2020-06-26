@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, BigInteger
 from .meta import Base
 
 
 class Node(Base):
     __tablename__ = 'node'
     id = Column(Integer, primary_key=True)
-    node = Column(Integer, nullable=False, unique=True)
+    node = Column(BigInteger, nullable=False, unique=True)
     status = Column(Integer, nullable=False)                               # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     hostname = Column(Integer, nullable=False)                             # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     hostname_status = Column(String(255))

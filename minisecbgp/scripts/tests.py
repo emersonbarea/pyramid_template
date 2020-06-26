@@ -1,5 +1,6 @@
 import argparse
 import getopt
+import ipaddress
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
@@ -10,16 +11,18 @@ from minisecbgp.scripts.services import ssh, local_command
 
 
 class TestClusterNode(object):
-    def __init__(self, dbsession, execution_type, hostname, username, password):
+    def __init__(self, dbsession, execution_type, target_ip_address, username, password):
         self.dbsession = dbsession
         self.execution_type = execution_type
-        self.hostname = hostname
+        self.target_ip_address = int(ipaddress.ip_address(target_ip_address))
         self.username = username
         self.password = password
+
         if self.username:
-            nodes = [self.dbsession.query(models.Node).filter(models.Node.node == self.hostname).first()]
+            nodes = [self.dbsession.query(models.Node).filter_by(node=self.target_ip_address).first()]
         else:
             nodes = self.dbsession.query(models.Node).all()
+
         self.nodes = nodes
 
     def test_ping(self):
@@ -63,12 +66,12 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "execution-type=", "hostname=", "username=", "password="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "execution-type=", "target-ip-address=", "username=", "password="])
     except getopt.GetoptError:
         print('tests '
               '--config-file=<pyramid config file .ini> '
               '--execution-type=manual|scheduled '
-              '--hostname=<cluster node name or IP address> '
+              '--target-ip-address=<cluster node IP address> '
               '--username=<cluster node username> '
               '--password=<cluster node user password>')
         sys.exit(2)
@@ -77,7 +80,7 @@ def main(argv=sys.argv[1:]):
             print('tests '
                   '--config-file=<pyramid config file .ini> '
                   '--execution-type=manual|scheduled '
-                  '--hostname=<cluster node name or IP address> '
+                  '--target-ip-address=<cluster node IP address> '
                   '--username=<cluster node username> '
                   '--password=<cluster node user password>')
             sys.exit()
@@ -85,8 +88,8 @@ def main(argv=sys.argv[1:]):
             config_file = arg
         elif opt == '--execution-type' and (arg == 'manual' or arg == 'scheduled'):
             execution_type = arg
-        elif opt == '--hostname':
-            hostname = arg
+        elif opt == '--target-ip-address':
+            target_ip_address = arg
         elif opt == '--username':
             username = arg
         elif opt == '--password':
@@ -98,7 +101,7 @@ def main(argv=sys.argv[1:]):
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            ccn = TestClusterNode(dbsession, execution_type, hostname, username, password)
+            ccn = TestClusterNode(dbsession, execution_type, target_ip_address, username, password)
             ccn.test_ping()
             ccn.test_ssh()
     except OperationalError:

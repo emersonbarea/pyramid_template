@@ -1,5 +1,6 @@
 import argparse
 import getopt
+import ipaddress
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
@@ -10,13 +11,13 @@ from minisecbgp.scripts.services import ssh, local_command
 
 
 class ConfigClusterNode(object):
-    def __init__(self, dbsession, hostname, username, password):
+    def __init__(self, dbsession, target_ip_address, username, password):
         self.dbsession = dbsession
-        self.hostname = hostname
+        self.target_ip_address = int(ipaddress.ip_address(target_ip_address))
         self.username = username
         self.password = password
 
-        node = self.dbsession.query(models.Node).filter(models.Node.node == self.hostname).first()
+        node = self.dbsession.query(models.Node).filter_by(node=self.target_ip_address).first()
         self.node = node
         nodes = self.dbsession.query(models.Node).all()
         self.nodes = nodes
@@ -27,7 +28,7 @@ class ConfigClusterNode(object):
             hostname = 0
             command = 'hostname'
             service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                ssh.ssh(self.hostname, self.username, self.password, command)
+                ssh.ssh(self.target_ip_address, self.username, self.password, command)
             hostname_status = command_output
             if service_ssh == 1:
                 self.node.status = self.node.hostname = service_ssh
@@ -66,7 +67,7 @@ class ConfigClusterNode(object):
                                 self.password, self.username)]
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, self.username, self.password, command)
+                        ssh.ssh(self.target_ip_address, self.username, self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.conf_user = service_ssh
                         self.node.conf_user_status = service_ssh_status[:240]
@@ -110,7 +111,7 @@ class ConfigClusterNode(object):
                             'chmod 400 /home/minisecbgpuser/.ssh/config']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.conf_ssh = service_ssh
                         self.node.conf_ssh_status = service_ssh_status[:240]
@@ -123,7 +124,7 @@ class ConfigClusterNode(object):
                 # update authorized_keys file on Workers to allow "minisecbgpuser" ssh remote connections without password
                 command = 'sudo -u minisecbgpuser sshpass -p "%s" scp -o StrictHostKeyChecking=no ' \
                           'minisecbgpuser@%s:/home/minisecbgpuser/.ssh/id_rsa.pub ' \
-                          '/home/minisecbgpuser/.ssh/authorized_keys.tmp' % (self.password, self.hostname)
+                          '/home/minisecbgpuser/.ssh/authorized_keys.tmp' % (self.password, self.target_ip_address)
                 result = local_command.local_command(command)
                 if result[0] == 1:
                     conf_ssh = result[0]
@@ -138,7 +139,7 @@ class ConfigClusterNode(object):
 
                 command = 'sudo -u minisecbgpuser sshpass -p "%s" scp -o StrictHostKeyChecking=no ' \
                           '/home/minisecbgpuser/.ssh/authorized_keys minisecbgpuser@%s:/home/minisecbgpuser/.ssh/' \
-                          % (self.password, self.hostname)
+                          % (self.password, self.target_ip_address)
                 result = local_command.local_command(command)
                 if result[0] == 1:
                     conf_ssh = result[0]
@@ -178,7 +179,7 @@ class ConfigClusterNode(object):
                             'pip3 install --upgrade --force-reinstall -U Pyro4']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
 
                     if service_ssh == 1:
                         self.node.status = self.node.install_remote_prerequisites = service_ssh
@@ -222,7 +223,7 @@ class ConfigClusterNode(object):
                     'sudo /home/minisecbgpuser/mininet/util/install.sh -a']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.install_mininet = service_ssh
                         self.node.install_mininet_status = service_ssh_status[:240]
@@ -262,7 +263,7 @@ class ConfigClusterNode(object):
                     'sudo ansible-playbook -i "localhost," -c local install.yml']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.install_containernet = service_ssh
                         self.node.install_containernet_status = service_ssh_status[:240]
@@ -296,7 +297,7 @@ class ConfigClusterNode(object):
                         install_metis = 0
                         install_metis_status = ''
                         command = 'sshpass -p "%s" scp -o StrictHostKeyChecking=no ./metis/metis-5.1.0.tar.gz ' \
-                                  'minisecbgpuser@%s:/home/minisecbgpuser/' % (self.password, self.hostname)
+                                  'minisecbgpuser@%s:/home/minisecbgpuser/' % (self.password, self.target_ip_address)
                         result = local_command.local_command(command)
                         if result[0] == 1:
                             install_metis = result[0]
@@ -310,7 +311,7 @@ class ConfigClusterNode(object):
                                     'sudo ldconfig']
                         for command in commands:
                             service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                                ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                                ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                         if service_ssh == 1:
                             self.node.status = self.node.install_metis = service_ssh
                             self.node.install_metis_status = install_metis_status + service_ssh_status[:240]
@@ -354,7 +355,7 @@ class ConfigClusterNode(object):
                             'sudo make install']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                        ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                        ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         self.node.status = self.node.install_maxinet = service_ssh
                         self.node.install_maxinet_status = service_ssh_status[:10]
@@ -458,7 +459,7 @@ class ConfigClusterNode(object):
                                     'sudo systemctl restart MaxiNetWorker']
                         for command in commands:
                             service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                                ssh.ssh(self.hostname, 'minisecbgpuser', self.password, command)
+                                ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
                         if service_ssh == 1:
                             self.node.status = self.node.install_maxinet = service_ssh
                             self.node.install_maxinet_status = install_maxinet_status + service_ssh_status[:10]
@@ -491,11 +492,11 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, "h:", ["config-file=", "hostname=", "username=", "password="])
+        opts, args = getopt.getopt(argv, "h:", ["config-file=", "target-ip-address=", "username=", "password="])
     except getopt.GetoptError as error:
         print('config '
               '--config-file=<pyramid config file .ini> '
-              '--hostname=<cluster node name or IP address> '
+              '--target-ip-address=<cluster node name or IP address> '
               '--username=<cluster node username> '
               '--password=<cluster node user password>')
         sys.exit(2)
@@ -503,14 +504,14 @@ def main(argv=sys.argv[1:]):
         if opt == '-h':
             print('config '
                   '--config-file=<pyramid config file .ini> '
-                  '--hostname=<cluster node name or IP address> '
+                  '--target-ip-address=<cluster node name or IP address> '
                   '--username=<cluster node username> '
                   '--password=<cluster node user password>')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-        elif opt == '--hostname':
-            hostname = arg
+        elif opt == '--target-ip-address':
+            target_ip_address = arg
         elif opt == '--username':
             username = arg
         elif opt == '--password':
@@ -522,12 +523,12 @@ def main(argv=sys.argv[1:]):
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            ccn = ConfigClusterNode(dbsession, hostname, username, password)
+            ccn = ConfigClusterNode(dbsession, target_ip_address, username, password)
             ccn.validate_hostname()
 
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            ccn = ConfigClusterNode(dbsession, hostname, username, password)
+            ccn = ConfigClusterNode(dbsession, target_ip_address, username, password)
             ccn.create_minisecbgpuser()
             ccn.configure_ssh()
             ccn.install_remote_prerequisites()

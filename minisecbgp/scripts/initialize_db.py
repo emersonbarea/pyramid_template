@@ -1,7 +1,8 @@
 import argparse
+import getopt
 import getpass
+import ipaddress
 import sys
-import socket
 from datetime import date
 
 from pyramid.paster import bootstrap, setup_logging
@@ -10,7 +11,7 @@ from sqlalchemy.exc import OperationalError
 from .. import models
 
 
-def setup_models(dbsession):
+def setup_models(dbsession, master_ip_address):
 
     # User
 
@@ -26,7 +27,9 @@ def setup_models(dbsession):
 
     # Node
 
-    node = models.Node(node=socket.gethostname(),
+    node_ip_address = int(ipaddress.ip_address(master_ip_address))
+
+    node = models.Node(node=node_ip_address,
                        status=2,
                        hostname=2,
                        username=getpass.getuser(),
@@ -139,22 +142,40 @@ def setup_models(dbsession):
                                    text_color=color['text']))
 
 
-def parse_args(argv):
+def parse_args(config_file):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'config_uri',
         help='Configuration file, e.g., minisecbgp.ini',
     )
-    return parser.parse_args(argv[1:])
+    return parser.parse_args(config_file.split())
 
 
-def main(argv=sys.argv):
-    args = parse_args(argv)
+def main(argv=sys.argv[1:]):
+    try:
+        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "master-ip-address="])
+    except getopt.GetoptError:
+        print('* Usage: initialize_db '
+              '--config-file=<pyramid config file .ini> '
+              '--master-ip-address={master cluster node IP address (Ex.: 192.168.0.1}')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('* Usage: initialize_db '
+                  '--config-file=<pyramid config file .ini> '
+                  '--master-ip-address={master cluster node IP address (Ex.: 192.168.0.1}')
+            sys.exit()
+        elif opt == '--config-file':
+            config_file = arg
+        elif opt == '--master-ip-address':
+            master_ip_address = arg
+
+    args = parse_args(config_file)
     setup_logging(args.config_uri)
     env = bootstrap(args.config_uri)
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            setup_models(dbsession)
+            setup_models(dbsession, master_ip_address)
     except OperationalError:
         print('Database error')
