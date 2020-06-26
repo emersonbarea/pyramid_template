@@ -5,7 +5,7 @@ from .meta import Base
 class Node(Base):
     __tablename__ = 'node'
     id = Column(Integer, primary_key=True)
-    node = Column(String(50), nullable=False, unique=True)
+    node = Column(Integer, nullable=False, unique=True)
     status = Column(Integer, nullable=False)                               # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     hostname = Column(Integer, nullable=False)                             # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
     hostname_status = Column(String(255))

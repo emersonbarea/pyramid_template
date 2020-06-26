@@ -40,7 +40,7 @@ class DownloadTopology(object):
                                            '/tmp/' + databases[0] + '.txt.bz2')
                 arguments = ['--config-file=%s/minisecbgp.ini' % self.topology_path,
                              '--file=%s.txt.bz2' % databases[0]]
-                subprocess.Popen(['MiniSecBGP_realistic_topology'] + arguments)
+                subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_topology'] + arguments)
 
         except Exception as error:
             print(error)

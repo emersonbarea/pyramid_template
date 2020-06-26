@@ -315,7 +315,7 @@ class ManualTopology(object):
 
         except Exception as error:
             arguments = ['--id_topology=%s' % id_topology]
-            subprocess.Popen(['MiniSecBGP_delete_topology'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_delete_topology'] + arguments)
             return error
 
     @staticmethod

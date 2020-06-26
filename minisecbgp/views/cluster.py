@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import subprocess
 
@@ -5,17 +6,16 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy.exc import IntegrityError
 from wtforms import Form, StringField, PasswordField, SelectField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, IPAddress
 from minisecbgp import models
 
 from minisecbgp.scripts.services import local_command
 
 
 class ClusterDataForm(Form):
-    node = StringField('Node IP address (Ex.: 192.168.1.1): *',
+    node = StringField('Cluster node IP address (Ex.: 192.168.1.1): *',
                        validators=[InputRequired(),
-                                   Length(min=1, max=50, message=('Node name/IP address must be between 1 and 50 '
-                                                                  'characters long.'))])
+                                   IPAddress(ipv4=True, message='Enter only IPv4 address format.')])
     node_type = StringField('Node type: *')
 
     username = StringField('Cluster node Username: *',
@@ -68,7 +68,7 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            node = models.Node(node=form.node.data,
+            node = models.Node(node=int(ipaddress.ip_address(form.node.data)),
                                status=2,
                                hostname=2,
                                username=form.username.data,
@@ -93,18 +93,18 @@ def create(request):
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['MiniSecBGP_tests'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_tests'] + arguments)
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--hostname=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
 
-            subprocess.Popen(['MiniSecBGP_config'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_config'] + arguments)
 
             home_dir = os.getcwd()
             command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
-                      '* * * * * minisecbgpuser %s/venv/bin/tests ' \
+                      '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_tests ' \
                       '--config-file=%s/minisecbgp.ini ' \
                       '--execution-type=\\"scheduled\\" ' \
                       '--hostname=\\"%s\\" ' \

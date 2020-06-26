@@ -13,63 +13,70 @@
 
       <form action="{{ request.route_url('clusterAction',action='create') }}" method="POST">
 
-        <div class="form-field">
-          <p><strong>Caution:</strong> before creating a cluster node make sure you are not performing a
-            <a href="{{ request.route_url('hijackRealisticAnalysis') }}">Realistic Analysis</a>.</p>
+        <div class="row-fluid">
+          <div class="form-field">
+            <p>
+              <strong>Caution:</strong> before creating a cluster node make sure you are not performing a
+              <a href="{{ request.route_url('hijackRealisticAnalysis') }}">Realistic Analysis</a>.
+            </p>
+          </div>
         </div>
 
-        <div class="form-field">
-          {{ form.node.label }}
-          {{ form.node }}
-          {% if form.node.errors %}
-            <ul class="errorMessage">
-              {% for error in form.node.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
+        <div class="row-fluid">
 
-        <div class="form-field">
-          {{ form.node_type.label }}
-          {{ form.node_type(disabled=True) }}
-          {% if form.node_type.errors %}
-            <ul class="errorMessage">
-              {% for error in form.node_type.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
+          <div class="form-field">
+            {{ form.node.label }}
+            {{ form.node }}
+            {% if form.node.errors %}
+              <ul class="errorMessage">
+                {% for error in form.node.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
 
-        <div class="form-field">
-          {{ form.username.label }}
-          {{ form.username }}
-          {% if form.username.errors %}
-            <ul class="errorMessage">
-              {% for error in form.username.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
+          <div class="form-field">
+            {{ form.node_type.label }}
+            {{ form.node_type(disabled=True) }}
+            {% if form.node_type.errors %}
+              <ul class="errorMessage">
+                {% for error in form.node_type.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
 
-        <div class="form-field">
-          {{ form.password.label }}
-          {{ form.password }}
-          <p>Obs., the password will not be stored anywhere.</p>
-          <p>It will be used to connect to the remote host using SSH only once.</p>
-          {% if form.password.errors %}
-            <ul class="errorMessage">
-              {% for error in form.password.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
+          <div class="form-field">
+            {{ form.username.label }}
+            {{ form.username }}
+            {% if form.username.errors %}
+              <ul class="errorMessage">
+                {% for error in form.username.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
 
-        <div class="form-button">
-          <button type="submit" name="form.submitted" value="Create" class="btn btn-primary">Add</button>
+          <div class="form-field">
+            {{ form.password.label }}
+            {{ form.password }}
+            <p>Obs., the password will not be stored anywhere.</p>
+            <p>It will be used to connect to the remote host using SSH only once.</p>
+            {% if form.password.errors %}
+              <ul class="errorMessage">
+                {% for error in form.password.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+
+          <div class="form-button">
+            <button type="submit" name="form.submitted" value="Create" class="btn btn-primary">Add</button>
+          </div>
         </div>
 
       </form>
