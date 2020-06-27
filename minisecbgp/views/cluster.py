@@ -232,7 +232,36 @@ def delete(request):
             css_class = 'errorMessage'
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
-        nodes = request.dbsession.query(models.Node).all()
+
+        nodes_temp = request.dbsession.query(models.Node).all()
+        nodes = list()
+        for n in nodes_temp:
+            nodes.append({'id': n.id,
+                          'node': str(ipaddress.ip_address(n.node)),
+                          'status': n.status,
+                          'hostname': n.hostname,
+                          'hostname_status': n.hostname_status,
+                          'username': n.username,
+                          'master': n.master,
+                          'service_ping': n.service_ping,
+                          'service_ssh': n.service_ssh,
+                          'service_ssh_status': n.service_ssh_status,
+                          'all_services': n.all_services,
+                          'conf_user': n.conf_user,
+                          'conf_user_status': n.conf_user_status,
+                          'conf_ssh': n.conf_ssh,
+                          'conf_ssh_status': n.conf_ssh_status,
+                          'install_remote_prerequisites': n.install_remote_prerequisites,
+                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
+                          'install_mininet': n.install_mininet,
+                          'install_mininet_status': n.install_mininet_status,
+                          'install_containernet': n.install_containernet,
+                          'install_containernet_status': n.install_containernet_status,
+                          'install_metis': n.install_metis,
+                          'install_metis_status': n.install_metis_status,
+                          'install_maxinet': n.install_maxinet,
+                          'install_maxinet_status': n.install_maxinet_status,
+                          'all_install': n.all_install})
 
         dictionary = dict()
         dictionary['nodes'] = nodes

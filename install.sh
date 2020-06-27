@@ -76,11 +76,11 @@ update() {
 }
 
 
-configure_hosts() {
-        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux hosts File ...'
-        sudo sed --i '/MiniSecBGP_master/d' /etc/hosts | sudo tee --append /etc/hosts
-        echo "$var_ip MiniSecBGP_master" | sudo tee --append /etc/hosts
-}
+#configure_hosts() {
+#        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux hosts File ...'
+#        sudo sed --i '/MiniSecBGP_master/d' /etc/hosts | sudo tee --append /etc/hosts
+#        echo "$var_ip MiniSecBGP_master" | sudo tee --append /etc/hosts
+#}
 
 
 install_Linux_reqs() {
@@ -225,7 +225,7 @@ PROJECT_NAME=MiniSecBGP
 welcome;
 network_address;
 update;
-configure_hosts;
+#configure_hosts;
 install_Linux_reqs;
 virtualenv;
 install_Python_reqs;

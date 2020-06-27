@@ -349,6 +349,8 @@ class ConfigClusterNode(object):
             if self.node.status == 0:
                 install_maxinet = 0
                 install_maxinet_status = ''
+
+                # install MaxiNet on all cluster nodes
                 commands = ['git clone git://github.com/MaxiNet/MaxiNet.git',
                             'cd /home/minisecbgpuser/MaxiNet;'
                             'git checkout v1.2;'
@@ -365,39 +367,6 @@ class ConfigClusterNode(object):
                             install_maxinet = 1
                             install_maxinet_status = command_error_warning[:10]
 
-                # configure MaxiNet.cfg on Master
-                command = 'sudo -u minisecbgpuser bash -c \'' \
-                          'echo "[all]\n' \
-                          'password = MiniSecBGP\n' \
-                          'controller = MiniSecBGP_master:6633\n' \
-                          'logLevel = ERROR\n' \
-                          'port_ns = 9090\n' \
-                          'port_sshd = 5345\n' \
-                          'runWith1500MTU = False\n' \
-                          'useMultipleIPs = 0\n' \
-                          'deactivateTSO = True\n' \
-                          'sshuser = minisecbgpuser\n' \
-                          'usesudo = True\n' \
-                          'useSTT = False\n\n' \
-                          '[FrontendServer]\n' \
-                          'ip = MiniSecBGP_master\n' \
-                          'threadpool = 256\n" | sudo tee /etc/MaxiNet.cfg\''
-                result = local_command.local_command(command)
-                if result[0] == 1:
-                    install_maxinet = result[0]
-                    install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
-
-                for server in self.nodes:
-                    command = 'sudo -u minisecbgpuser bash -c \'' \
-                              'echo "[%s]\n' \
-                              'ip = %s\n' \
-                              'share = 1\n" | sudo tee --append /etc/MaxiNet.cfg\'' % \
-                              (server.node, server.node)
-                    result = local_command.local_command(command)
-                    if result[0] == 1:
-                        install_maxinet = result[0]
-                        install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
-
                 # create MaxiNetFrontendServer and MaxiNetWorker services (on Master)
                 if self.node.master == 1:
                     command = 'sudo -u minisecbgpuser bash -c \'' \
@@ -407,7 +376,7 @@ class ConfigClusterNode(object):
                               '[Service]\n' \
                               'ExecStart=/usr/local/bin/MaxiNetFrontendServer\n\n' \
                               '[Install]\n' \
-                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetFrontendServer.service\';' \
+                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetFrontendServer.service; \'; ' \
                               'sudo -u minisecbgpuser bash -c \'' \
                               'echo "[Unit]\n' \
                               'Description=MaxiNetWorker\n' \
@@ -415,59 +384,102 @@ class ConfigClusterNode(object):
                               '[Service]\n' \
                               'ExecStart=/usr/local/bin/MaxiNetWorker\n\n' \
                               '[Install]\n' \
-                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetWorker.service\''
+                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/MaxiNetWorker.service; \'; ' \
+                              'sudo -u minisecbgpuser bash -c \'' \
+                              'sudo systemctl daemon-reload; ' \
+                              'sudo systemctl enable MaxiNetFrontendServer; \''
                     result = local_command.local_command(command)
                     if result[0] == 1:
                         install_maxinet = result[0]
                         install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
-                # restart MaxiNet services (MaxiNetFrontendServer and MaxiNetWorker) on MiniSecBGP Master cluster node
-                command = 'sudo -u minisecbgpuser bash -c \'' \
-                          'sudo systemctl daemon-reload; ' \
-                          'sudo systemctl enable MaxiNetFrontendServer; ' \
-                          'sudo systemctl restart MaxiNetFrontendServer; ' \
-                          'sleep 5; ' \
-                          'sudo systemctl enable MaxiNetWorker; ' \
-                          'sudo systemctl restart MaxiNetWorker\''
-                result = local_command.local_command(command)
-                if result[0] == 1:
-                    install_maxinet = result[0]
-                    install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
-
-                # send MaxiNet.cfg and MaxiNetWorker.service files to all Workers cluster nodes. Restart MaxiNetWorker service.
-                command = 'grep MiniSecBGP_master /etc/hosts'
-                result = local_command.local_command(command)
-                MiniSecBGP_master = str(result[1].decode())
-
+                # configure MaxiNet.cfg
                 for server in self.nodes:
-                    if server.master != 1:
+                    if server.master == 1:
                         command = 'sudo -u minisecbgpuser bash -c \'' \
-                                  'scp -o StrictHostKeyChecking=no /etc/MaxiNet.cfg minisecbgpuser@%s:/home/minisecbgpuser; ' \
-                                  'scp -o StrictHostKeyChecking=no /etc/systemd/system/MaxiNetWorker.service minisecbgpuser@%s:/home/minisecbgpuser\'' \
-                                  % (server.node, server.node)
+                                  'echo "[all]\n' \
+                                  'password = MiniSecBGP\n' \
+                                  'controller = %s:6633\n' \
+                                  'logLevel = ERROR\n' \
+                                  'port_ns = 9090\n' \
+                                  'port_sshd = 5345\n' \
+                                  'runWith1500MTU = False\n' \
+                                  'useMultipleIPs = 0\n' \
+                                  'deactivateTSO = True\n' \
+                                  'sshuser = minisecbgpuser\n' \
+                                  'usesudo = True\n' \
+                                  'useSTT = False\n\n' \
+                                  '[FrontendServer]\n' \
+                                  'ip = %s\n' \
+                                  'threadpool = 256\n" | sudo tee /etc/MaxiNet.cfg; \'' % \
+                                  (ipaddress.ip_address(server.node), ipaddress.ip_address(server.node))
                         result = local_command.local_command(command)
                         if result[0] == 1:
                             install_maxinet = result[0]
                             install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
-                        commands = ['sudo sed --i \'/MiniSecBGP_master/d\' /etc/hosts | sudo tee --append /etc/hosts',
-                                    'echo "%s" | sudo tee --append /etc/hosts' % MiniSecBGP_master,
-                                    'sudo mv /home/minisecbgpuser/MaxiNet.cfg /etc/MaxiNet.cfg',
-                                    'sudo mv /home/minisecbgpuser/MaxiNetWorker.service /etc/systemd/system/MaxiNetWorker.service',
-                                    'sudo systemctl daemon-reload',
-                                    'sudo systemctl enable MaxiNetWorker',
-                                    'sudo systemctl restart MaxiNetWorker']
-                        for command in commands:
-                            service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
-                                ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
-                        if service_ssh == 1:
-                            self.node.status = self.node.install_maxinet = service_ssh
-                            self.node.install_maxinet_status = install_maxinet_status + service_ssh_status[:10]
-                            return
-                        else:
-                            if command_status != 0:
-                                install_maxinet = 1
-                                install_maxinet_status = install_maxinet_status + command_error_warning[:10]
+                    command = 'sudo -u minisecbgpuser bash -c \'' \
+                              'echo "[%s]\n' \
+                              'ip = %s\n' \
+                              'share = 1\n" | sudo tee --append /etc/MaxiNet.cfg; \'' % \
+                              (ipaddress.ip_address(server.node), ipaddress.ip_address(server.node))
+                    result = local_command.local_command(command)
+                    if result[0] == 1:
+                        install_maxinet = result[0]
+                        install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                # send MaxiNet.cfg and MaxiNetWorker.service files to all Workers cluster nodes
+                for server in self.nodes:
+                    if server.master != 1:
+                        command = 'sudo -u minisecbgpuser bash -c \'' \
+                                  'scp -o StrictHostKeyChecking=no /etc/MaxiNet.cfg minisecbgpuser@%s:/home/minisecbgpuser; ' \
+                                  'scp -o StrictHostKeyChecking=no /etc/systemd/system/MaxiNetWorker.service minisecbgpuser@%s:/home/minisecbgpuser; ' \
+                                  'ssh %s sudo mv /home/minisecbgpuser/MaxiNet.cfg /etc/MaxiNet.cfg; ' \
+                                  'ssh %s sudo mv /home/minisecbgpuser/MaxiNetWorker.service /etc/systemd/system/MaxiNetWorker.service; \'' \
+                                  % (server.node, server.node, server.node, server.node)
+                        result = local_command.local_command(command)
+                        if result[0] == 1:
+                            install_maxinet = result[0]
+                            install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                # configure /etc/hosts on all cluster nodes
+                for server in self.nodes:
+                    command = 'sudo -u minisecbgpuser bash -c \'' \
+                              'ssh %s "sudo sed --i \\"/# MiniSecBGP cluster node/d\\" /etc/hosts | sudo tee --append /etc/hosts;"; \'' % server.node
+                    result = local_command.local_command(command)
+                    if result[0] == 1:
+                        install_maxinet = result[0]
+                        install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                    for host in self.nodes:
+                        command = 'sudo -u minisecbgpuser bash -c \'' \
+                                  'ssh %s "echo %s %s \# MiniSecBGP cluster node | sudo tee --append /etc/hosts"; \'' \
+                                  % (server.node, ipaddress.ip_address(host.node), host.hostname_status)
+                        result = local_command.local_command(command)
+                        if result[0] == 1:
+                            install_maxinet = result[0]
+                            install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                # restart MaxiNet services (MaxiNetFrontendServer and MaxiNetWorker) on all cluster nodes
+                for server in self.nodes:
+                    if server.master == 1:
+                        command = 'sudo -u minisecbgpuser bash -c \'' \
+                                  'sudo systemctl restart MaxiNetFrontendServer; ' \
+                                  'sleep 5; \''
+                        result = local_command.local_command(command)
+                        if result[0] == 1:
+                            install_maxinet = result[0]
+                            install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
+
+                    command = 'sudo -u minisecbgpuser bash -c \'' \
+                              'ssh %s sudo systemctl daemon-reload; ' \
+                              'ssh %s sudo systemctl enable MaxiNetWorker; ' \
+                              'ssh %s sudo systemctl restart MaxiNetWorker; \'' % \
+                              (server.node, server.node, server.node)
+                    result = local_command.local_command(command)
+                    if result[0] == 1:
+                        install_maxinet = result[0]
+                        install_maxinet_status = install_maxinet_status + str(result[2].decode()[:10])
 
                 self.node.all_install = self.node.status = self.node.install_maxinet = install_maxinet
                 self.node.install_maxinet_status = install_maxinet_status[:240]
