@@ -141,7 +141,7 @@ def create(request):
                       '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_tests ' \
                       '--config-file=%s/minisecbgp.ini ' \
                       '--execution-type=\\"scheduled\\" ' \
-                      '--hostname=\\"%s\\" ' \
+                      '--target-ip-address=\\"%s\\" ' \
                       '--username=\\"\\" ' \
                       '--password=\\"\\"" | ' \
                       'sudo tee /etc/cron.d/minisecbgp_tests_%s\'' % \

@@ -38,7 +38,7 @@ class DownloadTopology(object):
                         return
                 urllib.request.urlretrieve(downloadParameters.url + databases[0] + '.txt.bz2',
                                            '/tmp/' + databases[0] + '.txt.bz2')
-                arguments = ['--config-file=%s/minisecbgp.ini' % self.topology_path,
+                arguments = ['--config-file=minisecbgp.ini' % self.topology_path,
                              '--file=%s.txt.bz2' % databases[0]]
                 subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_topology'] + arguments)
 
