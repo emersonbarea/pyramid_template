@@ -375,7 +375,7 @@ class ConfigClusterNode(object):
                               'Description=Pox Controller\n' \
                               'After=syslog.target network.target\n\n' \
                               '[Service]\n' \
-                              'ExecStart=/home/minisecbgpuser/pox.py forwarding.l2_learning\n\n' \
+                              'ExecStart=/home/minisecbgpuser/pox/pox.py forwarding.l2_learning\n\n' \
                               '[Install]\n' \
                               'WantedBy=default.target\n" | sudo tee /etc/systemd/system/pox.service; \'; ' \
                               'sudo -u minisecbgpuser bash -c \'' \
