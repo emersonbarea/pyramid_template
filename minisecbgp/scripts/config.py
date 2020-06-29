@@ -372,6 +372,14 @@ class ConfigClusterNode(object):
                 if self.node.master == 1:
                     command = 'sudo -u minisecbgpuser bash -c \'' \
                               'echo "[Unit]\n' \
+                              'Description=Pox Controller\n' \
+                              'After=syslog.target network.target\n\n' \
+                              '[Service]\n' \
+                              'ExecStart=/home/minisecbgpuser/pox.py forwarding.l2_learning\n\n' \
+                              '[Install]\n' \
+                              'WantedBy=default.target\n" | sudo tee /etc/systemd/system/pox.service; \'; ' \
+                              'sudo -u minisecbgpuser bash -c \'' \
+                              'echo "[Unit]\n' \
                               'Description=MaxiNetFrontendServer\n' \
                               'After=syslog.target network.target\n\n' \
                               '[Service]\n' \
@@ -474,9 +482,11 @@ class ConfigClusterNode(object):
 
                     command = 'sudo -u minisecbgpuser bash -c \'' \
                               'ssh %s sudo systemctl daemon-reload; ' \
+                              'ssh %s sudo systemctl enable pox; ' \
+                              'ssh %s sudo systemctl restart pox; ' \
                               'ssh %s sudo systemctl enable MaxiNetWorker; ' \
                               'ssh %s sudo systemctl restart MaxiNetWorker; \'' % \
-                              (server.node, server.node, server.node)
+                              (server.node, server.node, server.node, server.node, server.node)
                     result = local_command.local_command(command)
                     if result[0] == 1:
                         install_maxinet = result[0]
