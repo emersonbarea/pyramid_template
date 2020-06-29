@@ -18,7 +18,6 @@ requires = [
     'alembic',
     'pyramid_tm',
     'pyramid_retry',
-    #'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'psycopg2',
     'wtforms',

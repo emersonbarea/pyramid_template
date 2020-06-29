@@ -42,7 +42,7 @@ class ConfigClusterNode(object):
                 for server in self.nodes:
                     if server.hostname_status == command_output and server.id != self.node.id:
                         self.node.status = self.node.hostname = 1
-                        self.node.hostname_status = 'Hostname already configured on another cluster node: %s' % server.node
+                        self.node.hostname_status = 'Hostname already configured on another cluster node: %s' % ipaddress.ip_address(server.node)
                         return
             self.node.hostname = hostname
             self.node.hostname_status = hostname_status
@@ -176,7 +176,8 @@ class ConfigClusterNode(object):
                 commands = ['sudo apt update',
                             'sudo apt upgrade -y',
                             'sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
-                            'pip3 install --upgrade --force-reinstall -U Pyro4']
+                            'pip3 install --upgrade --force-reinstall -U Pyro4',
+                            'sudo timedatectl set-timezone America/Sao_Paulo']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.target_ip_address, 'minisecbgpuser', self.password, command)
@@ -422,7 +423,7 @@ class ConfigClusterNode(object):
                               'echo "[%s]\n' \
                               'ip = %s\n' \
                               'share = 1\n" | sudo tee --append /etc/MaxiNet.cfg; \'' % \
-                              (ipaddress.ip_address(server.node), ipaddress.ip_address(server.node))
+                              (server.hostname_status, ipaddress.ip_address(server.node))
                     result = local_command.local_command(command)
                     if result[0] == 1:
                         install_maxinet = result[0]
