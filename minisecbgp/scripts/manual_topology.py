@@ -39,10 +39,11 @@ class ManualTopology(object):
             return error
 
         try:
+            list_autonomous_system = list()
+            list_router_id_ip_address = list()
             list_region_autonomous_system = list()
             list_region_internet_exchange_point = list()
             list_autonomous_system_internet_exchange_point = list()
-            list_autonomous_system = list()
             list_internet_exchange_point = list()
             list_type_of_user = list()
             list_type_of_user_number = list()
@@ -56,6 +57,7 @@ class ManualTopology(object):
             for row1 in range(len(data['autonomous_systems'])):
                 list_autonomous_system.append(data['autonomous_systems'][row1]['autonomous_system'])
                 list_region_autonomous_system.append(data['autonomous_systems'][row1]['region'])
+                list_router_id_ip_address.append(data['autonomous_systems'][row1]['router_id'])
 
                 for row2 in range(len(data['autonomous_systems'][row1]['internet_exchange_points'])):
                     list_autonomous_system_internet_exchange_point.append(data['autonomous_systems'][row1]['autonomous_system'])
@@ -75,7 +77,7 @@ class ManualTopology(object):
 
                 for row5 in range(len(data['autonomous_systems'][row1]['prefixes'])):
                     list_prefix_autonomous_system.append(data['autonomous_systems'][row1]['autonomous_system'])
-                    list_prefix.append(int(ipaddress.ip_address(data['autonomous_systems'][row1]['prefixes'][row5]['prefix'])))
+                    list_prefix.append(data['autonomous_systems'][row1]['prefixes'][row5]['prefix'])
                     list_prefix_mask.append(data['autonomous_systems'][row1]['prefixes'][row5]['mask'])
 
             # Region
@@ -127,6 +129,22 @@ class ManualTopology(object):
             # get Autonomous System ID
             autonomous_systems = dbsession.query(models.AutonomousSystem).filter_by(id_topology=id_topology).all()
 
+            # Router_id
+            df_router_id = pd.DataFrame({'id_autonomous_system': list_autonomous_system,
+                                         'router_id': list_router_id_ip_address})
+            df_router_id = df_router_id.dropna()
+            df_router_id.reset_index()
+            df_router_id.set_index('id_autonomous_system', inplace=True)
+            for autonomous_system in autonomous_systems:
+                df_router_id.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
+            df_router_id = df_router_id.reset_index().copy()
+            df_router_id.reset_index()
+            df_router_id.set_index('router_id', inplace=True)
+            for row in df_router_id.itertuples():
+                df_router_id.rename(index={row[0]: str(int(ipaddress.ip_address(row[0])))}, inplace=True)
+            df_router_id = df_router_id.reset_index().copy()
+            df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
+
             # Autonomous System in Internet eXchange Point
             df_autonomous_system_internet_exchange_point = pd.DataFrame(
                 {'id_autonomous_system': list_autonomous_system_internet_exchange_point,
@@ -156,9 +174,9 @@ class ManualTopology(object):
             df_autonomous_system_internet_exchange_point.reset_index()
             df_autonomous_system_internet_exchange_point.set_index('id_internet_exchange_point', inplace=True)
             for internet_exchange_point in internet_exchange_points:
-                df_autonomous_system_internet_exchange_point.\
-                    rename(index={str(internet_exchange_point.id_region) + internet_exchange_point.internet_exchange_point:
-                                                      internet_exchange_point.id}, inplace=True)
+                df_autonomous_system_internet_exchange_point.rename(index={str(
+                    internet_exchange_point.id_region) + internet_exchange_point.internet_exchange_point: internet_exchange_point.id},
+                                                                    inplace=True)
             df_autonomous_system_internet_exchange_point = df_autonomous_system_internet_exchange_point.reset_index().copy()
 
             df_autonomous_system_internet_exchange_point.to_sql('autonomous_system_internet_exchange_point',
@@ -233,11 +251,19 @@ class ManualTopology(object):
             df_prefix = pd.DataFrame({'id_autonomous_system': list_prefix_autonomous_system,
                                       'prefix': list_prefix,
                                       'mask': list_prefix_mask})
+            df_prefix = df_prefix.dropna()
             df_prefix.reset_index()
             df_prefix.set_index('id_autonomous_system', inplace=True)
             for autonomous_system in autonomous_systems:
                 df_prefix.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
             df_prefix = df_prefix.reset_index().copy()
+
+            df_prefix.reset_index()
+            df_prefix.set_index('prefix', inplace=True)
+            for row in df_prefix.itertuples():
+                df_prefix.rename(index={row[0]: str(int(ipaddress.ip_address(row[0])))}, inplace=True)
+            df_prefix = df_prefix.reset_index().copy()
+
             df_prefix.to_sql('prefix', con=dbsession.bind, if_exists='append', index=False)
 
             # Link

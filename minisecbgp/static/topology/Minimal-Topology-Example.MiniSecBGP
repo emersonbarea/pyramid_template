@@ -4,6 +4,7 @@
     {
       "autonomous_system": "65001",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -19,14 +20,15 @@
       "type_of_services": ["access"],
       "prefixes": [
         {
-          "prefix": "1.1.1.0",
-          "mask": 24
+          "prefix": null,
+          "mask": null
         }
       ]
     },
     {
       "autonomous_system": "65002",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,

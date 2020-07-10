@@ -3,7 +3,7 @@ import ipaddress
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
 from sqlalchemy import or_
-from wtforms import Form, SubmitField, IntegerField, SelectField, SelectMultipleField, widgets, StringField
+from wtforms import Form, SubmitField, IntegerField, SelectField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired
 from wtforms.widgets.html5 import NumberInput
 

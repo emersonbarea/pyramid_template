@@ -22,6 +22,7 @@ class Topology(Base):
     internet_exchange_point = relationship('InternetExchangePoint', foreign_keys='InternetExchangePoint.id_topology')
     type_of_user = relationship('TypeOfUser', foreign_keys='TypeOfUser.id_topology')
     type_of_service = relationship('TypeOfService', foreign_keys='TypeOfService.id_topology')
+    realistic_analysis = relationship('RealisticAnalysis', foreign_keys='RealisticAnalysis.id_topology')
     Index('IndexId_topology_type', id_topology_type)
 
 
@@ -32,6 +33,7 @@ class AutonomousSystem(Base):
     id_region = Column(Integer, ForeignKey('region.id'))
     autonomous_system = Column(BigInteger, nullable=False)
     stub = Column(Integer, nullable=False)          # 0 = not stub | 1 = stub
+    router_id = relationship('RouterId', foreign_keys='RouterId.id_autonomous_system')
     prefix = relationship('Prefix', foreign_keys='Prefix.id_autonomous_system')
     link_id_autonomous_system1 = relationship('Link', foreign_keys='Link.id_autonomous_system1')
     link_id_autonomous_system2 = relationship('Link', foreign_keys='Link.id_autonomous_system2')
@@ -39,9 +41,18 @@ class AutonomousSystem(Base):
     type_of_user_autonomous_system = relationship('TypeOfUserAutonomousSystem', foreign_keys='TypeOfUserAutonomousSystem.id_autonomous_system')
     type_of_service_autonomous_system = relationship('TypeOfServiceAutonomousSystem', foreign_keys='TypeOfServiceAutonomousSystem.id_autonomous_system')
     autonomous_system_internet_exchange_point = relationship('AutonomousSystemInternetExchangePoint', foreign_keys='AutonomousSystemInternetExchangePoint.id_autonomous_system')
+    realistic_analysis_detail = relationship('RealisticAnalysisDetail', foreign_keys='RealisticAnalysisDetail.id_autonomous_system')
     Index('IndexTopologyAS', id_topology, autonomous_system)
     Index('IndexId1_topology', id_topology)
     Index('IndexId1_region', id_region)
+
+
+class RouterId(Base):
+    __tablename__ = 'router_id'
+    id = Column(Integer, primary_key=True)
+    id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
+    router_id = Column(BigInteger, nullable=False)
+    Index('IndexId1_autonomous_system', id_autonomous_system)
 
 
 class Prefix(Base):
@@ -50,7 +61,7 @@ class Prefix(Base):
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     prefix = Column(BigInteger, nullable=False)
     mask = Column(Integer, nullable=False)
-    Index('IndexId1_autonomous_system', id_autonomous_system)
+    Index('IndexId2_autonomous_system', id_autonomous_system)
 
 
 class Link(Base):
@@ -125,7 +136,7 @@ class TypeOfUserAutonomousSystem(Base):
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     id_type_of_user = Column(Integer, ForeignKey('type_of_user.id'))
     number = Column(Integer)
-    Index('IndexId2_autonomous_system', id_autonomous_system)
+    Index('IndexId3_autonomous_system', id_autonomous_system)
     Index('IndexId_type_of_user', id_type_of_user)
 
 
@@ -143,7 +154,7 @@ class TypeOfServiceAutonomousSystem(Base):
     id = Column(Integer, primary_key=True)
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     id_type_of_service = Column(Integer, ForeignKey('type_of_service.id'))
-    Index('IndexId3_autonomous_system', id_autonomous_system)
+    Index('IndexId4_autonomous_system', id_autonomous_system)
     Index('IndexId_type_of_service', id_type_of_service)
 
 
@@ -177,7 +188,7 @@ class AutonomousSystemInternetExchangePoint(Base):
     id_internet_exchange_point = Column(Integer, ForeignKey('internet_exchange_point.id'))
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     Index('IndexId_internet_exchange_point', id_internet_exchange_point)
-    Index('IndexId4_autonomous_system', id_autonomous_system)
+    Index('IndexId5_autonomous_system', id_autonomous_system)
 
 
 class Color(Base):

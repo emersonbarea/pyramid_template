@@ -56,7 +56,6 @@
 
       <p><hr></p>
 
-
       <div class="form-field ">
         <p>{{ form.internet_exchange_point.label }}</p>
         <div class="form-inline form-check-inline frame-color">
@@ -202,7 +201,7 @@
             </div>
             <div class="modal-body">
               <p>Are you sure you really want to delete this Autonomous System?</p>
-              <p><strong>Attention: all links and prefixes of this AS will also be deleted!</strong></p>
+              <p><strong>Attention: all peering and prefixes of this AS will also be deleted!</strong></p>
             </div>
             <div class="modal-footer">
               <div class="form-group">
@@ -216,7 +215,7 @@
     </form>
 
     <p align="center">* Go to the correct page to create or edit <a href="{{ request.route_url('link', id_topology = topology.id) }}">
-      Links</a> and <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Prefixes</a>.</p>
+      Peering</a> and <a href="{{ request.route_url('prefix', id_topology = topology.id) }}">Prefixes</a>.</p>
 
   </div>
 

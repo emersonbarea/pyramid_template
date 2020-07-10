@@ -99,7 +99,7 @@ def update_topology(request):
         downloading = request.dbsession.query(models.DownloadingTopology).first()
         if downloading.downloading == 1:
             dictionary['message'] = 'Warning: there is an update process running in the background. ' \
-                      'Wait for it finish to access Manual Update again.'
+                      'Wait for it finish to access update topology again.'
             dictionary['css_class'] = 'warningMessage'
             dictionary['updating'] = downloading.downloading
             request.override_renderer = 'minisecbgp:templates/topology/realisticTopologiesUpdateTopology.jinja2'

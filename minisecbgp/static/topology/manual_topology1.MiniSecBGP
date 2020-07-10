@@ -4,6 +4,7 @@
     {
       "autonomous_system": "65001",
       "region": "north",
+      "router_id": "1.1.1.1",
       "internet_exchange_points": [
         {
           "internet_exchange_point": "IX-A",
@@ -52,6 +53,7 @@
     {
       "autonomous_system": "65002",
       "region": "north",
+      "router_id": "1.1.1.2",
       "internet_exchange_points": [
         {
           "internet_exchange_point": "IX-A",
@@ -86,6 +88,7 @@
     {
       "autonomous_system": "65003",
       "region": "south",
+      "router_id": "1.1.1.3",
       "internet_exchange_points": [
         {
           "internet_exchange_point": "IX-A",
@@ -127,6 +130,37 @@
           "mask": 24
         }
       ]
+    },
+    {
+      "autonomous_system": "65004",
+      "region": "south",
+      "router_id": "1.1.1.4",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": "IX-A",
+          "region": "south"
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": "business",
+          "number": 2000
+        },
+        {
+          "type_of_user": "household",
+          "number": 2000
+        }
+      ],
+      "type_of_services": [
+        "Application",
+        "Transit"
+      ],
+      "prefixes": [
+        {
+          "prefix": "27.0.0.0",
+          "mask": 24
+        }
+      ]
     }
   ],
   "links": [
@@ -144,23 +178,23 @@
     },
     {
       "source": "65001",
-      "destination": "65002",
-      "ip_source": "10.0.0.9",
-      "ip_destination": "10.0.0.10",
-      "mask": "30",
-      "description": "link test 2",
-      "agreement": "p2p",
-      "bandwidth": null,
-      "delay": null,
-      "load": null
-    },
-    {
-      "source": "65001",
       "destination": "65003",
       "ip_source": "10.0.0.5",
       "ip_destination": "10.0.0.6",
       "mask": "30",
       "description": "link test 3",
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65002",
+      "destination": "65004",
+      "ip_source": "10.0.0.9",
+      "ip_destination": "10.0.0.10",
+      "mask": "30",
+      "description": "link test 4",
       "agreement": "p2c",
       "bandwidth": null,
       "delay": null,

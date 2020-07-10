@@ -4,6 +4,7 @@
     {
       "autonomous_system": "65000",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -27,6 +28,7 @@
     {
       "autonomous_system": "1000",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -50,6 +52,7 @@
     {
       "autonomous_system": "1",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -73,6 +76,7 @@
     {
       "autonomous_system": "2",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -96,6 +100,7 @@
     {
       "autonomous_system": "3",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -119,6 +124,7 @@
     {
       "autonomous_system": "4",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -142,6 +148,7 @@
     {
       "autonomous_system": "5",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -165,6 +172,7 @@
     {
       "autonomous_system": "6",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -188,6 +196,7 @@
     {
       "autonomous_system": "7",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -211,6 +220,7 @@
     {
       "autonomous_system": "8",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,

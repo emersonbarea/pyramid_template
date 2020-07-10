@@ -11,6 +11,7 @@ from .topology import (
     TopologyType,
     Topology,
     AutonomousSystem,
+    RouterId,
     Prefix,
     Link,
     LinkAgreement,
@@ -26,6 +27,12 @@ from .topology import (
     InternetExchangePoint,
     AutonomousSystemInternetExchangePoint,
     Color)
+from .hijack import (
+    TopologyDistributionMethod,
+    EmulationPlatform,
+    RouterPlatform,
+    RealisticAnalysis,
+    RealisticAnalysisDetail)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

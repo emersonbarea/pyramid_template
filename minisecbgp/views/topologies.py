@@ -180,6 +180,7 @@ def topologies_draw(request):
         links = request.dbsession.query(models.Link).\
             filter_by(id_topology=request.matchdict["id_topology"]).all()
         dictionary['edges'] = links
+        dictionary['full_stub'] = 'FULL TOPOLOGY'
 
     except Exception as error:
         dictionary['message'] = error
@@ -254,6 +255,7 @@ def topologies_draw_stub(request):
                           'id_autonomous_system2': link.id_autonomous_system2,
                           'id_link_agreement': link.id_link_agreement})
         dictionary['edges'] = links
+        dictionary['full_stub'] = 'NON STUB TOPOLOGY'
 
     except Exception as error:
         dictionary['message'] = error

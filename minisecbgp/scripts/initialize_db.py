@@ -89,7 +89,8 @@ def setup_models(dbsession, master_ip_address):
     downloading = models.DownloadingTopology(downloading=0)
     dbsession.add(downloading)
 
-    # color
+    # Color
+
     colors = [{'background': 'FF0000', 'text': '000000'},
               {'background': '00FF00', 'text': '000000'},
               {'background': '0000FF', 'text': 'FFFFFF'},
@@ -140,6 +141,20 @@ def setup_models(dbsession, master_ip_address):
     for color in colors:
         dbsession.add(models.Color(background_color=color['background'],
                                    text_color=color['text']))
+
+    # Hijack
+
+    topology_distribution_methods = ['Customer Cone', 'Metis', 'Manual', 'Round Robin']
+    for topology_distribution_method in topology_distribution_methods:
+        dbsession.add(models.TopologyDistributionMethod(topology_distribution_method=topology_distribution_method))
+
+    emulation_platforms = ['Mininet', 'Docker']
+    for emulation_platform in emulation_platforms:
+        dbsession.add(models.EmulationPlatform(emulation_platform=emulation_platform))
+
+    router_platforms = ['Quagga']
+    for router_platform in router_platforms:
+        dbsession.add(models.RouterPlatform(router_platform=router_platform))
 
 
 def parse_args(config_file):

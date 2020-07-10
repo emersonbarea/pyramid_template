@@ -88,6 +88,21 @@ class RealisticTopology(object):
         df_autonomous_system.to_sql('autonomous_system', con=dbsession.bind, if_exists='append', index=False)
 
     @staticmethod
+    def automatic_router_id(dbsession, id_topology):
+        df_router_id = pd.read_sql(dbsession.query(models.AutonomousSystem.id).
+                                   filter_by(id_topology=id_topology).
+                                   order_by(models.AutonomousSystem.id.asc()).
+                                   statement, con=dbsession.bind)
+        df_router_id.columns = ['id_autonomous_system']
+        router_id_ip = 2147483647
+        list_router_id = list()
+        for row in df_router_id.itertuples():
+            list_router_id.append(router_id_ip)
+            router_id_ip = router_id_ip - 1
+        df_router_id['router_id'] = list_router_id
+        df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
+
+    @staticmethod
     def automatic_prefix(dbsession, id_topology):
         df_prefix = pd.read_sql(dbsession.query(models.AutonomousSystem.id).
                                 filter_by(id_topology=id_topology).
@@ -230,6 +245,10 @@ def main(argv=sys.argv[1:]):
         with env['request'].tm:
             dbsession = env['request'].dbsession
             t.autonomous_system(dbsession, id_topology, id_region, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems)
+
+        with env['request'].tm:
+            dbsession = env['request'].dbsession
+            t.automatic_router_id(dbsession, id_topology)
 
         with env['request'].tm:
             dbsession = env['request'].dbsession

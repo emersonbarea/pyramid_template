@@ -216,9 +216,11 @@ def delete(request):
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)
         try:
-            request.dbsession.query(models.Node).filter(models.Node.id == form.cluster_list.data).delete()
+            node = request.dbsession.query(models.Node).filter(models.Node.id == form.cluster_list.data).first()
+            host = str(ipaddress.ip_address(node.node))
+            request.dbsession.delete(node)
 
-            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/minisecbgp_tests_%s\'' % value
+            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/minisecbgp_tests_%s\'' % host
             result = local_command.local_command(command)
             if result[0] == 1:
                 print('Crontab delete error', str(result[2].decode()))

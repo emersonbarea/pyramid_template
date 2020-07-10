@@ -4,6 +4,7 @@
     {
       "autonomous_system": "65000",
       "region": "north",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-north-IXP",
@@ -27,6 +28,7 @@
     {
       "autonomous_system": "1000",
       "region": "south",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-south-IXP",
@@ -50,6 +52,7 @@
     {
       "autonomous_system": "1",
       "region": "west",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-west-IXP",
@@ -73,6 +76,7 @@
     {
       "autonomous_system": "2",
       "region": "east",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-east-IXP",
@@ -96,6 +100,7 @@
     {
       "autonomous_system": "3",
       "region": "northeast",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-northeast-IXP",
@@ -119,6 +124,7 @@
     {
       "autonomous_system": "4",
       "region": "southeast",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-southeast-IXP",
@@ -142,6 +148,7 @@
     {
       "autonomous_system": "5",
       "region": "midwest",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-midwest-IXP",
@@ -165,6 +172,7 @@
     {
       "autonomous_system": "6",
       "region": "bananal-island",
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": "middle-bananal-island-IXP",
@@ -188,6 +196,7 @@
     {
       "autonomous_system": "7",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,
@@ -211,6 +220,7 @@
     {
       "autonomous_system": "8",
       "region": null,
+      "router_id": null,
       "internet_exchange_points": [
         {
           "internet_exchange_point": null,

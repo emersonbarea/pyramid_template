@@ -1,6 +1,5 @@
 import ipaddress
 import os
-import subprocess
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden
@@ -96,10 +95,10 @@ class RealisticAnalysisDataForm(Form):
                                       coerce=int, validators=[InputRequired(message='Check at least one cluster node')])
     topology_distribution_method_list = SelectField('Choose how to spawn the topology on cluster nodes: ',
                                                     coerce=int, validators=[InputRequired()])
-    router_platform_list = SelectField('Choose which BGP router to use: ',
-                                       coerce=int, validators=[InputRequired()])
-    emulation_platform_list = SelectField('Choose which emulation platform to use: ',
-                                          coerce=int, validators=[InputRequired()])
+    router_platform = SelectField('Choose which BGP router to use: ',
+                                  coerce=int, validators=[InputRequired()])
+    emulation_platform = SelectField('Choose wich emulation platform to use: ',
+                                     coerce=int, validators=[InputRequired()])
 
 
 @view_config(route_name='hijack', renderer='minisecbgp:templates/hijack/hijackHistory.jinja2')
@@ -157,11 +156,119 @@ def hijackRealisticAnalysis(request):
         form.topology_distribution_method_list.choices = [(row.id, row.topology_distribution_method) for row in
                                                           request.dbsession.query(models.TopologyDistributionMethod)]
 
-        form.emulation_platform_list.choices = [(row.id, row.emulation_platform) for row in
-                                                request.dbsession.query(models.EmulationPlatform)]
+        form.emulation_platform.choices = [(row.id, row.emulation_platform) for row in
+                                           request.dbsession.query(models.EmulationPlatform)]
 
-        form.router_platform_list.choices = [(row.id, row.router_platform) for row in
-                                             request.dbsession.query(models.RouterPlatform)]
+        form.router_platform.choices = [(row.id, row.router_platform) for row in
+                                        request.dbsession.query(models.RouterPlatform)]
+
+        if request.method == 'POST' and form.validate():
+            try:
+                realistic_analysis = models.RealisticAnalysis(id_topology=form.topology_list.data,
+                                                              id_topology_distribution_method=form.topology_distribution_method_list.data,
+                                                              id_emulation_platform=form.emulation_platform.data,
+                                                              id_router_platform=form.router_platform.data,
+                                                              realistic_analysis=form.realistic_analysis.data)
+                request.dbsession.add(realistic_analysis)
+                request.dbsession.flush()
+            except IntegrityError:
+                request.dbsession.rollback()
+                dictionary['message'] = 'The Realistic Analysis name/description "%s" already exist. Choose another ' \
+                                        'name/description.' % form.realistic_analysis.data
+                dictionary['css_class'] = 'errorMessage'
+
+            if form.router_platform.data == 1:  # Quagga
+
+                df_autonomous_system = pd.read_sql(request.dbsession.query(models.AutonomousSystem).
+                                                   filter_by(id_topology=form.topology_list.data).statement,
+                                                   request.dbsession.bind,
+                                                   index_col=['id'])
+
+                df_link = pd.read_sql(request.dbsession.query(models.Link).
+                                      filter_by(id_topology=form.topology_list.data).statement,
+                                      request.dbsession.bind,
+                                      index_col=['id'])
+
+                df_link.reset_index()
+                df_link.set_index('id_autonomous_system1', inplace=True)
+                df_link = pd.concat([df_link, df_autonomous_system['autonomous_system']], axis=1, join='inner')
+                df_link = df_link.reset_index().rename(columns={'index': 'id_autonomous_system1'})
+                df_link = df_link.rename(columns={'autonomous_system': 'autonomous_system1'})
+
+                df_link.reset_index()
+                df_link.set_index('id_autonomous_system2', inplace=True)
+                df_link = pd.concat([df_link, df_autonomous_system['autonomous_system']], axis=1, join='inner')
+                df_link = df_link.reset_index().rename(columns={'index': 'id_autonomous_system2'})
+                df_link = df_link.rename(columns={'autonomous_system': 'autonomous_system2'})
+
+                df_link['link1'] = 'interface ' + \
+                                   df_link['autonomous_system1'].astype(str) + \
+                                   '-' + \
+                                   df_link['autonomous_system2'].astype(str) + \
+                                   '\nip address ' + \
+                                   [str(ipaddress.ip_address(i)) for i in df_link['ip_autonomous_system1']] + \
+                                   '/' + \
+                                   df_link['mask'].astype(str)
+
+                df_link['link2'] = 'interface ' + \
+                                   df_link['autonomous_system2'].astype(str) + \
+                                   '-' + \
+                                   df_link['autonomous_system1'].astype(str) + \
+                                   '\nip address ' + \
+                                   [str(ipaddress.ip_address(i)) for i in df_link['ip_autonomous_system2']] + \
+                                   '/' + \
+                                   df_link['mask'].astype(str)
+
+                df_link_temp_autonomous_system1 = df_link[['id_autonomous_system1', 'autonomous_system1', 'link1']]
+                df_link_temp_autonomous_system1.columns = ['id_autonomous_system', 'autonomous_system', 'link']
+                df_link_temp_autonomous_system2 = df_link[['id_autonomous_system2', 'autonomous_system2', 'link2']]
+                df_link_temp_autonomous_system2.columns = ['id_autonomous_system', 'autonomous_system', 'link']
+
+                df_realistic_analysis_detail = pd.concat([df_link_temp_autonomous_system1, df_link_temp_autonomous_system2], axis=0)
+                df_realistic_analysis_detail = \
+                    df_realistic_analysis_detail.groupby(['id_autonomous_system', 'autonomous_system'])['link'].apply(
+                        lambda x: '\n\n'.join(x.astype(str))).reset_index()
+
+                #pd.set_option('display.max_colwidth', None)
+                #print(df_y)
+                #os.system('echo "%s" > teste.txt' % df_y)
+
+                df_realistic_analysis_detail['link'] = '! -*- zebra -*-\n\nhostname ' + \
+                                                       df_realistic_analysis_detail.autonomous_system.map(str) + \
+                                                       '\npassword en\nenable password en\n\ninterface lo\nip address 127.0.0.1/32\n\n' + \
+                                                       df_realistic_analysis_detail.link.map(str) + \
+                                                       '\nlog file /tmp/' + df_realistic_analysis_detail.autonomous_system.map(str) + '.log'
+
+                #pd.set_option('display.max_colwidth', None)
+                #print(df_realistic_analysis_detail)
+                #os.system('echo "%s" > teste.txt' % df_realistic_analysis_detail)
+
+
+
+
+
+
+                # já posso fazer o route-map aqui
+                # --> aqui
+
+
+
+                #df_autonomous_system = df_autonomous_system.reset_index().rename(columns={'id': 'id_autonomous_system'})
+
+                #df_router_conf = pd.DataFrame(data=df_autonomous_system['id_autonomous_system'])
+                #df_router_conf.set_index('id_autonomous_system', inplace=True)
+                #df_link.set_index('id_autonomous_system1', inplace=True)
+                #print(df_router_conf)
+                #df_router_conf['router_conf'] = df_router_conf['router_conf'].astype(str)
+
+                #realistic_analysis_detail = {'id_autonomous_system': df_autonomous_system['id_autonomous_system'],
+                #                             'id_realistic_analysis': realistic_analysis.id}
+                #df_realistic_analysis_detail = pd.DataFrame(data=realistic_analysis_detail)
+
+                #print(df_realistic_analysis_detail)
+
+
+
 
         availability = True
         all_installs = request.dbsession.query(models.Node.all_install).all()
@@ -180,39 +287,6 @@ def hijackRealisticAnalysis(request):
 
         dictionary['form'] = form
         dictionary['availability'] = availability
-
-        if request.method == 'POST' and form.validate():
-            try:
-                realistic_analysis = models.RealisticAnalysis(id_topology=form.topology_list.data,
-                                                              id_topology_distribution_method=form.topology_distribution_method_list.data,
-                                                              id_emulation_platform=form.emulation_platform_list.data,
-                                                              id_router_platform=form.router_platform_list.data,
-                                                              realistic_analysis=form.realistic_analysis.data)
-                request.dbsession.add(realistic_analysis)
-                request.dbsession.flush()
-            except IntegrityError:
-                request.dbsession.rollback()
-                dictionary['message'] = 'The Realistic Analysis name/description "%s" already exist. Choose another ' \
-                                        'name/description.' % form.realistic_analysis.data
-                dictionary['css_class'] = 'errorMessage'
-                return dictionary
-
-            if form.stub.data:
-                topology_length = 'FULL'
-            else:
-                topology_length = 'STUB'
-            topology_distribution_method = (dict(form.topology_distribution_method_list.choices).get(form.topology_distribution_method_list.data)).upper()
-            emulation_platform = (dict(form.emulation_platform_list.choices).get(form.emulation_platform_list.data)).upper()
-            router_platform = (dict(form.router_platform_list.choices).get(form.router_platform_list.data)).upper()
-
-            arguments = ['--config-file=minisecbgp.ini',
-                         '--realistic-analysis-name=%s' % form.realistic_analysis.data,
-                         '--topology=%s' % form.topology_list.data,
-                         '--topology-length=%s' % topology_length,
-                         '--topology-distribution-method=%s' % topology_distribution_method,
-                         '--emulation-platform=%s' % emulation_platform,
-                         '--router-platform=%s' % router_platform]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_analysis'] + arguments)
 
     except Exception as error:
         request.dbsession.rollback()
