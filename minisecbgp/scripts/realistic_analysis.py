@@ -12,7 +12,7 @@ from sqlalchemy.exc import OperationalError
 
 class RealisticAnalysis(object):
     def __init__(self, realistic_analysis_name, id_topology, topology_length, topology_distribution_method, emulation_platform):
-        self.output_dir = '/tmp/MiniSecBGP/output/%s/' % realistic_analysis_name
+        self.output_dir = os.getcwd() + '/output/topology/%s/' % realistic_analysis_name
         self.id_topology = id_topology                                                          # id_topology
         self.topology_length = topology_length                                                  # STUB / FULL
         self.topology_distribution_method = topology_distribution_method                        # CUSTOMER CONE / METIS /MANUAL /ROUND ROBIN
@@ -106,6 +106,8 @@ class RealisticAnalysis(object):
         elif self.topology_length == 'FULL':
             self.sr_unique_as = sr_unique_as
 
+        self.sr_unique_as = self.sr_unique_as.sort_values(ascending=True)
+
         # print('Number of ASes: %s' % len(self.sr_unique_as))
         # print('Number of stub ASes: %s (Number of ASes not stub: %s)\n' % (len(self.sr_stub), len(self.sr_unique_as) - len(self.sr_stub)))
 
@@ -184,6 +186,22 @@ class RealisticAnalysis(object):
                 list_create_bgpd_prefix.append({'AS': int(row[3]), 'command': '  network %s\n' % (
                         str(ipaddress.ip_address(row[1])) + '/' + str(row[2]))})
 
+        list_startup_zebra_commands = list()
+        list_startup_bgpd_commands = list()
+        for AS in self.sr_unique_as.values:
+            # zebra startup commands
+            list_startup_zebra_commands.append('AS%s.cmd(\'./opt/quagga/sbin/zebra -f '
+                                               './AS/%s/zebra.conf -z '
+                                               './socket/%s.socket -i '
+                                               './pid/zebra-%s.pid > '
+                                               './log/zebra-%s.log &\')' % (AS, AS, AS, AS, AS))
+            # bgpd startup commands
+            list_startup_bgpd_commands.append('AS%s.cmd (\'./opt/quagga/sbin/bgpd -f '
+                                              './AS/%s/bgpd.conf -z '
+                                              './socket/%s.socket -i '
+                                              './pid/bgpd-%s.pid > '
+                                              './log/bgpd-%s.log &\')' % (AS, AS, AS, AS, AS))
+
         self.df_create_zebra_interfaces = pd.DataFrame(list_create_zebra_interfaces)
         self.df_create_zebra_interfaces.set_index('AS', inplace=True)
         self.df_create_bgpd_neighbor = pd.DataFrame(list_create_bgpd_neighbor)
@@ -192,6 +210,8 @@ class RealisticAnalysis(object):
         self.df_create_bgpd_prefix.set_index('AS', inplace=True)
         self.df_create_bgpd_router_id = pd.DataFrame(list_create_bgpd_router_id)
         self.df_create_bgpd_router_id.set_index('AS', inplace=True)
+        self.list_startup_zebra_commands = list_startup_zebra_commands
+        self.list_startup_bgpd_commands = list_startup_bgpd_commands
 
         # -------------->> topology STUB
 
@@ -201,7 +221,7 @@ class RealisticAnalysis(object):
         # pd.set_option('display.max_colwidth', None)
 
         # print(self.df_create_zebra_interfaces)
-        
+
         # AS      command
         # 65002   interface 65002-65004\n  ip address 10.0.0.9/30\n\n
         # 65004   interface 65004-65002\n  ip address 10.0.0.10/30\n\n
@@ -211,7 +231,7 @@ class RealisticAnalysis(object):
         # 65002   interface 65002-65001\n  ip address 10.0.0.2/30\n\n
 
         # print(self.df_create_bgpd_neighbor)
-        
+
         # AS        command
         # 65002     neighbor 10.0.0.10 remote-as 65004\n
         # 65004     neighbor 10.0.0.9 remote-as 65002\n
@@ -280,7 +300,10 @@ class RealisticAnalysis(object):
         # erase previews configuration
         if os.path.exists(self.output_dir):
             shutil.rmtree(self.output_dir)
-        os.makedirs(self.output_dir + 'ASes')
+        os.makedirs(self.output_dir + 'AS')
+        os.makedirs(self.output_dir + 'log')
+        os.makedirs(self.output_dir + 'pid')
+        os.makedirs(self.output_dir + 'socket')
 
         # Mininet
         with open(self.output_dir + 'topology.py', 'w') as file_topology:
@@ -291,44 +314,56 @@ class RealisticAnalysis(object):
                 file_topology.write(mininet_element + '\n')
             for mininet_link in self.list_create_mininet_links_commands:
                 file_topology.write(mininet_link + '\n')
+            with open('./minisecbgp/static/templates/mininet_middle.template', 'r') as file_to_read:
+                file_topology.write(file_to_read.read())
+            file_to_read.close()
+            for startup_zebra_command in self.list_startup_zebra_commands:
+                file_topology.write(startup_zebra_command + '\n')
+            for startup_bgpd_command in self.list_startup_bgpd_commands:
+                file_topology.write(startup_bgpd_command + '\n')
             with open('./minisecbgp/static/templates/mininet_end.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
         file_topology.close()
+        os.chmod(self.output_dir + 'topology.py', 0o755)
 
         for AS in self.sr_unique_as:
-            os.makedirs(self.output_dir + 'ASes/' + str(AS))
+            os.makedirs(self.output_dir + 'AS/' + str(AS))
 
         # zebra.conf and bgpd.conf header
         for AS in self.sr_unique_as:
-            with open(self.output_dir + 'ASes/' + str(AS) + '/zebra.conf', 'w') as file_zebra:
+            with open(self.output_dir + 'AS/' + str(AS) + '/zebra.conf', 'w') as file_zebra:
                 with open('./minisecbgp/static/templates/zebra.conf.template', 'r') as file_to_read_zebra:
                     file_zebra.write(file_to_read_zebra.read().replace('*AS*', str(AS)))
                 file_to_read_zebra.close()
-            with open(self.output_dir + 'ASes/' + str(AS) + '/bgpd.conf', 'w') as file_bgpd:
+            with open(self.output_dir + 'AS/' + str(AS) + '/bgpd.conf', 'w') as file_bgpd:
                 with open('./minisecbgp/static/templates/bgpd.conf.template', 'r') as file_to_read_bgpd:
                     file_bgpd.write(file_to_read_bgpd.read().replace('*AS*', str(AS)))
                 file_to_read_bgpd.close()
             file_zebra.close()
             file_bgpd.close()
+
         # zebra.conf interfaces
         for row in self.df_create_zebra_interfaces.itertuples():
-            with open(self.output_dir + 'ASes/' + str(row[0]) + '/zebra.conf', 'a') as file_zebra:
+            with open(self.output_dir + 'AS/' + str(row[0]) + '/zebra.conf', 'a') as file_zebra:
                 file_zebra.write(row[1])
             file_zebra.close()
+
         # bgpd.conf router ID
         for row in self.df_create_bgpd_router_id.itertuples():
-            with open(self.output_dir + 'ASes/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
+            with open(self.output_dir + 'AS/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
                 file_bgpd.write(row[1])
             file_bgpd.close()
+
         # bgpd.conf neighbor
         for row in self.df_create_bgpd_neighbor.itertuples():
-            with open(self.output_dir + 'ASes/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
+            with open(self.output_dir + 'AS/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
                 file_bgpd.write(row[1])
             file_bgpd.close()
+
         # bgpd.conf prefix
         for row in self.df_create_bgpd_prefix.itertuples():
-            with open(self.output_dir + 'ASes/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
+            with open(self.output_dir + 'AS/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
                 file_bgpd.write(row[1])
             file_bgpd.close()
 

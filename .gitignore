@@ -9,3 +9,4 @@ run_full.sh
 */alembic/versions/*.py
 showCluster.jinja2_bkp
 access.log
+output

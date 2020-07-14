@@ -30,6 +30,7 @@ welcome() {
 	    - Metis 5.1
 	    - Pyro 4
 	    - MaxiNet 1.2
+	    - Quagga 1.2
  	  - install MiniSecBGP application
 
 	Obs.: thank you MaxiNet install program (https://raw.githubusercontent.com/MaxiNet/MaxiNet/master/installer.sh)\n\n"
@@ -74,13 +75,6 @@ update() {
         sudo apt -f install -y;
         sudo apt autoremove -y;
 }
-
-
-#configure_hosts() {
-#        printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Linux hosts File ...'
-#        sudo sed --i '/MiniSecBGP_master/d' /etc/hosts | sudo tee --append /etc/hosts
-#        echo "$var_ip MiniSecBGP_master" | sudo tee --append /etc/hosts
-#}
 
 
 install_Linux_reqs() {
