@@ -91,9 +91,6 @@ def cluster(request):
                           'all_configurations': all_configurations,
                           'all_installs': all_installs})
 
-        for n in nodes:
-            print(n)
-
         dictionary['nodes'] = nodes
         dictionary['cluster_url'] = request.route_url('cluster')
         dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')

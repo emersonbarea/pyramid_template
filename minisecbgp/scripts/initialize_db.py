@@ -44,7 +44,7 @@ def setup_models(dbsession, master_ip_address):
     installs = [['prerequisites', 'Linux prerequisites', ''],
                 ['mininet', 'Mininet', 'http://www.mininet.org'],
                 ['containernet', 'Containernet', 'https://containernet.github.io/'],
-                ['programs', 'Metis', 'http://glaros.dtc.umn.edu/gkhome/metis/metis/overview'],
+                ['metis', 'Metis', 'http://glaros.dtc.umn.edu/gkhome/metis/metis/overview'],
                 ['maxinet', 'Maxinet', 'https://maxinet.github.io/'],
                 ['quagga', 'Quagga', 'https://www.quagga.net/']]
     for install in installs:

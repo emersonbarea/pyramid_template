@@ -44,7 +44,7 @@
              '\nservice: ' + ( {{ node.all_services }} == 0 ? 'OK' : ( {{ node.all_services }} == 1 ? 'ERROR' : 'Installing' ) ) +
              '\nconfig: ' + ( {{ node.all_configurations }} == 0 ? 'OK' : ( {{ node.all_configurations }} == 1 ? 'ERROR' : 'Installing' ) ) +
              '\ninstall: ' + ( {{ node.all_installs }} == 0 ? 'OK' : ( {{ node.all_installs }} == 1 ? 'ERROR' : 'Installing' ) ) ),
-             image: DIR + ( '{{ node.master }}' == 'worker' ? 'computer.png' : ( '{{ node.master }}' == 'master' ? 'server.png' : 'webadmin.png')),
+             image: DIR + ( '{{ node.master }}' == 'worker' ? 'computer.png' : ( '{{ node.master }}' == 'master' ? 'server.png')),
              shape: 'image',
              url: '{{ cluster_detail_url }}{{ node.id }}'
             },
