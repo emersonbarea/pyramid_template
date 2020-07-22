@@ -142,9 +142,6 @@ install_app() {
 
         MiniSecBGP_node_service --config-file=minisecbgp.ini --execution-type='manual' --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
-	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
-* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_node_service --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --node-ip-address="'$var_ip'" --username="" --password=""' | sudo tee /etc/cron.d/MiniSecBGP_node_service_$HOSTNAME
-
 	      MiniSecBGP_node_configuration --config-file=minisecbgp.ini --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
 	      MiniSecBGP_node_install --config-file=minisecbgp.ini --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD

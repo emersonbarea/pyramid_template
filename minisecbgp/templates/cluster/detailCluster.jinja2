@@ -5,7 +5,7 @@
 <div id="aum" class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-      <h3 align="center">Node Detail: {{ node.hostname_status }} </h3>
+      <h3 align="center">Node Detail: {{ node.node }} </h3>
     </div>
   </div>
   <div class="row-fluid">
@@ -15,119 +15,71 @@
 
       <p><b>Node ID :</b> {{ node.id }}</p>
       <p><b>Node :</b> {{ node.node }}</p>
-      <p><b>Hostname :</b>
-        {% if node.hostname == 0 %}
-          <font color="green"> {{ node.hostname_status }} </font>
-        {% elif node.hostname == 1 %}
-          <font color="red">ERROR: {{ node.hostname_status }} </font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
-      <p><b>Original username :</b> {{ node.username }}</p>
+      <p><b>Hostname :</b> {{ node.hostname }}</p>
       <p><b>Node type :</b>
-        {% if node.master == 0 %}
-          Worker
-        {% elif node.master == 1 %}
+        {% if node.master %}
           Master
+        {% else %}
+          Worker
         {% endif %}
       </p>
 
       <hr>
+
       <h4 align="center">Services status</h4>
-
-      <p><b>Ping :</b>
-        {% if node.service_ping == 0 %}
-          <font color="green">OK</font>
-        {% elif node.service_ping == 1 %}
-          <font color="red">ERROR</font>
+      {% for service in services %}
+        {% if service.Service.url %}
+          <p><b><a href=" {{ service.Service.url }} " target="_blank"> {{ service.Service.description }} :</a></b>
         {% else %}
-          <font color="orange">Installing... (wait)</font>
+          <p><b>{{ service.Service.description }} :</b>
         {% endif %}
-      </p>
-
-      <p><b>SSH (connection made with the original user - tested only once):</b>
-        {% if node.service_ssh == 0 %}
-          <font color="green">OK</font>
-        {% elif node.service_ssh == 1 %}
-          <font color="red">ERROR: {{ node.service_ssh_status }} </font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
+          {% if service.NodeService.status == 0 %}
+            <font color="green">OK {{ service.NodeService.log }} </font>
+          {% elif service.NodeService.status == 1 %}
+            <font color="red">ERROR {{ service.NodeService.log }} </font>
+          {% elif service.NodeService.status == 2 %}
+            <font color="orange">wait (installing...) {{ service.NodeService.log }} </font>
+          {% endif %}
+        </p>
+      {% endfor %}
 
       <hr>
-      <h4 align="center">Config / install status</h4>
 
-      <p><b>User "minisecbgp" :</b>
-        {% if node.conf_user == 0 %}
-          <font color="green">OK: {{ node.conf_user_status }}</font>
-        {% elif node.conf_user == 1 %}
-          <font color="red">ERROR: {{ node.conf_user_status }}</font>
+      <h4 align="center">Configuration status</h4>
+      {% for configuration in configurations %}
+        {% if configuration.Configuration.url %}
+          <p><b><a href=" {{ configuration.Configuration.url }} " target="_blank"> {{ configuration.Configuration.description }} :</a></b>
         {% else %}
-          <font color="orange">Installing... (wait)</font>
+          <p><b>{{ configuration.Configuration.description }} :</b>
         {% endif %}
-      </p>
+          {% if configuration.NodeConfiguration.status == 0 %}
+            <font color="green">OK {{ configuration.NodeConfiguration.log }} </font>
+          {% elif configuration.NodeConfiguration.status == 1 %}
+            <font color="red">ERROR {{ configuration.NodeConfiguration.log }} </font>
+          {% elif configuration.NodeConfiguration.status == 2 %}
+            <font color="orange">wait (installing...) {{ configuration.NodeConfiguration.log }} </font>
+          {% endif %}
+        </p>
+      {% endfor %}
 
-      <p><b>SSH config (minisecbgpuser connection) :</b>
-        {% if node.conf_ssh == 0 %}
-          <font color="green">OK: {{ node.conf_ssh_status }}</font>
-        {% elif node.conf_ssh == 1 %}
-          <font color="red">ERROR: {{ node.conf_ssh_status }}</font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
+      <hr>
 
-      <p><b>Install remote prerequisites :</b>
-        {% if node.install_remote_prerequisites == 0 %}
-          <font color="green">OK: {{ node.install_remote_prerequisites_status }}</font>
-        {% elif node.install_remote_prerequisites == 1 %}
-          <font color="red">ERROR: {{ node.install_remote_prerequisites_status }}</font>
+      <h4 align="center">Installation status</h4>
+      {% for install in installs %}
+        {% if install.Install.url %}
+          <p><b><a href=" {{ install.Install.url }} " target="_blank"> {{ install.Install.description }} :</a></b>
         {% else %}
-          <font color="orange">Installing... (wait)</font>
+          <p><b>{{ install.Install.description }} :</b>
         {% endif %}
-      </p>
-
-      <p><b><a href="http://mininet.org/" target="_blank">Mininet :</a></b>
-        {% if node.install_mininet == 0 %}
-          <font color="green">OK: {{ node.install_mininet_status }}</font>
-        {% elif node.install_mininet == 1 %}
-          <font color="red">ERROR: {{ node.install_mininet_status }}</font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
-
-      <p><b><a href="https://containernet.github.io/" target="_blank">Containernet :</a></b>
-        {% if node.install_containernet == 0 %}
-          <font color="green">OK: {{ node.install_containernet_status }}</font>
-        {% elif node.install_containernet == 1 %}
-          <font color="red">ERROR: {{ node.install_containernet_status }}</font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
-
-      <p><b><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview" target="_blank">Metis :</a></b>
-        {% if node.install_metis == 0 %}
-          <font color="green">OK: {{ node.install_metis_status }}</font>
-        {% elif node.install_metis == 1 %}
-          <font color="red">ERROR: {{ node.install_metis_status }}</font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
-
-      <p><b><a href="https://maxinet.github.io/" target="_blank">Maxinet :</a></b>
-        {% if node.install_maxinet == 0 %}
-          <font color="green">OK: {{ node.install_maxinet_status }}</font>
-        {% elif node.install_maxinet == 1 %}
-          <font color="red">ERROR: {{ node.install_maxinet_status }}</font>
-        {% else %}
-          <font color="orange">Installing... (wait)</font>
-        {% endif %}
-      </p>
+          {% if install.NodeInstall.status == 0 %}
+            <font color="green">OK {{ install.NodeInstall.log }} </font>
+          {% elif install.NodeInstall.status == 1 %}
+            <font color="red">ERROR {{ install.NodeInstall.log }} </font>
+          {% elif install.NodeInstall.status == 2 %}
+            <font color="orange">wait (installing...) {{ install.NodeInstall.log }} </font>
+          {% endif %}
+        </p>
+      {% endfor %}
 
     </div>
 

@@ -1,6 +1,7 @@
 import argparse
 import getopt
 import ipaddress
+import os
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
@@ -185,6 +186,45 @@ class ConfigClusterNode(object):
             self.dbsession.rollback()
             print('Database error for ssh configuration on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
 
+    def configure_crontab(self):
+        print('Configuring crontab ...')
+        try:
+            node_configuration = self.dbsession.query(models.Node, models.NodeConfiguration, models.Configuration). \
+                filter(models.Node.node == self.node_ip_address). \
+                filter(models.Node.id == models.NodeConfiguration.id_node). \
+                filter(models.NodeConfiguration.id_configuration == models.Configuration.id). \
+                filter(models.Configuration.configuration == 'crontab').first()
+
+            if node_configuration_status(self.dbsession, self.node_ip_address):
+                home_dir = os.getcwd()
+                command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
+                          '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_node_service ' \
+                          '--config-file=%s/minisecbgp.ini ' \
+                          '--execution-type=\\"scheduled\\" ' \
+                          '--node-ip-address=\\"%s\\" ' \
+                          '--username=\\"\\" ' \
+                          '--password=\\"\\"" | ' \
+                          'sudo tee /etc/cron.d/MiniSecBGP_node_service_%s\'' % \
+                          (ipaddress.ip_address(self.node_ip_address), home_dir, home_dir,
+                           ipaddress.ip_address(self.node_ip_address), self.node_ip_address)
+                result = local_command.local_command(command)
+                if result[0] == 1:
+                    node_configuration.NodeConfiguration.status = 1
+                    node_configuration.NodeConfiguration.log = str(result[2].decode())
+                    self.dbsession.flush()
+                    return
+
+                node_configuration.NodeConfiguration.status = 0
+                node_configuration.NodeConfiguration.log = ''
+            else:
+                node_configuration.NodeConfiguration.status = 1
+                node_configuration.NodeConfiguration.log = 'Aborted'
+
+            self.dbsession.flush()
+        except Exception as error:
+            self.dbsession.rollback()
+            print('Database error for crontab configuration on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+
 
 def parse_args(config_file):
     parser = argparse.ArgumentParser()
@@ -236,5 +276,6 @@ def main(argv=sys.argv[1:]):
             ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
             ccn.create_minisecbgpuser()
             ccn.configure_ssh()
+            ccn.configure_crontab()
     except OperationalError:
         print('Database error')

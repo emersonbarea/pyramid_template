@@ -16,8 +16,6 @@ class ClusterDataForm(Form):
     node = StringField('Cluster node IP address (Ex.: 192.168.1.1): *',
                        validators=[InputRequired(),
                                    IPAddress(ipv4=True, message='Enter only IPv4 address format.')])
-    node_type = StringField('Node type: *')
-
     username = StringField('Cluster node Username: *',
                            validators=[InputRequired(),
                                        Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
@@ -33,13 +31,7 @@ class ClusterDataFormSelectField(Form):
                                validators=[InputRequired()])
 
 
-@view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/showCluster.jinja2')
-def cluster(request):
-    user = request.user
-    if user is None:
-        raise HTTPForbidden
-
-    dictionary = dict()
+def nodes(request):
     try:
         nodes_temp = request.dbsession.query(models.Node).all()
         nodes = list()
@@ -91,7 +83,25 @@ def cluster(request):
                           'all_configurations': all_configurations,
                           'all_installs': all_installs})
 
-        dictionary['nodes'] = nodes
+            message = ''
+            css_class = ''
+    except Exception as error:
+        nodes = ''
+        message = error
+        css_class = 'errorMessage'
+
+    return nodes, message, css_class
+
+
+@view_config(route_name='cluster', renderer='minisecbgp:templates/cluster/showCluster.jinja2')
+def cluster(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    try:
+        dictionary['nodes'], dictionary['message'], dictionary['css_class'] = nodes(request)
         dictionary['cluster_url'] = request.route_url('cluster')
         dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
@@ -109,71 +119,35 @@ def create(request):
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
 
-    master = request.dbsession.query(models.Node).filter(models.Node.master == 1).first()
-    if master:
-        form = ClusterDataForm(request.POST, node_type='worker')
-        nodeTypeMessage = ' - WORKER'
-        nodeType = '0'
-    else:
-        form = ClusterDataForm(request.POST, node_type='master')
-        nodeTypeMessage = ' - MASTER'
-        nodeType = '1'
+    form = ClusterDataForm(request.POST)
 
     if request.method == 'POST' and form.validate():
         try:
-            node = models.Node(node=int(ipaddress.ip_address(form.node.data)),
-                               status=2,
-                               hostname=2,
-                               username=form.username.data,
-                               master=nodeType,
-                               service_ping=2,
-                               service_ssh=2,
-                               all_services=2,
-                               conf_user=2,
-                               conf_ssh=2,
-                               install_remote_prerequisites=2,
-                               install_mininet=2,
-                               install_containernet=2,
-                               install_metis=2,
-                               install_maxinet=2,
-                               all_install=2
-                               )
-            request.dbsession.add(node)
-            request.dbsession.flush()
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--node-ip-address=%s' % form.node.data,
+                         '--master=False']
+            subprocess.run(['./venv/bin/MiniSecBGP_node_create'] + arguments)                       # wait to finish
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--execution-type=manual',
                          '--node-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_node_service'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_node_service'] + arguments)                    # runs in parallel
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--node-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
 
-            subprocess.Popen(['./venv/bin/MiniSecBGP_node_configuration'] + arguments)
+            subprocess.run(['./venv/bin/MiniSecBGP_node_configuration'] + arguments)                # wait to finish
 
-            subprocess.Popen(['./venv/bin/MiniSecBGP_node_install'] + arguments)
-
-            home_dir = os.getcwd()
-            command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
-                      '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_node_service ' \
-                      '--config-file=%s/minisecbgp.ini ' \
-                      '--execution-type=\\"scheduled\\" ' \
-                      '--node-ip-address=\\"%s\\" ' \
-                      '--username=\\"\\" ' \
-                      '--password=\\"\\"" | ' \
-                      'sudo tee /etc/cron.d/MiniSecBGP_node_service_%s\'' % \
-                      (form.node.data, home_dir, home_dir, form.node.data, form.node.data)
-            result = local_command.local_command(command)
-            if result[0] == 1:
-                print('Crontab error', str(result[2].decode()))
+            subprocess.Popen(['./venv/bin/MiniSecBGP_node_install'] + arguments)                    # runs in parallel
 
             message = ('Node "%s" successfully included in cluster.' % form.node.data)
             css_class = 'successMessage'
 
+            request.dbsession.flush()
         except IntegrityError as e:
             request.dbsession.rollback()
             message = ('Node "%s" already exists in cluster.' % form.node.data)
@@ -181,38 +155,13 @@ def create(request):
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
 
-        nodes_temp = request.dbsession.query(models.Node).all()
-        nodes = list()
-        for n in nodes_temp:
-            nodes.append({'id': n.id,
-                          'node': str(ipaddress.ip_address(n.node)),
-                          'status': n.status,
-                          'hostname': n.hostname,
-                          'hostname_status': n.hostname_status,
-                          'username': n.username,
-                          'master': n.master,
-                          'service_ping': n.service_ping,
-                          'service_ssh': n.service_ssh,
-                          'service_ssh_status': n.service_ssh_status,
-                          'all_services': n.all_services,
-                          'conf_user': n.conf_user,
-                          'conf_user_status': n.conf_user_status,
-                          'conf_ssh': n.conf_ssh,
-                          'conf_ssh_status': n.conf_ssh_status,
-                          'install_remote_prerequisites': n.install_remote_prerequisites,
-                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
-                          'install_mininet': n.install_mininet,
-                          'install_mininet_status': n.install_mininet_status,
-                          'install_containernet': n.install_containernet,
-                          'install_containernet_status': n.install_containernet_status,
-                          'install_metis': n.install_metis,
-                          'install_metis_status': n.install_metis_status,
-                          'install_maxinet': n.install_maxinet,
-                          'install_maxinet_status': n.install_maxinet_status,
-                          'all_install': n.all_install})
-
         dictionary = dict()
-        dictionary['nodes'] = nodes
+        dictionary['nodes'], message_temp, css_class_temp = nodes(request)
+        if message_temp:
+            message = message_temp
+        if css_class_temp:
+            css_class = css_class_temp
+
         dictionary['message'] = message
         dictionary['css_class'] = css_class
         dictionary['cluster_url'] = request.route_url('cluster')
@@ -220,7 +169,7 @@ def create(request):
 
         return dictionary
 
-    return {'form': form, 'nodeTypeMessage': nodeTypeMessage}
+    return {'form': form}
 
 
 @view_config(route_name='clusterAction', match_param='action=delete', renderer='minisecbgp:templates/cluster'
@@ -232,23 +181,37 @@ def delete(request):
 
     form = ClusterDataFormSelectField(request.POST)
     form.cluster_list.choices = [(row.id, ipaddress.ip_address(row.node)) for row in
-                                 request.dbsession.query(models.Node).filter(models.Node.master != 1)]
+                                 request.dbsession.query(models.Node).filter(models.Node.master.is_(False))]
 
     if request.method == 'POST' and form.validate():
         value = dict(form.cluster_list.choices).get(form.cluster_list.data)
         try:
             node = request.dbsession.query(models.Node).filter(models.Node.id == form.cluster_list.data).first()
-            host = str(ipaddress.ip_address(node.node))
-            request.dbsession.delete(node)
 
-            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/MiniSecBGP_node_service_%s\'' % host
+            services = request.dbsession.query(models.NodeService). \
+                filter_by(id_node=node.id).all()
+
+            configurations = request.dbsession.query(models.NodeConfiguration). \
+                filter_by(id_node=node.id).all()
+
+            installs = request.dbsession.query(models.NodeInstall). \
+                filter_by(id_node=node.id).all()
+
+            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/MiniSecBGP_node_service_%s\' 2> /dev/null' % node.node
             result = local_command.local_command(command)
-            if result[0] == 1:
-                print('Crontab delete error', str(result[2].decode()))
+
+            for install in installs:
+                request.dbsession.delete(install)
+            for configuration in configurations:
+                request.dbsession.delete(configuration)
+            for service in services:
+                request.dbsession.delete(service)
+            request.dbsession.delete(node)
 
             message = ('Cluster node "%s" successfully deleted.' % value)
             css_class = 'successMessage'
 
+            request.dbsession.flush()
         except IntegrityError as e:
             request.dbsession.rollback()
             message = ('Cluster node "%s" does not exist.' % form.cluster_list.data)
@@ -256,38 +219,13 @@ def delete(request):
 
         request.override_renderer = 'minisecbgp:templates/cluster/showCluster.jinja2'
 
-        nodes_temp = request.dbsession.query(models.Node).all()
-        nodes = list()
-        for n in nodes_temp:
-            nodes.append({'id': n.id,
-                          'node': str(ipaddress.ip_address(n.node)),
-                          'status': n.status,
-                          'hostname': n.hostname,
-                          'hostname_status': n.hostname_status,
-                          'username': n.username,
-                          'master': n.master,
-                          'service_ping': n.service_ping,
-                          'service_ssh': n.service_ssh,
-                          'service_ssh_status': n.service_ssh_status,
-                          'all_services': n.all_services,
-                          'conf_user': n.conf_user,
-                          'conf_user_status': n.conf_user_status,
-                          'conf_ssh': n.conf_ssh,
-                          'conf_ssh_status': n.conf_ssh_status,
-                          'install_remote_prerequisites': n.install_remote_prerequisites,
-                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
-                          'install_mininet': n.install_mininet,
-                          'install_mininet_status': n.install_mininet_status,
-                          'install_containernet': n.install_containernet,
-                          'install_containernet_status': n.install_containernet_status,
-                          'install_metis': n.install_metis,
-                          'install_metis_status': n.install_metis_status,
-                          'install_maxinet': n.install_maxinet,
-                          'install_maxinet_status': n.install_maxinet_status,
-                          'all_install': n.all_install})
-
         dictionary = dict()
-        dictionary['nodes'] = nodes
+        dictionary['nodes'], message_temp, css_class_temp = nodes(request)
+        if message_temp:
+            message = message_temp
+        if css_class_temp:
+            css_class = css_class_temp
+
         dictionary['message'] = message
         dictionary['css_class'] = css_class
         dictionary['cluster_url'] = request.route_url('cluster')
@@ -311,32 +249,28 @@ def clusterDetail(request):
             filter_by(id=request.matchdict["id"]).first()
         node = {'id': node_temp.id,
                 'node': str(ipaddress.ip_address(node_temp.node)),
-                'status': node_temp.status,
-                'hostname': node_temp.hostname,
-                'hostname_status': node_temp.hostname_status,
-                'username': node_temp.username,
-                'master': node_temp.master,
-                'service_ping': node_temp.service_ping,
-                'service_ssh': node_temp.service_ssh,
-                'service_ssh_status': node_temp.service_ssh_status,
-                'all_services': node_temp.all_services,
-                'conf_user': node_temp.conf_user,
-                'conf_user_status': node_temp.conf_user_status,
-                'conf_ssh': node_temp.conf_ssh,
-                'conf_ssh_status': node_temp.conf_ssh_status,
-                'install_remote_prerequisites': node_temp.install_remote_prerequisites,
-                'install_remote_prerequisites_status': node_temp.install_remote_prerequisites_status,
-                'install_mininet': node_temp.install_mininet,
-                'install_mininet_status': node_temp.install_mininet_status,
-                'install_containernet': node_temp.install_containernet,
-                'install_containernet_status': node_temp.install_containernet_status,
-                'install_metis': node_temp.install_metis,
-                'install_metis_status': node_temp.install_metis_status,
-                'install_maxinet': node_temp.install_maxinet,
-                'install_maxinet_status': node_temp.install_maxinet_status,
-                'all_install': node_temp.all_install}
+                'hostname': node_temp.hostname if node_temp.hostname else '--',
+                'master': node_temp.master}
+
+        services = request.dbsession.query(models.NodeService, models.Service).\
+            filter(models.NodeService.id_node == request.matchdict["id"]).\
+            filter(models.NodeService.id_service == models.Service.id).\
+            order_by(models.Service.id).all()
+
+        configurations = request.dbsession.query(models.NodeConfiguration, models.Configuration).\
+            filter(models.NodeConfiguration.id_node == request.matchdict["id"]).\
+            filter(models.NodeConfiguration.id_configuration == models.Configuration.id).\
+            order_by(models.Configuration.id).all()
+
+        installs = request.dbsession.query(models.NodeInstall, models.Install).\
+            filter(models.NodeInstall.id_node == request.matchdict["id"]).\
+            filter(models.NodeInstall.id_install == models.Install.id).\
+            order_by(models.Install.id).all()
 
         dictionary['node'] = node
+        dictionary['services'] = services
+        dictionary['configurations'] = configurations
+        dictionary['installs'] = installs
         dictionary['cluster_detail_url'] = request.route_url('clusterDetail', id='')
 
     except Exception as error:

@@ -35,7 +35,8 @@ def setup_models(dbsession, master_ip_address):
     # Node Configuration
     configurations = [['hostname', 'Hostname'],
                       ['user', '"minisecbgpuser" user'],
-                      ['ssh', 'SSH']]
+                      ['ssh', 'SSH'],
+                      ['crontab', 'Crontab']]
     for configuration in configurations:
         dbsession.add(models.Configuration(configuration=configuration[0],
                                            description=configuration[1]))
