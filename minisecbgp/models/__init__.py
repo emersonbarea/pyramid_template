@@ -6,7 +6,14 @@ import zope.sqlalchemy
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
 from .user import User  # flake8: noqa
-from .node import Node
+from .node import (
+    Node,
+    Service,
+    Configuration,
+    Install,
+    NodeService,
+    NodeConfiguration,
+    NodeInstall)
 from .topology import (
     TopologyType,
     Topology,

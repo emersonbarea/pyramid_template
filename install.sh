@@ -138,15 +138,20 @@ install_app() {
         MiniSecBGP_manual_topology --file='/tmp/manual_topology3.MiniSecBGP'
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
-        MiniSecBGP_tests --config-file=minisecbgp.ini --execution-type='manual' --target-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
+        MiniSecBGP_node_create --config-file=minisecbgp.ini --node-ip-address=$var_ip --master=True
+
+        MiniSecBGP_node_service --config-file=minisecbgp.ini --execution-type='manual' --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Start job every 1 minute (monitor '$HOSTNAME')
-* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_tests --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --target-ip-address="'$var_ip'" --username="" --password=""' | sudo tee /etc/cron.d/minisecbgp_tests_$HOSTNAME
+* * * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_node_service --config-file='$LOCAL_HOME'/minisecbgp.ini --execution-type="scheduled" --node-ip-address="'$var_ip'" --username="" --password=""' | sudo tee /etc/cron.d/MiniSecBGP_node_service_$HOSTNAME
+
+	      MiniSecBGP_node_configuration --config-file=minisecbgp.ini --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
+
+	      MiniSecBGP_node_install --config-file=minisecbgp.ini --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
-0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/minisecbgp_realistic_topology_scheduled_download
+0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/MiniSecBGP_realistic_topology_scheduled_download
 
-	      MiniSecBGP_config --config-file=minisecbgp.ini --target-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 }
 
 

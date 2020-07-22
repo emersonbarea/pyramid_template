@@ -37,9 +37,14 @@
 
           {% for node in nodes %}
             {id: {{ node.id }},
-             font: {color: ( {{ node.all_install }} == 0 && {{ node.all_services }} == 0 ? 'green' : ( {{ node.all_install }} == 1 ? 'red' : 'orange'))},
-             label: ( {{ node.master }} == 0 ? 'worker' : 'master' ) + '\nnode: {{ node.node }} \nservices status: ' + ( {{ node.all_services }} == 0 ? 'OK' : ( {{ node.all_services }} == 1 ? 'ERROR' : 'Installing' ) ) + '\napp status: ' + ( {{ node.all_install }} == 0 ? 'OK' : ( {{ node.all_install }} == 1 ? 'ERROR' : 'Installing') ),
-             image: DIR + ( {{ node.master }} == 0 ? 'computer.png' : ( {{ node.master }} == 1 ? 'server.png' : 'webadmin.png')),
+             font: {color: ( {{ node.all_services }} == 0 && {{ node.all_configurations }} == 0 && {{ node.all_installs }} == 0 ? 'green' :
+             ( {{ node.all_installs }} == 1 || {{ node.all_configurations }} == 1 ? 'red' : 'orange'))},
+             label: ( '{{ node.master }}' +
+             '\nnode: {{ node.node }} ' +
+             '\nservice: ' + ( {{ node.all_services }} == 0 ? 'OK' : ( {{ node.all_services }} == 1 ? 'ERROR' : 'Installing' ) ) +
+             '\nconfig: ' + ( {{ node.all_configurations }} == 0 ? 'OK' : ( {{ node.all_configurations }} == 1 ? 'ERROR' : 'Installing' ) ) +
+             '\ninstall: ' + ( {{ node.all_installs }} == 0 ? 'OK' : ( {{ node.all_installs }} == 1 ? 'ERROR' : 'Installing' ) ) ),
+             image: DIR + ( '{{ node.master }}' == 'worker' ? 'computer.png' : ( '{{ node.master }}' == 'master' ? 'server.png' : 'webadmin.png')),
              shape: 'image',
              url: '{{ cluster_detail_url }}{{ node.id }}'
             },

@@ -25,27 +25,32 @@ def setup_models(dbsession, master_ip_address):
     viewer.set_password('viewer')
     dbsession.add(viewer)
 
-    # Node
+    # Node Service
+    services = [['ping', 'Ping'],
+                ['ssh', 'SSH']]
+    for service in services:
+        dbsession.add(models.Service(service=service[0],
+                                     description=service[1]))
 
-    node_ip_address = int(ipaddress.ip_address(master_ip_address))
+    # Node Configuration
+    configurations = [['hostname', 'Hostname'],
+                      ['user', '"minisecbgpuser" user'],
+                      ['ssh', 'SSH']]
+    for configuration in configurations:
+        dbsession.add(models.Configuration(configuration=configuration[0],
+                                           description=configuration[1]))
 
-    node = models.Node(node=node_ip_address,
-                       status=2,
-                       hostname=2,
-                       username=getpass.getuser(),
-                       master=1,
-                       service_ping=2,
-                       service_ssh=2,
-                       all_services=2,
-                       conf_user=2,
-                       conf_ssh=2,
-                       install_remote_prerequisites=2,
-                       install_mininet=2,
-                       install_containernet=2,
-                       install_metis=2,
-                       install_maxinet=2,
-                       all_install=2)
-    dbsession.add(node)
+    # Node Install
+    installs = [['prerequisites', 'Linux prerequisites', ''],
+                ['mininet', 'Mininet', 'http://www.mininet.org'],
+                ['containernet', 'Containernet', 'https://containernet.github.io/'],
+                ['programs', 'Metis', 'http://glaros.dtc.umn.edu/gkhome/metis/metis/overview'],
+                ['maxinet', 'Maxinet', 'https://maxinet.github.io/'],
+                ['quagga', 'Quagga', 'https://www.quagga.net/']]
+    for install in installs:
+        dbsession.add(models.Install(install=install[0],
+                                     description=install[1],
+                                     url=install[2]))
 
     # Topology
 

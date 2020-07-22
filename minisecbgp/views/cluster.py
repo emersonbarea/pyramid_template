@@ -40,37 +40,59 @@ def cluster(request):
         raise HTTPForbidden
 
     dictionary = dict()
-
     try:
         nodes_temp = request.dbsession.query(models.Node).all()
         nodes = list()
-        for n in nodes_temp:
-            nodes.append({'id': n.id,
-                          'node': str(ipaddress.ip_address(n.node)),
-                          'status': n.status,
-                          'hostname': n.hostname,
-                          'hostname_status': n.hostname_status,
-                          'username': n.username,
-                          'master': n.master,
-                          'service_ping': n.service_ping,
-                          'service_ssh': n.service_ssh,
-                          'service_ssh_status': n.service_ssh_status,
-                          'all_services': n.all_services,
-                          'conf_user': n.conf_user,
-                          'conf_user_status': n.conf_user_status,
-                          'conf_ssh': n.conf_ssh,
-                          'conf_ssh_status': n.conf_ssh_status,
-                          'install_remote_prerequisites': n.install_remote_prerequisites,
-                          'install_remote_prerequisites_status': n.install_remote_prerequisites_status,
-                          'install_mininet': n.install_mininet,
-                          'install_mininet_status': n.install_mininet_status,
-                          'install_containernet': n.install_containernet,
-                          'install_containernet_status': n.install_containernet_status,
-                          'install_metis': n.install_metis,
-                          'install_metis_status': n.install_metis_status,
-                          'install_maxinet': n.install_maxinet,
-                          'install_maxinet_status': n.install_maxinet_status,
-                          'all_install': n.all_install})
+        for node in nodes_temp:
+            services = request.dbsession.query(models.NodeService, models.Service).\
+                filter(models.NodeService.id_service == models.Service.id).\
+                filter(models.NodeService.id_node == node.id).all()
+            all_services = 1
+            for service in services:                                                          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+                if service.NodeService.status == 0 and all_services != 2:
+                    all_services = 0
+                if service.NodeService.status == 1:
+                    all_services = 1
+                    break
+                elif service.NodeService.status == 2:
+                    all_services = 2
+
+            configurations = request.dbsession.query(models.NodeConfiguration, models.Configuration).\
+                filter(models.NodeConfiguration.id_configuration == models.Configuration.id).\
+                filter(models.NodeConfiguration.id_node == node.id).all()
+            all_configurations = 1
+            for configuration in configurations:                                              # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+                if configuration.NodeConfiguration.status == 0 and all_configurations != 2:
+                    all_configurations = 0
+                if configuration.NodeConfiguration.status == 1:
+                    all_configurations = 1
+                    break
+                elif configuration.NodeConfiguration.status == 2:
+                    all_configurations = 2
+
+            installs = request.dbsession.query(models.NodeInstall, models.Install).\
+                filter(models.NodeInstall.id_install == models.Install.id).\
+                filter(models.NodeInstall.id_node == node.id).all()
+            all_installs = 1
+            for install in installs:                                                          # 0 = 'OK', 1 = 'error', 2 = 'wait (installing)'
+                if install.NodeInstall.status == 0 and all_installs != 2:
+                    all_installs = 0
+                if install.NodeInstall.status == 1:
+                    all_installs = 1
+                    break
+                elif install.NodeInstall.status == 2:
+                    all_installs = 2
+
+            nodes.append({'id': node.id,
+                          'node': str(ipaddress.ip_address(node.node)),
+                          'hostname': node.hostname,
+                          'master': ('master' if node.master else 'worker'),
+                          'all_services': all_services,
+                          'all_configurations': all_configurations,
+                          'all_installs': all_installs})
+
+        for n in nodes:
+            print(n)
 
         dictionary['nodes'] = nodes
         dictionary['cluster_url'] = request.route_url('cluster')
@@ -124,27 +146,29 @@ def create(request):
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--execution-type=manual',
-                         '--target-ip-address=%s' % form.node.data,
+                         '--node-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_tests'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_node_service'] + arguments)
 
             arguments = ['--config-file=minisecbgp.ini',
-                         '--target-ip-address=%s' % form.node.data,
+                         '--node-ip-address=%s' % form.node.data,
                          '--username=%s' % form.username.data,
                          '--password=%s' % form.password.data]
 
-            subprocess.Popen(['./venv/bin/MiniSecBGP_config'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_node_configuration'] + arguments)
+
+            subprocess.Popen(['./venv/bin/MiniSecBGP_node_install'] + arguments)
 
             home_dir = os.getcwd()
             command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
-                      '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_tests ' \
+                      '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_node_service ' \
                       '--config-file=%s/minisecbgp.ini ' \
                       '--execution-type=\\"scheduled\\" ' \
-                      '--target-ip-address=\\"%s\\" ' \
+                      '--node-ip-address=\\"%s\\" ' \
                       '--username=\\"\\" ' \
                       '--password=\\"\\"" | ' \
-                      'sudo tee /etc/cron.d/minisecbgp_tests_%s\'' % \
+                      'sudo tee /etc/cron.d/MiniSecBGP_node_service_%s\'' % \
                       (form.node.data, home_dir, home_dir, form.node.data, form.node.data)
             result = local_command.local_command(command)
             if result[0] == 1:
@@ -220,7 +244,7 @@ def delete(request):
             host = str(ipaddress.ip_address(node.node))
             request.dbsession.delete(node)
 
-            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/minisecbgp_tests_%s\'' % host
+            command = 'sudo -u minisecbgpuser bash -c \'sudo rm /etc/cron.d/MiniSecBGP_node_service_%s\'' % host
             result = local_command.local_command(command)
             if result[0] == 1:
                 print('Crontab delete error', str(result[2].decode()))
