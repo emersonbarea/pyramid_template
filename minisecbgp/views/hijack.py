@@ -102,6 +102,31 @@ class RealisticAnalysisDataForm(Form):
                                           coerce=int, validators=[InputRequired()])
 
 
+def node_status(dbsession, node):
+    services = dbsession.query(models.Node, models.NodeService). \
+        filter(models.Node.node == node). \
+        filter(models.Node.id == models.NodeService.id_node).all()
+    for service in services:
+        if service.NodeService.status == 1:
+            return False
+
+    configurations = dbsession.query(models.Node, models.NodeConfiguration). \
+        filter(models.Node.node == node). \
+        filter(models.Node.id == models.NodeConfiguration.id_node).all()
+    for configuration in configurations:
+        if configuration.NodeConfiguration.status == 1:
+            return False
+
+    installs = dbsession.query(models.Node, models.NodeInstall). \
+        filter(models.Node.node == node). \
+        filter(models.Node.id == models.NodeInstall.id_node).all()
+    for install in installs:
+        if install.NodeInstall.status == 1:
+            return False
+
+    return True
+
+
 @view_config(route_name='hijack', renderer='minisecbgp:templates/hijack/hijackHistory.jinja2')
 def hijack(request):
     user = request.user
@@ -150,9 +175,21 @@ def hijackRealisticAnalysis(request):
         form.topology_list.choices = [(row.id, row.topology) for row in
                                       request.dbsession.query(models.Topology).order_by(models.Topology.topology)]
 
-        form.cluster_list.choices = [(row.id, ipaddress.ip_address(row.node)) for row in
-                                     request.dbsession.query(models.Node).filter(models.Node.all_services == 0).filter(
-                                         models.Node.all_install == 0).order_by(models.Node.node)]
+        query = 'select n.id, ' \
+                'n.node ' \
+                'from node n, ' \
+                'node_service ns, ' \
+                'node_configuration nc, ' \
+                'node_install ni ' \
+                'where n.id = ns.id_node ' \
+                'and n.id = nc.id_node ' \
+                'and n.id = ni.id_node ' \
+                'and ns.id_node not in(select ns.id_node from node_service ns where ns.status in (1,2) group by ns.id_node) ' \
+                'and nc.id_node not in(select nc.id_node from node_configuration nc where nc.status in (1,2) group by nc.id_node) ' \
+                'and ni.id_node not in(select ni.id_node from node_install ni where ni.status in (1,2) group by ni.id_node) ' \
+                'group by n.id, n.node'
+        result_proxy = request.dbsession.bind.execute(query)
+        form.cluster_list.choices = [(row.id, ipaddress.ip_address(row.node)) for row in result_proxy]
 
         form.topology_distribution_method_list.choices = [(row.id, row.topology_distribution_method) for row in
                                                           request.dbsession.query(models.TopologyDistributionMethod)]
@@ -164,10 +201,6 @@ def hijackRealisticAnalysis(request):
                                              request.dbsession.query(models.RouterPlatform)]
 
         availability = True
-        all_installs = request.dbsession.query(models.Node.all_install).all()
-        for all_install in all_installs:
-            if all_install == 2:
-                availability = False
         downloading = request.dbsession.query(models.DownloadingTopology).first()
         if downloading.downloading == 1:
             availability = False

@@ -1,5 +1,4 @@
 import ipaddress
-import os
 import subprocess
 
 from pyramid.view import view_config
