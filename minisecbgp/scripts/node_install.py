@@ -36,7 +36,7 @@ class ConfigClusterNode(object):
         self.password = password
 
     def install_linux_prerequisites(self):
-        print('Installing Linux prerequisites ...')
+        print('\nInstalling Linux prerequisites ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -82,7 +82,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_mininet(self):
-        print('Installing Mininet ...\n'
+        print('\nInstalling Mininet ...\n'
               'take a coffee and wait ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
@@ -126,7 +126,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_containernet(self):
-        print('Installing Containernet ...\n'
+        print('\nInstalling Containernet ...\n'
               'take a coffee and wait ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
@@ -170,7 +170,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_metis(self):
-        print('Installing Metis ...')
+        print('\nInstalling Metis ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -240,7 +240,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_maxinet(self):
-        print('Installing Maxinet ...')
+        print('\nInstalling Maxinet ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -427,7 +427,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_quagga(self):
-        print('Installing Quagga router ...')
+        print('\nInstalling Quagga router ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -437,15 +437,15 @@ class ConfigClusterNode(object):
 
             if node_install_status(self.dbsession, self.node_ip_address):
 
-                commands = ['sudo killall -9 -u quagga 2>/dev/null || exit 0;'
-                            'sudo userdel -r quagga 2>/dev/null || exit 0;'
-                            'sudo groupdel quaggavty 2>/dev/null || exit 0;'
-                            'sudo addgroup --system --gid 92 quagga;'
-                            'sudo addgroup --system --gid 85 quaggavty;'
+                commands = ['sudo killall -9 -u quagga 2>/dev/null || exit 0',
+                            'sudo userdel -r quagga 2>/dev/null || exit 0',
+                            'sudo groupdel quaggavty 2>/dev/null || exit 0',
+                            'sudo addgroup --system --gid 92 quagga',
+                            'sudo addgroup --system --gid 85 quaggavty',
                             'sudo adduser --system --ingroup quagga --home /var/run/quagga/ --gecos "Quagga routing suite" --shell /bin/false quagga',
                             'sudo apt install libreadline-dev pkg-config libc-ares-dev gawk -y',
-                            'rm -f /home/minisecbgpuser/quagga-1.2.4.tar.gz 2>/dev/null || exit 0;'
-                            'rm -f /home/minisecbgpuser/quagga-1.2.4.tar 2>/dev/null || exit 0;'
+                            'rm -f /home/minisecbgpuser/quagga-1.2.4.tar.gz 2>/dev/null || exit 0',
+                            'rm -f /home/minisecbgpuser/quagga-1.2.4.tar 2>/dev/null || exit 0',
                             'rm -rf /home/minisecbgpuser/quagga-1.2.4 2>/dev/null || exit 0']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \

@@ -30,7 +30,7 @@ class ConfigClusterNode(object):
         self.password = password
 
     def validate_hostname(self):
-        print('Validating unique hostname ...')
+        print('\nValidating unique hostname ...')
         try:
             node_configuration = self.dbsession.query(models.Node, models.NodeConfiguration, models.Configuration). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -74,7 +74,7 @@ class ConfigClusterNode(object):
             print('Database error for hostname validation on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
 
     def create_minisecbgpuser(self):
-        print('Creating user "minisecbgpuser" ...')
+        print('\nCreating user "minisecbgpuser" ...')
         try:
             node_configuration = self.dbsession.query(models.Node, models.NodeConfiguration, models.Configuration). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -120,7 +120,7 @@ class ConfigClusterNode(object):
             print('Database error for "minisecbgpuser" creation on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
 
     def configure_ssh(self):
-        print('Configuring ssh ...')
+        print('\nConfiguring ssh ...')
         try:
             node_configuration = self.dbsession.query(models.Node, models.NodeConfiguration, models.Configuration). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -187,7 +187,7 @@ class ConfigClusterNode(object):
             print('Database error for ssh configuration on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
 
     def configure_crontab(self):
-        print('Configuring crontab ...')
+        print('\nConfiguring crontab ...')
         try:
             node_configuration = self.dbsession.query(models.Node, models.NodeConfiguration, models.Configuration). \
                 filter(models.Node.node == self.node_ip_address). \

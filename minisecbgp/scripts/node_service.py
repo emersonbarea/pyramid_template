@@ -19,7 +19,7 @@ class TestClusterNode(object):
         self.password = password
 
     def test_ping(self):
-        print('Testing ping ...')
+        print('\nTesting ping ...')
         try:
             node_service = self.dbsession.query(models.Node, models.NodeService, models.Service).\
                 filter(models.Node.node == self.node_ip_address).\
@@ -42,7 +42,7 @@ class TestClusterNode(object):
             print('Database error for ping test on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
 
     def test_ssh(self):
-        print('Testing ssh ...')
+        print('\nTesting ssh ...')
         try:
             if self.execution_type == 'manual':
                 username = self.username

@@ -168,11 +168,12 @@ class RealisticAnalysis(object):
                     {'AS': row[8],
                      'command': '  neighbor %s remote-as %s\n' % (str(ipaddress.ip_address(row[9])), row[6])})
 
-        # bgpd - router ID
-        for row in self.df_router_id.itertuples():
-            if row[0] in self.sr_unique_as.values:                                              # do not link stub ASes if necessary
-                list_create_bgpd_router_id.append(
-                    {'AS': row[0], 'command': '  bgp router-id %s\n' % str(ipaddress.ip_address(row[3]))})
+        # bgpd - router
+        if not self.df_router_id.empty:
+            for row in self.df_router_id.itertuples():
+                if row[0] in self.sr_unique_as.values:                                              # do not link stub ASes if
+                    list_create_bgpd_router_id.append(
+                        {'AS': row[0], 'command': '  bgp router-id %s\n' % str(ipaddress.ip_address(row[3]))})
 
         # bgpd - network (prefix)
         for row in self.df_prefix.itertuples():
@@ -190,16 +191,16 @@ class RealisticAnalysis(object):
         list_startup_bgpd_commands = list()
         for AS in self.sr_unique_as.values:
             # zebra startup commands
-            list_startup_zebra_commands.append('AS%s.cmd(\'./opt/quagga/sbin/zebra -f '
-                                               './AS/%s/zebra.conf -z '
-                                               './socket/%s.socket -i '
-                                               './pid/zebra-%s.pid > '
+            list_startup_zebra_commands.append('AS%s.cmd(\'/home/minisecbgpuser/quagga-1.2.4/sbin/./zebra '
+                                               '-f ./AS/%s/zebra.conf '
+                                               '-z /var/run/quagga/%s.socket '
+                                               '-i /var/run/quagga/zebra-%s.pid > '
                                                './log/zebra-%s.log &\')' % (AS, AS, AS, AS, AS))
             # bgpd startup commands
-            list_startup_bgpd_commands.append('AS%s.cmd (\'./opt/quagga/sbin/bgpd -f '
-                                              './AS/%s/bgpd.conf -z '
-                                              './socket/%s.socket -i '
-                                              './pid/bgpd-%s.pid > '
+            list_startup_bgpd_commands.append('AS%s.cmd (\'/home/minisecbgpuser/quagga-1.2.4/sbin/./bgpd '
+                                              '-f ./AS/%s/bgpd.conf '
+                                              '-z /var/run/quagga/%s.socket '
+                                              '-i /var/run/quagga/bgpd-%s.pid > '
                                               './log/bgpd-%s.log &\')' % (AS, AS, AS, AS, AS))
 
         self.df_create_zebra_interfaces = pd.DataFrame(list_create_zebra_interfaces)
@@ -209,7 +210,8 @@ class RealisticAnalysis(object):
         self.df_create_bgpd_prefix = pd.DataFrame(list_create_bgpd_prefix)
         self.df_create_bgpd_prefix.set_index('AS', inplace=True)
         self.df_create_bgpd_router_id = pd.DataFrame(list_create_bgpd_router_id)
-        self.df_create_bgpd_router_id.set_index('AS', inplace=True)
+        if not self.df_create_bgpd_router_id.empty:
+            self.df_create_bgpd_router_id.set_index('AS', inplace=True)
         self.list_startup_zebra_commands = list_startup_zebra_commands
         self.list_startup_bgpd_commands = list_startup_bgpd_commands
 
@@ -297,13 +299,12 @@ class RealisticAnalysis(object):
         """
             Write configuration to files
         """
+
         # erase previews configuration
         if os.path.exists(self.output_dir):
             shutil.rmtree(self.output_dir)
         os.makedirs(self.output_dir + 'AS')
         os.makedirs(self.output_dir + 'log')
-        os.makedirs(self.output_dir + 'pid')
-        os.makedirs(self.output_dir + 'socket')
 
         # Mininet
         with open(self.output_dir + 'topology.py', 'w') as file_topology:
@@ -366,6 +367,11 @@ class RealisticAnalysis(object):
             with open(self.output_dir + 'AS/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
                 file_bgpd.write(row[1])
             file_bgpd.close()
+
+    def save_to_db(self):
+        """
+            Save configuration to database
+        """
 
 
 def parse_args(config_file):
@@ -438,6 +444,8 @@ def main(argv=sys.argv[1:]):
             pass
 
         ra.write_to_file()
+
+        ra.save_to_db()
 
     except OperationalError:
         print('Database error')

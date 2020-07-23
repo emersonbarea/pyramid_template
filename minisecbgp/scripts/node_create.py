@@ -16,7 +16,7 @@ class CreateClusterNode(object):
         self.master = master
 
     def create_cluster_node(self):
-        print('Creating cluster node ...')
+        print('\nCreating cluster node ...')
         try:
             services = self.dbsession.query(models.Service).all()
             configurations = self.dbsession.query(models.Configuration).all()

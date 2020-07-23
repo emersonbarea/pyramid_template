@@ -3,4 +3,8 @@ info('*** Running CLI\n')
 CLI(net)
 
 info('*** Stopping network')
-net.stop()
+net.stop
+
+info('*** Killing all router process')
+os.system('pkill -9 zebra')
+os.system('pkill -9 bgpd')
