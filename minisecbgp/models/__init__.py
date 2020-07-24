@@ -38,8 +38,7 @@ from .hijack import (
     TopologyDistributionMethod,
     EmulationPlatform,
     RouterPlatform,
-    RealisticAnalysis,
-    RealisticAnalysisDetail)
+    RealisticAnalysis)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

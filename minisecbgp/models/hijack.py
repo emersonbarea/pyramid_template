@@ -38,20 +38,7 @@ class RealisticAnalysis(Base):
     id_router_platform = Column(Integer, ForeignKey('router_platform.id'))
     include_stub = Column(Boolean, nullable=False)
     realistic_analysis = Column(String(50), nullable=False, unique=True)
-    realistic_analysis_detail = relationship('RealisticAnalysisDetail',
-                                             foreign_keys='RealisticAnalysisDetail.id_realistic_analysis')
     Index('IndexId7_topology', id_topology)
     Index('IndexId_topology_distribution_method', id_topology_distribution_method)
     Index('IndexId_emulation_platform', id_emulation_platform)
     Index('IndexId_router_platform', id_router_platform)
-
-
-class RealisticAnalysisDetail(Base):
-    __tablename__ = 'realistic_analysis_detail'
-    id = Column(Integer, primary_key=True)
-    id_realistic_analysis = Column(Integer, ForeignKey('realistic_analysis.id'))
-    id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
-    router_conf = Column(BYTEA, nullable=False)
-    bgp_conf = Column(BYTEA, nullable=False)
-    Index('IndexId_realistic_analysis', id_realistic_analysis)
-    Index('IndexId6_autonomous_system', id_autonomous_system)

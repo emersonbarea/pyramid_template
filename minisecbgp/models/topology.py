@@ -41,7 +41,6 @@ class AutonomousSystem(Base):
     type_of_user_autonomous_system = relationship('TypeOfUserAutonomousSystem', foreign_keys='TypeOfUserAutonomousSystem.id_autonomous_system')
     type_of_service_autonomous_system = relationship('TypeOfServiceAutonomousSystem', foreign_keys='TypeOfServiceAutonomousSystem.id_autonomous_system')
     autonomous_system_internet_exchange_point = relationship('AutonomousSystemInternetExchangePoint', foreign_keys='AutonomousSystemInternetExchangePoint.id_autonomous_system')
-    realistic_analysis_detail = relationship('RealisticAnalysisDetail', foreign_keys='RealisticAnalysisDetail.id_autonomous_system')
     Index('IndexTopologyAS', id_topology, autonomous_system)
     Index('IndexId1_topology', id_topology)
     Index('IndexId1_region', id_region)
