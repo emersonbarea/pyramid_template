@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Index
+from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean
 from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import relationship
 
@@ -36,6 +36,7 @@ class RealisticAnalysis(Base):
     id_topology_distribution_method = Column(Integer, ForeignKey('topology_distribution_method.id'))
     id_emulation_platform = Column(Integer, ForeignKey('emulation_platform.id'))
     id_router_platform = Column(Integer, ForeignKey('router_platform.id'))
+    include_stub = Column(Boolean, nullable=False)
     realistic_analysis = Column(String(50), nullable=False, unique=True)
     realistic_analysis_detail = relationship('RealisticAnalysisDetail',
                                              foreign_keys='RealisticAnalysisDetail.id_realistic_analysis')

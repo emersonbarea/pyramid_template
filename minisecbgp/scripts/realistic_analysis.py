@@ -7,18 +7,23 @@ import os
 import shutil
 
 from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
+
+from minisecbgp import models
 
 
 class RealisticAnalysis(object):
-    def __init__(self, realistic_analysis_name, id_topology, topology_length, topology_distribution_method, emulation_platform):
+    def __init__(self, dbsession, realistic_analysis_name, id_topology, include_stub, topology_distribution_method,
+                 emulation_platform):
+        self.dbsession = dbsession
         self.output_dir = os.getcwd() + '/output/topology/%s/' % realistic_analysis_name
-        self.id_topology = id_topology                                                          # id_topology
-        self.topology_length = topology_length                                                  # STUB / FULL
-        self.topology_distribution_method = topology_distribution_method                        # CUSTOMER CONE / METIS /MANUAL /ROUND ROBIN
-        self.emulation_platform = emulation_platform                                            # MININET / DOCKER
+        self.id_topology = id_topology
+        self.include_stub = include_stub
+        self.topology_distribution_method = topology_distribution_method
+        self.emulation_platform = emulation_platform
 
-    def dfs_from_database(self, dbsession):
+    def dfs_from_database(self):
         query = 'select l.id as id_link, ' \
                 'l.id_topology as id_topology, ' \
                 'l.id_link_agreement as id_link_agreement, ' \
@@ -38,7 +43,7 @@ class RealisticAnalysis(object):
                 'link_agreement agr ' \
                 'where l.id_topology = %s ' \
                 'and l.id_link_agreement = agr.id;' % self.id_topology
-        result_proxy = dbsession.bind.execute(query)
+        result_proxy = self.dbsession.bind.execute(query)
         self.df_as = pd.DataFrame(result_proxy, columns=[
             'id_link', 'id_topology', 'id_link_agreement', 'agreement', 'id_autonomous_system1', 'autonomous_system1',
             'id_autonomous_system2', 'autonomous_system2', 'ip_autonomous_system1', 'ip_autonomous_system2',
@@ -57,7 +62,7 @@ class RealisticAnalysis(object):
                 'autonomous_system asys ' \
                 'where r.id_autonomous_system = asys.id ' \
                 'and asys.id_topology = %s' % self.id_topology
-        result_proxy = dbsession.bind.execute(query)
+        result_proxy = self.dbsession.bind.execute(query)
         self.df_router_id = pd.DataFrame(data=result_proxy, columns=[
             'id_router_id', 'id_autonomous_system', 'autonomous_system', 'router_id'])
         self.df_router_id.set_index('autonomous_system', inplace=True)
@@ -76,7 +81,7 @@ class RealisticAnalysis(object):
                 'autonomous_system asys ' \
                 'where p.id_autonomous_system = asys.id ' \
                 'and asys.id_topology = %s' % self.id_topology
-        result_proxy = dbsession.bind.execute(query)
+        result_proxy = self.dbsession.bind.execute(query)
         self.df_prefix = pd.DataFrame(data=result_proxy, columns=[
             'id_prefix', 'id_autonomous_system', 'autonomous_system', 'prefix', 'mask'])
         self.df_prefix.set_index('autonomous_system', inplace=True)
@@ -92,7 +97,7 @@ class RealisticAnalysis(object):
                                  self.df_as['autonomous_system2']], ignore_index=True)
         sr_unique_as = sr_all_ases.drop_duplicates(keep='first')                                # save all unique ASes (stub and not stub)
 
-        if self.topology_length == 'STUB':                                                      # STUB / FULL
+        if not self.include_stub:                                                               # if does not include stub ASs
             sr_stub = sr_all_ases.drop_duplicates(keep=False)                                   # save only stub ASes
             stub_list = list()
             for row in self.df_as.itertuples():
@@ -103,21 +108,28 @@ class RealisticAnalysis(object):
             self.df_stub = pd.DataFrame(data=stub_list)
             self.df_stub.set_index('AS_stub', inplace=True)
             self.sr_unique_as = pd.concat([sr_unique_as, sr_stub]).drop_duplicates(keep=False)  # save all ASes removing stub ASes
-        elif self.topology_length == 'FULL':
+
+            # print('Number of stub ASes: %s (Number of ASes not stub: %s)\n' % (len(self.df_stub), len(self.sr_unique_as) - len(self.df_stub)))
+            # Number of stub ASes: 23977(Number of ASes not stub: 19072)
+
+        else:                                                                                   # else include stub ASs (all ASs)
             self.sr_unique_as = sr_unique_as
 
         self.sr_unique_as = self.sr_unique_as.sort_values(ascending=True)
 
         # print('Number of ASes: %s' % len(self.sr_unique_as))
-        # print('Number of stub ASes: %s (Number of ASes not stub: %s)\n' % (len(self.sr_stub), len(self.sr_unique_as) - len(self.sr_stub)))
+        # Number of ASes: 43049
 
     def emulation_commands(self):
+        emulation_platform = self.dbsession.query(models.EmulationPlatform).\
+            filter_by(id=self.emulation_platform).first()
+
         # Mininet elements
         self.list_create_mininet_elements_commands = list()
-        if self.emulation_platform == 'MININET':                                                # MININET /DOCKER
+        if emulation_platform.emulation_platform.lower() == 'mininet':                                                     # mininet / docker
             for AS in self.sr_unique_as:
                 self.list_create_mininet_elements_commands.append("AS%s = net.addHost('AS%s', ip=None)" % (AS, AS))
-        elif self.emulation_platform == 'DOCKER':
+        elif emulation_platform.emulation_platform.lower() == 'docker':
             for AS in self.sr_unique_as:
                 self.list_create_mininet_elements_commands.append(
                     "AS%s = net.addDocker('AS%s', ip=None, dimage='alpine-quagga:latest')" % (AS, AS))
@@ -180,7 +192,7 @@ class RealisticAnalysis(object):
             if row[0] in self.sr_unique_as.values:                                              # do not link stub ASes if necessary
                 list_create_bgpd_prefix.append({'AS': row[0], 'command': '  network %s\n' % (
                             str(ipaddress.ip_address(row[3])) + '/' + str(row[4]))})
-        if self.topology_length == 'STUB':                                                      # do not link stub ASes if necessary
+        if not self.include_stub:                                                               # do not link stub ASes if necessary
             df_stub_prefix = pd.concat([self.df_prefix[['prefix', 'mask']], self.df_stub.reindex(self.df_prefix.index)], axis=1, join='inner')
             df_stub_prefix = df_stub_prefix.dropna()
             for row in df_stub_prefix.itertuples():
@@ -295,15 +307,6 @@ class RealisticAnalysis(object):
         # 65002    bgp router-id 1.1.1.2\n
         # 65001    bgp router-id 1.1.1.1\n
 
-    def save_to_db(self):
-        """
-            Save configuration to database
-        """
-
-        # save to realistic_analysis
-
-        # save to realistic_analysis_detail
-
     def write_to_file(self):
         """
             Write configuration to files
@@ -378,6 +381,17 @@ class RealisticAnalysis(object):
             file_bgpd.close()
 
 
+def str2bool(master):
+    if isinstance(master, bool):
+        return master
+    if master.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif master.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def parse_args(config_file):
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -390,28 +404,28 @@ def parse_args(config_file):
 def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, "h:",
-                                   ["config-file=", "realistic-analysis-name=", "topology=", "topology-length=", "topology-distribution-method=",
+                                   ["config-file=", "realistic-analysis-name=", "topology=", "include-stub=", "topology-distribution-method=",
                                     "emulation-platform=", "router-platform="])
     except getopt.GetoptError as error:
         print('config '
               '--config-file=<pyramid config file .ini> '
               '--realistic-analysis-name=<realistic analysis name/description> '
-              '--topology=<id_topology> '
-              '--topology-length=<FULL|STUB> '
-              '--topology-distribution-method=<CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN> '
-              '--emulation-platform=<MININET|DOCKER> '
-              '--router-platform=<QUAGGA|BIRD>')
+              '--topology=<Topology ID> '
+              '--include-stub=<True|False> '
+              '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
+              '--emulation-platform=<Emulation platform ID (MININET|DOCKER)> '
+              '--router-platform=<Router platform ID (QUAGGA|BIRD)>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('config '
                   '--config-file=<pyramid config file .ini> '
                   '--realistic-analysis-name=<realistic analysis name/description> '
-                  '--topology=<id_topology> '
-                  '--topology-length=<FULL|STUB> '
-                  '--topology-distribution-method=<CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN> '
-                  '--emulation-platform=<MININET|DOCKER> '
-                  '--router-platform=<QUAGGA|BIRD>')
+                  '--topology=<Topology ID> '
+                  '--include-stub=<True|False> '
+                  '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
+                  '--emulation-platform=<Emulation platform ID (MININET|DOCKER)> '
+                  '--router-platform=<Router platform ID (QUAGGA|BIRD)>')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
@@ -419,8 +433,8 @@ def main(argv=sys.argv[1:]):
             realistic_analysis_name = arg
         elif opt == '--topology':
             id_topology = arg
-        elif opt == '--topology-length':
-            topology_length = arg
+        elif opt == '--include-stub':
+            include_stub = str2bool(arg)
         elif opt == '--topology-distribution-method':
             topology_distribution_method = arg
         elif opt == '--emulation-platform':
@@ -432,24 +446,23 @@ def main(argv=sys.argv[1:]):
     setup_logging(args.config_uri)
     env = bootstrap(args.config_uri)
     try:
-        ra = RealisticAnalysis(realistic_analysis_name, id_topology, topology_length, topology_distribution_method, emulation_platform)
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            ra.dfs_from_database(dbsession)
 
-        ra.data_frames()
+            quagga = dbsession.query(models.RouterPlatform.id). \
+                filter(func.lower(models.RouterPlatform.router_platform) == 'quagga').first()
 
-        ra.emulation_commands()
+            ra = RealisticAnalysis(dbsession, realistic_analysis_name, id_topology, include_stub,
+                                   topology_distribution_method, emulation_platform)
+            ra.dfs_from_database()
+            ra.data_frames()
+            ra.emulation_commands()
 
-        if router_platform == 'QUAGGA':
-            pass
-            ra.quagga_commands()
-        elif router_platform == 'BIRD':
-            pass
+            # Router platform
+            if router_platform == str(quagga[0]):
+                ra.quagga_commands()
 
-        ra.save_to_db()
-
-        ra.write_to_file()
+            ra.write_to_file()
 
     except OperationalError:
         print('Database error')

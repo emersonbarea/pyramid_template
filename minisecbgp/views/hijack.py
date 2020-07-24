@@ -172,9 +172,11 @@ def hijackRealisticAnalysis(request):
     try:
         form = RealisticAnalysisDataForm(request.POST)
 
+        # Topology
         form.topology_list.choices = [(row.id, row.topology) for row in
                                       request.dbsession.query(models.Topology).order_by(models.Topology.topology)]
 
+        # Cluster nodes
         query = 'select n.id, ' \
                 'n.node ' \
                 'from node n, ' \
@@ -191,12 +193,15 @@ def hijackRealisticAnalysis(request):
         result_proxy = request.dbsession.bind.execute(query)
         form.cluster_list.choices = [(row.id, ipaddress.ip_address(row.node)) for row in result_proxy]
 
+        # Topology distribution method on cluster (Customer Cone, Round Robin)
         form.topology_distribution_method_list.choices = [(row.id, row.topology_distribution_method) for row in
                                                           request.dbsession.query(models.TopologyDistributionMethod)]
 
+        # Emulation platform (Mininet, Docker)
         form.emulation_platform_list.choices = [(row.id, row.emulation_platform) for row in
                                                 request.dbsession.query(models.EmulationPlatform)]
 
+        # Router platform (Quagga, Bird)
         form.router_platform_list.choices = [(row.id, row.router_platform) for row in
                                              request.dbsession.query(models.RouterPlatform)]
 
@@ -215,36 +220,33 @@ def hijackRealisticAnalysis(request):
         dictionary['availability'] = availability
 
         if request.method == 'POST' and form.validate():
+            if form.stub.data:
+                include_stub = True
+            else:
+                include_stub = False
             try:
-                realistic_analysis = request.dbsession.query(models.RealisticAnalysis).\
-                    filter_by(realistic_analysis=form.realistic_analysis.data).first()
-            except Exception as error:
-                dictionary['message'] = error
-                dictionary['css_class'] = 'errorMessage'
-                return dictionary
-
-            if realistic_analysis:
+                realistic_analysis = models.RealisticAnalysis(id_topology=form.topology_list.data,
+                                                              id_topology_distribution_method=form.topology_distribution_method_list.data,
+                                                              id_emulation_platform=form.emulation_platform_list.data,
+                                                              id_router_platform=form.router_platform_list.data,
+                                                              include_stub=include_stub,
+                                                              realistic_analysis=form.realistic_analysis.data)
+                request.dbsession.add(realistic_analysis)
+                request.dbsession.flush()
+            except IntegrityError:
+                request.dbsession.rollback()
                 dictionary['message'] = 'The Realistic Analysis name/description "%s" already exist. Choose another ' \
                                         'name/description.' % form.realistic_analysis.data
                 dictionary['css_class'] = 'errorMessage'
                 return dictionary
 
-            if form.stub.data:
-                topology_length = 'FULL'
-            else:
-                topology_length = 'STUB'
-
-            topology_distribution_method = (dict(form.topology_distribution_method_list.choices).get(form.topology_distribution_method_list.data)).upper()
-            emulation_platform = (dict(form.emulation_platform_list.choices).get(form.emulation_platform_list.data)).upper()
-            router_platform = (dict(form.router_platform_list.choices).get(form.router_platform_list.data)).upper()
-
             arguments = ['--config-file=minisecbgp.ini',
                          '--realistic-analysis-name=%s' % form.realistic_analysis.data,
                          '--topology=%s' % form.topology_list.data,
-                         '--topology-length=%s' % topology_length,
-                         '--topology-distribution-method=%s' % topology_distribution_method,
-                         '--emulation-platform=%s' % emulation_platform,
-                         '--router-platform=%s' % router_platform]
+                         '--include-stub=%s' % include_stub,
+                         '--topology-distribution-method=%s' % form.topology_distribution_method_list.data,
+                         '--emulation-platform=%s' % form.emulation_platform_list.data,
+                         '--router-platform=%s' % form.router_platform_list.data]
             subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_analysis'] + arguments)
 
     except Exception as error:
