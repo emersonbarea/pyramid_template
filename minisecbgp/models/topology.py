@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Index, BigInteger
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, UniqueConstraint, Index, BigInteger, Boolean
 from .meta import Base
 from sqlalchemy.orm import relationship
 
@@ -32,7 +32,7 @@ class AutonomousSystem(Base):
     id_topology = Column(Integer, ForeignKey('topology.id'))
     id_region = Column(Integer, ForeignKey('region.id'))
     autonomous_system = Column(BigInteger, nullable=False)
-    stub = Column(Integer, nullable=False)          # 0 = not stub | 1 = stub
+    stub = Column(Boolean, nullable=False)                                                      # True = 'stub' | false = 'full'
     router_id = relationship('RouterId', foreign_keys='RouterId.id_autonomous_system')
     prefix = relationship('Prefix', foreign_keys='Prefix.id_autonomous_system')
     link_id_autonomous_system1 = relationship('Link', foreign_keys='Link.id_autonomous_system1')

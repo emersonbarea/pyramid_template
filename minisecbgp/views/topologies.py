@@ -48,15 +48,15 @@ def topologies_detail(request):
 
     dictionary = dict()
     try:
-        dictionary['topology'] = request.dbsession.query(models.Topology) \
-            .filter_by(id=request.matchdict["id_topology"]).first()
+        dictionary['topology'] = request.dbsession.query(models.Topology).\
+            filter_by(id=request.matchdict["id_topology"]).first()
 
-        dictionary['unique_as'] = request.dbsession.query(models.AutonomousSystem.id)\
-            .filter_by(id_topology=request.matchdict["id_topology"]).count()
+        dictionary['unique_as'] = request.dbsession.query(models.AutonomousSystem.id).\
+            filter_by(id_topology=request.matchdict["id_topology"]).count()
 
-        dictionary['unique_as_stub'] = request.dbsession.query(models.AutonomousSystem.id) \
-            .filter(models.AutonomousSystem.stub == 0) \
-            .filter_by(id_topology=request.matchdict["id_topology"]).count()
+        dictionary['unique_as_stub'] = request.dbsession.query(models.AutonomousSystem.id).\
+            filter(models.AutonomousSystem.stub.is_(False)).\
+            filter_by(id_topology=request.matchdict["id_topology"]).count()
 
         query = 'select la.agreement as agreement, ' \
                 '(select count(l.id) ' \
@@ -75,11 +75,11 @@ def topologies_detail(request):
                 'and l.id_autonomous_system1 in (select id ' \
                 'from autonomous_system ' \
                 'where id_topology = %s ' \
-                'and stub = 0) ' \
+                'and not stub) ' \
                 'and l.id_autonomous_system2 in (select id ' \
                 'from autonomous_system ' \
                 'where id_topology = %s ' \
-                'and stub = 0)) as p2c ' \
+                'and not stub)) as p2c ' \
                 'from link_agreement la ' \
                 'group by la.id, la.agreement;' % (request.matchdict["id_topology"],
                                                    request.matchdict["id_topology"],
@@ -92,7 +92,7 @@ def topologies_detail(request):
 
         dictionary['prefixes_stub'] = request.dbsession.query(models.Prefix, models.AutonomousSystem).\
             filter(models.AutonomousSystem.id_topology == request.matchdict["id_topology"]). \
-            filter(models.AutonomousSystem.stub == 0). \
+            filter(models.AutonomousSystem.stub.is_(False)). \
             filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
 
     except Exception as error:
@@ -211,7 +211,7 @@ def topologies_draw_stub(request):
                 'region r, ' \
                 'color c ' \
                 'where asys.id_topology = %s ' \
-                'and asys.stub = 0 ' \
+                'and not asys.stub ' \
                 'and asys.id_region = r.id ' \
                 'and r.id_color = c.id' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
@@ -246,7 +246,7 @@ def topologies_draw_stub(request):
                 'from autonomous_system asys, ' \
                 'link l ' \
                 'where asys.id_topology = %s ' \
-                'and asys.stub = 0 ' \
+                'and not asys.stub ' \
                 'and (asys.id = l.id_autonomous_system1 or asys.id = l.id_autonomous_system2)' % request.matchdict["id_topology"]
         result_proxy = request.dbsession.bind.execute(query)
         links = list()

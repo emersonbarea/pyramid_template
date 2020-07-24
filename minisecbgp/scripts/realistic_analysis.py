@@ -295,6 +295,15 @@ class RealisticAnalysis(object):
         # 65002    bgp router-id 1.1.1.2\n
         # 65001    bgp router-id 1.1.1.1\n
 
+    def save_to_db(self):
+        """
+            Save configuration to database
+        """
+
+        # save to realistic_analysis
+
+        # save to realistic_analysis_detail
+
     def write_to_file(self):
         """
             Write configuration to files
@@ -368,11 +377,6 @@ class RealisticAnalysis(object):
                 file_bgpd.write(row[1])
             file_bgpd.close()
 
-    def save_to_db(self):
-        """
-            Save configuration to database
-        """
-
 
 def parse_args(config_file):
     parser = argparse.ArgumentParser()
@@ -443,9 +447,9 @@ def main(argv=sys.argv[1:]):
         elif router_platform == 'BIRD':
             pass
 
-        ra.write_to_file()
-
         ra.save_to_db()
+
+        ra.write_to_file()
 
     except OperationalError:
         print('Database error')

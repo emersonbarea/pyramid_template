@@ -75,14 +75,14 @@ class RealisticTopology(object):
         df_autonomous_system = pd.concat([df_autonomous_system.assign(id_region=id_region) for id_region in id_region])
 
         df_autonomous_system_stub = pd.DataFrame({'autonomous_system_stub': pandas_stub_autonomous_systems.values})
-        df_autonomous_system_stub = pd.concat([df_autonomous_system_stub.assign(stub=1)])
+        df_autonomous_system_stub = pd.concat([df_autonomous_system_stub.assign(stub=True)])
 
         df_autonomous_system.set_index('autonomous_system', inplace=True)
 
         df_autonomous_system_stub.set_index('autonomous_system_stub', inplace=True)
 
         df_autonomous_system = pd.concat([df_autonomous_system, df_autonomous_system_stub], axis=1, join='outer')
-        df_autonomous_system = df_autonomous_system.fillna(0).reset_index()
+        df_autonomous_system = df_autonomous_system.fillna(False).reset_index()
         df_autonomous_system.columns = ['autonomous_system', 'id_topology', 'id_region', 'stub']
 
         df_autonomous_system.to_sql('autonomous_system', con=dbsession.bind, if_exists='append', index=False)

@@ -1,7 +1,5 @@
 import argparse
 import getopt
-import getpass
-import ipaddress
 import sys
 from datetime import date
 
@@ -11,7 +9,7 @@ from sqlalchemy.exc import OperationalError
 from .. import models
 
 
-def setup_models(dbsession, master_ip_address):
+def setup_models(dbsession):
 
     # User
 
@@ -174,22 +172,18 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "master-ip-address="])
+        opts, args = getopt.getopt(argv, 'h:', ["config-file="])
     except getopt.GetoptError:
         print('* Usage: initialize_db '
-              '--config-file=<pyramid config file .ini> '
-              '--master-ip-address={master cluster node IP address (Ex.: 192.168.0.1}')
+              '--config-file=<pyramid config file .ini>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('* Usage: initialize_db '
-                  '--config-file=<pyramid config file .ini> '
-                  '--master-ip-address={master cluster node IP address (Ex.: 192.168.0.1}')
+                  '--config-file=<pyramid config file .ini>')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-        elif opt == '--master-ip-address':
-            master_ip_address = arg
 
     args = parse_args(config_file)
     setup_logging(args.config_uri)
@@ -197,6 +191,6 @@ def main(argv=sys.argv[1:]):
     try:
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            setup_models(dbsession, master_ip_address)
+            setup_models(dbsession)
     except OperationalError:
         print('Database error')

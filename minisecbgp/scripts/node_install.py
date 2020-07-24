@@ -240,7 +240,8 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_maxinet(self):
-        print('\nInstalling Maxinet ...')
+        print('\nInstalling Maxinet ...\n'
+              'take a coffee and wait ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -427,7 +428,8 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_quagga(self):
-        print('\nInstalling Quagga router ...')
+        print('\nInstalling Quagga router ...\n'
+              'take a coffee and wait ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \

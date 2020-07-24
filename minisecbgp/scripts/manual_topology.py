@@ -115,7 +115,7 @@ class ManualTopology(object):
             # Autonomous System
             df_autonomous_system = pd.DataFrame({'autonomous_system': list_autonomous_system,
                                                  'id_region': list_region_autonomous_system,
-                                                 'stub': 0})
+                                                 'stub': False})
             df_autonomous_system.fillna(value='-- undefined region --', inplace=True)
             df_autonomous_system.reset_index()
             df_autonomous_system.set_index('id_region', inplace=True)
@@ -337,7 +337,7 @@ class ManualTopology(object):
             df_stub = df_stub.reset_index().copy()
             for row in df_stub.itertuples():
                 autonomous_system = dbsession.query(models.AutonomousSystem).filter_by(id=row[1]).first()
-                autonomous_system.stub = 1
+                autonomous_system.stub = True
 
         except Exception as error:
             arguments = ['--id_topology=%s' % id_topology]

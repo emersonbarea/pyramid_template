@@ -216,15 +216,14 @@ def hijackRealisticAnalysis(request):
 
         if request.method == 'POST' and form.validate():
             try:
-                realistic_analysis = models.RealisticAnalysis(id_topology=form.topology_list.data,
-                                                              id_topology_distribution_method=form.topology_distribution_method_list.data,
-                                                              id_emulation_platform=form.emulation_platform_list.data,
-                                                              id_router_platform=form.router_platform_list.data,
-                                                              realistic_analysis=form.realistic_analysis.data)
-                request.dbsession.add(realistic_analysis)
-                request.dbsession.flush()
-            except IntegrityError:
-                request.dbsession.rollback()
+                realistic_analysis = request.dbsession.query(models.RealisticAnalysis).\
+                    filter_by(realistic_analysis=form.realistic_analysis.data).first()
+            except Exception as error:
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
+
+            if realistic_analysis:
                 dictionary['message'] = 'The Realistic Analysis name/description "%s" already exist. Choose another ' \
                                         'name/description.' % form.realistic_analysis.data
                 dictionary['css_class'] = 'errorMessage'
@@ -234,6 +233,7 @@ def hijackRealisticAnalysis(request):
                 topology_length = 'FULL'
             else:
                 topology_length = 'STUB'
+
             topology_distribution_method = (dict(form.topology_distribution_method_list.choices).get(form.topology_distribution_method_list.data)).upper()
             emulation_platform = (dict(form.emulation_platform_list.choices).get(form.emulation_platform_list.data)).upper()
             router_platform = (dict(form.router_platform_list.choices).get(form.router_platform_list.data)).upper()
