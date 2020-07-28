@@ -13,7 +13,9 @@ def topologies(request):
         raise HTTPForbidden
 
     dictionary = dict()
-    all_topologies = request.dbsession.query(models.Topology, models.TopologyType).\
+    topology_types = request.dbsession.query(models.TopologyType).\
+        order_by(models.TopologyType.id).all()
+    topologies = request.dbsession.query(models.Topology, models.TopologyType).\
         filter(models.Topology.id_topology_type == models.TopologyType.id).all()
     downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
@@ -21,7 +23,8 @@ def topologies(request):
                   'Wait for it finish to see the new topology installed and access topology detail.'
         dictionary['css_class'] = 'warningMessage'
     dictionary['updating'] = downloading.downloading
-    dictionary['topologies'] = all_topologies
+    dictionary['topology_types'] = topology_types
+    dictionary['topologies'] = topologies
     dictionary['topologies_url'] = request.route_url('topologies')
     dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
 
@@ -138,7 +141,8 @@ def topologies_draw(request):
     dictionary = dict()
 
     try:
-        topology = request.dbsession.query(models.Topology).filter_by(id=request.matchdict["id_topology"]).first()
+        topology = request.dbsession.query(models.Topology).\
+            filter_by(id=request.matchdict["id_topology"]).first()
         dictionary['topology'] = topology
 
         query = 'select asys.id as id, ' \
@@ -199,7 +203,8 @@ def topologies_draw_stub(request):
     dictionary = dict()
 
     try:
-        topology = request.dbsession.query(models.Topology).filter_by(id=request.matchdict["id_topology"]).first()
+        topology = request.dbsession.query(models.Topology).\
+            filter_by(id=request.matchdict["id_topology"]).first()
         dictionary['topology'] = topology
 
         query = 'select asys.id as id, ' \

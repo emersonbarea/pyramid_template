@@ -9,6 +9,7 @@ import ipaddress
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy import func
 from sqlalchemy.exc import OperationalError, IntegrityError
 
 from minisecbgp import models
@@ -25,7 +26,8 @@ class ManualTopology(object):
 
         # Topology
         try:
-            topology_type = dbsession.query(models.TopologyType).filter_by(topology_type='Manual').first()
+            topology_type = dbsession.query(models.TopologyType).\
+                filter(func.lower(models.TopologyType.topology_type) == 'manual').first()
             dictionary_topology = {'id_topology_type': [topology_type.id],
                                    'topology': [data['topology_name']],
                                    'description': ['Manual topology (from json file)']}

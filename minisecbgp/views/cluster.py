@@ -122,31 +122,38 @@ def create(request):
 
     if request.method == 'POST' and form.validate():
         try:
-            arguments = ['--config-file=minisecbgp.ini',
-                         '--node-ip-address=%s' % form.node.data,
-                         '--master=False']
-            subprocess.run(['./venv/bin/MiniSecBGP_node_create'] + arguments)                       # wait to finish
+            node = request.dbsession.query(models.Node).\
+                filter_by(node=int(ipaddress.ip_address(form.node.data))).first()
+            if not node:
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--node-ip-address=%s' % form.node.data,
+                             '--master=False']
+                subprocess.run(['./venv/bin/MiniSecBGP_node_create'] + arguments)                       # wait to finish
 
-            arguments = ['--config-file=minisecbgp.ini',
-                         '--execution-type=manual',
-                         '--node-ip-address=%s' % form.node.data,
-                         '--username=%s' % form.username.data,
-                         '--password=%s' % form.password.data]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_node_service'] + arguments)                    # runs in parallel
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--execution-type=manual',
+                             '--node-ip-address=%s' % form.node.data,
+                             '--username=%s' % form.username.data,
+                             '--password=%s' % form.password.data]
+                subprocess.Popen(['./venv/bin/MiniSecBGP_node_service'] + arguments)                    # runs in parallel
 
-            arguments = ['--config-file=minisecbgp.ini',
-                         '--node-ip-address=%s' % form.node.data,
-                         '--username=%s' % form.username.data,
-                         '--password=%s' % form.password.data]
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--node-ip-address=%s' % form.node.data,
+                             '--username=%s' % form.username.data,
+                             '--password=%s' % form.password.data]
 
-            subprocess.run(['./venv/bin/MiniSecBGP_node_configuration'] + arguments)                # wait to finish
+                subprocess.run(['./venv/bin/MiniSecBGP_node_configuration'] + arguments)                # wait to finish
 
-            subprocess.Popen(['./venv/bin/MiniSecBGP_node_install'] + arguments)                    # runs in parallel
+                subprocess.Popen(['./venv/bin/MiniSecBGP_node_install'] + arguments)                    # runs in parallel
 
-            message = ('Node "%s" successfully included in cluster.' % form.node.data)
-            css_class = 'successMessage'
+                message = ('Node "%s" successfully included in cluster.' % form.node.data)
+                css_class = 'successMessage'
 
-            request.dbsession.flush()
+                request.dbsession.flush()
+            else:
+                message = ('Node "%s" already exists in cluster.' % form.node.data)
+                css_class = 'errorMessage'
+
         except IntegrityError as e:
             request.dbsession.rollback()
             message = ('Node "%s" already exists in cluster.' % form.node.data)

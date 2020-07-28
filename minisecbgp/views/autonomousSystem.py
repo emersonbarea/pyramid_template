@@ -123,7 +123,7 @@ def autonomousSystemAddEdit(request):
             try:
                 entry = 'insert into autonomous_system (id_topology, id_region, autonomous_system, stub) ' \
                         'values (%s, %s, %s, %s)' % (request.matchdict["id_topology"], form.id_region.data,
-                                                     form.autonomous_system.data, 0)
+                                                     form.autonomous_system.data, True)
                 request.dbsession.bind.execute(entry)
 
                 new_autonomous_system = request.dbsession.query(models.AutonomousSystem).\

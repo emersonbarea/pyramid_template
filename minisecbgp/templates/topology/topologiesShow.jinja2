@@ -3,28 +3,30 @@
 {% block contentTopologies %}
 
 <div id="aum" class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
 
-      <meta http-equiv="refresh" content="60;URL= '{{ topologies_url }}'">
+  <meta http-equiv="refresh" content="60;URL= '{{ topologies_url }}'">
 
-      <h3 align="center">Installed Topologies</h3>
+  {% for topology_type in topology_types %}
+    <div class="row-fluid">
+      <div class="span12">
+        <h4 align="center"> {{ topology_type.topology_type }} </h4>
+        {% for topology in topologies %}
+          {% if topology.TopologyType.id == topology_type.id %}
+            {% if updating != 1 %}
+              <p><a href="{{ request.route_url('topologiesDetail', id_topology = topology.Topology.id) }}" title="click to access topology details">
+                <p> {{ topology.Topology.topology }} - {{ topology.Topology.description }} </p>
+              </a></p>
+            {% else %}
+              <p> {{ topology.Topology.topology }} - {{ topology.Topology.description }} </p>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span12">
-      {% for topology in topologies %}
-        {% if updating != 1 %}
-          <p><a href="{{ request.route_url('topologiesDetail', id_topology = topology.Topology.id) }}" title="click to access topology details">
-            {{ topology.Topology.topology }} - {{ topology.TopologyType.topology_type }}
-          </a></p>
-        {% else %}
-          <p> {{ topology.Topology.topology }} - {{ topology.TopologyType.topology_type }} </p>
-        {% endif %}
-      {% endfor %}
-      <p align="center">* this page is automatically reloaded every minute</p>
-    </div>
-  </div>
+    <p><hr></p>
+  {% endfor %}
+  <p align="center">* this page is automatically reloaded every minute</p>
+
 </div>
 
 {% endblock contentTopologies %}

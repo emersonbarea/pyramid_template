@@ -53,9 +53,12 @@ def setup_models(dbsession):
 
     # Topology
 
-    topology_types = ['Realistic', 'Synthetic', 'Manual']
+    topology_types = [{'topology_type': 'Manual', 'description': 'Manually Created Topologies'},
+                      {'topology_type': 'Realistic', 'description': 'CAIDA AS-Relationship imported topologies'},
+                      {'topology_type': 'Affected Area', 'description': 'Topologies automatically generated from the Affected Area'}]
     for topology_type in topology_types:
-        dbsession.add(models.TopologyType(topology_type=topology_type))
+        dbsession.add(models.TopologyType(topology_type=topology_type['topology_type'],
+                                          description=topology_type['description']))
 
     link_agreement_c2p = models.LinkAgreement(agreement='p2c',
                                               description='Customer ASes pay ISPs (providers) for access to the rest of '

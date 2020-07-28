@@ -6,6 +6,7 @@ import subprocess
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
+from sqlalchemy import func
 from wtforms import Form, SelectField
 from wtforms.validators import InputRequired
 
@@ -23,9 +24,9 @@ def manualTopologies(request):
         raise HTTPForbidden
 
     dictionary = dict()
-    dictionary['topologies'] = request.dbsession.query(models.Topology). \
-        filter(models.Topology.id_topology_type == request.dbsession.query(models.TopologyType.id).
-               filter_by(topology_type='Manual')).all()
+    dictionary['topologies'] = request.dbsession.query(models.Topology, models.TopologyType).\
+        filter(models.Topology.id_topology_type == models.TopologyType.id).\
+        filter(func.lower(models.TopologyType.topology_type) == 'manual').all()
     downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
         dictionary['message'] = 'Warning: there is an update process running in the background. ' \

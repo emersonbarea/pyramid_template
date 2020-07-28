@@ -1,0 +1,151 @@
+{% extends "hijack.jinja2" %}
+
+{% block contentHijack %}
+
+<div id="aum" class="container-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row-fluid">
+        <div class="span12">
+            {% if not realistic_analysis[0]['time_write_files'] %}
+                <meta http-equiv="refresh" content="5;URL= '{{ hijackRealisticAnalysisScenario_url }}'">
+                <h3 align="center">Creating Scenario Configuration</h3>
+            {% else %}
+                <h3 align="center">Scenario Configuration</h3>
+            {% endif %}
+        </div>
+    </div>
+    <form action="#" method="POST">
+        <div class="row-fluid">
+            {{ message }}
+            <div class="span12">
+                <p>
+                    <strong> Topology name: </strong>
+                    <font color="green"> {{ realistic_analysis[0]['topology'] }} </font>
+                </p>
+                <p>
+                    <strong> Include stub ASs: </strong>
+                    <font color="green"> {{ realistic_analysis[0]['include_stub'] }} </font>
+                </p>
+                <p>
+                    <strong> Method to spawn the topology on cluster nodes: </strong>
+                    <font color="green"> {{ realistic_analysis[0]['topology_distribution_method'] }} </font> </p>
+                <p>
+                    <strong> Emulation platform: </strong>
+                    <font color="green"> {{ realistic_analysis[0]['emulation_platform'] }} </font>
+                </p>
+                <p>
+                    <strong> Router platform: </strong>
+                    <font color="green"> {{ realistic_analysis[0]['router_platform'] }} </font>
+                </p>
+                {% if realistic_analysis[0]['output_path'] %}
+                    <p>
+                        <strong> Output configuration files: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['output_path'] }} </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Output configuration files: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['number_of_autonomous_systems'] %}
+                    <p>
+                        <strong> Number of ASs: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['number_of_autonomous_systems'] }} </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Number of ASs: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['time_get_data'] %}
+                    <p>
+                        <strong> Time spent to get data from topology: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_get_data'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time spent to get data from topology: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['time_emulate_platform_commands'] %}
+                    <p>
+                        <strong> Time spent to create emulation commands: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_emulate_platform_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time spent to create emulation commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['time_router_platform_commands'] %}
+                    <p>
+                        <strong> Time spent to create router platform commands: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_router_platform_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time spent to create router platform commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['time_write_files'] %}
+                    <p>
+                        <strong> Time spent to write configuration files: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_write_files'] }} sec </font>
+                    </p>
+                    <p>
+                        <strong> Total time: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['total_time'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time spent to write configuration files: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                    <p>
+                        <strong> Total time: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <p><hr></p>
+
+        {% if not realistic_analysis[0]['time_write_files'] %}
+            <p align="center">* fields status checked automatically every 5 seconds</p>
+        {% else %}
+            <div class="form-group" align="center">
+                {{ form.download_button(class="btn btn-primary") }}
+                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+            </div>
+
+              <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
+                      <p>This process can take a long time due to the topology size, and will block some MiniSecBGP functions until it finish.</p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form.emulate_button(class="btn btn-primary") }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        {% endif %}
+    </form>
+</div>
+
+{% endblock contentHijack %}

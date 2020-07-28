@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean
-from sqlalchemy.dialects.postgresql import BYTEA
+from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean, BigInteger, Float
 from sqlalchemy.orm import relationship
 
 from .meta import Base
@@ -32,13 +31,17 @@ class RouterPlatform(Base):
 class RealisticAnalysis(Base):
     __tablename__ = 'realistic_analysis'
     id = Column(Integer, primary_key=True)
-    id_topology = Column(Integer, ForeignKey('topology.id'))
     id_topology_distribution_method = Column(Integer, ForeignKey('topology_distribution_method.id'))
     id_emulation_platform = Column(Integer, ForeignKey('emulation_platform.id'))
     id_router_platform = Column(Integer, ForeignKey('router_platform.id'))
-    include_stub = Column(Boolean, nullable=False)
-    realistic_analysis = Column(String(50), nullable=False, unique=True)
-    Index('IndexId7_topology', id_topology)
+    topology = Column(String(50))
+    include_stub = Column(Boolean)
+    output_path = Column(String(250))
+    number_of_autonomous_systems = Column(String(250))
+    time_get_data = Column(String(250))
+    time_emulate_platform_commands = Column(String(250))
+    time_router_platform_commands = Column(String(250))
+    time_write_files = Column(String(250))
     Index('IndexId_topology_distribution_method', id_topology_distribution_method)
     Index('IndexId_emulation_platform', id_emulation_platform)
     Index('IndexId_router_platform', id_router_platform)

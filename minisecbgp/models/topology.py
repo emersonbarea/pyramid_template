@@ -7,6 +7,7 @@ class TopologyType(Base):
     __tablename__ = 'topology_type'
     id = Column(Integer, primary_key=True)
     topology_type = Column(String(50), nullable=False, unique=True)
+    description = Column(String(250), nullable=False, unique=True)
     topology = relationship('Topology', foreign_keys='Topology.id_topology_type')
 
 
@@ -22,7 +23,6 @@ class Topology(Base):
     internet_exchange_point = relationship('InternetExchangePoint', foreign_keys='InternetExchangePoint.id_topology')
     type_of_user = relationship('TypeOfUser', foreign_keys='TypeOfUser.id_topology')
     type_of_service = relationship('TypeOfService', foreign_keys='TypeOfService.id_topology')
-    realistic_analysis = relationship('RealisticAnalysis', foreign_keys='RealisticAnalysis.id_topology')
     Index('IndexId_topology_type', id_topology_type)
 
 

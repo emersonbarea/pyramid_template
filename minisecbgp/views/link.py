@@ -103,11 +103,11 @@ def linkAddEditDelete(request):
             if stub_autonomous_system1.count > 1:
                 autonomous_system = request.dbsession.query(models.AutonomousSystem).\
                     filter_by(id=autonomous_system1).first()
-                autonomous_system.stub = 0
+                autonomous_system.stub = False
             else:
                 autonomous_system = request.dbsession.query(models.AutonomousSystem).\
                     filter_by(id=autonomous_system1).first()
-                autonomous_system.stub = 1
+                autonomous_system.stub = True
 
         query = 'select count(id) as count ' \
                 'from link ' \
@@ -118,11 +118,11 @@ def linkAddEditDelete(request):
             if stub_autonomous_system2.count > 1:
                 autonomous_system = request.dbsession.query(models.AutonomousSystem).\
                     filter_by(id=autonomous_system2).first()
-                autonomous_system.stub = 0
+                autonomous_system.stub = False
             else:
                 autonomous_system = request.dbsession.query(models.AutonomousSystem).\
                     filter_by(id=autonomous_system2).first()
-                autonomous_system.stub = 1
+                autonomous_system.stub = True
 
     def fillSelectFields():
         query = 'select l.id as id_link, ' \

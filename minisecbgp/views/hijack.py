@@ -1,15 +1,14 @@
 import ipaddress
-import os
 import subprocess
+import tarfile
+import os.path
 
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPForbidden
-from sqlalchemy.exc import IntegrityError
+from pyramid.httpexceptions import HTTPForbidden, HTTPFound
+from pyramid.response import Response, FileResponse
 from wtforms import Form, SelectField, IntegerField, StringField, SubmitField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets.html5 import NumberInput
-
-import pandas as pd
 
 from minisecbgp import models
 
@@ -84,11 +83,6 @@ class AffectedAreaDataForm(Form):
 
 
 class RealisticAnalysisDataForm(Form):
-    realistic_analysis = StringField('Realistic Analysis name/description: *',
-                                     validators=[InputRequired(),
-                                                 Length(min=1, max=50,
-                                                        message='Realistic Analysis name/description string must be between '
-                                                                '1 and 50 characters long.')])
     topology_list = SelectField('Choose the topology: ', coerce=int,
                                 validators=[InputRequired()])
     stub = MultiCheckboxField(choices=[(1, 'Include stub ASs')], coerce=int)
@@ -100,6 +94,11 @@ class RealisticAnalysisDataForm(Form):
                                        coerce=int, validators=[InputRequired()])
     emulation_platform_list = SelectField('Choose which emulation platform to use: ',
                                           coerce=int, validators=[InputRequired()])
+
+
+class RealisticAnalysisScenarioDataForm(Form):
+    emulate_button = SubmitField('Submit')
+    download_button = SubmitField('Download')
 
 
 def node_status(dbsession, node):
@@ -127,7 +126,7 @@ def node_status(dbsession, node):
     return True
 
 
-@view_config(route_name='hijack', renderer='minisecbgp:templates/hijack/hijackHistory.jinja2')
+@view_config(route_name='hijack', renderer='minisecbgp:templates/hijack/hijack.jinja2')
 def hijack(request):
     user = request.user
     if user is None:
@@ -138,8 +137,9 @@ def hijack(request):
     return dictionary
 
 
-@view_config(route_name='hijackAffectedArea', renderer='minisecbgp:templates/hijack/hijackAffectedArea.jinja2')
-def hijackAffectedArea(request):
+@view_config(route_name='hijackAffectedArea',
+             renderer='minisecbgp:templates/hijack/hijackAffectedArea.jinja2')
+def hijack_affected_area(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -163,7 +163,7 @@ def hijackAffectedArea(request):
 
 @view_config(route_name='hijackRealisticAnalysis',
              renderer='minisecbgp:templates/hijack/hijackRealisticAnalysis.jinja2')
-def hijackRealisticAnalysis(request):
+def hijack_realistic_analysis(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -224,24 +224,31 @@ def hijackRealisticAnalysis(request):
                 include_stub = True
             else:
                 include_stub = False
+
             try:
-                realistic_analysis = models.RealisticAnalysis(id_topology=form.topology_list.data,
-                                                              id_topology_distribution_method=form.topology_distribution_method_list.data,
-                                                              id_emulation_platform=form.emulation_platform_list.data,
-                                                              id_router_platform=form.router_platform_list.data,
-                                                              include_stub=include_stub,
-                                                              realistic_analysis=form.realistic_analysis.data)
-                request.dbsession.add(realistic_analysis)
+                request.dbsession.query(models.RealisticAnalysis).delete()
+                topology = request.dbsession.query(models.Topology). \
+                    filter_by(id=form.topology_list.data).first()
+                topology_distribution_method = request.dbsession.query(models.TopologyDistributionMethod). \
+                    filter_by(id=form.topology_distribution_method_list.data).first()
+                emulation_platform = request.dbsession.query(models.EmulationPlatform). \
+                    filter_by(id=form.emulation_platform_list.data).first()
+                router_platform = request.dbsession.query(models.RouterPlatform). \
+                    filter_by(id=form.router_platform_list.data).first()
+                request.dbsession.add(
+                    models.RealisticAnalysis(id_topology_distribution_method=topology_distribution_method.id,
+                                             id_emulation_platform=emulation_platform.id,
+                                             id_router_platform=router_platform.id,
+                                             topology=topology.topology,
+                                             include_stub=include_stub))
                 request.dbsession.flush()
-            except IntegrityError:
+            except Exception as error:
                 request.dbsession.rollback()
-                dictionary['message'] = 'The Realistic Analysis name/description "%s" already exist. Choose another ' \
-                                        'name/description.' % form.realistic_analysis.data
+                dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
                 return dictionary
 
             arguments = ['--config-file=minisecbgp.ini',
-                         '--realistic-analysis-name=%s' % form.realistic_analysis.data,
                          '--topology=%s' % form.topology_list.data,
                          '--include-stub=%s' % include_stub,
                          '--topology-distribution-method=%s' % form.topology_distribution_method_list.data,
@@ -249,8 +256,81 @@ def hijackRealisticAnalysis(request):
                          '--router-platform=%s' % form.router_platform_list.data]
             subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_analysis'] + arguments)
 
+            return HTTPFound(location=request.route_path('hijackRealisticAnalysisScenario'))
+
     except Exception as error:
         request.dbsession.rollback()
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='hijackRealisticAnalysisScenario',
+             renderer='minisecbgp:templates/hijack/hijackRealisticAnalysisScenario.jinja2')
+def hijack_realistic_analysis_scenario(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    form = RealisticAnalysisScenarioDataForm(request.POST)
+    try:
+        query = 'select ra.id as id, ' \
+                'ra.topology as topology, ' \
+                '(select tdm.topology_distribution_method from topology_distribution_method tdm ' \
+                'where tdm.id = ra.id_topology_distribution_method) as topology_distribution_method, ' \
+                '(select ep.emulation_platform from emulation_platform ep ' \
+                'where ep.id = ra.id_emulation_platform) as emulation_platform, ' \
+                '(select rp.router_platform from router_platform rp ' \
+                'where rp.id = ra.id_router_platform) as router_platform, ' \
+                'ra.include_stub as include_stub, ' \
+                'ra.output_path as output_path, ' \
+                'ra.number_of_autonomous_systems as number_of_autonomous_systems, ' \
+                'ra.time_get_data as time_get_data, ' \
+                'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
+                'ra.time_router_platform_commands as time_router_platform_commands, ' \
+                'ra.time_write_files as time_write_files ' \
+                'from realistic_analysis ra;'
+        result_proxy = request.dbsession.bind.execute(query)
+        realistic_analysis = list()
+        for realistic_analyze in result_proxy:
+            realistic_analysis.append({'topology': realistic_analyze.topology,
+                                       'topology_distribution_method': realistic_analyze.topology_distribution_method,
+                                       'emulation_platform': realistic_analyze.emulation_platform,
+                                       'router_platform': realistic_analyze.router_platform,
+                                       'include_stub': realistic_analyze.include_stub,
+                                       'output_path': realistic_analyze.output_path,
+                                       'number_of_autonomous_systems': realistic_analyze.number_of_autonomous_systems,
+                                       'time_get_data': realistic_analyze.time_get_data,
+                                       'time_emulate_platform_commands': realistic_analyze.time_emulate_platform_commands,
+                                       'time_router_platform_commands': realistic_analyze.time_router_platform_commands,
+                                       'time_write_files': realistic_analyze.time_write_files,
+                                       'total_time': (float(realistic_analyze.time_get_data) if realistic_analyze.time_get_data else 0) +
+                                                     (float(realistic_analyze.time_emulate_platform_commands) if realistic_analyze.time_emulate_platform_commands else 0) +
+                                                     (float(realistic_analyze.time_router_platform_commands) if realistic_analyze.time_router_platform_commands else 0) +
+                                                     (float(realistic_analyze.time_write_files) if realistic_analyze.time_write_files else 0)})
+        dictionary['realistic_analysis'] = realistic_analysis
+        dictionary['form'] = form
+        dictionary['hijackRealisticAnalysisScenario_url'] = request.route_url('hijackRealisticAnalysisScenario')
+
+        if request.method == 'POST' and form.validate():
+
+            if form.download_button.data:
+                realistic_analysis = request.dbsession.query(models.RealisticAnalysis).first()
+                source_dir = str(realistic_analysis.output_path[:-1])
+                output_filename = str(realistic_analysis.topology) + '.tar.gz'
+                with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
+                    tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+                response = FileResponse(source_dir + '/' + output_filename)
+                response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
+                return response
+
+            if form.emulate_button.data:
+                pass
+
+    except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'
 

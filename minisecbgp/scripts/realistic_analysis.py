@@ -2,6 +2,8 @@ import argparse
 import getopt
 import ipaddress
 import sys
+import time
+
 import pandas as pd
 import os
 import shutil
@@ -14,14 +16,18 @@ from minisecbgp import models
 
 
 class RealisticAnalysis(object):
-    def __init__(self, dbsession, realistic_analysis_name, id_topology, include_stub, topology_distribution_method,
-                 emulation_platform):
+    def __init__(self, dbsession, id_topology, include_stub, topology_distribution_method,
+                 emulation_platform, router_platform):
         self.dbsession = dbsession
-        self.output_dir = os.getcwd() + '/output/topology/%s/' % realistic_analysis_name
+        self.topology = dbsession.query(models.Topology).filter_by(id=id_topology).first()
+        self.output_dir = '/tmp/MiniSecBGP/output/topology/%s/' % self.topology.topology
         self.id_topology = id_topology
         self.include_stub = include_stub
         self.topology_distribution_method = topology_distribution_method
         self.emulation_platform = emulation_platform
+        self.router_platform = router_platform
+
+        save_to_database(self.dbsession, ['output_path'], [self.output_dir])
 
     def dfs_from_database(self):
         query = 'select l.id as id_link, ' \
@@ -119,6 +125,8 @@ class RealisticAnalysis(object):
 
         # print('Number of ASes: %s' % len(self.sr_unique_as))
         # Number of ASes: 43049
+
+        save_to_database(self.dbsession, ['number_of_autonomous_systems'], [len(self.sr_unique_as)])
 
     def emulation_commands(self):
         emulation_platform = self.dbsession.query(models.EmulationPlatform).\
@@ -381,6 +389,17 @@ class RealisticAnalysis(object):
             file_bgpd.close()
 
 
+def save_to_database(dbsession, field, value):
+    try:
+        for i in range(len(field)):
+            update = 'update realistic_analysis set %s = \'%s\'' % (field[i], str(value[i]))
+            dbsession.bind.execute(update)
+            dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print(error)
+
+
 def str2bool(master):
     if isinstance(master, bool):
         return master
@@ -404,12 +423,11 @@ def parse_args(config_file):
 def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, "h:",
-                                   ["config-file=", "realistic-analysis-name=", "topology=", "include-stub=", "topology-distribution-method=",
+                                   ["config-file=", "topology=", "include-stub=", "topology-distribution-method=",
                                     "emulation-platform=", "router-platform="])
     except getopt.GetoptError as error:
         print('config '
               '--config-file=<pyramid config file .ini> '
-              '--realistic-analysis-name=<realistic analysis name/description> '
               '--topology=<Topology ID> '
               '--include-stub=<True|False> '
               '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
@@ -420,7 +438,6 @@ def main(argv=sys.argv[1:]):
         if opt == '-h':
             print('config '
                   '--config-file=<pyramid config file .ini> '
-                  '--realistic-analysis-name=<realistic analysis name/description> '
                   '--topology=<Topology ID> '
                   '--include-stub=<True|False> '
                   '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
@@ -429,8 +446,6 @@ def main(argv=sys.argv[1:]):
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-        elif opt == '--realistic-analysis-name':
-            realistic_analysis_name = arg
         elif opt == '--topology':
             id_topology = arg
         elif opt == '--include-stub':
@@ -452,17 +467,31 @@ def main(argv=sys.argv[1:]):
             quagga = dbsession.query(models.RouterPlatform.id). \
                 filter(func.lower(models.RouterPlatform.router_platform) == 'quagga').first()
 
-            ra = RealisticAnalysis(dbsession, realistic_analysis_name, id_topology, include_stub,
-                                   topology_distribution_method, emulation_platform)
+            ra = RealisticAnalysis(dbsession, id_topology, include_stub,
+                                   topology_distribution_method, emulation_platform, router_platform)
+
+            time_get_data = time.time()
             ra.dfs_from_database()
             ra.data_frames()
+            time_get_data = time.time() - time_get_data
+            save_to_database(dbsession, ['time_get_data'], [time_get_data])
+
+            time_emulate_platform_commands = time.time()
             ra.emulation_commands()
+            time_emulate_platform_commands = time.time() - time_emulate_platform_commands
+            save_to_database(dbsession, ['time_emulate_platform_commands'], [time_emulate_platform_commands])
 
             # Router platform
+            time_router_platform_commands = time.time()
             if router_platform == str(quagga[0]):
                 ra.quagga_commands()
+            time_router_platform_commands = time.time() - time_router_platform_commands
+            save_to_database(dbsession, ['time_router_platform_commands'], [time_router_platform_commands])
 
+            time_write_files = time.time()
             ra.write_to_file()
+            time_write_files = time.time() - time_write_files
+            save_to_database(dbsession, ['time_write_files'], [time_write_files])
 
     except OperationalError:
         print('Database error')

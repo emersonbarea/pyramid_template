@@ -9,6 +9,7 @@ import re
 import urllib
 
 from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
 
 from minisecbgp import models
@@ -29,11 +30,11 @@ class DownloadTopology(object):
                 databases = re.findall(r'\d{8}' + downloadParameters.file_search_string, site.text)
                 databases = list(dict.fromkeys(databases))
                 databases.sort(reverse=True)
-                installed_databases = self.dbsession.query(models.Topology).\
-                    filter(models.Topology.id_topology_type == self.dbsession.query(models.TopologyType.id).
-                           filter_by(topology_type='Realistic')).all()
-                for database in installed_databases:
-                    if databases[0] == database.topology:
+                installed_databases = self.dbsession.query(models.Topology, models.TopologyType).\
+                    filter(models.Topology.id_topology_type == models.TopologyType.id). \
+                    filter(func.lower(models.TopologyType.topology_type) == 'realistic').all()
+                for installed_database in installed_databases:
+                    if databases[0] == installed_database.Topology.topology:
                         print('Topology already installed')
                         return
                 urllib.request.urlretrieve(downloadParameters.url + databases[0] + '.txt.bz2',

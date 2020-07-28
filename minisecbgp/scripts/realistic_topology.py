@@ -7,6 +7,7 @@ import sys
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
 
 from minisecbgp import models
@@ -46,8 +47,8 @@ class RealisticTopology(object):
     def topology(self, dbsession):
         topology = models.Topology(topology=self.topology_name,
                                    description='CAIDA AS Relationship - %s' % self.file,
-                                   id_topology_type=dbsession.query(models.TopologyType.id).filter_by(
-                                       topology_type='Realistic'))
+                                   id_topology_type=dbsession.query(models.TopologyType.id).filter(
+                                       func.lower(models.TopologyType.topology_type) == 'realistic'))
         dbsession.add(topology)
 
     def get_topology_id(self, dbsession):
