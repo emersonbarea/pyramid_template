@@ -321,8 +321,7 @@ class RealisticAnalysis(object):
         """
 
         # erase previews configuration
-        if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir)
+        shutil.rmtree('/tmp/MiniSecBGP/output/topology/')
         os.makedirs(self.output_dir + 'AS')
         os.makedirs(self.output_dir + 'log')
 

@@ -14,7 +14,6 @@ class DeleteTopology(object):
 
     @staticmethod
     def delete(dbsession, id_topology):
-        realistic_analysis = 'delete from realistic_analysis where id_topology = %s;' % id_topology
         router_id = 'delete from router_id where id_autonomous_system in (' \
                     'select id from autonomous_system where id_topology = %s);' % id_topology
         prefix = 'delete from prefix where id_autonomous_system in (' \
@@ -35,7 +34,6 @@ class DeleteTopology(object):
         region = 'delete from region where id_topology = %s;' % id_topology
         topology = 'delete from topology where id = %s;' % id_topology
 
-        dbsession.bind.execute(realistic_analysis)
         dbsession.bind.execute(router_id)
         dbsession.bind.execute(prefix)
         dbsession.bind.execute(link)
