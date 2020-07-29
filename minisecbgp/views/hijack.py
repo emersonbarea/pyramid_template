@@ -5,7 +5,7 @@ import os.path
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
-from pyramid.response import Response, FileResponse
+from pyramid.response import FileResponse
 from wtforms import Form, SelectField, IntegerField, StringField, SubmitField, SelectMultipleField, widgets
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets.html5 import NumberInput
@@ -19,64 +19,58 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class AffectedAreaDataForm(Form):
-    attacker = SelectField('Choose the <b><i>attacker</i></b> '
-                           '(Which AS will announce the hijacked prefix): *',
-                           choices=[('', '--'),
+    scenario_name = StringField(validators=[InputRequired(),
+                                            Length(min=1, max=50,
+                                                   message='Scenario name string must be between 1 and 50 characters long.')])
+    scenario_description = StringField(validators=[InputRequired(),
+                                                   Length(min=1, max=50,
+                                                          message='Scenario description string must be between 1 and 50 characters long.')])
+    topology = SelectField(coerce=int,
+                           validators=[InputRequired()])
+    include_stub = MultiCheckboxField(choices=[(1, 'Include stub ASs')],
+                                      coerce=int)
+    attacker = SelectField(choices=[('', '--'),
                                     ('all', 'All ASs'),
                                     ('region', 'All ASs from a region'),
                                     ('AS', 'Specify the ASN')])
-    regionAttacker = StringField('Attacker\'s region name: *',
-                                 validators=[InputRequired(),
+    regionAttacker = StringField(validators=[InputRequired(),
                                              Length(min=1, max=100,
                                                     message='Region name string must be between 1 and 100 characters long.')])
-    ASAttacker = StringField('Attacker\'s ASN: *',
-                             validators=[InputRequired(),
+    ASAttacker = StringField(validators=[InputRequired(),
                                          Length(min=1, max=100,
                                                 message='ASN string must be between 1 and 100 characters long.')])
 
-    target = SelectField('Choose the <b><i>affected area</i></b> '
-                         '(Check if this AS receives and accepts the hijacked route): *',
-                         choices=[('', '--'),
+    target = SelectField(choices=[('', '--'),
                                   ('all', 'All ASs'),
                                   ('region', 'All ASs from a region'),
                                   ('AS', 'Specify the ASN')])
-    regionTarget = StringField('Target\'s region name: *',
-                               validators=[InputRequired(),
+    regionTarget = StringField(validators=[InputRequired(),
                                            Length(min=1, max=100,
                                                   message='Region name string must be between 1 and 100 characters long.')])
-    ASTarget = StringField('Target\'s ASN: *',
-                           validators=[InputRequired(),
+    ASTarget = StringField(validators=[InputRequired(),
                                        Length(min=1, max=100,
                                               message='ASN string must be between 1 and 100 characters long.')])
 
-    prefix = SelectField('Choose the <b><i>prefix target</i></b> '
-                         '(Which prefix will be hijacked): *',
-                         choices=[('', '--'),
+    prefix = SelectField(choices=[('', '--'),
                                   ('target', 'Use the target\'s prefix'),
-                                  ('all', 'All AS\'s prefixes'),
-                                  ('region', 'All AS\'s prefixes from a region'),
+                                  ('all', 'All prefixes of all topology ASs'),
+                                  ('region', 'All prefixes of all routers in the region'),
                                   ('AS', 'Use the prefix of a specific AS'),
-                                  ('prefix', 'Enter the prefix')])
-    regionPrefix = StringField('Name of the region where all AS\'s prefixes will be hijacked: *',
-                               validators=[InputRequired(),
+                                  ('prefix', 'Choose the prefix')])
+    regionPrefix = StringField(validators=[InputRequired(),
                                            Length(min=1, max=100,
                                                   message='Region name string must be between 1 and 100 characters long.')])
-    ASPrefix = StringField('ASN from which its prefix will be hijacked: *',
-                           validators=[InputRequired(),
+    ASPrefix = StringField(validators=[InputRequired(),
                                        Length(min=1, max=100,
                                               message='ASN string must be between 1 and 100 characters long.')])
-    prefixPrefix = StringField('Specific prefix that will be hijacked: *',
-                               validators=[InputRequired(),
+    prefixPrefix = StringField(validators=[InputRequired(),
                                            Length(min=1, max=100,
                                                   message='Prefix string must be between 1 and 100 characters long.')])
 
-    path = SelectField('Number of shortest <b><i>paths</i></b> '
-                       '(How many shortest paths should be considered in the report): *',
-                       choices=[('', '--'),
+    path = SelectField(choices=[('', '--'),
                                 ('all', 'All Paths'),
                                 ('shortest', 'Choose the number of shortest paths')])
-    shortestPath = IntegerField('Number of shortest paths: *',
-                                widget=NumberInput(min=0, max=10000, step=1),
+    shortestPath = IntegerField(widget=NumberInput(min=0, max=10000, step=1),
                                 validators=[InputRequired()])
 
     continue_button = SubmitField('Continue')
@@ -85,7 +79,7 @@ class AffectedAreaDataForm(Form):
 class RealisticAnalysisDataForm(Form):
     topology_list = SelectField('Choose the topology: ', coerce=int,
                                 validators=[InputRequired()])
-    stub = MultiCheckboxField(choices=[(1, 'Include stub ASs')], coerce=int)
+    include_stub = MultiCheckboxField(choices=[(1, 'Include stub ASs')], coerce=int)
     cluster_list = MultiCheckboxField('Choose the servers on which to spawn the topology: ',
                                       coerce=int, validators=[InputRequired(message='Check at least one cluster node')])
     topology_distribution_method_list = SelectField('Choose how to spawn the topology on cluster nodes: ',
@@ -148,12 +142,38 @@ def hijack_affected_area(request):
 
     try:
         form = AffectedAreaDataForm(request.POST)
-        dictionary['form'] = form
+        form.topology.choices = [(row.id, row.topology) for row in request.dbsession.query(models.Topology).all()]
 
         if request.method == 'POST' and form.validate():
-            form = AffectedAreaDataForm()
-            dictionary['form'] = form
 
+            print('\nform.topology.data: ', form.topology.data,
+                  '\nform.include_stub.data: ', form.include_stub.data,
+                  '\nform.attacker.data: ', form.attacker.data,
+                  '\nform.regionAttacker.data: ', form.regionAttacker.data,
+                  '\nform.ASAttacker.data: ', form.ASAttacker.data,
+                  '\nform.target.data: ', form.target.data,
+                  '\nform.regionTarget.data: ', form.regionTarget.data,
+                  '\nform.ASTarget.data: ', form.ASTarget.data,
+                  '\nform.prefix.data: ', form.prefix.data,
+                  '\nform.regionPrefix.data: ', form.regionPrefix.data,
+                  '\nform.ASPrefix.data: ', form.ASPrefix.data,
+                  '\nform.prefixPrefix.data: ', form.prefixPrefix.data,
+                  '\nform.path.data: ', form.path.data,
+                  '\nform.shortestPath.data: ', form.shortestPath.data)
+
+            if form.include_stub.data:
+                include_stub = True
+            else:
+                include_stub = False
+
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--topology=%s' % form.topology_list.data,
+                         '--include-stub=%s' % include_stub]
+            subprocess.Popen(['./venv/bin/MiniSecBGP_affected_area'] + arguments)
+
+            return HTTPFound(location=request.route_path('hijackAffectedAreaScenario'))
+
+        dictionary['form'] = form
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'
@@ -220,7 +240,7 @@ def hijack_realistic_analysis(request):
         dictionary['availability'] = availability
 
         if request.method == 'POST' and form.validate():
-            if form.stub.data:
+            if form.include_stub.data:
                 include_stub = True
             else:
                 include_stub = False

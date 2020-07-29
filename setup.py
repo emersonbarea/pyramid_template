@@ -70,7 +70,8 @@ setup(
             'MiniSecBGP_realistic_topology = minisecbgp.scripts.realistic_topology:main',
             'MiniSecBGP_delete_topology = minisecbgp.scripts.delete_topology:main',
             'MiniSecBGP_manual_topology = minisecbgp.scripts.manual_topology:main',
-            'MiniSecBGP_realistic_analysis = minisecbgp.scripts.realistic_analysis:main'
+            'MiniSecBGP_realistic_analysis = minisecbgp.scripts.realistic_analysis:main',
+            'MiniSecBGP_affected_area = minisecbgp.scripts.affected_area:main'
         ],
     },
 )
