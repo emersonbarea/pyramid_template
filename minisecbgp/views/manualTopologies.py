@@ -73,7 +73,8 @@ def upload(request):
                 shutil.copyfileobj(input_file, output_file)
             os.rename(temp_file_path, file_path)
 
-            arguments = ['--file=%s' % file_path]
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--file=%s' % file_path]
             result = subprocess.Popen(['./venv/bin/MiniSecBGP_manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             command_result, command_result_error = result.communicate()
             if command_result:

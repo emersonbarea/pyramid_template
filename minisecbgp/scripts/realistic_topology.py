@@ -196,74 +196,100 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "file="])
+        opts, args = getopt.getopt(argv, 'h', ["config-file=", "file="])
     except getopt.GetoptError:
-        print('* Usage: realistic_topology '
-              '--config-file=<pyramid config file .ini> '
-              '--file={compressed file name}')
+        print('\n'
+              'Usage: MiniSecBGP_realistic_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--file=20191201.as-rel2.txt.bz2                  CAIDA AS-Relationship compressed topology filename\n'
+              '                                                 * the file must be in /tmp\n')
         sys.exit(2)
+    config_file = file = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('* Usage: realistic_topology '
-                  '--config-file=<pyramid config file .ini> '
-                  '--file={compressed file name}')
+            print('\n'
+                  'Usage: MiniSecBGP_realistic_topology [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--file=20191201.as-rel2.txt.bz2                  CAIDA AS-Relationship compressed topology filename\n'
+                  '                                                 * the file must be in /tmp\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
         elif opt == '--file':
             file = arg
+    if config_file and file:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            t = RealisticTopology(file)
 
-    args = parse_args(config_file)
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-        t = RealisticTopology(file)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                downloading = 1
+                t.downloading(dbsession, downloading)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            downloading = 1
-            t.downloading(dbsession, downloading)
+            with env['request'].tm:
+                pandas_unique_autonomous_systems, pandas_stub_autonomous_systems, df_from_file = t.as_relationship()
 
-        with env['request'].tm:
-            pandas_unique_autonomous_systems, pandas_stub_autonomous_systems, df_from_file = t.as_relationship()
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.topology(dbsession)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.topology(dbsession)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                id_topology = t.get_topology_id(dbsession)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            id_topology = t.get_topology_id(dbsession)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.region(dbsession, id_topology)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.region(dbsession, id_topology)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                id_region = t.get_region_id(dbsession, id_topology)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            id_region = t.get_region_id(dbsession, id_topology)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.autonomous_system(dbsession, id_topology, id_region, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.autonomous_system(dbsession, id_topology, id_region, pandas_unique_autonomous_systems, pandas_stub_autonomous_systems)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.automatic_router_id(dbsession, id_topology)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.automatic_router_id(dbsession, id_topology)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.automatic_prefix(dbsession, id_topology)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.automatic_prefix(dbsession, id_topology)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                t.automatic_link(dbsession, id_topology, df_from_file)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            t.automatic_link(dbsession, id_topology, df_from_file)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                downloading = 0
+                t.downloading(dbsession, downloading)
 
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            downloading = 0
-            t.downloading(dbsession, downloading)
-
-        t.erase_file()
-    except OperationalError:
-        print('Database error')
+            t.erase_file()
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_realistic_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--file=20191201.as-rel2.txt.bz2                  CAIDA AS-Relationship compressed topology filename\n'
+              '                                                 * the file must be in /tmp\n')

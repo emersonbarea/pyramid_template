@@ -76,19 +76,32 @@ def str2bool(master):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "node-ip-address=", "master="])
+        opts, args = getopt.getopt(argv, 'h', ["config-file=", "node-ip-address=", "master="])
     except getopt.GetoptError:
-        print('MiniSecBGP_create_node '
-              '--config-file=<pyramid config file .ini> '
-              '--node-ip-address=<cluster node IP address> '
-              '--master=<True | False>')
+        print('\n'
+              'Usage: MiniSecBGP_node_create [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--master=[True|False]                            if the cluster node is the master (True) or the worker (False)\n')
         sys.exit(2)
+    config_file = node_ip_address = master = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('MiniSecBGP_create_node '
-                  '--config-file=<pyramid config file .ini> '
-                  '--node-ip-address=<cluster node IP address> '
-                  '--master=<True | False>')
+            print('\n'
+                  'Usage: MiniSecBGP_node_create [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+                  '--master=[True|False]                            if the cluster node is the master (True) or the worker (False)\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
@@ -96,14 +109,25 @@ def main(argv=sys.argv[1:]):
             node_ip_address = arg
         elif opt == '--master':
             master = str2bool(arg)
-
-    args = parse_args(config_file)
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            ccn = CreateClusterNode(dbsession, node_ip_address, master)
-            ccn.create_cluster_node()
-    except OperationalError:
-        print('Database error')
+    if config_file and node_ip_address:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                ccn = CreateClusterNode(dbsession, node_ip_address, master)
+                ccn.create_cluster_node()
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_node_create [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--master=[True|False]                            if the cluster node is the master (True) or the worker (False)\n')

@@ -175,25 +175,47 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file="])
+        opts, args = getopt.getopt(argv, 'h', ["config-file="])
     except getopt.GetoptError:
-        print('* Usage: initialize_db '
-              '--config-file=<pyramid config file .ini>')
+        print('\n'
+              'Usage: MiniSecBGP_initialize_db [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n')
         sys.exit(2)
+    config_file = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('* Usage: initialize_db '
-                  '--config-file=<pyramid config file .ini>')
+            print('\n'
+                  'Usage: MiniSecBGP_initialize_db [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-
-    args = parse_args(config_file)
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            setup_models(dbsession)
-    except OperationalError:
-        print('Database error')
+    if config_file:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                setup_models(dbsession)
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_initialize_db [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n')

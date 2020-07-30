@@ -80,23 +80,40 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["config-file=", "execution-type=", "node-ip-address=", "username=", "password="])
+        opts, args = getopt.getopt(argv, 'h', ["config-file=", "execution-type=",
+                                               "node-ip-address=", "username=",
+                                               "password="])
     except getopt.GetoptError:
-        print('tests '
-              '--config-file=<pyramid config file .ini> '
-              '--execution-type=manual|scheduled '
-              '--node-ip-address=<cluster node IP address> '
-              '--username=<cluster node username> '
-              '--password=<cluster node user password>')
+        print('\n'
+              'Usage: MiniSecBGP_node_service [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--execution-type=[manual|scheduled]              manual = when user execute this function in CLI\n'
+              '                                                 scheduled = when this function is executed by crontab\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--username=ubuntu                                the username to use to configure the cluster node\n'
+              '--password=ubuntu                                the user password to access the cluster node\n')
         sys.exit(2)
+    config_file = execution_type = node_ip_address = username = password = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('tests '
-                  '--config-file=<pyramid config file .ini> '
-                  '--execution-type=manual|scheduled '
-                  '--node-ip-address=<cluster node IP address> '
-                  '--username=<cluster node username> '
-                  '--password=<cluster node user password>')
+            print('\n'
+                  'Usage: MiniSecBGP_node_service [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--execution-type=[manual|scheduled]              manual = when user execute this function in CLI\n'
+                  '                                                 scheduled = when this function is executed by crontab\n'
+                  '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+                  '--username=ubuntu                                the username to use to configure the cluster node\n'
+                  '--password=ubuntu                                the user password to access the cluster node\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
@@ -108,15 +125,29 @@ def main(argv=sys.argv[1:]):
             username = arg
         elif opt == '--password':
             password = arg
-
-    args = parse_args(config_file)
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            ccn = TestClusterNode(dbsession, execution_type, node_ip_address, username, password)
-            ccn.test_ping()
-            ccn.test_ssh()
-    except OperationalError:
-        print('Database error')
+    if config_file and execution_type and node_ip_address:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                ccn = TestClusterNode(dbsession, execution_type, node_ip_address, username, password)
+                ccn.test_ping()
+                ccn.test_ssh()
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_node_service [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--execution-type=[manual|scheduled]              manual = when user execute this function in CLI\n'
+              '                                                 scheduled = when this function is executed by crontab\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--username=ubuntu                                the username to use to configure the cluster node\n'
+              '--password=ubuntu                                the user password to access the cluster node\n')

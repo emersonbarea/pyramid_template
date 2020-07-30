@@ -118,7 +118,8 @@ def topologies_delete(request):
             topology = request.dbsession.query(models.Topology.topology).\
                 filter_by(id=request.matchdict["id_topology"]).first()
 
-            arguments = ['--id_topology=%s' % request.matchdict["id_topology"]]
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--topology=%s' % request.matchdict["id_topology"]]
             subprocess.Popen(['./venv/bin/MiniSecBGP_delete_topology'] + arguments)
 
             dictionary['message'] = ('Topology "%s" successfully deleted.' % topology.topology)

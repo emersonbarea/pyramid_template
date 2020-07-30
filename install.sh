@@ -133,19 +133,19 @@ install_app() {
 
         printf '\n%s\n' 'Manual topology Minimal-Topology-Example.MiniSecBGP ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/Minimal-Topology-Example.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
+        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology1.MiniSecBGP ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology1.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --file='/tmp/manual_topology1.MiniSecBGP'
+        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology1.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology2.MiniSecBGP ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology2.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --file='/tmp/manual_topology2.MiniSecBGP'
+        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology2.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology3.MiniSecBGP ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology3.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --file='/tmp/manual_topology3.MiniSecBGP'
+        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology3.MiniSecBGP'
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
         MiniSecBGP_node_create --config-file=minisecbgp.ini --node-ip-address=$var_ip --master=True
@@ -157,7 +157,7 @@ install_app() {
 	      MiniSecBGP_node_install --config-file=minisecbgp.ini --node-ip-address=$var_ip --username=$WHOAMI --password=$PASSWORD
 
 	      printf '%s%s%s%s%s%s%s%s%s\n' $'# Scheduled realistic topology update (verify every day if today is the day for update)
-0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini --topology-path='$LOCAL_HOME'/' | sudo tee /etc/cron.d/MiniSecBGP_realistic_topology_scheduled_download
+0 3 * * * minisecbgpuser '$LOCAL_HOME'/venv/bin/MiniSecBGP_realistic_topology_scheduled_download --config-file='$LOCAL_HOME'/minisecbgp.ini' | sudo tee /etc/cron.d/MiniSecBGP_realistic_topology_scheduled_download
 
 }
 

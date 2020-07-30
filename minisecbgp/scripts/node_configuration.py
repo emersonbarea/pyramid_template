@@ -200,10 +200,8 @@ class ConfigClusterNode(object):
                 command = 'sudo -u minisecbgpuser bash -c \'echo -e "# Start job every 1 minute (monitor %s)\n' \
                           '* * * * * minisecbgpuser %s/venv/bin/MiniSecBGP_node_service ' \
                           '--config-file=%s/minisecbgp.ini ' \
-                          '--execution-type=\\"scheduled\\" ' \
-                          '--node-ip-address=\\"%s\\" ' \
-                          '--username=\\"\\" ' \
-                          '--password=\\"\\"" | ' \
+                          '--execution-type=scheduled ' \
+                          '--node-ip-address=%s" | ' \
                           'sudo tee /etc/cron.d/MiniSecBGP_node_service_%s\'' % \
                           (ipaddress.ip_address(self.node_ip_address), home_dir, home_dir,
                            ipaddress.ip_address(self.node_ip_address), self.node_ip_address)
@@ -237,21 +235,34 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, "h:", ["config-file=", "node-ip-address=", "username=", "password="])
-    except getopt.GetoptError as error:
-        print('config '
-              '--config-file=<pyramid config file .ini> '
-              '--node-ip-address=<cluster node name or IP address> '
-              '--username=<cluster node username> '
-              '--password=<cluster node user password>')
+        opts, args = getopt.getopt(argv, "h", ["config-file=", "node-ip-address=", "username=", "password="])
+    except getopt.GetoptError:
+        print('\n'
+              'Usage: MiniSecBGP_node_configuration [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--username=ubuntu                                the username to use to configure the cluster node\n'
+              '--password=ubuntu                                the user password to access the cluster node\n')
         sys.exit(2)
+    config_file = node_ip_address = username = password = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('config '
-                  '--config-file=<pyramid config file .ini> '
-                  '--node-ip-address=<cluster node name or IP address> '
-                  '--username=<cluster node username> '
-                  '--password=<cluster node user password>')
+            print('\n'
+                  'Usage: MiniSecBGP_node_configuration [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+                  '--username=ubuntu                                the username to use to configure the cluster node\n'
+                  '--password=ubuntu                                the user password to access the cluster node\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
@@ -261,21 +272,33 @@ def main(argv=sys.argv[1:]):
             username = arg
         elif opt == '--password':
             password = arg
+    if config_file and node_ip_address and username and password:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
+                ccn.validate_hostname()
 
-    args = parse_args(config_file)
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
-            ccn.validate_hostname()
-
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
-            ccn.create_minisecbgpuser()
-            ccn.configure_ssh()
-            ccn.configure_crontab()
-    except OperationalError:
-        print('Database error')
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
+                ccn.create_minisecbgpuser()
+                ccn.configure_ssh()
+                ccn.configure_crontab()
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_node_configuration [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--node-ip-address=[192.168.0.1|3232239375]       cluster node IP address\n'
+              '--username=ubuntu                                the username to use to configure the cluster node\n'
+              '--password=ubuntu                                the user password to access the cluster node\n')

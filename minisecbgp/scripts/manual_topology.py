@@ -342,7 +342,8 @@ class ManualTopology(object):
                 autonomous_system.stub = True
 
         except Exception as error:
-            arguments = ['--id_topology=%s' % id_topology]
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--topology=%s' % id_topology]
             subprocess.Popen(['./venv/bin/MiniSecBGP_delete_topology'] + arguments)
             return error
 
@@ -366,42 +367,64 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["file="])
+        opts, args = getopt.getopt(argv, "h", ["config-file=", "file="])
     except getopt.GetoptError:
-        print('* Usage: manual_topology --file={json topology filename}')
+        print('\n'
+              'Usage: MiniSecBGP_manual_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--file=Manual-Topology-1.MiniSecBGP              json topology filename (.MiniSecBGP extension)\n')
         sys.exit(2)
+    config_file = file = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('* Usage: manual_topology --file={json topology filename}')
+            print('\n'
+                  'Usage: MiniSecBGP_manual_topology [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--file=Manual-Topology-1.MiniSecBGP              json topology filename (.MiniSecBGP extension)\n')
             sys.exit()
+        elif opt == '--config-file':
+            config_file = arg
         elif opt == '--file':
             file = arg
-
-    args = parse_args('minisecbgp.ini')
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
-
-        mt = ManualTopology(file)
-
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            downloading = 1
-            mt.downloading(dbsession, downloading)
-
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            result = mt.create(dbsession)
-
-        with env['request'].tm:
-            dbsession = env['request'].dbsession
-            downloading = 0
-            mt.downloading(dbsession, downloading)
-
-        mt.erase_file()
-
-        if result:
-            print(result)
-
-    except OperationalError:
-        print('Database error')
+    if config_file and file:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
+        try:
+            mt = ManualTopology(file)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                downloading = 1
+                mt.downloading(dbsession, downloading)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                result = mt.create(dbsession)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                downloading = 0
+                mt.downloading(dbsession, downloading)
+            mt.erase_file()
+            if result:
+                print(result)
+        except OperationalError:
+            print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_manual_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--file=Manual-Topology-1.MiniSecBGP              json topology filename (.MiniSecBGP extension)\n')

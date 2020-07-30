@@ -14,38 +14,42 @@ class DeleteTopology(object):
 
     @staticmethod
     def delete(dbsession, id_topology):
-        router_id = 'delete from router_id where id_autonomous_system in (' \
-                    'select id from autonomous_system where id_topology = %s);' % id_topology
-        prefix = 'delete from prefix where id_autonomous_system in (' \
-                 'select id from autonomous_system where id_topology = %s);' % id_topology
-        link = 'delete from link where id_autonomous_system1 in (' \
-               'select id from autonomous_system where id_topology = %s);' % id_topology
-        autonomous_system = 'delete from autonomous_system where id_topology = %s;' % id_topology
-        type_of_service_autonomous_system = 'delete from type_of_service_autonomous_system where id_autonomous_system in (' \
-                                            'select id from autonomous_system where id_topology = %s);' % id_topology
-        type_of_user_autonomous_system = 'delete from type_of_user_autonomous_system where id_autonomous_system in (' \
-                                         'select id from autonomous_system where id_topology = %s);' % id_topology
-        type_of_user = 'delete from type_of_user where id_topology = %s' % id_topology
-        type_of_service = 'delete from type_of_service where id_topology = %s' % id_topology
-        autonomous_system_internet_exchange_point = 'delete from autonomous_system_internet_exchange_point where id_autonomous_system in (' \
-                                                    'select id from autonomous_system where id_topology = %s);' % id_topology
-        internet_exchange_point = 'delete from internet_exchange_point where id_topology = %s;' % id_topology
+        try:
+            router_id = 'delete from router_id where id_autonomous_system in (' \
+                        'select id from autonomous_system where id_topology = %s);' % id_topology
+            prefix = 'delete from prefix where id_autonomous_system in (' \
+                     'select id from autonomous_system where id_topology = %s);' % id_topology
+            link = 'delete from link where id_autonomous_system1 in (' \
+                   'select id from autonomous_system where id_topology = %s);' % id_topology
+            autonomous_system = 'delete from autonomous_system where id_topology = %s;' % id_topology
+            type_of_service_autonomous_system = 'delete from type_of_service_autonomous_system where id_autonomous_system in (' \
+                                                'select id from autonomous_system where id_topology = %s);' % id_topology
+            type_of_user_autonomous_system = 'delete from type_of_user_autonomous_system where id_autonomous_system in (' \
+                                             'select id from autonomous_system where id_topology = %s);' % id_topology
+            type_of_user = 'delete from type_of_user where id_topology = %s' % id_topology
+            type_of_service = 'delete from type_of_service where id_topology = %s' % id_topology
+            autonomous_system_internet_exchange_point = 'delete from autonomous_system_internet_exchange_point where id_autonomous_system in (' \
+                                                        'select id from autonomous_system where id_topology = %s);' % id_topology
+            internet_exchange_point = 'delete from internet_exchange_point where id_topology = %s;' % id_topology
 
-        region = 'delete from region where id_topology = %s;' % id_topology
-        topology = 'delete from topology where id = %s;' % id_topology
+            region = 'delete from region where id_topology = %s;' % id_topology
+            topology = 'delete from topology where id = %s;' % id_topology
 
-        dbsession.bind.execute(router_id)
-        dbsession.bind.execute(prefix)
-        dbsession.bind.execute(link)
-        dbsession.bind.execute(autonomous_system_internet_exchange_point)
-        dbsession.bind.execute(type_of_service_autonomous_system)
-        dbsession.bind.execute(type_of_user_autonomous_system)
-        dbsession.bind.execute(autonomous_system)
-        dbsession.bind.execute(type_of_user)
-        dbsession.bind.execute(type_of_service)
-        dbsession.bind.execute(internet_exchange_point)
-        dbsession.bind.execute(region)
-        dbsession.bind.execute(topology)
+            dbsession.bind.execute(router_id)
+            dbsession.bind.execute(prefix)
+            dbsession.bind.execute(link)
+            dbsession.bind.execute(autonomous_system_internet_exchange_point)
+            dbsession.bind.execute(type_of_service_autonomous_system)
+            dbsession.bind.execute(type_of_user_autonomous_system)
+            dbsession.bind.execute(autonomous_system)
+            dbsession.bind.execute(type_of_user)
+            dbsession.bind.execute(type_of_service)
+            dbsession.bind.execute(internet_exchange_point)
+            dbsession.bind.execute(region)
+            dbsession.bind.execute(topology)
+        except Exception as error:
+            dbsession.rollback()
+            print('Database error: ', error)
 
     @staticmethod
     def downloading(dbsession, downloading):
@@ -64,23 +68,40 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, 'h:', ["id_topology="])
+        opts, args = getopt.getopt(argv, "h", ["config-file=", "topology="])
     except getopt.GetoptError:
-        print('* Usage: delete_topology --id_topology=id_topology')
+        print('\n'
+              'Usage: MiniSecBGP_delete_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--topology=3                                     the topology ID to be deleted\n')
         sys.exit(2)
+    config_file = topology = ''
     for opt, arg in opts:
         if opt == '-h':
-            print('* Usage: delete_topology --id_topology=id_topology')
+            print('\n'
+                  'Usage: MiniSecBGP_delete_topology [options]\n'
+                  '\n'
+                  'options (with examples):\n'
+                  '\n'
+                  '-h                                               this help\n'
+                  '\n'
+                  '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+                  '--topology=3                                     the topology ID to be deleted\n')
             sys.exit()
-        elif opt == '--id_topology':
-            id_topology = arg
-
-    args = parse_args('minisecbgp.ini')
-    setup_logging(args.config_uri)
-    env = bootstrap(args.config_uri)
-    try:
+        elif opt == '--config-file':
+            config_file = arg
+        elif opt == '--topology':
+            topology = arg
+    if config_file and topology:
+        args = parse_args(config_file)
+        setup_logging(args.config_uri)
+        env = bootstrap(args.config_uri)
         dt = DeleteTopology()
-
         with env['request'].tm:
             dbsession = env['request'].dbsession
             downloading = 1
@@ -88,12 +109,19 @@ def main(argv=sys.argv[1:]):
 
         with env['request'].tm:
             dbsession = env['request'].dbsession
-            dt.delete(dbsession, id_topology)
-            
+            dt.delete(dbsession, topology)
+
         with env['request'].tm:
             dbsession = env['request'].dbsession
             downloading = 0
             dt.downloading(dbsession, downloading)
-
-    except OperationalError:
-        print('Database error')
+    else:
+        print('\n'
+              'Usage: MiniSecBGP_delete_topology [options]\n'
+              '\n'
+              'options (with examples):\n'
+              '\n'
+              '-h                                               this help\n'
+              '\n'
+              '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
+              '--topology=3                                     the topology ID to be deleted\n')
