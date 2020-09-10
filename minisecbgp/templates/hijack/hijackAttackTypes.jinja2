@@ -1,0 +1,29 @@
+{% extends "hijack.jinja2" %}
+
+{% block contentHijack %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Attack Types</h3>
+    </div>
+  </div>
+  <div class="row-fluid" style="text-align: center;">
+      <div class="span12">
+        <table border="0" style="width: 100%;">
+          <tr>
+            <td><h4>Attack Type</h4></td>
+            <td><h4>Description</h4></td>
+          </tr>
+          {% for attack_type in attack_types %}
+            <tr>
+              <td style="width: 30%;"><p> {{ attack_type.scenario_attack_type }} </p></td>
+              <td style="text-align: left; width: 70%;"><p> {{ attack_type.description }} </p></td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+  </div>
+</div>
+
+{% endblock contentHijack %}

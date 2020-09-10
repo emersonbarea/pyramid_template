@@ -6,7 +6,7 @@ import os.path
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
 from pyramid.response import FileResponse
-from wtforms import Form, SelectField, IntegerField, StringField, SubmitField, SelectMultipleField, widgets
+from wtforms import Form, SelectField, StringField, SubmitField, SelectMultipleField, widgets, IntegerField
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets.html5 import NumberInput
 
@@ -18,7 +18,7 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 
-class AffectedAreaDataForm(Form):
+class AttackScenarioDataForm(Form):
     scenario_name = StringField(validators=[InputRequired(),
                                             Length(min=1, max=50,
                                                    message='Scenario name string must be between 1 and 50 characters long.')])
@@ -27,45 +27,42 @@ class AffectedAreaDataForm(Form):
                                                           message='Scenario description string must be between 1 and 50 characters long.')])
     topology = SelectField(coerce=int,
                            validators=[InputRequired()])
-    include_stub = MultiCheckboxField(choices=[(1, 'Include stub ASs')],
-                                      coerce=int)
+
+    attack_type = SelectField(coerce=int,
+                              validators=[InputRequired()])
+
     attacker = SelectField(choices=[('', '--'),
                                     ('all', 'All ASs'),
-                                    ('region', 'All ASs from a region'),
-                                    ('AS', 'Specify the ASN')])
-    regionAttacker = StringField(validators=[InputRequired(),
-                                             Length(min=1, max=100,
-                                                    message='Region name string must be between 1 and 100 characters long.')])
-    ASAttacker = StringField(validators=[InputRequired(),
-                                         Length(min=1, max=100,
-                                                message='ASN string must be between 1 and 100 characters long.')])
+                                    ('region', 'All ASs from specific region(s)'),
+                                    ('AS', 'Specific AS(s)')])
+    attacker_region = StringField(validators=[InputRequired(),
+                                              Length(min=1, max=100,
+                                                     message='Region name string must be between 1 and 100 characters long.')])
+    attacker_autonomous_system = StringField(validators=[InputRequired(),
+                                                         Length(min=1, max=100,
+                                                                message='ASN string must be between 1 and 100 characters long.')])
+
+    affected_area = SelectField(choices=[('', '--'),
+                                         ('all', 'All ASs'),
+                                         ('region', 'All ASs from specific region(s)'),
+                                         ('AS', 'Specific AS(s)')])
+    affected_area_region = StringField(validators=[InputRequired(),
+                                                   Length(min=1, max=100,
+                                                          message='Region name string must be between 1 and 100 characters long.')])
+    affected_area_autonomous_system = StringField(validators=[InputRequired(),
+                                                              Length(min=1, max=100,
+                                                                     message='ASN string must be between 1 and 100 characters long.')])
 
     target = SelectField(choices=[('', '--'),
-                                  ('all', 'All ASs'),
-                                  ('region', 'All ASs from a region'),
-                                  ('AS', 'Specify the ASN')])
-    regionTarget = StringField(validators=[InputRequired(),
-                                           Length(min=1, max=100,
-                                                  message='Region name string must be between 1 and 100 characters long.')])
-    ASTarget = StringField(validators=[InputRequired(),
-                                       Length(min=1, max=100,
-                                              message='ASN string must be between 1 and 100 characters long.')])
-
-    prefix = SelectField(choices=[('', '--'),
-                                  ('target', 'Use the target\'s prefix'),
-                                  ('all', 'All prefixes of all topology ASs'),
-                                  ('region', 'All prefixes of all routers in the region'),
-                                  ('AS', 'Use the prefix of a specific AS'),
-                                  ('prefix', 'Choose the prefix')])
-    regionPrefix = StringField(validators=[InputRequired(),
-                                           Length(min=1, max=100,
-                                                  message='Region name string must be between 1 and 100 characters long.')])
-    ASPrefix = StringField(validators=[InputRequired(),
-                                       Length(min=1, max=100,
-                                              message='ASN string must be between 1 and 100 characters long.')])
-    prefixPrefix = StringField(validators=[InputRequired(),
-                                           Length(min=1, max=100,
-                                                  message='Prefix string must be between 1 and 100 characters long.')])
+                                  ('all', 'Use the prefix(es) of all ASs'),
+                                  ('region', 'Use the prefix(es) of all ASs in the region(s)'),
+                                  ('AS', 'Use the prefix(es) of specific AS(s)')])
+    target_region = StringField(validators=[InputRequired(),
+                                            Length(min=1, max=100,
+                                                   message='Region name string must be between 1 and 100 characters long.')])
+    target_autonomous_system = StringField(validators=[InputRequired(),
+                                                       Length(min=1, max=100,
+                                                              message='ASN string must be between 1 and 100 characters long.')])
 
     path = SelectField(choices=[('', '--'),
                                 ('all', 'All Paths'),
@@ -90,7 +87,7 @@ class RealisticAnalysisDataForm(Form):
                                           coerce=int, validators=[InputRequired()])
 
 
-class RealisticAnalysisScenarioDataForm(Form):
+class RealisticAnalysisDetailDataForm(Form):
     emulate_button = SubmitField('Submit')
     download_button = SubmitField('Download')
 
@@ -131,9 +128,9 @@ def hijack(request):
     return dictionary
 
 
-@view_config(route_name='hijackAffectedArea',
-             renderer='minisecbgp:templates/hijack/hijackAffectedArea.jinja2')
-def hijack_affected_area(request):
+@view_config(route_name='hijackAttackScenario',
+             renderer='minisecbgp:templates/hijack/hijackAttackScenario.jinja2')
+def hijack_attack_scenario(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -141,42 +138,240 @@ def hijack_affected_area(request):
     dictionary = dict()
 
     try:
-        form = AffectedAreaDataForm(request.POST)
-        form.topology.choices = [(row.id, row.topology) for row in request.dbsession.query(models.Topology).all()]
+        form = AttackScenarioDataForm(request.POST)
+        form.topology.choices = [(row.id, row.topology) for row in
+                                 request.dbsession.query(models.Topology).all()]
+        form.attack_type.choices = [(row.id, row.scenario_attack_type) for row in
+                                    request.dbsession.query(models.ScenarioAttackType).all()]
+
+        availability = True
+        downloading = request.dbsession.query(models.DownloadingTopology).first()
+        if downloading.downloading == 1:
+            availability = False
+
+        if not availability:
+            dictionary['message'] = 'Warning: there is an update process running in the background ' \
+                                    '(cluster nodes or topology). Wait for it finish to access Realistic Analysis again.'
+            dictionary['css_class'] = 'warningMessage'
+
+        dictionary['form'] = form
+        dictionary['availability'] = availability
 
         if request.method == 'POST' and form.validate():
 
-            print('\nform.topology.data: ', form.topology.data,
-                  '\nform.include_stub.data: ', form.include_stub.data,
-                  '\nform.attacker.data: ', form.attacker.data,
-                  '\nform.regionAttacker.data: ', form.regionAttacker.data,
-                  '\nform.ASAttacker.data: ', form.ASAttacker.data,
-                  '\nform.target.data: ', form.target.data,
-                  '\nform.regionTarget.data: ', form.regionTarget.data,
-                  '\nform.ASTarget.data: ', form.ASTarget.data,
-                  '\nform.prefix.data: ', form.prefix.data,
-                  '\nform.regionPrefix.data: ', form.regionPrefix.data,
-                  '\nform.ASPrefix.data: ', form.ASPrefix.data,
-                  '\nform.prefixPrefix.data: ', form.prefixPrefix.data,
-                  '\nform.path.data: ', form.path.data,
-                  '\nform.shortestPath.data: ', form.shortestPath.data)
+            # attacker
+            attacker_list = list()
+            if form.attacker.data == 'all':
+                attackers = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=form.topology.data).all()
+                if attackers:
+                    for attacker in attackers:
+                        attacker_list.append(attacker.autonomous_system)
+                else:
+                    dictionary['message'] = 'There is no Autonomous Systems in topology "%s" ' \
+                                            'to be used as an attacker' % form.topology.data
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.attacker.data == 'region':
+                try:
+                    region = request.dbsession.query(models.Region).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(region=form.attacker_region.data).first()
+                except Exception as error:
+                    dictionary['message'] = error
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+                if region:
+                    attackers = request.dbsession.query(models.AutonomousSystem).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(id_region=region.id).all()
+                    if attackers:
+                        for attacker in attackers:
+                            attacker_list.append(attacker.autonomous_system)
+                    else:
+                        dictionary['message'] = 'There is no Autonomous Systems in region "%s" ' \
+                                                'to be used as an attacker' % form.attacker_region.data
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
+                else:
+                    dictionary['message'] = 'The region "%s" does not exist in topology "%s" to be used as ' \
+                                            'attacker' % (form.attacker_region.data, form.topology.data)
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.attacker.data == 'AS':
+                attackers = form.attacker_autonomous_system.data.strip('][').split(',')
+                attackers = map(int, attackers)
+                attacker_list = list(attackers)
+                for attacker in attacker_list:
+                    attacker_exist = request.dbsession.query(models.AutonomousSystem).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(autonomous_system=attacker).first()
+                    if not attacker_exist:
+                        dictionary['message'] = 'Autonomous System "%s" does not exist to be ' \
+                                                'used as an attacker' % attacker
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
 
-            if form.include_stub.data:
-                include_stub = True
-            else:
-                include_stub = False
+            # affected area
+            affected_area_list = list()
+            if form.affected_area.data == 'all':
+                affected_areas = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=form.topology.data).all()
+                if affected_areas:
+                    for affected_area in affected_areas:
+                        affected_area_list.append(affected_area.autonomous_system)
+                else:
+                    dictionary['message'] = 'There is no Autonomous Systems in topology "%s" ' \
+                                            'to be used in affected area' % form.topology.data
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.affected_area.data == 'region':
+                try:
+                    region = request.dbsession.query(models.Region).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(region=form.affected_area_region.data).first()
+                except Exception as error:
+                    dictionary['message'] = error
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+                if region:
+                    affected_areas = request.dbsession.query(models.AutonomousSystem).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(id_region=region.id).all()
+                    if affected_areas:
+                        for affected_area in affected_areas:
+                            affected_area_list.append(affected_area.autonomous_system)
+                    else:
+                        dictionary['message'] = 'There is no Autonomous Systems in region "%s" ' \
+                                                'to be used in affected area' % form.affected_area_region.data
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
+                else:
+                    dictionary['message'] = 'The region "%s" does not exist in topology "%s" to be used in ' \
+                                            'affected area' % (form.affected_area_region.data, form.topology.data)
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.affected_area.data == 'AS':
+                affected_areas = form.affected_area_autonomous_system.data.strip('][').split(',')
+                affected_areas = map(int, affected_areas)
+                affected_area_list = list(affected_areas)
+                for affected_area in affected_area_list:
+                    affected_area_exist = request.dbsession.query(models.AutonomousSystem). \
+                        filter_by(id_topology=form.topology.data). \
+                        filter_by(autonomous_system=affected_area).first()
+                    if not affected_area_exist:
+                        dictionary['message'] = 'Autonomous System "%s" does not exist to be ' \
+                                                'used in affected area' % affected_area
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
+
+            # target
+            target_list = list()
+            if form.target.data == 'all':
+                targets = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=form.topology.data).all()
+                if targets:
+                    for target in targets:
+                        target_list.append(target.autonomous_system)
+                else:
+                    dictionary['message'] = 'There is no Autonomous Systems in topology "%s" ' \
+                                            'to be used as target' % form.topology.data
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.target.data == 'region':
+                try:
+                    region = request.dbsession.query(models.Region).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(region=form.target_region.data).first()
+                except Exception as error:
+                    dictionary['message'] = error
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+                if region:
+                    targets = request.dbsession.query(models.AutonomousSystem).\
+                        filter_by(id_topology=form.topology.data).\
+                        filter_by(id_region=region.id).all()
+                    if targets:
+                        for target in targets:
+                            target_list.append(target.autonomous_system)
+                    else:
+                        dictionary['message'] = 'There is no Autonomous Systems in region ' \
+                                                '"%s" to be used as target' % form.target_region.data
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
+                else:
+                    dictionary['message'] = 'The region "%s" does not exist in topology "%s" to be used as ' \
+                                            'target' % (form.target_region.data, form.topology.data)
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+            elif form.target.data == 'AS':
+                targets = form.target_autonomous_system.data.strip('][').split(',')
+                targets = map(int, targets)
+                target_list = list(targets)
+                for target in target_list:
+                    target_exist = request.dbsession.query(models.AutonomousSystem). \
+                        filter_by(id_topology=form.topology.data). \
+                        filter_by(autonomous_system=target).first()
+                    if not target_exist:
+                        dictionary['message'] = 'Autonomous System "%s" does not exist to be ' \
+                                                'used as target' % target
+                        dictionary['css_class'] = 'errorMessage'
+                        return dictionary
+
+            # number of shortest paths
+            
+
+
+            try:
+                scenario_stuff = request.dbsession.query(models.ScenarioStuff).\
+                    filter_by(scenario_name=form.scenario_name.data).first()
+                if scenario_stuff:
+                    dictionary['message'] = 'There is already a scenario with this name: "%s".\n' \
+                                            'Try again with another scenario identification.' % \
+                                            form.scenario_name.data
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+
+                request.dbsession.add(models.ScenarioStuff(
+                    scenario_name=form.scenario_name.data,
+                    scenario_description=form.scenario_description.data,
+                    id_topology=form.topology.data,
+                    attacker_list=str(attacker_list),
+                    affected_area_list=str(affected_area_list),
+                    target_list=str(target_list),
+                    attack_type=form.attack_type.data))
+                request.dbsession.flush()
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+                return dictionary
+
+            scenario_stuff = request.dbsession.query(models.ScenarioStuff). \
+                filter_by(scenario_name=form.scenario_name.data).first()
 
             arguments = ['--config-file=minisecbgp.ini',
-                         '--topology=%s' % form.topology_list.data,
-                         '--include-stub=%s' % include_stub]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_affected_area'] + arguments)
+                         '--scenario-id=%s' % scenario_stuff.id]
 
-            return HTTPFound(location=request.route_path('hijackAffectedAreaScenario'))
+            subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_attack_scenario'] + arguments)
+            return HTTPFound(location=request.route_path('hijackAttackScenarioDetail'))
 
         dictionary['form'] = form
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='hijackAttackScenarioDetail',
+             renderer='minisecbgp:templates/hijack/hijackAttackScenarioDetail.jinja2')
+def hijack_attack_scenario_detail(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
 
     return dictionary
 
@@ -274,9 +469,9 @@ def hijack_realistic_analysis(request):
                          '--topology-distribution-method=%s' % form.topology_distribution_method_list.data,
                          '--emulation-platform=%s' % form.emulation_platform_list.data,
                          '--router-platform=%s' % form.router_platform_list.data]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_realistic_analysis'] + arguments)
+            subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_realistic_analysis'] + arguments)
 
-            return HTTPFound(location=request.route_path('hijackRealisticAnalysisScenario'))
+            return HTTPFound(location=request.route_path('hijackRealisticAnalysisDetail'))
 
     except Exception as error:
         request.dbsession.rollback()
@@ -286,15 +481,15 @@ def hijack_realistic_analysis(request):
     return dictionary
 
 
-@view_config(route_name='hijackRealisticAnalysisScenario',
-             renderer='minisecbgp:templates/hijack/hijackRealisticAnalysisScenario.jinja2')
-def hijack_realistic_analysis_scenario(request):
+@view_config(route_name='hijackRealisticAnalysisDetail',
+             renderer='minisecbgp:templates/hijack/hijackRealisticAnalysisDetail.jinja2')
+def hijack_realistic_analysis_detail(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
 
     dictionary = dict()
-    form = RealisticAnalysisScenarioDataForm(request.POST)
+    form = RealisticAnalysisDetailDataForm(request.POST)
     try:
         query = 'select ra.id as id, ' \
                 'ra.topology as topology, ' \
@@ -332,7 +527,7 @@ def hijack_realistic_analysis_scenario(request):
                                                      (float(realistic_analyze.time_write_files) if realistic_analyze.time_write_files else 0)})
         dictionary['realistic_analysis'] = realistic_analysis
         dictionary['form'] = form
-        dictionary['hijackRealisticAnalysisScenario_url'] = request.route_url('hijackRealisticAnalysisScenario')
+        dictionary['hijackRealisticAnalysisDetail_url'] = request.route_url('hijackRealisticAnalysisDetail')
 
         if request.method == 'POST' and form.validate():
 
@@ -353,5 +548,17 @@ def hijack_realistic_analysis_scenario(request):
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='hijackAttackType', renderer='minisecbgp:templates/hijack/hijackAttackTypes.jinja2')
+def hijack_attack_type(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    dictionary['attack_types'] = request.dbsession.query(models.ScenarioAttackType).all()
 
     return dictionary

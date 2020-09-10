@@ -1,0 +1,413 @@
+{% extends "hijack.jinja2" %}
+
+{% block contentHijack %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Attack Scenario Definition</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <form action="#" method="POST">
+
+        <div id="div_scenario_name" class="form-field">
+          <p>Scenario name: *</p>
+          {% if availability %}
+            {{ form.scenario_name }}
+          {% else %}
+            {{ form.scenario_name(disabled=True) }}
+          {% endif %}
+          {% if form.scenario_name.errors %}
+            <ul class="errorMessage">
+              {% for error in form.scenario_name.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_scenario_description" class="form-field">
+          <p>Scenario description: </p>
+          {% if availability %}
+            {{ form.scenario_description }}
+          {% else %}
+            {{ form.scenario_description(disabled=True) }}
+          {% endif %}
+          {% if form.scenario_description.errors %}
+            <ul class="errorMessage">
+              {% for error in form.scenario_description.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div><hr></div>
+
+        <div id="div_topology" class="form-field">
+          <p>Choose the <b><i>topology</i></b>: *</p>
+          {% if availability %}
+            {{ form.topology }}
+          {% else %}
+            {{ form.topology(disabled=True) }}
+          {% endif %}
+          {% if form.topology.errors %}
+            <ul class="errorMessage">
+              {% for error in form.topology.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div><hr></div>
+
+        <div id="div_attack_type" class="form-field">
+          <p>Choose the <b><i>attack type</i></b>
+          (Go to <a href="{{ request.route_url('hijackAttackType') }}">Attack Type</a> page for more information): *</p>
+          {{ form.attack_type }}
+          {% if form.attack_type.errors %}
+            <ul class="errorMessage">
+              {% for error in form.attack_type.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div><hr></div>
+
+        <div id="div_attacker" class="form-field">
+          <p>Choose the <b><i>attacker</i></b> (The AS(s) that will announce the hijacked prefix): *</p>
+          {% if availability %}
+            {{ form.attacker(onchange="attackerFunction()") }}
+          {% else %}
+            {{ form.attacker(disabled=True) }}
+          {% endif %}
+          {% if form.attacker.errors %}
+            <ul class="errorMessage">
+              {% for error in form.attacker.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_attacker_region" class="form-field" style="display: none;">
+          <p>Write the <b>Region(s)</b> name of the attacking AS(s): *</p>
+          {{ form.attacker_region }} (use comma to separate between multiple regions. Ex.: north, south, east)
+          {% if form.attacker_region.errors %}
+            <ul class="errorMessage">
+              {% for error in form.attacker_region.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_attacker_autonomous_system" class="form-field" style="display: none;">
+          <p>Write the <b>AS number(s)</b>: *</p>
+          {{ form.attacker_autonomous_system }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
+          {% if form.attacker_autonomous_system.errors %}
+            <ul class="errorMessage">
+              {% for error in form.attacker_autonomous_system.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_hr1" style="display: none;"><hr></div>
+
+        <div id="div_affected_area" class="form-field" style="display: none;">
+          <p>Choose the <b><i>affected area</i></b> (Checks if the AS(s) will receives and accepts the hijacked route): *</p>
+          {{ form.affected_area(onchange="affected_areaFunction()") }}
+          {% if form.affected_area.errors %}
+            <ul class="errorMessage">
+              {% for error in form.affected_area.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_affected_area_region" class="form-field" style="display: none;">
+          <p>Write the <b>Region(s)</b> name of the affected area: *</p>
+          {{ form.affected_area_region }} (use comma to separate between multiple regions. Ex.: north, south, east)
+          {% if form.affected_area_region.errors %}
+            <ul class="errorMessage">
+              {% for error in form.affected_area_region.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_affected_area_autonomous_system" class="form-field" style="display: none;">
+          <p>Write the <b>AS number(s)</b>: *</p>
+          {{ form.affected_area_autonomous_system }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
+          {% if form.affected_area_autonomous_system.errors %}
+            <ul class="errorMessage">
+              {% for error in form.affected_area_autonomous_system.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_hr2" style="display: none;"><hr></div>
+
+        <div id="div_target" class="form-field" style="display: none;">
+          <p>Choose the <b><i>prefix target</i></b> (The prefix(es) that will be hijacked): *</p>
+          {{ form.target(onchange="targetFunction()") }}
+          {% if form.target.errors %}
+            <ul class="errorMessage">
+              {% for error in form.target.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_target_region" class="form-field" style="display: none;">
+          <p>Write the name of the <b>region(s)</b> where all AS prefixes will be hijacked: *</p>
+          {{ form.target_region }} (use comma to separate between multiple regions. Ex.: north, south, east)
+          {% if form.target_region.errors %}
+            <ul class="errorMessage">
+              {% for error in form.target_region.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_target_autonomous_system" class="form-field" style="display: none;">
+          <p>Write the <b>AS number(s)</b> from which its prefix will be hijacked: *</p>
+          {{ form.target_autonomous_system }} (use comma to separate between multiple ASs. Ex.: 65001, 65002, 65003)
+          {% if form.target_autonomous_system.errors %}
+            <ul class="errorMessage">
+              {% for error in form.target_autonomous_system.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_hr3" style="display: none;"><hr></div>
+
+        <div id="div_path" class="form-field" style="display: none;">
+          <p>Number of <b><i>shortest paths</i></b> (How many shortest paths should be considered in the report): *</p>
+          {{ form.path(onchange="pathFunction()") }}
+          {% if form.path.errors %}
+            <ul class="errorMessage">
+              {% for error in form.path.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div id="div_shortestPath" class="form-field" style="display: none;">
+          <p>Number of <b>shortest paths</b>: *</p>
+          {{ form.shortestPath }}
+          {% if form.shortestPath.errors %}
+            <ul class="errorMessage">
+              {% for error in form.shortestPath.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="form-button">
+          <p>
+            <button id="submit_button" type="button" disabled class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Submit</button>
+          </p>
+        </div>
+
+        <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true" align="left">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmation</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>Attention:</strong> processing can take a long time depending on the settings used.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      {{ form.continue_button(class="btn btn-primary") }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function attackerFunction() {
+      choose = document.getElementById("attacker").value;
+      if (choose == 'all') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_attacker_region").style.display = "none";
+        attacker_region.value = choose
+        document.getElementById("div_attacker_autonomous_system").style.display = "none";
+        attacker_autonomous_system.value = choose
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+      } else if (choose == 'region') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_attacker_region").style.display = "block";
+        attacker_region.value = ''
+        document.getElementById("div_attacker_autonomous_system").style.display = "none";
+        attacker_autonomous_system.value = choose
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+      } else if (choose == 'AS') {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_attacker_region").style.display = "none";
+        attacker_region.value = choose
+        document.getElementById("div_attacker_autonomous_system").style.display = "block";
+        attacker_autonomous_system.value = ''
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+      } else {
+        document.getElementById("div_attacker").style.display = "block";
+        document.getElementById("div_attacker_region").style.display = "none";
+        document.getElementById("div_attacker_autonomous_system").style.display = "none";
+        document.getElementById("div_hr1").style.display = "none";
+        document.getElementById("div_affected_area").style.display = "none";
+        document.getElementById("div_affected_area_region").style.display = "none";
+        document.getElementById("div_affected_area_autonomous_system").style.display = "none";
+        document.getElementById("div_hr2").style.display = "none";
+        document.getElementById("div_target").style.display = "none";
+        document.getElementById("div_target_region").style.display = "none";
+        document.getElementById("div_target_autonomous_system").style.display = "none";
+        document.getElementById("div_hr3").style.display = "none";
+        document.getElementById("div_path").style.display = "none";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+    function affected_areaFunction() {
+      choose = document.getElementById("affected_area").value;
+      if (choose == 'all') {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+        document.getElementById("div_affected_area_region").style.display = "none";
+        affected_area_region.value = choose
+        document.getElementById("div_affected_area_autonomous_system").style.display = "none";
+        affected_area_autonomous_system.value = choose
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+      } else if (choose == 'region') {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+        document.getElementById("div_affected_area_region").style.display = "block";
+        affected_area_region.value = ''
+        document.getElementById("div_affected_area_autonomous_system").style.display = "none";
+        affected_area_autonomous_system.value = choose
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+      } else if (choose == 'AS') {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+        document.getElementById("div_affected_area_region").style.display = "none";
+        affected_area_region.value = choose
+        document.getElementById("div_affected_area_autonomous_system").style.display = "block";
+        affected_area_autonomous_system.value = ''
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+      } else {
+        document.getElementById("div_hr1").style.display = "block";
+        document.getElementById("div_affected_area").style.display = "block";
+        document.getElementById("div_affected_area_region").style.display = "none";
+        document.getElementById("div_affected_area_autonomous_system").style.display = "none";
+        document.getElementById("div_hr2").style.display = "none";
+        document.getElementById("div_target").style.display = "none";
+        document.getElementById("div_target_region").style.display = "none";
+        document.getElementById("div_target_autonomous_system").style.display = "none";
+        document.getElementById("div_hr3").style.display = "none";
+        document.getElementById("div_path").style.display = "none";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+    function targetFunction() {
+      choose = document.getElementById("target").value;
+      if (choose == 'all') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_target_region").style.display = "none";
+        target_region.value = choose
+        document.getElementById("div_target_autonomous_system").style.display = "none";
+        target_autonomous_system.value = choose
+        document.getElementById("div_hr3").style.display = "block";
+        document.getElementById("div_path").style.display = "block";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      } else if (choose == 'region') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_target_region").style.display = "block";
+        target_region.value = ''
+        document.getElementById("div_target_autonomous_system").style.display = "none";
+        target_autonomous_system.value = choose
+        document.getElementById("div_hr3").style.display = "block";
+        document.getElementById("div_path").style.display = "block";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      } else if (choose == 'AS') {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_target_region").style.display = "none";
+        target_region.value = choose
+        document.getElementById("div_target_autonomous_system").style.display = "block";
+        target_autonomous_system.value = ''
+        document.getElementById("div_hr3").style.display = "block";
+        document.getElementById("div_path").style.display = "block";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      } else {
+        document.getElementById("div_hr2").style.display = "block";
+        document.getElementById("div_target").style.display = "block";
+        document.getElementById("div_target_region").style.display = "none";
+        document.getElementById("div_target_autonomous_system").style.display = "none";
+        document.getElementById("div_hr3").style.display = "none";
+        document.getElementById("div_path").style.display = "none";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+    function pathFunction() {
+      choose = document.getElementById("path").value;
+      if (choose == 'all') {
+        document.getElementById("div_hr3").style.display = "block";
+        document.getElementById("div_path").style.display = "block";
+        document.getElementById("div_shortestPath").style.display = "none";
+        shortestPath.value = 0
+        document.getElementById("submit_button").disabled = false;
+      } else if (choose == 'shortest') {
+        document.getElementById("div_hr3").style.display = "block";
+        document.getElementById("div_path").style.display = "block";
+        document.getElementById("div_shortestPath").style.display = "block";
+        shortestPath.value = ''
+        document.getElementById("submit_button").disabled = false;
+      } else {
+        document.getElementById("div_hr3").style.display = "none";
+        document.getElementById("div_path").style.display = "none";
+        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("submit_button").disabled = true;
+      }
+    }
+  </script>
+</div>
+
+{% endblock contentHijack %}

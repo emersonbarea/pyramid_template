@@ -5,11 +5,11 @@
 <div id="aum" class="container-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="row-fluid">
         <div class="span12">
-            {% if not affected_area[0]['time_write_files'] %}
-                <meta http-equiv="refresh" content="5;URL= '{{ hijackRealisticAnalysisScenario_url }}'">
-                <h3 align="center">Creating Affected Area Scenario Configuration</h3>
+            {% if not realistic_analysis[0]['time_write_files'] %}
+                <meta http-equiv="refresh" content="5;URL= '{{ hijackRealisticAnalysisDetail_url }}'">
+                <h3 align="center">Creating Scenario Configuration</h3>
             {% else %}
-                <h3 align="center">Affected Area Scenario Configuration</h3>
+                <h3 align="center">Scenario Configuration</h3>
             {% endif %}
         </div>
     </div>
@@ -19,27 +19,27 @@
             <div class="span12">
                 <p>
                     <strong> Topology name: </strong>
-                    <font color="green"> {{ affected_area[0]['topology'] }} </font>
+                    <font color="green"> {{ realistic_analysis[0]['topology'] }} </font>
                 </p>
                 <p>
                     <strong> Include stub ASs: </strong>
-                    <font color="green"> {{ affected_area[0]['include_stub'] }} </font>
+                    <font color="green"> {{ realistic_analysis[0]['include_stub'] }} </font>
                 </p>
                 <p>
                     <strong> Method to spawn the topology on cluster nodes: </strong>
-                    <font color="green"> {{ affected_area[0]['topology_distribution_method'] }} </font> </p>
+                    <font color="green"> {{ realistic_analysis[0]['topology_distribution_method'] }} </font> </p>
                 <p>
                     <strong> Emulation platform: </strong>
-                    <font color="green"> {{ affected_area[0]['emulation_platform'] }} </font>
+                    <font color="green"> {{ realistic_analysis[0]['emulation_platform'] }} </font>
                 </p>
                 <p>
                     <strong> Router platform: </strong>
-                    <font color="green"> {{ affected_area[0]['router_platform'] }} </font>
+                    <font color="green"> {{ realistic_analysis[0]['router_platform'] }} </font>
                 </p>
-                {% if affected_area[0]['output_path'] %}
+                {% if realistic_analysis[0]['output_path'] %}
                     <p>
                         <strong> Output configuration files: </strong>
-                        <font color="green"> {{ affected_area[0]['output_path'] }} </font>
+                        <font color="green"> {{ realistic_analysis[0]['output_path'] }} </font>
                     </p>
                 {% else %}
                     <p>
@@ -47,10 +47,10 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if affected_area[0]['number_of_autonomous_systems'] %}
+                {% if realistic_analysis[0]['number_of_autonomous_systems'] %}
                     <p>
                         <strong> Number of ASs: </strong>
-                        <font color="green"> {{ affected_area[0]['number_of_autonomous_systems'] }} </font>
+                        <font color="green"> {{ realistic_analysis[0]['number_of_autonomous_systems'] }} </font>
                     </p>
                 {% else %}
                     <p>
@@ -58,10 +58,10 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if affected_area[0]['time_get_data'] %}
+                {% if realistic_analysis[0]['time_get_data'] %}
                     <p>
                         <strong> Time spent to get data from topology: </strong>
-                        <font color="green"> {{ affected_area[0]['time_get_data'] }} sec </font>
+                        <font color="green"> {{ realistic_analysis[0]['time_get_data'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
@@ -69,10 +69,10 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if affected_area[0]['time_emulate_platform_commands'] %}
+                {% if realistic_analysis[0]['time_emulate_platform_commands'] %}
                     <p>
                         <strong> Time spent to create emulation commands: </strong>
-                        <font color="green"> {{ affected_area[0]['time_emulate_platform_commands'] }} sec </font>
+                        <font color="green"> {{ realistic_analysis[0]['time_emulate_platform_commands'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
@@ -80,10 +80,10 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if affected_area[0]['time_router_platform_commands'] %}
+                {% if realistic_analysis[0]['time_router_platform_commands'] %}
                     <p>
                         <strong> Time spent to create router platform commands: </strong>
-                        <font color="green"> {{ affected_area[0]['time_router_platform_commands'] }} sec </font>
+                        <font color="green"> {{ realistic_analysis[0]['time_router_platform_commands'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
@@ -91,14 +91,14 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if affected_area[0]['time_write_files'] %}
+                {% if realistic_analysis[0]['time_write_files'] %}
                     <p>
                         <strong> Time spent to write configuration files: </strong>
-                        <font color="green"> {{ affected_area[0]['time_write_files'] }} sec </font>
+                        <font color="green"> {{ realistic_analysis[0]['time_write_files'] }} sec </font>
                     </p>
                     <p>
                         <strong> Total time: </strong>
-                        <font color="green"> {{ affected_area[0]['total_time'] }} sec </font>
+                        <font color="green"> {{ realistic_analysis[0]['total_time'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
@@ -115,7 +115,7 @@
 
         <p><hr></p>
 
-        {% if not affected_area[0]['time_write_files'] %}
+        {% if not realistic_analysis[0]['time_write_files'] %}
             <p align="center">* fields status checked automatically every 5 seconds</p>
         {% else %}
             <div class="form-group" align="center">

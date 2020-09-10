@@ -38,6 +38,13 @@ from .hijack import (
     TopologyDistributionMethod,
     EmulationPlatform,
     RouterPlatform,
+    ScenarioAttackType,
+    Scenario,
+    ScenarioItem,
+    VantagePointActor,
+    Path,
+    PathItem,
+    ScenarioStuff,
     RealisticAnalysis)
 
 # run configure_mappers after defining all of the models to ensure

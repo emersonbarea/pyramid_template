@@ -34,7 +34,7 @@ def topologies(request):
 @view_config(route_name='topologiesAgreement', renderer='minisecbgp:templates/topology/topologiesLinksAgreements.jinja2')
 def topologies_agreement(request):
     user = request.user
-    if user is None or (user.role != 'admin'):
+    if user is None:
         raise HTTPForbidden
 
     dictionary = dict()

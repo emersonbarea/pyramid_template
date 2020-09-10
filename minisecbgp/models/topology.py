@@ -23,6 +23,7 @@ class Topology(Base):
     internet_exchange_point = relationship('InternetExchangePoint', foreign_keys='InternetExchangePoint.id_topology')
     type_of_user = relationship('TypeOfUser', foreign_keys='TypeOfUser.id_topology')
     type_of_service = relationship('TypeOfService', foreign_keys='TypeOfService.id_topology')
+    scenario = relationship('Scenario', foreign_keys='Scenario.id_topology')
     Index('IndexId_topology_type', id_topology_type)
 
 
@@ -77,6 +78,7 @@ class Link(Base):
     bandwidth = Column(Integer)  # kbps
     delay = Column(Integer)  # ms
     load = Column(Integer)  # kbps
+    path_item = relationship('PathItem', foreign_keys='PathItem.id_link')
     Index('IndexId2_topology', id_topology)
     Index('IndexId1_link_agreement', id_link_agreement)
     Index('IndexId_autonomous_system1', id_autonomous_system1)

@@ -1,7 +1,79 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean, BigInteger, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean, TEXT
 from sqlalchemy.orm import relationship
 
 from .meta import Base
+
+
+class ScenarioAttackType(Base):
+    __tablename__ = 'scenario_attack_type'
+    id = Column(Integer, primary_key=True)
+    scenario_attack_type = Column(String(50), nullable=False, unique=True)
+    description = Column(String(250), nullable=False, unique=True)
+    scenario = relationship('Scenario', foreign_keys='Scenario.id_scenario_attack_type')
+
+
+class Scenario(Base):
+    __tablename__ = 'scenario'
+    id = Column(Integer, primary_key=True)
+    id_scenario_attack_type = Column(Integer, ForeignKey('scenario_attack_type.id'))
+    id_topology = Column(Integer, ForeignKey('topology.id'))
+    scenario_item = relationship('ScenarioItem', foreign_keys='ScenarioItem.id_scenario')
+    Index('IndexId_scenario_attack_type', id_scenario_attack_type)
+    Index('IndexId7_topology', id_topology)
+
+
+class ScenarioItem(Base):
+    __tablename__ = 'scenario_item'
+    id = Column(Integer, primary_key=True)
+    id_scenario = Column(Integer, ForeignKey('scenario.id'))
+    attacker_as = Column(Integer, ForeignKey('autonomous_system.id'))
+    affected_as = Column(Integer, ForeignKey('autonomous_system.id'))
+    target_as = Column(Integer, ForeignKey('autonomous_system.id'))
+    path = relationship('Path', foreign_keys='Path.id_scenario_item')
+    Index('IndexId1_scenario', id_scenario)
+    Index('IndexId6_autonomous_system', attacker_as)
+    Index('IndexId7_autonomous_system', affected_as)
+    Index('IndexId8_autonomous_system', target_as)
+
+
+class VantagePointActor(Base):
+    __tablename__ = 'vantage_point_actor'
+    id = Column(Integer, primary_key=True)
+    vantage_point_actor = Column(String(50), nullable=False, unique=True)
+    description = Column(String(250), nullable=False, unique=True)
+
+
+class Path(Base):
+    __tablename__ = 'path'
+    id = Column(Integer, primary_key=True)
+    id_scenario_item = Column(Integer, ForeignKey('scenario_item.id'))
+    source = Column(Integer, ForeignKey('vantage_point_actor.id'))
+    destination = Column(Integer, ForeignKey('vantage_point_actor.id'))
+    Index('IndexId1_scenario_item', id_scenario_item)
+    Index('IndexId1_vantage_point_actor', source)
+    Index('IndexId2_vantage_point_actor', destination)
+
+
+class PathItem(Base):
+    __tablename__ = 'path_item'
+    id = Column(Integer, primary_key=True)
+    id_path = Column(Integer, ForeignKey('path.id'))
+    text_color = Column(Integer, nullable=False)
+    id_link = Column(Integer, ForeignKey('link.id'))
+    Index('IndexId1_path', id_path)
+    Index('IndexId1_link', id_link)
+
+
+class ScenarioStuff(Base):
+    __tablename__ = 'scenario_stuff'
+    id = Column(Integer, primary_key=True)
+    scenario_name = Column(String(50), nullable=False, unique=True)
+    scenario_description = Column(String(50))
+    id_topology = Column(Integer, nullable=False)
+    attacker_list = Column(TEXT, nullable=False)
+    affected_area_list = Column(TEXT, nullable=False)
+    target_list = Column(TEXT, nullable=False)
+    attack_type = Column(Integer, nullable=False)
 
 
 class TopologyDistributionMethod(Base):

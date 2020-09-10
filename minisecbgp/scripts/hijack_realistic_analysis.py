@@ -425,7 +425,7 @@ def main(argv=sys.argv[1:]):
                                    ["config-file=", "topology=", "include-stub=", "topology-distribution-method=",
                                     "emulation-platform=", "router-platform="])
     except getopt.GetoptError as error:
-        print('config '
+        print('MiniSecBGP_hijack_realistic_analysis '
               '--config-file=<pyramid config file .ini> '
               '--topology=<Topology ID> '
               '--include-stub=<True|False> '
@@ -435,7 +435,7 @@ def main(argv=sys.argv[1:]):
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('config '
+            print('MiniSecBGP_hijack_realistic_analysis '
                   '--config-file=<pyramid config file .ini> '
                   '--topology=<Topology ID> '
                   '--include-stub=<True|False> '

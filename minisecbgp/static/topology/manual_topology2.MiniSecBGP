@@ -280,37 +280,37 @@
       "load": null
     },
     {
-      "source": "2",
-      "destination": "3",
+      "source": "3",
+      "destination": "2",
       "ip_source": "192.168.0.13",
       "ip_destination": "192.168.0.14",
       "mask": "30",
       "description": null,
-      "agreement": "p2p",
-      "bandwidth": null,
-      "delay": null,
-      "load": null
-    },
-    {
-      "source": "1",
-      "destination": "3",
-      "ip_source": "192.168.0.17",
-      "ip_destination": "192.168.0.18",
-      "mask": "30",
-      "description": null,
-      "agreement": "p2p",
+      "agreement": "p2c",
       "bandwidth": null,
       "delay": null,
       "load": null
     },
     {
       "source": "3",
-      "destination": "5",
+      "destination": "1",
+      "ip_source": "192.168.0.17",
+      "ip_destination": "192.168.0.18",
+      "mask": "30",
+      "description": null,
+      "agreement": "p2c",
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "5",
+      "destination": "3",
       "ip_source": "192.168.0.21",
       "ip_destination": "192.168.0.22",
       "mask": "30",
       "description": null,
-      "agreement": "p2p",
+      "agreement": "p2c",
       "bandwidth": null,
       "delay": null,
       "load": null
@@ -346,7 +346,7 @@
       "ip_destination": "192.168.0.34",
       "mask": "30",
       "description": null,
-      "agreement": "p2p",
+      "agreement": "p2c",
       "bandwidth": null,
       "delay": null,
       "load": null

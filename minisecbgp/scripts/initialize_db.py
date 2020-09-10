@@ -55,7 +55,7 @@ def setup_models(dbsession):
 
     topology_types = [{'topology_type': 'Manual', 'description': 'Manually Created Topologies'},
                       {'topology_type': 'Realistic', 'description': 'CAIDA AS-Relationship imported topologies'},
-                      {'topology_type': 'Affected Area', 'description': 'Topologies automatically generated from the Affected Area'}]
+                      {'topology_type': 'Attack Scenario', 'description': 'Topologies automatically generated from the Attack Scenario procedure'}]
     for topology_type in topology_types:
         dbsession.add(models.TopologyType(topology_type=topology_type['topology_type'],
                                           description=topology_type['description']))
@@ -162,6 +162,28 @@ def setup_models(dbsession):
     router_platforms = ['Quagga']
     for router_platform in router_platforms:
         dbsession.add(models.RouterPlatform(router_platform=router_platform))
+
+    scenario_attack_types = [{'scenario_attack_type': 'Attraction',
+                              'description': 'In the traffic attraction attack type, '
+                                             'the attacker must just attract the traffic '
+                                             'of hijacked target.'},
+                             {'scenario_attack_type': 'Interception',
+                              'description': 'In the traffic interception attack type, '
+                                             'the attacker must attract the traffic and '
+                                             'redirect it to the real hijacked target.'}]
+    for scenario_attack_type in scenario_attack_types:
+        dbsession.add(models.ScenarioAttackType(scenario_attack_type=scenario_attack_type['scenario_attack_type'],
+                                                description=scenario_attack_type['description']))
+
+    vantage_point_actors = [{'vantage_point_actor': 'Attacker',
+                             'description': 'The autonomous system that announces the hijacked prefixes.'},
+                            {'vantage_point_actor': 'Affected',
+                             'description': 'The autonomous system that receives and accepts the hijacked prefixes from the attacker.'},
+                            {'vantage_point_actor': 'Target',
+                             'description': 'The autonomous system that has its prefixes hijacked.'}]
+    for vantage_point_actor in vantage_point_actors:
+        dbsession.add(models.VantagePointActor(vantage_point_actor=vantage_point_actor['vantage_point_actor'],
+                                               description=vantage_point_actor['description']))
 
 
 def parse_args(config_file):
