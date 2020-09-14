@@ -74,6 +74,7 @@ class ScenarioStuff(Base):
     affected_area_list = Column(TEXT, nullable=False)
     target_list = Column(TEXT, nullable=False)
     attack_type = Column(Integer, nullable=False)
+    number_of_shortest_paths = Column(Integer, nullable=False)          # 0 = all paths | 1...999 = number of shortest paths
 
 
 class TopologyDistributionMethod(Base):

@@ -64,11 +64,11 @@ class AttackScenarioDataForm(Form):
                                                        Length(min=1, max=100,
                                                               message='ASN string must be between 1 and 100 characters long.')])
 
-    path = SelectField(choices=[('', '--'),
-                                ('all', 'All Paths'),
-                                ('shortest', 'Choose the number of shortest paths')])
-    shortestPath = IntegerField(widget=NumberInput(min=0, max=10000, step=1),
-                                validators=[InputRequired()])
+    shortest_paths = SelectField(choices=[('', '--'),
+                                          ('all', 'All Paths'),
+                                          ('shortest', 'Choose the number of shortest paths')])
+    number_of_shortest_paths = IntegerField(widget=NumberInput(min=1, max=10000, step=1),
+                                            validators=[InputRequired()])
 
     continue_button = SubmitField('Continue')
 
@@ -319,8 +319,10 @@ def hijack_attack_scenario(request):
                         return dictionary
 
             # number of shortest paths
-            
-
+            if form.shortest_paths.data == 'all':
+                number_of_shortest_paths = 0
+            elif form.shortest_paths.data == 'shortest':
+                number_of_shortest_paths = form.number_of_shortest_paths.data
 
             try:
                 scenario_stuff = request.dbsession.query(models.ScenarioStuff).\
@@ -339,7 +341,8 @@ def hijack_attack_scenario(request):
                     attacker_list=str(attacker_list),
                     affected_area_list=str(affected_area_list),
                     target_list=str(target_list),
-                    attack_type=form.attack_type.data))
+                    attack_type=form.attack_type.data,
+                    number_of_shortest_paths=number_of_shortest_paths))
                 request.dbsession.flush()
             except Exception as error:
                 request.dbsession.rollback()

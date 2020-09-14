@@ -197,24 +197,24 @@
 
         <div id="div_hr3" style="display: none;"><hr></div>
 
-        <div id="div_path" class="form-field" style="display: none;">
+        <div id="div_shortest_paths" class="form-field" style="display: none;">
           <p>Number of <b><i>shortest paths</i></b> (How many shortest paths should be considered in the report): *</p>
-          {{ form.path(onchange="pathFunction()") }}
-          {% if form.path.errors %}
+          {{ form.shortest_paths(onchange="pathFunction()") }}
+          {% if form.shortest_paths.errors %}
             <ul class="errorMessage">
-              {% for error in form.path.errors %}
+              {% for error in form.shortest_paths.errors %}
                 <li>{{ error }}</li>
               {% endfor %}
             </ul>
           {% endif %}
         </div>
 
-        <div id="div_shortestPath" class="form-field" style="display: none;">
+        <div id="div_number_of_shortest_paths" class="form-field" style="display: none;">
           <p>Number of <b>shortest paths</b>: *</p>
-          {{ form.shortestPath }}
-          {% if form.shortestPath.errors %}
+          {{ form.number_of_shortest_paths }}
+          {% if form.number_of_shortest_paths.errors %}
             <ul class="errorMessage">
-              {% for error in form.shortestPath.errors %}
+              {% for error in form.number_of_shortest_paths.errors %}
                 <li>{{ error }}</li>
               {% endfor %}
             </ul>
@@ -291,8 +291,8 @@
         document.getElementById("div_target_region").style.display = "none";
         document.getElementById("div_target_autonomous_system").style.display = "none";
         document.getElementById("div_hr3").style.display = "none";
-        document.getElementById("div_path").style.display = "none";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "none";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }
@@ -335,8 +335,8 @@
         document.getElementById("div_target_region").style.display = "none";
         document.getElementById("div_target_autonomous_system").style.display = "none";
         document.getElementById("div_hr3").style.display = "none";
-        document.getElementById("div_path").style.display = "none";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "none";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }
@@ -350,8 +350,8 @@
         document.getElementById("div_target_autonomous_system").style.display = "none";
         target_autonomous_system.value = choose
         document.getElementById("div_hr3").style.display = "block";
-        document.getElementById("div_path").style.display = "block";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "block";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       } else if (choose == 'region') {
         document.getElementById("div_hr2").style.display = "block";
@@ -361,8 +361,8 @@
         document.getElementById("div_target_autonomous_system").style.display = "none";
         target_autonomous_system.value = choose
         document.getElementById("div_hr3").style.display = "block";
-        document.getElementById("div_path").style.display = "block";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "block";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       } else if (choose == 'AS') {
         document.getElementById("div_hr2").style.display = "block";
@@ -372,8 +372,8 @@
         document.getElementById("div_target_autonomous_system").style.display = "block";
         target_autonomous_system.value = ''
         document.getElementById("div_hr3").style.display = "block";
-        document.getElementById("div_path").style.display = "block";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "block";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       } else {
         document.getElementById("div_hr2").style.display = "block";
@@ -381,29 +381,29 @@
         document.getElementById("div_target_region").style.display = "none";
         document.getElementById("div_target_autonomous_system").style.display = "none";
         document.getElementById("div_hr3").style.display = "none";
-        document.getElementById("div_path").style.display = "none";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "none";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }
     function pathFunction() {
-      choose = document.getElementById("path").value;
+      choose = document.getElementById("shortest_paths").value;
       if (choose == 'all') {
         document.getElementById("div_hr3").style.display = "block";
-        document.getElementById("div_path").style.display = "block";
-        document.getElementById("div_shortestPath").style.display = "none";
-        shortestPath.value = 0
+        document.getElementById("div_shortest_paths").style.display = "block";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
+        number_of_shortest_paths.value = 1
         document.getElementById("submit_button").disabled = false;
       } else if (choose == 'shortest') {
         document.getElementById("div_hr3").style.display = "block";
-        document.getElementById("div_path").style.display = "block";
-        document.getElementById("div_shortestPath").style.display = "block";
-        shortestPath.value = ''
+        document.getElementById("div_shortest_paths").style.display = "block";
+        document.getElementById("div_number_of_shortest_paths").style.display = "block";
+        number_of_shortest_paths.value = ''
         document.getElementById("submit_button").disabled = false;
       } else {
         document.getElementById("div_hr3").style.display = "none";
-        document.getElementById("div_path").style.display = "none";
-        document.getElementById("div_shortestPath").style.display = "none";
+        document.getElementById("div_shortest_paths").style.display = "none";
+        document.getElementById("div_number_of_shortest_paths").style.display = "none";
         document.getElementById("submit_button").disabled = true;
       }
     }
