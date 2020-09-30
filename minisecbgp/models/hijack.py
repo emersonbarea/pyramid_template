@@ -58,7 +58,7 @@ class PathItem(Base):
     __tablename__ = 'path_item'
     id = Column(Integer, primary_key=True)
     id_path = Column(Integer, ForeignKey('path.id'))
-    text_color = Column(Integer, nullable=False)
+    hop = Column(Integer, nullable=False)
     id_link = Column(Integer, ForeignKey('link.id'))
     Index('IndexId1_path', id_path)
     Index('IndexId1_link', id_link)
