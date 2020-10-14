@@ -1,8 +1,8 @@
 import argparse
 import getopt
-
-import networkx as nx
+import subprocess
 import sys
+from datetime import datetime
 
 import pandas as pd
 
@@ -10,174 +10,112 @@ from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
 
-from graph_tool.all import *
-import timeit
-
 from minisecbgp import models
-
-import time
 
 
 class AttackScenario(object):
     def __init__(self, dbsession, scenario_id, scenario_name, scenario_description,
                  topology, attacker, affected_area, target, attack_type, number_of_shortest_paths):
+        self.failed = False
+        try:
+            if scenario_id:
+                pass
+            else:
+                try:
+                    topology = dbsession.query(models.Topology).\
+                        filter_by(id=topology).first()
+                    id_topology_base = topology.id
+                    topology_base = topology.topology
+                except Exception:
+                    self.failed = True
+                    print('The topology does not exist')
+                    return
+                try:
+                    scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
+                        filter(func.lower(models.ScenarioAttackType.scenario_attack_type) == func.lower(attack_type)).first()
+                except Exception:
+                    self.failed = True
+                    print('The attacker type does not exist')
+                    return
 
-        t = time.time()
-        print('\n<-- getting autonomous systems')
-        query = 'select asys.id as id_autonomous_system, ' \
-                'asys.id_topology as id_topology, ' \
-                'asys.id_region as id_region, ' \
-                'asys.autonomous_system as autonomous_system, ' \
-                'asys.stub as stub ' \
-                'from autonomous_system asys ' \
-                'where asys.id_topology = %s;' % 1
-        result_proxy = dbsession.bind.execute(query)
-        df_autonomous_system = pd.DataFrame(result_proxy, columns=['id_autonomous_system',
-                                                                   'id_topology',
-                                                                   'id_region',
-                                                                   'autonomous_system',
-                                                                   'stub'])
-        print('--> autonomous systems ok - ', time.time() - t)
-        print(df_autonomous_system)
+            query = 'select l.id_autonomous_system1 as id_autonomous_system1, '\
+                    'l.id_autonomous_system2 as id_autonomous_system2 ' \
+                    'from link l ' \
+                    'where l.id_topology = %s;' % id_topology_base
+            result_proxy = dbsession.bind.execute(query)
+            df_links = pd.DataFrame(result_proxy, columns=['id_autonomous_system1',
+                                                           'id_autonomous_system2'])
 
-        t = time.time()
-        print('\n<-- getting links')
-        query = 'select l.id as id_link, ' \
-                'l.id_topology as id_topology, ' \
-                'l.id_link_agreement as id_link_agreement, ' \
-                'l.id_autonomous_system1 as id_autonomous_system1, ' \
-                'l.id_autonomous_system2 as id_autonomous_system2, ' \
-                'l.ip_autonomous_system1 as ip_autonomous_system1, ' \
-                'l.ip_autonomous_system2 as ip_autonomous_system2, ' \
-                'l.mask as mask, ' \
-                'l.description as description, ' \
-                'l.bandwidth as bandwidth, ' \
-                'l.delay as delay, ' \
-                'l.load as load ' \
-                'from link l ' \
-                'where l.id_topology = %s;' % 1
-        result_proxy = dbsession.bind.execute(query)
-        df_link = pd.DataFrame(result_proxy, columns=['id_link',
-                                                      'id_topology',
-                                                      'id_link_agreement',
-                                                      'id_autonomous_system1',
-                                                      'id_autonomous_system2',
-                                                      'ip_autonomous_system1',
-                                                      'ip_autonomous_system2',
-                                                      'mask',
-                                                      'description',
-                                                      'bandwidth',
-                                                      'delay',
-                                                      'load'])
-        print('--> links ok - ', time.time() - t)
+            query = 'select count(l.id) as edge_array_length ' \
+                    'from link l ' \
+                    'where l.id_topology = %s;' % id_topology_base
+            result_proxy = dbsession.bind.execute(query)
+            for row in result_proxy:
+                edge_array_length = str(row[0])
 
-        print(df_link)
+            query = 'select count(asys.id) as count_asys ' \
+                    'from autonomous_system asys ' \
+                    'where asys.id_topology = %s;' % id_topology_base
+            result_proxy = dbsession.bind.execute(query)
+            for row in result_proxy:
+                count_asys = str(row[0])
 
-        print('<-- transforma o índice do df LINK em campo')
-        t = time.time()
-        df_link.reset_index(level=0, inplace=True)
-        print('--> ok - ', time.time() - t)
+        except Exception as error:
+            print('Error: ', error)
+            return
 
-        print('<-- renomeia o campo (antigo índice) do df LINK')
-        t = time.time()
-        df_link.columns = ['id_index_link', 'id_link', 'id_topology', 'id_link_agreement', 'id_autonomous_system1',
-                           'id_autonomous_system2', 'ip_autonomous_system1', 'ip_autonomous_system2', 'mask',
-                           'description', 'bandwidth', 'delay', 'load']
-        print('--> ok - ', time.time() - t)
+        self.dbsession = dbsession
+        self.scenario_id = scenario_id
+        self.scenario_name = scenario_name
+        self.scenario_description = scenario_description
+        self.id_topology_base = id_topology_base
+        self.topology_base = topology_base
+        self.number_of_shortest_paths = int(number_of_shortest_paths)
 
-        print('<-- transforma o índice do df AUTONOMOUS_SYSTEM em campo')
-        t = time.time()
-        df_autonomous_system.reset_index(level=0, inplace=True)
-        print('--> ok - ', time.time() - t)
+        self.df_links = df_links
+        self.edge_array_length = edge_array_length
+        self.count_asys = count_asys
 
-        print('<-- renomeia o campo (antigo índice) para usar no primeiro concat para autonomous_system1')
-        t = time.time()
-        df_autonomous_system.columns = ['id_index_autonomous_system1', 'id_autonomous_system', 'id_topology',
-                                        'id_region', 'autonomous_system', 'stub']
-        print('--> ok - ', time.time() - t)
+    def all_paths(self):
 
-        print('<-- concatena o df_autonomous_system no df_link baseado no autonomous_system1 do df_link')
-        t = time.time()
-        df_link_autonomous_system = pd.concat([df_link.set_index('id_autonomous_system1'),
-                                               df_autonomous_system.set_index('id_autonomous_system')],
-                                              axis=1,
-                                              join='inner')
-        print('-->  ok - ', time.time() - t)
+        df_links = self.df_links[['id_autonomous_system1',
+                                  'id_autonomous_system2']]
 
-        print('<-- reset index df_link_autonomous_system')
-        t = time.time()
-        df_link_autonomous_system.reset_index(inplace=True)
-        print('-->  ok - ', time.time() - t)
+        links = list()
+        for index, row in df_links.iterrows():
+            links.append(str(row[0]) + '-' + str(row[1]))
 
-        print('<-- renomeia o campo (antigo índice) para usar no segundo concat para autonomous_system2')
-        t = time.time()
-        df_autonomous_system.columns = ['id_index_autonomous_system2', 'id_autonomous_system', 'id_topology',
-                                        'id_region', 'autonomous_system', 'stub']
-        print('-->  ok - ', time.time() - t)
+        return links
 
-        print('<-- concatena o df_autonomous_system no df_link baseado no autonomous_system2 do df_link')
-        t = time.time()
-        df_link_autonomous_system = pd.concat([df_link_autonomous_system.set_index('id_autonomous_system2'),
-                                               df_autonomous_system.set_index('id_autonomous_system')],
-                                              axis=1,
-                                              join='inner')
-        print('-->  ok - ', time.time() - t)
+    def attack_scenario(self):
 
-        print('<-- renomeia o campo (antigo índice) para o nome original que ficará daqui em diante')
-        t = time.time()
-        df_autonomous_system.columns = ['id_index_autonomous_system', 'id_autonomous_system', 'id_topology',
-                                        'id_region', 'autonomous_system', 'stub']
-        print('-->  ok - ', time.time() - t)
+        links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
 
-        print('<-- reset index df_link_autonomous_system')
-        t = time.time()
-        df_link_autonomous_system.reset_index(inplace=True)
-        print('-->  ok - ', time.time() - t)
 
-        print('<-- retira os campos não utilizados do df_link_autonomous_system')
-        t = time.time()
-        df_link_autonomous_system = df_link_autonomous_system[['id_index_autonomous_system1', 'id_index_autonomous_system2']]
-        print('-->  ok - ', time.time() - t)
 
-        #pd.set_option('display.max_rows', None)
-        #pd.set_option('display.max_columns', None)
-        #pd.set_option('display.width', None)
-        #pd.set_option('display.max_colwidth', None)
+        return links, self.edge_array_length, self.count_asys
 
-        print(df_autonomous_system)
-        print(df_link)
-        print(df_link_autonomous_system)
 
-        #g = Graph(directed=False)
-        #g.add_edge_list(df_link_autonomous_system.values, hashed=True)
-        #print('print graph vertices: ', g.get_vertices())
-        #print('print graph edges: ', g.get_edges())
+def clear_database(dbsession, scenario_id):
+    try:
+        delete = 'delete from scenario_stuff where id = %s' % scenario_id
+        dbsession.bind.execute(delete)
+        dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print('clear_database: ', error)
 
-        #for path in graph_tool.all.all_paths(g, 67025, 1):
-        #    print(path)
-        #print('------------------------------------------------')
-        #print(graph_tool.all.shortest_distance(g, source=1916))
-        #print('------------------------------------------------')
 
-        print('<-- MONTANDO O NETWORKX GRAPH')
-        t = time.time()
-        self.graph = nx.from_pandas_edgelist(
-            df_link_autonomous_system,
-            source='id_index_autonomous_system1',
-            target='id_index_autonomous_system2',
-            create_using=nx.MultiGraph()
-        )
-        print('-->  ok - ', time.time() - t)
+def save_to_database(dbsession, field, value):
+    try:
+        for i in range(len(field)):
+            update = 'update realistic_analysis set %s = \'%s\'' % (field[i], str(value[i]))
+            dbsession.bind.execute(update)
+            dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print(error)
 
-        print('<-- PROCURANDO OS PATHS DE 1916 PARA 1421')
-        t = time.time()
-        paths = nx.all_simple_edge_paths(self.graph, 1916, 1421, cutoff=5)
-        print('-->  ok - ', time.time() - t)
-
-        print('<-- PRINTANDO OS PATHS')
-        t = time.time()
-        print(list(paths))
-        print('-->  ok - ', time.time() - t)
 
 def str2bool(master):
     if isinstance(master, bool):
@@ -285,8 +223,38 @@ def main(argv=sys.argv[1:]):
         try:
             with env['request'].tm:
                 dbsession = env['request'].dbsession
+
+                print('iniciando o objeto')
+
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
                                     attacker, affected_area, target, attack_type, number_of_shortest_paths)
+
+                print('iniciando o attack_scenario')
+
+                links, edge_array_length, count_asys = aa.attack_scenario()
+
+                link = links
+
+                link_filename = '/tmp/link_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(link_filename, "a")
+                f.write(link)
+                f.close()
+
+                print('VOU CHAMAR O CÓDIGO C++')
+
+                print(link_filename)
+                print(edge_array_length)
+                print(count_asys)
+
+                #arguments = [link_filename, edge_array_length, count_asys]
+                arguments = ['/tmp/bla.MiniSecBGP', str(5), str(5)]
+                subprocess.Popen(['./venv/bin/asp'] + arguments)
+
+                print('RETORNEI DO CÓDIGO C++')
+
+            with env['request'].tm:
+                if scenario_id:
+                    clear_database(dbsession, scenario_id)
         except OperationalError:
             print('Database error')
     else:

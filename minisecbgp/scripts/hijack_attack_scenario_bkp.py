@@ -1,9 +1,11 @@
 import argparse
 import getopt
-import time
+import os
+import subprocess
 import sys
+from datetime import datetime
+
 import pandas as pd
-import networkx as nx
 
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy import func
@@ -180,305 +182,22 @@ class AttackScenario(object):
             except KeyError:
                 pass
 
-        # creating the ID field
-        df_links_temp1 = df_links_temp1.reset_index().rename(columns={'index': 'reverse_row_id'})
-        df_links_temp2 = df_links_temp2.reset_index().rename(columns={'index': 'reverse_row_id'})
-
         df_links = pd.concat([df_links_temp1, df_links_temp2], ignore_index=True)
 
-        return df_links
+        links = list()
+        for index, row in df_links.iterrows():
+            links.append(str(row[0]) + '-' + str(row[1]) + '-' + str(row[2]) + '-' + str(row[3]))
 
-    def children(self, parent):
-        try:
-            children_temp1 = self.df_links.set_index('id_autonomous_system1'). \
-                loc[[parent]][['id_autonomous_system2', 'agreement', 'id_link']]
-            children_temp1.columns = ['children', 'agreement', 'id_link']
-        except KeyError:
-            children_temp1 = pd.DataFrame(columns=['children', 'agreement', 'id_link'])
-
-        # changing p2p to 2 and p2c to 3 where needed
-        if not children_temp1.empty:
-            try:
-                children_temp1.loc[children_temp1['agreement'] == 'p2p', 'agreement'] = 2
-            except KeyError:
-                pass
-
-            try:
-                children_temp1.loc[children_temp1['agreement'] == 'p2c', 'agreement'] = 3
-            except KeyError:
-                pass
-
-        try:
-            children_temp2 = self.df_links.set_index('id_autonomous_system2'). \
-                loc[[parent]][['id_autonomous_system1', 'agreement', 'id_link']]
-            children_temp2.columns = ['children', 'agreement', 'id_link']
-        except KeyError:
-            children_temp2 = pd.DataFrame(columns=['children', 'agreement', 'id_link'])
-
-        # changing p2p to 2 and p2c to 1 where needed
-        if not children_temp2.empty:
-            try:
-                children_temp2.loc[children_temp2['agreement'] == 'p2p', 'agreement'] = 2
-            except KeyError:
-                pass
-
-            try:
-                children_temp2.loc[children_temp2['agreement'] == 'p2c', 'agreement'] = 1
-            except KeyError:
-                pass
-
-        children = pd.concat([children_temp1, children_temp2])
-        children = children.reset_index().rename(columns={'index': 'parent'})
-
-        return children
+        return links
 
     def attack_scenario(self):
-#        if not self.failed:
-#            # topology
-#            try:
-#                scenario_topology = models.Topology(id_topology_type=self.id_topology_type,
-#                                                    topology=(self.scenario_name + ' - ' + self.topology_base)[:50],
-#                                                    description=self.scenario_description)
-#                self.dbsession.add(scenario_topology)
-#                self.dbsession.flush()
-#            except Exception as error:
-#                self.dbsession.rollback()
-#                print(error)
-#                return
 
-            # scenario
-#            try:
-#                self.dbsession.add(models.Scenario(id_scenario_attack_type=self.id_scenario_attack_type,
-#                                                   id_topology=scenario_topology.id))
-#                self.dbsession.flush()
-#            except Exception as error:
-#                self.dbsession.rollback()
-#                print(error)
-#                return
+        attacker_list = str(self.attacker_list).strip('[]').replace(' ', '')
+        affected_area_list = str(self.affected_area_list).strip('[]').replace(' ', '')
+        target_list = str(self.target_list).strip('[]').replace(' ', '')
+        links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
 
-#            self.id_scenario = self.dbsession.query(models.Scenario.id). \
-#                filter_by(id_scenario_attack_type=self.id_scenario_attack_type). \
-#                filter_by(id_topology=scenario_topology.id).first()
-
-            return self.attacker_list, self.affected_area_list, self.target_list, self.scenario_attack_type
-
-    def interception_attack_type(self):
-
-        t1 = time.time()
-
-        df_links = self.all_paths()
-
-        print(df_links)
-
-        for source in self.attacker_list:
-            for target in self.target_list:
-                if target != source:
-                    data = pd.DataFrame(columns=[
-                        'reverse_row_id',
-                        'id_autonomous_system1',
-                        'id_autonomous_system2',
-                        'agreement',
-                        'id_link',
-                        'last_row_verified'])
-                    child = source
-                    parent_agreement = 1
-                    visited = list()
-                    find_more_paths = True
-                    last_row_verified = 0
-                    source_peers = list(df_links[df_links['id_autonomous_system1'] == child].index)
-
-                    while find_more_paths:
-
-                        insert_result_set = False
-                        target_found = False
-
-                        try:
-                            # get the first ocurency of child in id_autonomous_system1 begnning from last_row_verified
-                            child_result_set = df_links.loc[
-                                df_links[df_links.index > data.loc[data.index.max()]['last_row_verified']].loc[
-                                    df_links['id_autonomous_system1'] == child].index.min()]
-
-                            # populate parent last_row_verified column
-                            data.loc[data.index.max()]['last_row_verified'] = child_result_set.name
-
-                            # validate reverse_row_id and visited
-                            if (child_result_set['reverse_row_id'] != parent_result_set['reverse_row_id']) and \
-                                    (child_result_set['id_autonomous_system2'] not in visited) and \
-                                    ((parent_result_set['agreement'] == 1 and child_result_set['agreement'] >= 1) or \
-                                     (parent_result_set['agreement'] > 1 and child_result_set['agreement'] > 2)):
-
-                                if child_result_set['id_autonomous_system2'] == target:
-                                    target_found = True
-                                    insert_result_set = False
-                                else:
-                                    target_found = False
-                                    insert_result_set = True
-
-                            else:
-
-                                insert_result_set = False
-
-                        except KeyError:
-
-                            if source_peers:
-                                # get the first occurency of child in id_autonomous_system1 begnning from last_row_verified
-                                child_result_set = df_links.loc[df_links[df_links.index == source_peers[0]].loc[
-                                    df_links['id_autonomous_system1'] == child].index.min()]
-
-                                del source_peers[0]
-
-                                if child_result_set['id_autonomous_system2'] == target:
-                                    target_found = True
-                                    insert_result_set = False
-                                else:
-                                    target_found = False
-                                    insert_result_set = True
-                            else:
-                                find_more_paths = False
-
-                        except TypeError:
-
-                            insert_result_set = False
-                            target_found = False
-
-                            visited.remove(data.loc[data.index.max()]['id_autonomous_system1'])
-                            data = data.drop(data.index.max())
-
-                            # raise KeyError if try to get parent data in a empty dataframe
-                            try:
-                                child = data.loc[data.index.max()]['id_autonomous_system2']
-                                parent_result_set = data.loc[data.index.max()]
-                            except KeyError:
-
-                                # if has source peers yet, try another source peer
-                                if source_peers:
-                                    child = source
-                                # else, finish
-                                else:
-                                    find_more_paths = False
-
-                        if insert_result_set:
-                            parent_result_set = child_result_set
-
-                            data = data.append({
-                                'reverse_row_id': child_result_set['reverse_row_id'],
-                                'id_autonomous_system1': child_result_set['id_autonomous_system1'],
-                                'id_autonomous_system2': child_result_set['id_autonomous_system2'],
-                                'agreement': child_result_set['agreement'],
-                                'id_link': child_result_set['id_link'],
-                                'last_row_verified': last_row_verified}, ignore_index=True)
-
-                            visited.append(child_result_set['id_autonomous_system1'])
-                            child = child_result_set['id_autonomous_system2']
-
-                        if target_found:
-                            path = list(data['id_link'])
-                            path.append(child_result_set['id_link'])
-
-                            print('PATH ==== : ', source, '-', target, ': ', path)
-
-        print('TEMPO: ', time.time() - t1)
-
-    def attraction_attack_type(self):
-
-        for source in [1,2,3,4,5,6]:
-            for target in [1,2,3,4,5,6]:
-                parent = source
-
-                # getting source's children
-                children = self.children(parent)
-
-                print('source: ', source)
-                print('parent: ', parent)
-                print('target: ', target)
-                print('\nchildren:\n', children)
-
-                while not children.empty:
-
-                    print('\n++++++++++++++++++++++++++++++++++++++++')
-
-                    # looking for target in children
-                    target_found = children[children.children == target]
-
-                    # looking for target in children
-                    if target_found.empty:
-                        # if target not in children
-
-                        # take last child as parent
-                        parent = children.iloc[-1]
-
-                        # getting parent's children
-                        parent_children = self.children(parent['children'])
-
-                        # validate link agreement to put new parent children in children
-                        if parent['agreement'] > 1:
-                            parent_children = parent_children[parent_children.agreement == 3]
-
-                        # remove duplicated links to put new parent children in children
-                        parent_children = parent_children[~parent_children.id_link.isin(children.id_link)]
-
-                        children = pd.concat([children, parent_children], ignore_index=True)
-
-                        print('source: ', source)
-                        print('parent: ', parent['children'])
-                        print('target: ', target)
-                        print('\nchildren:\n', children)
-
-                        if parent_children.empty:
-                            print('o parent_children está vazio !!!!!!!!!!!!!!!!!!!')
-                            return
-                            # aqui devo limpar o parent children
-
-                    else:
-
-                        print('\nENCONTROU O TARGET NO CHILDREN')
-
-                        # if target in children
-                        while not target_found.empty:
-                            # for each registry found in target_found
-                            target_temp = target_found.iloc[-1]
-                            # validate link agreement to get complete path
-                            if (parent.agreement == 1 and target_temp.agreement >= 1) or \
-                                    (parent.agreement > 1 and target_temp.agreement == 3):
-                                # clear this target from target_found
-                                target_found = target_found[target_found.id_link != target_temp.id_link]
-                                print('link agreement válido')
-
-                                print('target_temp:\n', target_temp)
-
-                                # monta o path
-                                # retira o registro do target_found
-                            else:
-                                print('link agreement inválido')
-
-                            # clear this target from children
-
-                            children = children[children.id_link != target_temp.id_link]
-                            print('\n----------------------------')
-                            print(parent)
-                            print('removendo o target_temp %s do children: \n' % target_temp['id_link'], children)
-
-                        # agora que verifiquei todos últimos links para o target, vou limpar o children até encontrar uma bifurcação em um parent
-#                        last_children = parent = children.iloc[-1]
-#                        penultimate_children = children.iloc[-2]
-
-#                        print('\n\n\n\n\nlast_children: ', last_children)
-#                        print('penultimate_children: ', penultimate_children)
-#                        print('maior indice do dataframe: ', children.index.max())
-
-                        print('\n\n\n\n\n, <<<<<<<<<<<<<<<<<<<<<<<<\n ')
-                        for index in range(children.index.max(), 0, -1):
-                            last_children = parent = children.loc[index]
-                            penultimate_children = children.loc[index - 1]
-                            print('last_children: ', last_children)
-                            print('penultimate_children: ', penultimate_children)
-
-                            if last_children.parent != penultimate_children.parent:
-                                children = children.drop([index])
-                                children = children[children.id_link != target_temp.id_link]
-
-                        print('\n\n\n\n\n, CHILDREN DEPOIS DE TUDO:\n ', children)
-                        print('\n\n\n\n\n, <<<<<<<<<<<<<<<<<<<<<<<<\n ')
+        return attacker_list, affected_area_list, target_list, links, self.scenario_attack_type
 
 
 def clear_database(dbsession, scenario_id):
@@ -608,21 +327,41 @@ def main(argv=sys.argv[1:]):
         try:
             with env['request'].tm:
                 dbsession = env['request'].dbsession
+
+                print('iniciando o objeto')
+
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
                                     attacker, affected_area, target, attack_type, number_of_shortest_paths)
-                attacker_list, affected_area_list, target_list, scenario_attack_type = aa.attack_scenario()
 
-            # scenario_item / path / path_item
-            if attacker_list and affected_area_list and target_list:
-                if scenario_attack_type == 'attraction':
-                    with env['request'].tm:
-                        aa.interception_attack_type()
-                elif scenario_attack_type == 'interception':
-                    with env['request'].tm:
-                        aa.interception_attack_type()
-                else:
-                    print('attack type unknown')
-                    return
+                print('iniciando o attack_scenario')
+
+                attacker_list, affected_area_list, target_list, links, scenario_attack_type = aa.attack_scenario()
+
+                source = attacker_list
+                target = target_list
+                link = links
+
+                source_filename = '/tmp/source_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(source_filename, "a")
+                f.write(source)
+                f.close()
+
+                target_filename = '/tmp/target_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(target_filename, "a")
+                f.write(target)
+                f.close()
+
+                link_filename = '/tmp/link_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(link_filename, "a")
+                f.write(link)
+                f.close()
+
+                print('VOU CHAMAR O CÓDIGO C++')
+
+                arguments = [source_filename, target_filename, link_filename]
+                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_attack_scenario.o'] + arguments)
+
+                print('RETORNEI DO CÓDIGO C++')
 
             with env['request'].tm:
                 if scenario_id:

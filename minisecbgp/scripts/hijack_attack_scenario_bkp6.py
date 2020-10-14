@@ -71,6 +71,8 @@ class AttackScenario(object):
                 else:
                     attacker_list.append(attacker_as_exist.id)
 
+            print('affected')
+
             affected_areas = affected_area.strip('][').split(',')
             affected_areas = map(int, affected_areas)
             affected_area_list_temp = list(affected_areas)
@@ -165,6 +167,10 @@ class AttackScenario(object):
             create_using=nx.MultiGraph()
         )
 
+        print('attacker length: ', len(self.attacker_list))
+        print('affected length: ', len(self.affected_area_list))
+        print('target length: ', len(self.target_list))
+
         print('finalizei o init')
 
     def validate_path(self, path):
@@ -183,11 +189,14 @@ class AttackScenario(object):
             if agreement_base == 'p2p':
                 for j in range(i+1, len(agreements), 1):
                     if agreements[j].strip() != 'p2c':
+                        print(' - validando o path %s - INVÁLIDO - %s' % (path, agreements))
                         return False
             elif agreement_base == 'p2c':
                 for j in range(i+1, len(agreements), 1):
                     if agreements[j].strip() != 'p2c':
+                        print(' - validando o path %s - INVÁLIDO - %s' % (path, agreements))
                         return False
+        print(' - validando o path %s - válido - %s' % (path, agreements))
         return True
 
     def attack_scenario(self):
@@ -236,11 +245,17 @@ class AttackScenario(object):
         pd.set_option('display.max_colwidth', None)
 
 
+        attacker_count = 1
+        affected_count = 1
+        target_count = 1
 
 
         df_scenario_item = pd.DataFrame()
         df_path = pd.DataFrame()
         df_path_item = pd.DataFrame()
+
+        print('PRINT 1: ', nx.shortest_path(self.graph, source=1, target=2))
+        print('PRINT 2: ', nx.shortest_path(self.graph, source=1, target=14))
 
         # for each attacker
         for attacker_as in self.attacker_list:
@@ -249,130 +264,256 @@ class AttackScenario(object):
                 # for each prefix hijacked
                 for target_as in self.target_list:
 
+                    print('ATTACKER %s de %s - (%s)' % (attacker_count, len(self.attacker_list), attacker_as))
+                    print('AFFECTED %s de %s - (%s)' % (affected_count, len(self.affected_area_list), affected_as))
+                    print('TARGET %s de %s - (%s)' % (target_count, len(self.target_list), target_as))
+
                     print('loop do target_as ', target_as)
 
-                    '''
-                        Verify if the AS in affected area will be affected by attacker hijack
-                    '''
                     # The first condition that must be met is the attacker AS, the affected AS,
                     # and the target AS must be different from each other
                     if not (attacker_as == affected_as) and \
                             not (attacker_as == target_as) and \
                             not (affected_as == target_as):
 
-                        # return the affected_area AS to attacker AS distance
+                        ''' 
+                            affected AS to target AS
+                        '''
+
+                        # - get all valid paths with the same cutoff as the shortest path between affected AS and target AS
+                        # - return the distance (number of hops) between the affected AS and target AS to be used as the limiter of the shortest distance
+                        #   between affected AS and attacker AS
+                        # - return the affected AS to target AS distance
+                        path_list = list()
+                        affected_to_target_shortest_path_found = False
+                        affected_to_target_valid_paths = list()
+                        affected_to_target_shortest_path_length = ''
+
+                        for cutoff in range(len(self.graph.nodes())):
+                            if not affected_to_target_shortest_path_found:
+                                paths = nx.all_simple_edge_paths(self.graph, affected_as, target_as, cutoff=cutoff)
+
+                                # create pandas dataframe
+                                for path in paths:
+                                    path_list.append({'path_length': len(path), 'path': path})
+                                df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
+                                df_path.reset_index()
+                                df_path.set_index('path_length', inplace=True)
+                                df_path = df_path.sort_index()
+
+                                print('\n\n===========================================')
+                                print('paths: affected AS to target AS')
+                                print(df_path)
+
+                                count_index = 0
+                                index_value = 0
+
+                                for index, row in df_path.iterrows():
+                                    if index_value < index:
+                                        index_value = index
+                                        count_index = count_index + 1
+                                    if (count_index > self.number_of_shortest_paths) and (
+                                            self.number_of_shortest_paths != 0):
+                                        break
+
+                                    if self.validate_path(list(row['path'])):
+                                        affected_to_target_valid_paths.append(row['path'])
+                                        if not affected_to_target_shortest_path_length:
+                                            affected_to_target_shortest_path_length = len(row['path'])
+                                        affected_to_target_shortest_path_found = True
+
+                            else:
+                                break
+
+                        print('affected_to_target_shortest_path_found :', affected_to_target_shortest_path_found)
+                        print('affected_to_target_valid_paths :', affected_to_target_valid_paths)
+                        print('affected_to_target_shortest_path_length :', affected_to_target_shortest_path_length)
+
+                        ''' 
+                            affected AS to attacker AS
+                        '''
+
+                        # - get first shortest valid path
+                        #   - if the shortest valid path length between affected AS and attacker AS is less or equal than
+                        #     the shortest path distance between affected AS and target AS:
+                        #       - get all valid paths with the same cutoff as the shortest path
+                        #       - get all valid paths with all possible cutoff that the distance is less or equal than the
+                        #         distance between affected AS to target AS, until the number of shortest paths is less or equal
+                        #         the value of --all-paths or --number-of-shortest-paths informed by user
+                        # - return the affected AS to attacker AS distance
                         path_list = list()
                         affected_to_attacker_shortest_path_found = False
                         affected_to_attacker_valid_paths = list()
                         affected_to_attacker_shortest_path_length = ''
 
-                        print('pesquisando os caminhos do affected %s para o attacker %s ' % (affected_as, attacker_as))
+                        for cutoff in range(len(self.graph.nodes())):
+                            if not affected_to_attacker_shortest_path_found:
+                                paths = nx.all_simple_edge_paths(self.graph, affected_as, attacker_as, cutoff=cutoff)
 
-                        paths = nx.all_simple_edge_paths(self.graph, affected_as, attacker_as)
+                                # create pandas dataframe
+                                for path in paths:
+                                    path_list.append({'path_length': len(path), 'path': path})
+                                df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
+                                df_path.reset_index()
+                                df_path.set_index('path_length', inplace=True)
+                                df_path = df_path.sort_index()
 
-                        print(list(paths))
+                                print('\n\n===========================================')
+                                print('paths: affected AS to attacker AS')
+                                print(df_path)
 
-                        print('terminei a pesquisa desse cara')
+                                count_index = 0
+                                index_value = 0
 
-                        # order paths by path length
+                                for index, row in df_path.iterrows():
+                                    if index_value < index:
+                                        index_value = index
+                                        count_index = count_index + 1
+                                    if (count_index > self.number_of_shortest_paths) and (
+                                            self.number_of_shortest_paths != 0):
+                                        break
 
-                        print('ordenando os caminhos do menor path para o maior path')
+                                    if self.validate_path(list(row['path'])):
+                                        affected_to_attacker_valid_paths.append(row['path'])
+                                        if not affected_to_attacker_shortest_path_length:
+                                            affected_to_attacker_shortest_path_length = len(row['path'])
+                                        affected_to_attacker_shortest_path_found = True
 
-                        for path in paths:
-                            path_list.append({'path_length': len(path), 'path': path})
-                        df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
-                        df_path.reset_index()
-                        df_path.set_index('path_length', inplace=True)
-                        df_path = df_path.sort_index()
-
-                        print('===========================================')
-                        print('paths: affected AS to attacker AS')
-                        print(df_path)
-
-                        count_index = 0
-                        index_value = 0
-
-                        for index, row in df_path.iterrows():
-                            if index_value < index:
-                                index_value = index
-                                count_index = count_index + 1
-                            if (count_index > self.number_of_shortest_paths) and (self.number_of_shortest_paths != 0):
+                            else:
                                 break
-
-                            if self.validate_path(list(row['path'])):
-                                affected_to_attacker_valid_paths.append(row['path'])
-                                if not affected_to_attacker_shortest_path_length:
-                                    affected_to_attacker_shortest_path_length = len(row['path'])
-                                affected_to_attacker_shortest_path_found = True
 
                         print('affected_to_attacker_shortest_path_found :', affected_to_attacker_shortest_path_found)
                         print('affected_to_attacker_valid_paths :', affected_to_attacker_valid_paths)
                         print('affected_to_attacker_shortest_path_length :', affected_to_attacker_shortest_path_length)
 
+                        # return the affected_area AS to attacker AS distance
+#                        path_list = list()
+#                        affected_to_attacker_shortest_path_found = False
+#                        affected_to_attacker_valid_paths = list()
+#                        affected_to_attacker_shortest_path_length = ''
+
+#                        print('pesquisando os caminhos do affected %s para o attacker %s ' % (affected_as, attacker_as))
+
+#                        paths = nx.all_simple_edge_paths(self.graph, affected_as, attacker_as, cutoff=3)
+
+                        #print(list(paths))
+
+#                        print('terminei a pesquisa desse cara')
+
+                        # order paths by path length
+
+#                        print('ordenando os caminhos do menor path para o maior path')
+
+#                        for path in paths:
+#                            print(path)
+#                            path_list.append({'path_length': len(path), 'path': path})
+#                        df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
+#                        df_path.reset_index()
+#                        df_path.set_index('path_length', inplace=True)
+#                        df_path = df_path.sort_index()
+
+#                        print('===========================================')
+#                        print('paths: affected AS to attacker AS')
+#                        print(df_path)
+
+#                        count_index = 0
+#                        index_value = 0
+
+#                        for index, row in df_path.iterrows():
+#                            if index_value < index:
+#                                index_value = index
+#                                count_index = count_index + 1
+#                            if (count_index > self.number_of_shortest_paths) and (self.number_of_shortest_paths != 0):
+#                                break
+
+#                            if self.validate_path(list(row['path'])):
+#                                affected_to_attacker_valid_paths.append(row['path'])
+#                                if not affected_to_attacker_shortest_path_length:
+#                                    affected_to_attacker_shortest_path_length = len(row['path'])
+#                                affected_to_attacker_shortest_path_found = True
+
+#                        print('affected_to_attacker_shortest_path_found :', affected_to_attacker_shortest_path_found)
+#                        print('affected_to_attacker_valid_paths :', affected_to_attacker_valid_paths)
+#                        print('affected_to_attacker_shortest_path_length :', affected_to_attacker_shortest_path_length)
+
                         # it only continues to check the distance from the affected AS to the target AS if:
                         # - there is at least one valid path between the attacker AS and the affected AS.
-                        if affected_to_attacker_shortest_path_found:
+#                        if affected_to_attacker_shortest_path_found:
 
                             # return the affected_area AS to target AS distance
-                            path_list = list()
-                            affected_to_target_shortest_path_found = False
-                            affected_to_target_valid_paths = list()
-                            affected_to_target_shortest_path_length = ''
-                            paths = nx.all_simple_edge_paths(self.graph, affected_as, target_as)
+#                            path_list = list()
+#                            affected_to_target_shortest_path_found = False
+#                            affected_to_target_valid_paths = list()
+#                            affected_to_target_shortest_path_length = ''
+#                            paths = nx.all_simple_edge_paths(self.graph, affected_as, target_as, cutoff=3)
 
-                            # order paths by path length and create pandas dataframe
-                            for path in paths:
-                                path_list.append({'path_length': len(path), 'path': path})
-                            df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
-                            df_path.reset_index()
-                            df_path.set_index('path_length', inplace=True)
-                            df_path = df_path.sort_index()
+                            # order paths by path length
+#                            for path in paths:
+#                                path_list.append({'path_length': len(path), 'path': path})
+#                            df_path = pd.DataFrame(data=path_list, columns=['path_length', 'path'])
+#                            df_path.reset_index()
+#                            df_path.set_index('path_length', inplace=True)
+#                            df_path = df_path.sort_index()
 
-                            print('\n\n===========================================')
-                            print('paths: affected AS to target AS')
-                            print(df_path)
+#                            print('\n\n===========================================')
+#                            print('paths: affected AS to target AS')
+#                            print(df_path)
 
-                            count_index = 0
-                            index_value = 0
+#                            count_index = 0
+#                            index_value = 0
 
-                            for index, row in df_path.iterrows():
-                                if index_value < index:
-                                    index_value = index
-                                    count_index = count_index + 1
-                                if (count_index > self.number_of_shortest_paths) and (
-                                        self.number_of_shortest_paths != 0):
-                                    break
+#                            for index, row in df_path.iterrows():
+#                                if index_value < index:
+#                                    index_value = index
+#                                    count_index = count_index + 1
+#                                if (count_index > self.number_of_shortest_paths) and (
+#                                        self.number_of_shortest_paths != 0):
+#                                    break
 
-                                if self.validate_path(list(row['path'])):
-                                    affected_to_target_valid_paths.append(row['path'])
-                                    if not affected_to_target_shortest_path_length:
-                                        affected_to_target_shortest_path_length = len(row['path'])
-                                    affected_to_target_shortest_path_found = True
+#                                if self.validate_path(list(row['path'])):
+#                                    affected_to_target_valid_paths.append(row['path'])
+#                                    if not affected_to_target_shortest_path_length:
+#                                        affected_to_target_shortest_path_length = len(row['path'])
+#                                    affected_to_target_shortest_path_found = True
 
-                            print('affected_to_target_shortest_path_found :', affected_to_target_shortest_path_found)
-                            print('affected_to_target_valid_paths :', affected_to_target_valid_paths)
-                            print('affected_to_target_shortest_path_length :', affected_to_target_shortest_path_length)
+#                            print('affected_to_target_shortest_path_found :', affected_to_target_shortest_path_found)
+#                            print('affected_to_target_valid_paths :', affected_to_target_valid_paths)
+#                            print('affected_to_target_shortest_path_length :', affected_to_target_shortest_path_length)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                             # it only continues if:
                             #  - there isn't a valid path between the affected AS and the target AS, OR
                             #  - the path length between attacker AS and affected AS is less or equal
                             # to the path length between the affected AS and target AS
-                            if not affected_to_target_shortest_path_found \
-                                    or (affected_to_target_shortest_path_found and
-                                        (affected_to_attacker_shortest_path_length <= affected_to_target_shortest_path_length)):
+#                            if not affected_to_target_shortest_path_found \
+#                                    or (affected_to_target_shortest_path_found and
+#                                        (affected_to_attacker_shortest_path_length <= affected_to_target_shortest_path_length)):
 
                                 # table: scenario_item
-                                scenario_item = models.ScenarioItem(id_scenario=self.id_scenario,
-                                                                    attacker_as=attacker_as,
-                                                                    affected_as=affected_as,
-                                                                    target_as=target_as)
-                                try:
-                                    self.dbsession.add(scenario_item)
-                                    self.dbsession.flush()
-                                except Exception as error:
-                                    self.dbsession.rollback()
-                                    print(error)
-                                    return
+#                                scenario_item = models.ScenarioItem(id_scenario=self.id_scenario,
+#                                                                    attacker_as=attacker_as,
+#                                                                    affected_as=affected_as,
+#                                                                    target_as=target_as)
+#                                try:
+#                                    self.dbsession.add(scenario_item)
+#                                    self.dbsession.flush()
+#                                except Exception as error:
+#                                    self.dbsession.rollback()
+#                                    print(error)
+#                                    return
 
                                 # tables: path and path_item
                                 # - repeat for each path found
@@ -383,69 +524,69 @@ class AttackScenario(object):
                                 # - create all path_item needed for each path created
                                 #   - one path_item for each link existent in the path
 
-                                print('+++++++++++++++++++++++++++++++++++++')
+#                                print('+++++++++++++++++++++++++++++++++++++')
 
                                 # affected to attacker paths
-                                for path in affected_to_attacker_valid_paths:
-                                    hop = 1
+#                                for path in affected_to_attacker_valid_paths:
+#                                    hop = 1
 
-                                    print('affected to ATTACKER paths found: ', path)
+#                                    print('affected to ATTACKER paths found: ', path)
 
                                     # path
-                                    path_attacker = models.Path(id_scenario_item=scenario_item.id,
-                                                                source=self.affected_vantage_point_actor,
-                                                                destination=self.attacker_vantage_point_actor)
-                                    try:
-                                        self.dbsession.add(path_attacker)
-                                        self.dbsession.flush()
-                                    except Exception as error:
-                                        self.dbsession.rollback()
-                                        print(error)
-                                        return
+#                                    path_attacker = models.Path(id_scenario_item=scenario_item.id,
+#                                                                source=self.affected_vantage_point_actor,
+#                                                                destination=self.attacker_vantage_point_actor)
+#                                    try:
+#                                        self.dbsession.add(path_attacker)
+#                                        self.dbsession.flush()
+#                                    except Exception as error:
+#                                        self.dbsession.rollback()
+#                                        print(error)
+#                                        return
 
                                     # path_item
-                                    for path_item in path:
-                                        print('path_item: ', path_item, ' - id_link: ', path_item[2], ' - id_path: ', path_attacker.id, ' - hop: ', hop)
-                                        path_item_attacker = models.PathItem(id_path=path_attacker.id,
-                                                                             hop=hop,
-                                                                             id_link=path_item[2])
-                                        try:
-                                            self.dbsession.add(path_item_attacker)
-                                        except Exception as error:
-                                            print(error)
-                                            return
-                                        hop = hop + 1
+#                                    for path_item in path:
+#                                        print('path_item: ', path_item, ' - id_link: ', path_item[2], ' - id_path: ', path_attacker.id, ' - hop: ', hop)
+#                                        path_item_attacker = models.PathItem(id_path=path_attacker.id,
+#                                                                             hop=hop,
+#                                                                             id_link=path_item[2])
+#                                        try:
+#                                            self.dbsession.add(path_item_attacker)
+#                                        except Exception as error:
+#                                            print(error)
+#                                            return
+#                                        hop = hop + 1
 
-                                if affected_to_target_shortest_path_found:
-                                    for path in affected_to_target_valid_paths:
-                                        hop = 1
+#                                if affected_to_target_shortest_path_found:
+#                                    for path in affected_to_target_valid_paths:
+#                                        hop = 1
 
-                                        print('affected to TARGET paths found: ', path)
+#                                        print('affected to TARGET paths found: ', path)
 
                                         # path
-                                        path_target = models.Path(id_scenario_item=scenario_item.id,
-                                                                  source=self.affected_vantage_point_actor,
-                                                                  destination=self.target_vantage_point_actor)
-                                        try:
-                                            self.dbsession.add(path_target)
-                                            self.dbsession.flush()
-                                        except Exception as error:
-                                            self.dbsession.rollback()
-                                            print(error)
-                                            return
+#                                        path_target = models.Path(id_scenario_item=scenario_item.id,
+#                                                                  source=self.affected_vantage_point_actor,
+#                                                                  destination=self.target_vantage_point_actor)
+#                                        try:
+#                                            self.dbsession.add(path_target)
+#                                            self.dbsession.flush()
+#                                        except Exception as error:
+#                                            self.dbsession.rollback()
+#                                            print(error)
+#                                            return
 
                                         # path_item
-                                        for path_item in path:
-                                            print('path_item: ', path_item, ' - id_link: ', path_item[2], ' - id_path: ', path_target.id, ' - hop: ', hop)
-                                            path_item_target = models.PathItem(id_path=path_target.id,
-                                                                               hop=hop,
-                                                                               id_link=path_item[2])
-                                            try:
-                                                self.dbsession.add(path_item_target)
-                                            except Exception as error:
-                                                print(error)
-                                                return
-                                            hop = hop + 1
+#                                        for path_item in path:
+#                                            print('path_item: ', path_item, ' - id_link: ', path_item[2], ' - id_path: ', path_target.id, ' - hop: ', hop)
+#                                            path_item_target = models.PathItem(id_path=path_target.id,
+#                                                                               hop=hop,
+#                                                                               id_link=path_item[2])
+#                                            try:
+#                                                self.dbsession.add(path_item_target)
+#                                            except Exception as error:
+#                                                print(error)
+#                                                return
+#                                            hop = hop + 1
 
                                 #path_target = models.Path(id_scenario_item=scenario_item.id,
                                 #                          source=self.affected_vantage_point_actor,
@@ -465,17 +606,12 @@ class AttackScenario(object):
 
                                 # table: path_item
 
-                            else:
-                                print('PRECISO AVISAR O USUÁRIO DE ALGUMA FORMA QUE ESSE ATACANTE PARA ESSE TARGET NÃO AFETA ESSE AS')
+#                            else:
+#                                print('PRECISO AVISAR O USUÁRIO DE ALGUMA FORMA QUE ESSE ATACANTE PARA ESSE TARGET NÃO AFETA ESSE AS')
 
-        #try:
-        #    df_scenario_item.to_sql('scenario_item', con=self.dbsession.bind, if_exists='append',
-        #                            index=False)
-        #    self.dbsession.flush()
-        #except Exception as error:
-        #    self.dbsession.rollback()
-        #    print(error)
-        #    return
+                    target_count = target_count + 1
+                affected_count = affected_count + 1
+            attacker_count = attacker_count + 1
 
 
 def clear_database(dbsession, scenario_id):

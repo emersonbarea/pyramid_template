@@ -1,11 +1,11 @@
 import argparse
 import getopt
 import os
-import time
+import subprocess
 import sys
+from datetime import datetime
+
 import pandas as pd
-from multiprocessing import Pool
-from functools import partial
 
 from pyramid.paster import bootstrap, setup_logging
 from sqlalchemy import func
@@ -182,130 +182,22 @@ class AttackScenario(object):
             except KeyError:
                 pass
 
-        # creating the ID field
-        df_links_temp1 = df_links_temp1.reset_index().rename(columns={'index': 'reverse_row_id'})
-        df_links_temp2 = df_links_temp2.reset_index().rename(columns={'index': 'reverse_row_id'})
-
         df_links = pd.concat([df_links_temp1, df_links_temp2], ignore_index=True)
 
-        return df_links
+        links = list()
+        for index, row in df_links.iterrows():
+            links.append(str(row[0]) + '-' + str(row[1]) + '-' + str(row[2]) + '-' + str(row[3]))
+
+        return links
 
     def attack_scenario(self):
 
-        self.links = self.all_paths()
+        attacker_list = str(self.attacker_list).strip('[]').replace(' ', '')
+        affected_area_list = str(self.affected_area_list).strip('[]').replace(' ', '')
+        target_list = str(self.target_list).strip('[]').replace(' ', '')
+        links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
 
-        return self.attacker_list, self.affected_area_list, self.target_list, self.scenario_attack_type, self.links
-
-
-def interception_attack_type(links, attack_scenarios):
-
-    source = attack_scenarios[0]
-    target = attack_scenarios[1]
-
-    path = list()
-
-    data = pd.DataFrame(columns=[
-        'reverse_row_id',
-        'id_autonomous_system1',
-        'id_autonomous_system2',
-        'agreement',
-        'id_link',
-        'last_row_verified'])
-    child = source
-    visited = list()
-    find_more_paths = True
-    last_row_verified = 0
-    source_peers = list(links[links['id_autonomous_system1'] == child].index)
-
-    while find_more_paths:
-
-        insert_result_set = False
-        target_found = False
-
-        try:
-            # get the first ocurency of child in id_autonomous_system1 begnning from last_row_verified
-            child_result_set = links.loc[
-            links[links.index > data.loc[data.index.max()]['last_row_verified']].loc[
-                links['id_autonomous_system1'] == child].index.min()]
-
-            # populate parent last_row_verified column
-            data.loc[data.index.max()]['last_row_verified'] = child_result_set.name
-
-            # validate reverse_row_id and visited
-            if (child_result_set['reverse_row_id'] != parent_result_set['reverse_row_id']) and \
-                (child_result_set['id_autonomous_system2'] not in visited) and \
-                ((parent_result_set['agreement'] == 1 and child_result_set['agreement'] >= 1) or \
-                (parent_result_set['agreement'] > 1 and child_result_set['agreement'] > 2)):
-
-                    if child_result_set['id_autonomous_system2'] == target:
-                        target_found = True
-                        insert_result_set = False
-                    else:
-                        target_found = False
-                        insert_result_set = True
-
-            else:
-
-                insert_result_set = False
-
-        except KeyError:
-
-            if source_peers:
-                # get the first occurency of child in id_autonomous_system1 begnning from last_row_verified
-                child_result_set = links.loc[links[links.index == source_peers[0]].loc[
-                    links['id_autonomous_system1'] == child].index.min()]
-
-                del source_peers[0]
-
-                if child_result_set['id_autonomous_system2'] == target:
-                    target_found = True
-                    insert_result_set = False
-                else:
-                    target_found = False
-                    insert_result_set = True
-            else:
-                find_more_paths = False
-
-        except TypeError:
-
-            insert_result_set = False
-            target_found = False
-
-            visited.remove(data.loc[data.index.max()]['id_autonomous_system1'])
-            data = data.drop(data.index.max())
-
-            # raise KeyError if try to get parent data in a empty dataframe
-            try:
-                child = data.loc[data.index.max()]['id_autonomous_system2']
-                parent_result_set = data.loc[data.index.max()]
-            except KeyError:
-
-                # if has source peers yet, try another source peer
-                if source_peers:
-                    child = source
-                # else, finish
-                else:
-                    find_more_paths = False
-
-        if insert_result_set:
-            parent_result_set = child_result_set
-
-            data = data.append({
-                'reverse_row_id': child_result_set['reverse_row_id'],
-                'id_autonomous_system1': child_result_set['id_autonomous_system1'],
-                'id_autonomous_system2': child_result_set['id_autonomous_system2'],
-                'agreement': child_result_set['agreement'],
-                'id_link': child_result_set['id_link'],
-                'last_row_verified': last_row_verified}, ignore_index=True)
-
-            visited.append(child_result_set['id_autonomous_system1'])
-            child = child_result_set['id_autonomous_system2']
-
-        if target_found:
-            path = list(data['id_link'])
-            path.append(child_result_set['id_link'])
-
-            os.system('echo "%s - %s: %s" >> /tmp/paths.txt' % (str(source), str(target), str(path)))
+        return attacker_list, affected_area_list, target_list, links, self.scenario_attack_type
 
 
 def clear_database(dbsession, scenario_id):
@@ -350,9 +242,6 @@ def parse_args(config_file):
 
 
 def main(argv=sys.argv[1:]):
-    num_processes = os.cpu_count()
-    pool = Pool(processes=num_processes)
-
     try:
         opts, args = getopt.getopt(argv, "h",
                                    ["config-file=", "scenario-id=", "scenario-name=", "scenario-description=",
@@ -446,25 +335,33 @@ def main(argv=sys.argv[1:]):
 
                 print('iniciando o attack_scenario')
 
-                attacker_list, affected_area_list, target_list, scenario_attack_type, links = aa.attack_scenario()
+                attacker_list, affected_area_list, target_list, links, scenario_attack_type = aa.attack_scenario()
 
-                print('montando a lista do attack_scenarios')
+                source = attacker_list
+                target = target_list
+                link = links
 
-                attack_scenarios = list()
-                for attacker_as in attacker_list:
-                    for affected_as in affected_area_list:
-                        if affected_as > attacker_as:
-                            attack_scenarios.append([attacker_as, affected_as])
+                source_filename = '/tmp/source_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(source_filename, "a")
+                f.write(source)
+                f.close()
 
-                print('COMEÇANDO O MULTIPROCESSING')
+                target_filename = '/tmp/target_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(target_filename, "a")
+                f.write(target)
+                f.close()
 
-                #attack_scenarios = [[67032, 67053], [67030, 67032], [67030, 67053], [67029, 67030], [67029, 67032], [67029, 67053], [67031, 67053], [67031, 67032], [67031, 67030], [67031, 67029]]
+                link_filename = '/tmp/link_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(link_filename, "a")
+                f.write(link)
+                f.close()
 
-                func = partial(interception_attack_type, links)
+                print('VOU CHAMAR O CÓDIGO C++')
 
-                pool.map(func, attack_scenarios)
-                #pool.close()
-                #pool.join()
+                arguments = [source_filename, target_filename, link_filename]
+                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_attack_scenario.o'] + arguments)
+
+                print('RETORNEI DO CÓDIGO C++')
 
             with env['request'].tm:
                 if scenario_id:
