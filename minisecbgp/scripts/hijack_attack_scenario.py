@@ -197,8 +197,6 @@ class AttackScenario(object):
         target_list = str(self.target_list).strip('[]').replace(' ', '')
         links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
 
-        return attacker_list, affected_area_list, target_list, links, self.scenario_attack_type
-
 
 def clear_database(dbsession, scenario_id):
     try:
@@ -334,34 +332,7 @@ def main(argv=sys.argv[1:]):
                                     attacker, affected_area, target, attack_type, number_of_shortest_paths)
 
                 print('iniciando o attack_scenario')
-
-                attacker_list, affected_area_list, target_list, links, scenario_attack_type = aa.attack_scenario()
-
-                source = attacker_list
-                target = target_list
-                link = links
-
-                source_filename = '/tmp/source_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
-                f = open(source_filename, "a")
-                f.write(source)
-                f.close()
-
-                target_filename = '/tmp/target_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
-                f = open(target_filename, "a")
-                f.write(target)
-                f.close()
-
-                link_filename = '/tmp/link_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
-                f = open(link_filename, "a")
-                f.write(link)
-                f.close()
-
-                print('VOU CHAMAR O CÓDIGO C++')
-
-                arguments = [source_filename, target_filename, link_filename]
-                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_attack_scenario.o'] + arguments)
-
-                print('RETORNEI DO CÓDIGO C++')
+                aa.attack_scenario()
 
             with env['request'].tm:
                 if scenario_id:
