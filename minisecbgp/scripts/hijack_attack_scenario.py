@@ -1,9 +1,8 @@
 import argparse
 import getopt
-import os
-import subprocess
+
+import networkx as nx
 import sys
-from datetime import datetime
 
 import pandas as pd
 
@@ -16,7 +15,7 @@ from minisecbgp import models
 
 class AttackScenario(object):
     def __init__(self, dbsession, scenario_id, scenario_name, scenario_description,
-                 topology, attacker, affected_area, target, attack_type, number_of_shortest_paths):
+                 topology, attacker, affected, target, attack_type, number_of_shortest_paths):
         self.failed = False
         try:
             if scenario_id:
@@ -31,7 +30,7 @@ class AttackScenario(object):
                 topology_base = topology.topology
 
                 attacker = scenario.attacker_list
-                affected_area = scenario.affected_area_list
+                affected = scenario.affected_area_list
                 target = scenario.target_list
 
                 scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
@@ -56,6 +55,8 @@ class AttackScenario(object):
                     print('The attacker type does not exist')
                     return
 
+            print('attackers')
+
             attackers = attacker.strip('][').split(',')
             attackers = map(int, attackers)
             attacker_list_temp = list(attackers)
@@ -70,19 +71,23 @@ class AttackScenario(object):
                 else:
                     attacker_list.append(attacker_as_exist.id)
 
-            affected_areas = affected_area.strip('][').split(',')
-            affected_areas = map(int, affected_areas)
-            affected_area_list_temp = list(affected_areas)
-            affected_area_list = list()
-            for affected_as in affected_area_list_temp:
+            print('affected')
+
+            affecteds = affected.strip('][').split(',')
+            affecteds = map(int, affecteds)
+            affected_list_temp = list(affecteds)
+            affected_list = list()
+            for affected_as in affected_list_temp:
                 affected_as_exist = dbsession.query(models.AutonomousSystem).\
                     filter_by(id_topology=id_topology_base).\
                     filter_by(autonomous_system=affected_as).first()
                 if not affected_as_exist:
                     print('Autonomous System "%s" does not exist to be used as an affected AS' % affected_as)
-                    affected_area_list = ''
+                    affected_list = ''
                 else:
-                    affected_area_list.append(affected_as_exist.id)
+                    affected_list.append(affected_as_exist.id)
+
+            print('targets')
 
             targets = target.strip('][').split(',')
             targets = map(int, targets)
@@ -114,17 +119,19 @@ class AttackScenario(object):
             self.target_vantage_point_actor = dbsession.query(models.VantagePointActor.id). \
                 filter(func.lower(models.VantagePointActor.vantage_point_actor) == 'target').first()
 
-            query = 'select l.id_autonomous_system1 as id_autonomous_system1, '\
-                    'l.id_autonomous_system2 as id_autonomous_system2, '\
-                    '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as agreement, ' \
-                    'l.id as id_link '\
+            print('pandas dataframe graph')
+
+            query = 'select l.id as key, ' \
+                    'l.id_autonomous_system1 as id_AS_1, ' \
+                    '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
+                    'l.id_autonomous_system2 as id_AS_2, ' \
+                    '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
+                    '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as link_agreement ' \
                     'from link l ' \
                     'where l.id_topology = %s;' % id_topology_base
             result_proxy = dbsession.bind.execute(query)
-            df_links = pd.DataFrame(result_proxy, columns=['id_autonomous_system1',
-                                                           'id_autonomous_system2',
-                                                           'agreement',
-                                                           'id_link'])
+            df_graph = pd.DataFrame(result_proxy, columns=['key', 'id_autonomous_system1', 'autonomous_system1',
+                                                           'id_autonomous_system2', 'autonomous_system2', 'link_agreement'])
 
         except Exception as error:
             print('Error: ', error)
@@ -137,65 +144,133 @@ class AttackScenario(object):
         self.id_topology_base = id_topology_base
         self.topology_base = topology_base
         self.attacker_list = attacker_list
-        self.affected_area_list = affected_area_list
+        self.affected_list = affected_list
         self.target_list = target_list
         self.id_scenario_attack_type = id_scenario_attack_type
         self.scenario_attack_type = scenario_attack_type.lower()
         self.number_of_shortest_paths = int(number_of_shortest_paths)
         self.id_topology_type = id_topology_type
 
-        self.df_links = df_links
+        self.df_graph = df_graph
 
-    def all_paths(self):
+        print('networkx graph')
 
-        df_links_temp1 = self.df_links[['id_autonomous_system1',
-                                        'id_autonomous_system2',
-                                        'agreement',
-                                        'id_link']]
+        self.graph = nx.from_pandas_edgelist(
+            df_graph,
+            source='id_autonomous_system1',
+            target='id_autonomous_system2',
+            edge_key='key',
+            edge_attr=['autonomous_system1', 'autonomous_system2', 'link_agreement'],
+            create_using=nx.MultiGraph()
+        )
 
-        df_links_temp2 = self.df_links[['id_autonomous_system2',
-                                        'id_autonomous_system1',
-                                        'agreement',
-                                        'id_link']]
-        df_links_temp2.rename(columns={'id_autonomous_system2': 'id_autonomous_system1',
-                                       'id_autonomous_system1': 'id_autonomous_system2'}, inplace=True)
+        print('attacker length: ', len(self.attacker_list))
+        print('affected length: ', len(self.affected_list))
+        print('target length: ', len(self.target_list))
 
-        # changing p2p to 2 and p2c to 3 in df_links
-        if not df_links_temp1.empty:
-            try:
-                df_links_temp1.loc[df_links_temp1['agreement'] == 'p2p', 'agreement'] = 2
-            except KeyError:
-                pass
-            try:
-                df_links_temp1.loc[df_links_temp1['agreement'] == 'p2c', 'agreement'] = 3
-            except KeyError:
-                pass
+        print('finalizei o init')
 
-        # changing p2p to 2 and p2c to 1 in df_links_inverted
-        if not df_links_temp2.empty:
-            try:
-                df_links_temp2.loc[df_links_temp2['agreement'] == 'p2p', 'agreement'] = 2
-            except KeyError:
-                pass
-            try:
-                df_links_temp2.loc[df_links_temp2['agreement'] == 'p2c', 'agreement'] = 1
-            except KeyError:
-                pass
+    def validate_path(self, path):
+        agreements = list()
+        for hop in range(len(path)):
+            agreement = self.df_graph.query('id_autonomous_system1 == %s & id_autonomous_system2 == %s & key == %s' %
+                                            (path[hop][0], path[hop][1], path[hop][2]))
+            if agreement.empty:
+                agreement = self.df_graph.query('id_autonomous_system1 == %s & id_autonomous_system2 == %s & key == %s' %
+                                                (path[hop][1], path[hop][0], path[hop][2]))
+                agreements.append(agreement.link_agreement.to_string(index=False)[::-1])
+            else:
+                agreements.append(agreement.link_agreement.to_string(index=False))
+        for i in range(len(agreements)):
+            agreement_base = agreements[i].strip()
+            if agreement_base == 'p2p':
+                for j in range(i+1, len(agreements), 1):
+                    if agreements[j].strip() != 'p2c':
+                        print(' - validando o path %s - INVÁLIDO - %s' % (path, agreements))
+                        return False
+            elif agreement_base == 'p2c':
+                for j in range(i+1, len(agreements), 1):
+                    if agreements[j].strip() != 'p2c':
+                        print(' - validando o path %s - INVÁLIDO - %s' % (path, agreements))
+                        return False
+        print(' - validando o path %s - válido - %s' % (path, agreements))
+        return True
 
-        df_links = pd.concat([df_links_temp1, df_links_temp2], ignore_index=True)
-
-        links = list()
-        for index, row in df_links.iterrows():
-            links.append(str(row[0]) + '-' + str(row[1]) + '-' + str(row[2]) + '-' + str(row[3]))
-
-        return links
+    @staticmethod
+    def path_already_researched(searched_paths, source, target):
+        for path in searched_paths:
+            if (path[0] == source and path[1] == target) or (path[1] == source and path[0] == target):
+                return True
+        return False
 
     def attack_scenario(self):
+        if not self.failed:
+            # topology
+            try:
+                scenario_topology = models.Topology(id_topology_type=self.id_topology_type,
+                                                    topology=(self.scenario_name + ' - ' + self.topology_base)[:50],
+                                                    description=self.scenario_description)
+                self.dbsession.add(scenario_topology)
+                self.dbsession.flush()
+            except Exception as error:
+                self.dbsession.rollback()
+                print(error)
+                return
 
-        attacker_list = str(self.attacker_list).strip('[]').replace(' ', '')
-        affected_area_list = str(self.affected_area_list).strip('[]').replace(' ', '')
-        target_list = str(self.target_list).strip('[]').replace(' ', '')
-        links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
+            # scenario
+            try:
+                self.dbsession.add(models.Scenario(id_scenario_attack_type=self.id_scenario_attack_type,
+                                                   id_topology=scenario_topology.id))
+                self.dbsession.flush()
+            except Exception as error:
+                self.dbsession.rollback()
+                print(error)
+                return
+
+            self.id_scenario = self.dbsession.query(models.Scenario.id).\
+                filter_by(id_scenario_attack_type=self.id_scenario_attack_type).\
+                filter_by(id_topology=scenario_topology.id).first()
+
+            return self.attacker_list, self.affected_list, self.target_list, self.scenario_attack_type
+
+    def interception_attack_type(self):
+        pass
+
+    def attraction_attack_type(self):
+
+        print('attraction_attack_type')
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', None)
+        pd.set_option('display.max_colwidth', None)
+
+        # for each affected:
+        # - look for the shortest path from the affected to the target
+        #   - if this path has not been found before
+        # - look for the path from the affected to the attacker
+        #   - if this path has not been found before
+        #   - if this path is less than the path between affected to target
+
+        searched_paths = list()
+
+        for affected_as in self.affected_list:
+
+            # for each target AS
+            for target_as in self.target_list:
+
+                # look for the path only if this path has not been found before
+                if affected_as != target_as and not self.path_already_researched(searched_paths, affected_as, target_as):
+
+                    # put the affected - target in the "searched_paths" list
+                    print('\n', affected_as, target_as)
+                    paths = nx.all_shortest_paths(self.graph, source=affected_as, target=target_as)
+                    for path in paths:
+                        print(path)
+                    searched_paths.append([affected_as, target_as])
+
+            # for each attacker
+#            for attacker_as in self.attacker_list:
+#                pass
 
 
 def clear_database(dbsession, scenario_id):
@@ -325,14 +400,21 @@ def main(argv=sys.argv[1:]):
         try:
             with env['request'].tm:
                 dbsession = env['request'].dbsession
-
-                print('iniciando o objeto')
-
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
                                     attacker, affected_area, target, attack_type, number_of_shortest_paths)
+                attacker_list, affected_area_list, target_list, scenario_attack_type = aa.attack_scenario()
 
-                print('iniciando o attack_scenario')
-                aa.attack_scenario()
+            # scenario_item / path / path_item
+            if attacker_list and affected_area_list and target_list:
+                if scenario_attack_type == 'attraction':
+                    with env['request'].tm:
+                        aa.attraction_attack_type()
+                elif scenario_attack_type == 'interception':
+                    with env['request'].tm:
+                        aa.interception_attack_type()
+                else:
+                    print('attack type unknown')
+                    return
 
             with env['request'].tm:
                 if scenario_id:

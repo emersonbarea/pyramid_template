@@ -142,6 +142,8 @@ int main(int argc, char **argv)
                             
                         }
 
+                        // look if id_as1 already exist in unmap link
+                        // if not exist, create it
                         if (link.find(array_temp[0]) == link.end()) {
                             vector_id_as2 v_id_as2;
                             umap_id_as2 map2;
@@ -149,6 +151,7 @@ int main(int argc, char **argv)
                             v_id_as2.push_back(map2);
                             link[array_temp[0]] = v_id_as2;
                         }
+                        // if exist, update it with id_as2 data
                         else {
                             vector_id_as2 v_id_as2;
                             vector_id_as2 id_as1_to_find = link[array_temp[0]];
@@ -212,6 +215,8 @@ int main(int argc, char **argv)
         for (int i=0; i<link[137055][0][67032].size(); i++)
             cout << link[137055][0][67032][i] << endl;
 
+        for (int i=0; i<link[137055].size(); i++)
+            cout << link[137055][0][67032][i] << endl;
 
         return 0;
     }
