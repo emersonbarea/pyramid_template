@@ -1,9 +1,7 @@
 import argparse
 import getopt
-
-import networkx as nx
+import time
 import sys
-
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
@@ -18,22 +16,42 @@ class AttackScenario(object):
                  topology, attacker, affected_area, target, attack_type, number_of_shortest_paths):
         self.failed = False
         try:
-            try:
+            if scenario_id:
+                scenario = dbsession.query(models.ScenarioStuff).\
+                    filter_by(id=scenario_id).first()
+                scenario_name = scenario.scenario_name
+                scenario_description = scenario.scenario_description
+
                 topology = dbsession.query(models.Topology).\
-                    filter_by(id=topology).first()
+                    filter_by(id=scenario.id_topology).first()
                 id_topology_base = topology.id
                 topology_base = topology.topology
-            except Exception:
-                self.failed = True
-                print('The topology does not exist')
-                return
-            try:
+
+                attacker = scenario.attacker_list
+                affected_area = scenario.affected_area_list
+                target = scenario.target_list
+
                 scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
-                    filter(func.lower(models.ScenarioAttackType.scenario_attack_type) == func.lower(attack_type)).first()
-            except Exception:
-                self.failed = True
-                print('The attacker type does not exist')
-                return
+                    filter_by(id=scenario.attack_type).first()
+
+                number_of_shortest_paths = scenario.number_of_shortest_paths
+            else:
+                try:
+                    topology = dbsession.query(models.Topology).\
+                        filter_by(id=topology).first()
+                    id_topology_base = topology.id
+                    topology_base = topology.topology
+                except Exception:
+                    self.failed = True
+                    print('The topology does not exist')
+                    return
+                try:
+                    scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
+                        filter(func.lower(models.ScenarioAttackType.scenario_attack_type) == func.lower(attack_type)).first()
+                except Exception:
+                    self.failed = True
+                    print('The attacker type does not exist')
+                    return
 
             attackers = attacker.strip('][').split(',')
             attackers = map(int, attackers)
@@ -93,20 +111,17 @@ class AttackScenario(object):
             self.target_vantage_point_actor = dbsession.query(models.VantagePointActor.id). \
                 filter(func.lower(models.VantagePointActor.vantage_point_actor) == 'target').first()
 
-            print('\npandas dataframe graph')
-
-            query = 'select l.id as key, ' \
-                    'l.id_autonomous_system1 as id_AS_1, ' \
-                    '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
-                    'l.id_autonomous_system2 as id_AS_2, ' \
-                    '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system2) as autonomous_system2, ' \
-                    '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as link_agreement ' \
+            query = 'select l.id as id_link, '\
+                    'l.id_autonomous_system1 as id_autonomous_system1, '\
+                    'l.id_autonomous_system2 as id_autonomous_system2, '\
+                    '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as agreement ' \
                     'from link l ' \
                     'where l.id_topology = %s;' % id_topology_base
             result_proxy = dbsession.bind.execute(query)
-            df_graph = pd.DataFrame(result_proxy, columns=['key', 'id_autonomous_system1', 'autonomous_system1',
-                                                           'id_autonomous_system2', 'autonomous_system2', 'link_agreement'])
-            print(df_graph)
+            df_graph = pd.DataFrame(result_proxy, columns=['id_link',
+                                                           'id_autonomous_system1',
+                                                           'id_autonomous_system2',
+                                                           'agreement'])
 
         except Exception as error:
             print('Error: ', error)
@@ -128,38 +143,242 @@ class AttackScenario(object):
 
         self.df_graph = df_graph
 
-        print('networkx graph')
+        print(self.df_graph)
 
-        self.graph = nx.from_pandas_edgelist(
-            df_graph,
-            source='id_autonomous_system1',
-            target='id_autonomous_system2',
-            edge_key='key',
-            edge_attr=['autonomous_system1', 'autonomous_system2', 'link_agreement'],
-            create_using=nx.MultiGraph()
-        )
+    def children(self, parent):
+        try:
+            children_temp1 = self.df_graph.set_index('id_autonomous_system1'). \
+                loc[[parent]][['id_link', 'id_autonomous_system2', 'agreement']]
+            children_temp1.columns = ['id_link', 'peer_id_autonomous_system', 'agreement']
+        except KeyError:
+            children_temp1 = pd.DataFrame(columns=['id_link', 'peer_id_autonomous_system', 'agreement'])
 
-        print(list(self.graph.edges()))
-        print(list(self.graph.edges()))
+        # changing p2p to 2 and p2c to 3 where needed
+        if not children_temp1.empty:
+            try:
+                children_temp1.loc[children_temp1['agreement'] == 'p2p', 'agreement'] = 2
+            except KeyError:
+                pass
 
-        attacker_count = 1
-        affected_count = 1
-        target_count = 1
+            try:
+                children_temp1.loc[children_temp1['agreement'] == 'p2c', 'agreement'] = 3
+            except KeyError:
+                pass
 
-        print('\nlistas:')
-        print(' - self.attacker_list: ', self.attacker_list)
-        print(' - self.affected_list: ', self.affected_area_list)
-        print(' - self.target_list: ', self.target_list)
+        try:
+            children_temp2 = self.df_graph.set_index('id_autonomous_system2'). \
+                loc[[parent]][['id_link', 'id_autonomous_system1', 'agreement']]
+            children_temp2.columns = ['id_link', 'peer_id_autonomous_system', 'agreement']
+        except KeyError:
+            children_temp2 = pd.DataFrame(columns=['id_link', 'peer_id_autonomous_system', 'agreement'])
 
-        for attacker_as in self.attacker_list:
-            for affected_as in self.affected_area_list:
-                for target_as in self.target_list:
+        # changing p2p to 2 and p2c to 1 where needed
+        if not children_temp2.empty:
+            try:
+                children_temp2.loc[children_temp2['agreement'] == 'p2p', 'agreement'] = 2
+            except KeyError:
+                pass
 
-                    print('\nATTACKER %s - %s de %s' % (attacker_as, attacker_count, len(self.attacker_list)))
-                    print('AFFECTED %s - %s de %s' % (affected_as, affected_count, len(self.affected_area_list)))
-                    print('TARGET %s - %s de %s' % (target_as, target_count, len(self.target_list)))
+            try:
+                children_temp2.loc[children_temp2['agreement'] == 'p2c', 'agreement'] = 1
+            except KeyError:
+                pass
 
-                    print(list(all_simple_paths(self.graph, source=affected_as, target=target_as, cutoff=4)))
+        children = pd.concat([children_temp1, children_temp2])
+        #children = children.reset_index()
+
+
+        return children
+
+    def attack_scenario(self):
+#        if not self.failed:
+#            # topology
+#            try:
+#                scenario_topology = models.Topology(id_topology_type=self.id_topology_type,
+#                                                    topology=(self.scenario_name + ' - ' + self.topology_base)[:50],
+#                                                    description=self.scenario_description)
+#                self.dbsession.add(scenario_topology)
+#                self.dbsession.flush()
+#            except Exception as error:
+#                self.dbsession.rollback()
+#                print(error)
+#                return
+
+            # scenario
+#            try:
+#                self.dbsession.add(models.Scenario(id_scenario_attack_type=self.id_scenario_attack_type,
+#                                                   id_topology=scenario_topology.id))
+#                self.dbsession.flush()
+#            except Exception as error:
+#                self.dbsession.rollback()
+#                print(error)
+#                return
+
+#            self.id_scenario = self.dbsession.query(models.Scenario.id). \
+#                filter_by(id_scenario_attack_type=self.id_scenario_attack_type). \
+#                filter_by(id_topology=scenario_topology.id).first()
+
+            return self.attacker_list, self.affected_area_list, self.target_list, self.scenario_attack_type
+
+    def interception_attack_type(self):
+        pass
+
+    def attraction_attack_type(self):
+
+        valid_paths = pd.DataFrame(columns=['source', 'target', 'path'])
+
+        for source in self.affected_area_list:
+            for target in self.target_list:
+
+                print('\n----------------------------')
+                print('\nsource: ', source)
+                print('target: ', target)
+
+                parent = source
+                visited = pd.DataFrame({'visited': [source]})
+                print('\n----------------------------')
+                print('visited:\n', visited)
+
+                path = list()
+                last_agreement = 1                # c2p = 1, p2p = 2 and p2c = 3
+
+                '''
+                    getting all source's peers (children) from df_graph 
+                '''
+                children = self.children(source)
+                print('\n----------------------------')
+                print('children:\n', children)
+
+                print('\nVERIFICANDO CHILDREN (while)')
+
+                # while children has child and target not found in path, repeat
+                while not children.empty:
+
+                    print('\n=========================================================')
+                    '''
+                        if target is in children
+                    '''
+
+                    print('\n----------------------------')
+                    print('verificando se target está em children')
+
+                    try:
+
+                        target_found = children[children.peer_id_autonomous_system == target]
+
+                        print('\n----------------------------')
+                        print('target_found \n', target_found, type(target_found))
+
+                        '''
+                            validate the agreement between parent and children item (the target)
+                        '''
+                        while not target_found.empty:
+
+                            # for each register found in target_found
+                            target_temp = target_found.iloc[-1]
+
+                            print('\n----------------------------')
+                            print('pegando o último target da lista de targets_found: ', target_temp['id_link'])
+
+                            '''
+                                validate agreement between parent and child to recursively find new children
+                            '''
+                            # if last_agreement_value == 1, child['agreement'] should be in (1, 2, 3)
+                            # if last_agreement_value == 2, child['agreement'] must be == 3
+                            # if last_agreement_value == 3, child['agreement'] must be == 3
+
+                            print('\n----------------------------')
+                            print('verificando se o agreement é válido')
+
+                            if ((last_agreement == 1 and target_temp['agreement'] >= 1)
+                                    or (last_agreement > 1 and target_temp['agreement'] > 2)):
+
+                                print('\n----------------------------')
+                                print('agreement válido !!!')
+
+                                # put the path in the valid_paths dataframe
+                                path.append(target_temp['id_link'])
+
+                                print('\n----------------------------')
+                                print('acrescentando o id_link do target no path:\n', path)
+
+                                #valid_paths = valid_paths.append({'source': source, 'target': target, 'path': path}, ignore_index=True)
+
+                            else:
+                                print('\n----------------------------')
+                                print('agreement INválido !!!')
+
+                            # removes this target from target_temp
+                            target_found = target_found[:-1]
+                            print('\n----------------------------')
+                            print('removendo o target_temp %s do target_found: \n' % target_temp['id_link'], target_found)
+
+                            # removes this target from children
+                            children = children[children.id_link != target_temp.id_link]
+                            print('\n----------------------------')
+                            print('removendo o target_temp %s do children: \n' % target_temp['id_link'], children)
+
+                    except IndexError:
+                        # raises keyError exception if target is not in children
+
+                        print('\n----------------------------')
+                        print('target not found !!!\n', target)
+
+                        '''
+                            take the child from children
+                        '''
+                        child = children.iloc[-1]
+                        print('\n----------------------------')
+                        print('pegando o child: \n', child['peer_id_autonomous_system'])
+
+                        '''
+                            validate agreement between parent and child to recursively find new children
+                        '''
+
+                        print('\n----------------------------')
+                        print('verificando se o agreement é válido')
+
+                        # if last_agreement_value == 1, child['agreement'] should be in (1, 2, 3)
+                        # if last_agreement_value == 2, child['agreement'] must be == 3
+                        # if last_agreement_value == 3, child['agreement'] must be == 3
+                        if ((last_agreement == 1 and child['agreement'] >= 1)
+                                or (last_agreement > 1 and child['agreement'] > 2)):
+
+                            print('\n----------------------------')
+                            print('agreement válido !!!')
+
+                            # last_agreement_value receive the new agreement value to use in next child path agreement verification
+                            last_agreement = child['agreement']
+                            print('\n----------------------------')
+                            print('atualizando o agreement: ', last_agreement)
+
+                            # put the link in path
+                            path.append(child['id_link'])
+                            print('\n----------------------------')
+                            print('incluindo o id_link no path: ', path)
+
+                            # put the child in visited
+                            visited = visited.append({'visited': child['peer_id_autonomous_system']}, ignore_index=True)
+                            print('\n----------------------------')
+                            print('incluindo o child no visited: \n', visited)
+
+                            # find child's children
+                            children = self.children(child['peer_id_autonomous_system'])
+                            print('\n----------------------------')
+                            print('consultando novo children do child %s (loop): \n' % child['peer_id_autonomous_system'], children)
+
+                        else:
+                            print('\n----------------------------')
+                            print('agreement INválido !!!')
+
+                        # removes this child from children
+                        #children = children[:-1]
+
+                        '''
+                            erase children items that exist in visited list
+                        '''
+                        children = children[~children.peer_id_autonomous_system.isin(visited.visited)]
+                        print('\ntirando visited items de children:\n', children)
 
 
 def all_simple_paths(G, source, target, cutoff=None):
@@ -253,6 +472,27 @@ def _all_simple_paths_multigraph(G, source, targets, cutoff):
                     yield list(visited) + [target]
             stack.pop()
             visited.popitem()
+
+
+def clear_database(dbsession, scenario_id):
+    try:
+        delete = 'delete from scenario_stuff where id = %s' % scenario_id
+        dbsession.bind.execute(delete)
+        dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print('clear_database: ', error)
+
+
+def save_to_database(dbsession, field, value):
+    try:
+        for i in range(len(field)):
+            update = 'update realistic_analysis set %s = \'%s\'' % (field[i], str(value[i]))
+            dbsession.bind.execute(update)
+            dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print(error)
 
 
 def str2bool(master):
@@ -363,6 +603,23 @@ def main(argv=sys.argv[1:]):
                 dbsession = env['request'].dbsession
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
                                     attacker, affected_area, target, attack_type, number_of_shortest_paths)
+                attacker_list, affected_area_list, target_list, scenario_attack_type = aa.attack_scenario()
+
+            # scenario_item / path / path_item
+            if attacker_list and affected_area_list and target_list:
+                if scenario_attack_type == 'attraction':
+                    with env['request'].tm:
+                        aa.attraction_attack_type()
+                elif scenario_attack_type == 'interception':
+                    with env['request'].tm:
+                        aa.interception_attack_type()
+                else:
+                    print('attack type unknown')
+                    return
+
+            with env['request'].tm:
+                if scenario_id:
+                    clear_database(dbsession, scenario_id)
         except OperationalError:
             print('Database error')
     else:

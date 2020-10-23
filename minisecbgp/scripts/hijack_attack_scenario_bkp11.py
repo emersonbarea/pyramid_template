@@ -1,5 +1,6 @@
 import argparse
 import getopt
+import re
 
 import networkx as nx
 import sys
@@ -8,7 +9,6 @@ import time
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
-from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
 
 from minisecbgp import models
@@ -16,85 +16,39 @@ from minisecbgp import models
 
 class AttackScenario(object):
     def __init__(self, dbsession, scenario_id, scenario_name, scenario_description,
-                 topology, attacker, affected_area, target, attack_type, number_of_shortest_paths):
-        self.failed = False
+                 topology, attacker, affected_area, target, attack_type):
         try:
             if scenario_id:
                 scenario = dbsession.query(models.ScenarioStuff).\
                     filter_by(id=scenario_id).first()
                 scenario_name = scenario.scenario_name
                 scenario_description = scenario.scenario_description
-
-                topology = dbsession.query(models.Topology).\
-                    filter_by(id=scenario.id_topology).first()
-                id_topology_base = topology.id
-                topology_base = topology.topology
-
+                id_topology_base = scenario.id_topology
                 attacker = scenario.attacker_list
                 affected_area = scenario.affected_area_list
                 target = scenario.target_list
-
-                scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
-                    filter_by(id=scenario.attack_type).first()
-
-                number_of_shortest_paths = scenario.number_of_shortest_paths
+                attack_type = scenario.attack_type
             else:
-                try:
-                    topology = dbsession.query(models.Topology).\
-                        filter_by(id=topology).first()
-                    id_topology_base = topology.id
-                    topology_base = topology.topology
-                except Exception:
-                    self.failed = True
+                topology_base = dbsession.query(models.Topology).\
+                    filter_by(id=topology).first()
+                if topology_base:
+                    id_topology_base = topology_base.id
+                else:
+                    self.id_topology_base = ''
                     print('The topology does not exist')
-                    return
-                try:
-                    scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
-                        filter(func.lower(models.ScenarioAttackType.scenario_attack_type) == func.lower(attack_type)).first()
-                except Exception:
-                    self.failed = True
-                    print('The attacker type does not exist')
                     return
 
             attackers = attacker.strip('][').split(',')
             attackers = map(int, attackers)
             attacker_list = list(attackers)
-            for attacker_as in attacker_list:
-                attacker_as_exist = dbsession.query(models.AutonomousSystem).\
-                    filter_by(id_topology=id_topology_base).\
-                    filter_by(autonomous_system=attacker_as).first()
-                if not attacker_as_exist:
-                    print('Autonomous System "%s" does not exist to be used as an attacker AS' % attacker_as)
-                    attacker_list = ''
 
             affected_areas = affected_area.strip('][').split(',')
             affected_areas = map(int, affected_areas)
             affected_area_list = list(affected_areas)
-            for affected_as in affected_area_list:
-                affected_as_exist = dbsession.query(models.AutonomousSystem).\
-                    filter_by(id_topology=id_topology_base).\
-                    filter_by(autonomous_system=affected_as).first()
-                if not affected_as_exist:
-                    print('Autonomous System "%s" does not exist to be used as an affected AS' % affected_as)
-                    affected_area_list = ''
 
             targets = target.strip('][').split(',')
             targets = map(int, targets)
             target_list = list(targets)
-            for target_as in target_list:
-                target_as_exist = dbsession.query(models.AutonomousSystem).\
-                    filter_by(id_topology=id_topology_base).\
-                    filter_by(autonomous_system=target_as).first()
-                if not target_as_exist:
-                    print('Autonomous System "%s" does not exist to be used as an target AS' % target_as)
-                    target_list = ''
-
-            topology_type = dbsession.query(models.TopologyType).\
-                filter(func.lower(models.TopologyType.topology_type) == 'attack scenario').first()
-            id_topology_type = topology_type.id
-
-            id_scenario_attack_type = scenario_attack_type.id
-            scenario_attack_type = scenario_attack_type.scenario_attack_type
 
             query = 'select l.id_autonomous_system1 as id_AS_1, ' \
                     '(select asys.autonomous_system from autonomous_system asys where asys.id = l.id_autonomous_system1) as autonomous_system1, ' \
@@ -120,18 +74,38 @@ class AttackScenario(object):
         self.scenario_name = scenario_name
         self.scenario_description = scenario_description
         self.id_topology_base = id_topology_base
-        self.topology_base = topology_base
         self.attacker_list = attacker_list
         self.affected_area_list = affected_area_list
         self.target_list = target_list
-        self.id_scenario_attack_type = id_scenario_attack_type
-        self.scenario_attack_type = scenario_attack_type.lower()
-        self.number_of_shortest_paths = int(number_of_shortest_paths)
-        self.id_topology_type = id_topology_type
+        self.attack_type = attack_type.lower()
 
         self.df_graph = df_graph
         self.graph = nx.from_pandas_edgelist(df_graph, source='autonomous_system1', target='autonomous_system2')
         self.autonomous_system = sr_autonomous_system
+
+    def valid_interception_path_found(self, attacker_as, attacker_to_target_paths, affected_to_attacker_paths):
+
+        print('AS atacante: ', attacker_as)
+        print('caminhos do atacante para o atacado: ', attacker_to_target_paths)
+        print('caminhos do atacante para o afetadp: ', affected_to_attacker_paths)
+
+        for attacker_to_target_path in attacker_to_target_paths:
+            print('peguei o caminho do atacante para o atacado: ', attacker_to_target_path)
+            attacker_to_target_autonomous_system = re.sub('[\[\]() ]', '', str(attacker_to_target_path)).split(',')
+            attacker_to_target_autonomous_system.remove(str(attacker_as))
+            print('destrinchei os AS desse caminho: ', attacker_to_target_autonomous_system)
+            for affected_to_attacker_path in affected_to_attacker_paths:
+                print('')
+                print('peguei o caminho do atacamte para o afetado: ', affected_to_attacker_path)
+                affected_to_attacker_autonomous_system = re.sub('[\[\]() ]', '', str(affected_to_attacker_path)).split(',')
+                affected_to_attacker_autonomous_system.remove(str(attacker_as))
+                print('destrinchei os AS desse caminho: ', affected_to_attacker_autonomous_system)
+                invalid_path = set(attacker_to_target_autonomous_system) & set(affected_to_attacker_autonomous_system)
+                print('verifico se existe um AS em comum nos dois caminhos.')
+                if not invalid_path:
+                    return True
+
+        return False
 
     def validate_path(self, path):
         agreements = list()
@@ -156,145 +130,147 @@ class AttackScenario(object):
                         return False
         return True
 
-    def attack_scenario(self):
-        if not self.failed:
-            # topology
-            try:
-                self.dbsession.add(models.Topology(id_topology_type=self.id_topology_type,
-                                                   topology=(self.scenario_name + ' - ' + self.topology_base)[:50],
-                                                   description=self.scenario_description))
-                self.dbsession.flush()
-            except Exception as error:
-                self.dbsession.rollback()
-                print(error)
-                return
-
-            scenario_topology = self.dbsession.query(models.Topology).\
-                filter_by(topology=(self.scenario_name + ' - ' + self.topology_base)[:50]).first()
-
-            # scenario
-            try:
-                self.dbsession.add(models.Scenario(id_scenario_attack_type=self.id_scenario_attack_type,
-                                                   id_topology=scenario_topology.id))
-                self.dbsession.flush()
-            except Exception as error:
-                self.dbsession.rollback()
-                print(error)
-                return
-
-            # scenario_item / path / path_item
-            if self.attacker_list and self.affected_area_list and self.target_list:
-                if self.scenario_attack_type == 'attraction':
-                    self.attraction_attack_type()
-                elif self.scenario_attack_type == 'interception':
-                    self.interception_attack_type()
-                else:
-                    print('attack type unknown')
-                    return
-
-    def interception_attack_type(self):
-        pass
-
-    def attraction_attack_type(self):
-        df_scenario_item = pd.DataFrame()
-        df_path = pd.DataFrame()
-        df_path_item = pd.DataFrame()
-
-        # for each attacker
+    def all_simple_paths(self):
+        print('attackers: ', self.attacker_list)
+        print('affecteds: ', self.affected_area_list)
+        print('targets: ', self.target_list)
         for attacker_as in self.attacker_list:
             # for each affected_area AS
             for affected_as in self.affected_area_list:
                 # for each prefix hijacked
                 for target_as in self.target_list:
-                    '''
-                        Verify if the AS in affected area will be affected by attacker hijack
-                    '''
-                    # The first condition that must be met is the attacker AS, the affected AS,
-                    # and the target AS must be different from each other
-                    if not (attacker_as == affected_as) and \
-                            not (attacker_as == target_as) and \
-                            not (affected_as == target_as):
+                    print('\nvou rodar o networkx para o atacante %s, o affected AS %s e o target %s\n' %(attacker_as, affected_as, target_as))
+                    paths = list(nx.all_simple_paths(self.graph, source=affected_as, target=attacker_as))
+                    print(paths)
 
-                        # return the affected_area AS to attacker AS distance
-                        affected_to_attacker_shortest_path_found = False
-                        affected_to_attacker_path = list()
-                        affected_to_attacker_path_length = ''
-                        for cutoff in range(len(self.graph.nodes())):
-                            if not affected_to_attacker_shortest_path_found:
-                                paths = list(nx.all_simple_paths(self.graph, source=affected_as,
-                                                                 target=attacker_as, cutoff=cutoff))
-                                if len(paths) > 0:
-                                    for path in map(nx.utils.pairwise, paths):
-                                        path = list(path)
-                                        if self.validate_path(list(path)):
-                                            affected_to_attacker_path.append(path)
-                                            affected_to_attacker_path_length = len(path)
-                                            affected_to_attacker_shortest_path_found = True
 
-                        # it only continues to check the distance from the affected AS to the target AS if:
-                        # - there is at least one valid path between the attacker AS and the affected AS.
-                        if affected_to_attacker_shortest_path_found:
-
-                            # return the affected_area AS to target AS distance
-                            affected_to_target_shortest_path_found = False
-                            affected_to_target_path = list()
-                            affected_to_target_path_length = ''
+    def attack_scenario(self):
+        if self.id_topology_base:
+            # for each attacker
+            for attacker_as in self.attacker_list:
+                # for each affected_area AS
+                for affected_as in self.affected_area_list:
+                    # for each prefix hijacked
+                    for target_as in self.target_list:
+                        '''
+                            Verify if the AS in affected area will be affected by attacker hijack
+                        '''
+                        # The first condition that must be met is that the attacker AS must be different from the
+                        # affected AS which must be different from the target AS
+                        print(attacker_as, affected_as, target_as)
+                        if not (attacker_as == affected_as) and \
+                                not (attacker_as == target_as) and \
+                                not (affected_as == target_as):
+                            # affected_area AS to attacker AS distance
+                            affected_to_attacker_shortest_path_found = False
+                            affected_to_attacker_path = list()
+                            affected_to_attacker_path_length = ''
                             for cutoff in range(len(self.graph.nodes())):
-                                if not affected_to_target_shortest_path_found:
+                                if not affected_to_attacker_shortest_path_found:
                                     paths = list(nx.all_simple_paths(self.graph, source=affected_as,
-                                                                     target=target_as, cutoff=cutoff))
+                                                                     target=attacker_as, cutoff=cutoff))
                                     if len(paths) > 0:
                                         for path in map(nx.utils.pairwise, paths):
                                             path = list(path)
                                             if self.validate_path(list(path)):
-                                                affected_to_target_path.append(path)
-                                                affected_to_target_path_length = len(path)
-                                                affected_to_target_shortest_path_found = True
+                                                affected_to_attacker_path.append(path)
+                                                affected_to_attacker_path_length = len(path)
+                                                affected_to_attacker_shortest_path_found = True
 
-                            # it only continues if:
-                            #  - there isn't a valid path between the affected AS and the target AS, OR
-                            #  - the path length between attacker AS and affected AS is less or equal
-                            # to the path length between the affected AS and target AS
-                            if not affected_to_target_shortest_path_found \
-                                    or (affected_to_target_shortest_path_found and
-                                        (affected_to_attacker_path_length <= affected_to_target_path_length)):
+                            # it only continues to check the distance from the affected AS to the target AS, and from the
+                            # attacker AS to the target AS (in the traffic interception attack) if:
+                            # - there is at least one valid path between the attacker AS and the affected AS.
+                            if affected_to_attacker_shortest_path_found:
 
-                                print('O AS %s está na affected area do atacante %s fazendo hijack do target %s' % (affected_as, attacker_as, target_as))
-                                print(self.id_topology_base, attacker_as, affected_as, target_as)
+                                # affected_area AS to target AS distance
+                                affected_to_target_shortest_path_found = False
+                                affected_to_target_path = list()
+                                affected_to_target_path_length =''
+                                for cutoff in range(len(self.graph.nodes())):
+                                    if not affected_to_target_shortest_path_found:
+                                        paths = list(nx.all_simple_paths(self.graph, source=affected_as,
+                                                                         target=target_as, cutoff=cutoff))
+                                        if len(paths) > 0:
+                                            for path in map(nx.utils.pairwise, paths):
+                                                path = list(path)
+                                                if self.validate_path(list(path)):
+                                                    affected_to_target_path.append(path)
+                                                    affected_to_target_path_length = len(path)
+                                                    affected_to_target_shortest_path_found = True
 
-                                # scenario_item
-                                df_scenario_item = df_scenario_item.append({'attacker_as': attacker_as,
-                                                                            'affected_as': affected_as,
-                                                                            'target_as': target_as,
-                                                                            'affected_to_attacker_path': affected_to_attacker_path,
-                                                                            'affected_to_target_path': affected_to_target_path},
-                                                                           ignore_index=True)
+                                # it only continues if:
+                                #  - there isn't a valid path between the affected AS and the target AS, OR
+                                #  - the path length between attacker AS and affected AS is less or equal
+                                # to the path length between the affected AS and target AS
+                                if not affected_to_target_shortest_path_found \
+                                        or (affected_to_target_shortest_path_found and
+                                            (affected_to_attacker_path_length <= affected_to_target_path_length)):
+
+                                    # if attack traffic type equal interception,
+                                    # - find the shortest path between the attacker AS and the target AS
+
+                                    #   - that does not pass through affected AS
+
+                                    # - checks if the same AS does not exist either in:
+                                    #   - the shortest path between the attacker AS and the affected AS, as well as in
+                                    #   - the shortest path between the attacker AS and the target AS
+                                    if self.attack_type == 'interception':
+
+                                        # attacker AS to target AS distance
+                                        attacker_to_target_shortest_path_found = False
+                                        attacker_to_target_path = list()
+                                        attacker_to_target_path_length = ''
+                                        for cutoff in range(len(self.graph.nodes())):
+                                            if not attacker_to_target_shortest_path_found:
+                                                paths = list(nx.all_simple_paths(self.graph, source=attacker_as,
+                                                                                 target=target_as, cutoff=cutoff))
+                                                if len(paths) > 0:
+                                                    for path in map(nx.utils.pairwise, paths):
+                                                        path = list(path)
+                                                        if self.validate_path(list(path)):
+                                                            attacker_to_target_path.append(path)
+                                                            attacker_to_target_path_length = len(path)
+                                                            attacker_to_target_shortest_path_found = True
+
+                                        # in interception attack there must be at least one path between the attacker AS
+                                        # and the target AS
+                                        if not attacker_to_target_shortest_path_found:
+                                            print('There is no path between the attacker AS and the target AS.\n'
+                                                  'This condition must be met in interception attacks.')
+                                            return
+
+                                        # in the interception attack, for a given scenario item, the same AS cannot exist either
+                                        # in the shortest path between the attacker AS and the affected AS, as well as in the
+                                        # shortest path between the attacker AS and the target AS
+                                        if self.valid_interception_path_found(attacker_as, attacker_to_target_path, affected_to_attacker_path):
+                                            print('CAMINHO SUPER VÁLIDO')
+                                            return
+                                        else:
+                                            print('CAMINHO NÃO VALIDADO')
+                                            print('existe um mesmo AS no caminho')
+                                            return
 
 
 
-                                # pathÇq!
+                                        # se o cenário for de interceptação e o caminho do affected AS para o atacante for menor do que o do caminho do
+                                        # affected AS para o target, consulto o caminho do atacante para o target
 
+                                            # procuro o caminho do attacante para o target (Obs.: esse caminho não pode passar por um mesmo AS do caminho entre o affected e o target
 
-                                # path_item
+                                            # se não existir esse caminho, então finaliza para esse target
 
-                            # se for igual interception
-                            else:
+                                        # se o caminho existir
 
-                                print('O AS %s NÃO está na affected area do atacante %s fazendo hijack do target %s' % (affected_as, attacker_as, target_as))
+                                    else: # se for igual interception
+                                        pass
 
-                    else:
-                        print('o atacante é o mesmo que o target que o affected')
-
-        pd.set_option('display.max_rows', None)
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.width', None)
-        pd.set_option('display.max_colwidth', None)
-        print(df_scenario_item)
+                        else:
+                            print('o atacante é o mesmo que o target que o affected')
 
 
 
-        #print('affected_to_attacker_path: ', affected_to_attacker_path)
-        #print('affected_to_target_path: ', affected_to_target_path)
+            #print('affected_to_attacker_path: ', affected_to_attacker_path)
+            #print('affected_to_target_path: ', affected_to_target_path)
 
 
 
@@ -444,12 +420,12 @@ class AttackScenario(object):
 
 def clear_database(dbsession, scenario_id):
     try:
-        delete = 'delete from scenario_stuff where id = %s' % scenario_id
+        delete = 'delete from affected_area_stuff where id = %s' % scenario_id
         dbsession.bind.execute(delete)
         dbsession.flush()
     except Exception as error:
         dbsession.rollback()
-        print('clear_database: ', error)
+        print(error)
 
 
 def save_to_database(dbsession, field, value):
@@ -487,11 +463,9 @@ def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, "h",
                                    ["config-file=", "scenario-id=", "scenario-name=", "scenario-description=",
-                                    "topology=", "attacker=", "affected-area=", "target=", "attack-type=",
-                                    "all-paths", "number-of-shortest-paths="])
+                                    "topology=", "attacker=", "affected-area=", "target=", "attack-type="])
     except getopt.GetoptError:
         print('\n'
-              'ERROR\n'
               'Usage: MiniSecBGP_hijack_attack_scenario [options]\n'
               '\n'
               'options (with examples):\n'
@@ -506,18 +480,15 @@ def main(argv=sys.argv[1:]):
               '--affected-area=[65001,65003]                            define which these AS(s) will receive and accept the hijacked routes\n'
               '--target=[\'10.0.0.0/24\',\'20.0.0.0/24\']                   define the prefix(s) and mask(s) that will be hijacked by the attacker(s)\n'
               '--attack-type=attraction|interception                    if the attack is an attraction attack or an interception attack\n'
-              '--all-paths or --number-of-shortest-paths=[1..999]       number of valid paths between the attacker AS, affected AS and target AS\n'
               '\n'
               'or\n'
               '\n'
               '--scenario-id=16                                         scenario ID\n')
         sys.exit(2)
-    config_file = scenario_id = scenario_name = scenario_description = topology = attacker = \
-        affected_area = target = attack_type = number_of_shortest_paths = ''
+    config_file = scenario_id = scenario_name = scenario_description = topology = attacker = affected_area = target = attack_type = ''
     for opt, arg in opts:
         if opt == '-h':
             print('\n'
-                  'HELP\n'
                   'Usage: MiniSecBGP_hijack_attack_scenario [options]\n'
                   '\n'
                   'options (with examples):\n'
@@ -532,7 +503,6 @@ def main(argv=sys.argv[1:]):
                   '--affected-area=[65001,65003]                            define which these AS(s) will receive and accept the hijacked routes\n'
                   '--target=[\'10.0.0.0/24\',\'20.0.0.0/24\']                   define the prefix(s) and mask(s) that will be hijacked by the attacker(s)\n'
                   '--attack-type=attraction|interception                    if the attack is an attraction attack or an interception attack\n'
-                  '--all-paths or --number-of-shortest-paths=[1..999]       number of valid paths between the attacker AS, affected AS and target AS\n'
                   '\n'
                   'or\n'
                   '\n'
@@ -556,12 +526,8 @@ def main(argv=sys.argv[1:]):
             target = arg
         elif opt == '--attack-type':
             attack_type = arg
-        elif opt == '--all-paths':
-            number_of_shortest_paths = '0'
-        elif opt == '--number-of-shortest-paths':
-            number_of_shortest_paths = arg
 
-    if (config_file and scenario_name and topology and attacker and affected_area and target and attack_type and number_of_shortest_paths) \
+    if (config_file and scenario_name and topology and attacker and affected_area and target and attack_type) \
             or (config_file and scenario_id):
         args = parse_args(config_file)
         setup_logging(args.config_uri)
@@ -570,8 +536,9 @@ def main(argv=sys.argv[1:]):
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
-                                    attacker, affected_area, target, attack_type, number_of_shortest_paths)
-                aa.attack_scenario()
+                                    attacker, affected_area, target, attack_type)
+                #aa.attack_scenario()
+                aa.all_simple_paths()
                 if scenario_id:
                     clear_database(dbsession, scenario_id)
         except OperationalError:
@@ -592,7 +559,6 @@ def main(argv=sys.argv[1:]):
               '--affected-area=[65001,65003]                            define which these AS(s) will receive and accept the hijacked routes\n'
               '--target=[\'10.0.0.0/24\',\'20.0.0.0/24\']                   define the prefix(s) and mask(s) that will be hijacked by the attacker(s)\n'
               '--attack-type=attraction|interception                    if the attack is an attraction attack or an interception attack\n'
-              '--all-paths or --number-of-shortest-paths=[1..999]       number of valid paths between the attacker AS, affected AS and target AS\n'
               '\n'
               'or\n'
               '\n'

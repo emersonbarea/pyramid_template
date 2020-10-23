@@ -1,5 +1,6 @@
 import argparse
 import getopt
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -19,7 +20,24 @@ class AttackScenario(object):
         self.failed = False
         try:
             if scenario_id:
-                pass
+                scenario = dbsession.query(models.ScenarioStuff).\
+                    filter_by(id=scenario_id).first()
+                scenario_name = scenario.scenario_name
+                scenario_description = scenario.scenario_description
+
+                topology = dbsession.query(models.Topology).\
+                    filter_by(id=scenario.id_topology).first()
+                id_topology_base = topology.id
+                topology_base = topology.topology
+
+                attacker = scenario.attacker_list
+                affected_area = scenario.affected_area_list
+                target = scenario.target_list
+
+                scenario_attack_type = dbsession.query(models.ScenarioAttackType).\
+                    filter_by(id=scenario.attack_type).first()
+
+                number_of_shortest_paths = scenario.number_of_shortest_paths
             else:
                 try:
                     topology = dbsession.query(models.Topology).\
@@ -38,27 +56,75 @@ class AttackScenario(object):
                     print('The attacker type does not exist')
                     return
 
+            attackers = attacker.strip('][').split(',')
+            attackers = map(int, attackers)
+            attacker_list_temp = list(attackers)
+            attacker_list = list()
+            for attacker_as in attacker_list_temp:
+                attacker_as_exist = dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=id_topology_base).\
+                    filter_by(autonomous_system=attacker_as).first()
+                if not attacker_as_exist:
+                    print('Autonomous System "%s" does not exist to be used as an attacker AS' % attacker_as)
+                    attacker_list = ''
+                else:
+                    attacker_list.append(attacker_as_exist.id)
+
+            affected_areas = affected_area.strip('][').split(',')
+            affected_areas = map(int, affected_areas)
+            affected_area_list_temp = list(affected_areas)
+            affected_area_list = list()
+            for affected_as in affected_area_list_temp:
+                affected_as_exist = dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=id_topology_base).\
+                    filter_by(autonomous_system=affected_as).first()
+                if not affected_as_exist:
+                    print('Autonomous System "%s" does not exist to be used as an affected AS' % affected_as)
+                    affected_area_list = ''
+                else:
+                    affected_area_list.append(affected_as_exist.id)
+
+            targets = target.strip('][').split(',')
+            targets = map(int, targets)
+            target_list_temp = list(targets)
+            target_list = list()
+            for target_as in target_list_temp:
+                target_as_exist = dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=id_topology_base).\
+                    filter_by(autonomous_system=target_as).first()
+                if not target_as_exist:
+                    print('Autonomous System "%s" does not exist to be used as an target AS' % target_as)
+                    target_list = ''
+                else:
+                    target_list.append(target_as_exist.id)
+
+            topology_type = dbsession.query(models.TopologyType).\
+                filter(func.lower(models.TopologyType.topology_type) == 'attack scenario').first()
+            id_topology_type = topology_type.id
+
+            id_scenario_attack_type = scenario_attack_type.id
+            scenario_attack_type = scenario_attack_type.scenario_attack_type
+
+            self.affected_vantage_point_actor = dbsession.query(models.VantagePointActor.id). \
+                filter(func.lower(models.VantagePointActor.vantage_point_actor) == 'affected').first()
+
+            self.attacker_vantage_point_actor = dbsession.query(models.VantagePointActor.id).\
+                filter(func.lower(models.VantagePointActor.vantage_point_actor) == 'attacker').first()
+
+            self.target_vantage_point_actor = dbsession.query(models.VantagePointActor.id). \
+                filter(func.lower(models.VantagePointActor.vantage_point_actor) == 'target').first()
+
             query = 'select l.id_autonomous_system1 as id_autonomous_system1, '\
-                    'l.id_autonomous_system2 as id_autonomous_system2 ' \
+                    'l.id_autonomous_system2 as id_autonomous_system2, '\
+                    '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as agreement, ' \
+                    'l.id as id_link '\
                     'from link l ' \
                     'where l.id_topology = %s;' % id_topology_base
             result_proxy = dbsession.bind.execute(query)
             df_links = pd.DataFrame(result_proxy, columns=['id_autonomous_system1',
-                                                           'id_autonomous_system2'])
-
-            query = 'select count(l.id) as edge_array_length ' \
-                    'from link l ' \
-                    'where l.id_topology = %s;' % id_topology_base
-            result_proxy = dbsession.bind.execute(query)
-            for row in result_proxy:
-                edge_array_length = str(row[0])
-
-            query = 'select count(asys.id) as count_asys ' \
-                    'from autonomous_system asys ' \
-                    'where asys.id_topology = %s;' % id_topology_base
-            result_proxy = dbsession.bind.execute(query)
-            for row in result_proxy:
-                count_asys = str(row[0])
+                                                           'id_autonomous_system2',
+                                                           'agreement',
+                                                           'id_link'])
 
         except Exception as error:
             print('Error: ', error)
@@ -70,30 +136,68 @@ class AttackScenario(object):
         self.scenario_description = scenario_description
         self.id_topology_base = id_topology_base
         self.topology_base = topology_base
+        self.attacker_list = attacker_list
+        self.affected_area_list = affected_area_list
+        self.target_list = target_list
+        self.id_scenario_attack_type = id_scenario_attack_type
+        self.scenario_attack_type = scenario_attack_type.lower()
         self.number_of_shortest_paths = int(number_of_shortest_paths)
+        self.id_topology_type = id_topology_type
 
         self.df_links = df_links
-        self.edge_array_length = edge_array_length
-        self.count_asys = count_asys
 
     def all_paths(self):
 
-        df_links = self.df_links[['id_autonomous_system1',
-                                  'id_autonomous_system2']]
+        df_links_temp1 = self.df_links[['id_autonomous_system1',
+                                        'id_autonomous_system2',
+                                        'agreement',
+                                        'id_link']]
+
+        df_links_temp2 = self.df_links[['id_autonomous_system2',
+                                        'id_autonomous_system1',
+                                        'agreement',
+                                        'id_link']]
+        df_links_temp2.rename(columns={'id_autonomous_system2': 'id_autonomous_system1',
+                                       'id_autonomous_system1': 'id_autonomous_system2'}, inplace=True)
+
+        # changing p2p to 2 and p2c to 3 in df_links
+        if not df_links_temp1.empty:
+            try:
+                df_links_temp1.loc[df_links_temp1['agreement'] == 'p2p', 'agreement'] = 2
+            except KeyError:
+                pass
+            try:
+                df_links_temp1.loc[df_links_temp1['agreement'] == 'p2c', 'agreement'] = 3
+            except KeyError:
+                pass
+
+        # changing p2p to 2 and p2c to 1 in df_links_inverted
+        if not df_links_temp2.empty:
+            try:
+                df_links_temp2.loc[df_links_temp2['agreement'] == 'p2p', 'agreement'] = 2
+            except KeyError:
+                pass
+            try:
+                df_links_temp2.loc[df_links_temp2['agreement'] == 'p2c', 'agreement'] = 1
+            except KeyError:
+                pass
+
+        df_links = pd.concat([df_links_temp1, df_links_temp2], ignore_index=True)
 
         links = list()
         for index, row in df_links.iterrows():
-            links.append(str(row[0]) + '-' + str(row[1]))
+            links.append(str(row[0]) + '-' + str(row[1]) + '-' + str(row[2]) + '-' + str(row[3]))
 
         return links
 
     def attack_scenario(self):
 
+        attacker_list = str(self.attacker_list).strip('[]').replace(' ', '')
+        affected_area_list = str(self.affected_area_list).strip('[]').replace(' ', '')
+        target_list = str(self.target_list).strip('[]').replace(' ', '')
         links = str(self.all_paths()).strip('[]').replace(' ', '').replace('\'', '')
 
-
-
-        return links, self.edge_array_length, self.count_asys
+        return attacker_list, affected_area_list, target_list, links, self.scenario_attack_type
 
 
 def clear_database(dbsession, scenario_id):
@@ -231,9 +335,21 @@ def main(argv=sys.argv[1:]):
 
                 print('iniciando o attack_scenario')
 
-                links, edge_array_length, count_asys = aa.attack_scenario()
+                attacker_list, affected_area_list, target_list, links, scenario_attack_type = aa.attack_scenario()
 
+                source = attacker_list
+                target = target_list
                 link = links
+
+                source_filename = '/tmp/source_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(source_filename, "a")
+                f.write(source)
+                f.close()
+
+                target_filename = '/tmp/target_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
+                f = open(target_filename, "a")
+                f.write(target)
+                f.close()
 
                 link_filename = '/tmp/link_' + str(datetime.now()).replace(' ', '').replace(':', '').replace('-', '').replace('.', '') + '.MiniSecBGP'
                 f = open(link_filename, "a")
@@ -242,13 +358,8 @@ def main(argv=sys.argv[1:]):
 
                 print('VOU CHAMAR O CÓDIGO C++')
 
-                print(link_filename)
-                print(edge_array_length)
-                print(count_asys)
-
-                #arguments = [link_filename, edge_array_length, count_asys]
-                arguments = ['/tmp/bla.MiniSecBGP', str(5), str(5)]
-                subprocess.Popen(['./venv/bin/asp'] + arguments)
+                arguments = [source_filename, target_filename, link_filename]
+                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_attack_scenario.o'] + arguments)
 
                 print('RETORNEI DO CÓDIGO C++')
 
