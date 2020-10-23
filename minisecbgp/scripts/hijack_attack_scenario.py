@@ -250,7 +250,7 @@ class AttackScenario(object):
                 # put the affected - target in the "peers_for_query" list
                 #print('if ---->')
                 peers_for_query.append([affected_as, target_as])
-        print('inserção: ', time.time() - t1)
+        os.system('echo "inserção: %s" > /tmp/teste.txt' % str(time.time() - t1))
 
         t1 = time.time()
         for affected_as in self.affected:
@@ -268,7 +268,7 @@ class AttackScenario(object):
                     a = 1
                 if [target_as, affected_as] in peers_for_query:
                     a = 1
-        print('consulta: ', time.time() - t1)
+        os.system('echo "consulta: %s" >> /tmp/teste.txt' % str(time.time() - t1))
 
         print('\niniciando o multiprocessing')
 
