@@ -69,6 +69,7 @@ class AttackScenario(object):
                     filter_by(id_topology=id_topology_base).\
                     filter(models.AutonomousSystem.autonomous_system.in_(attacker_list_temp)).all():
                 attacker_list.append(attacker.id)
+            attacker_list.sort()
 
             print('affected')
 
@@ -78,6 +79,7 @@ class AttackScenario(object):
                     filter_by(id_topology=id_topology_base).\
                     filter(models.AutonomousSystem.autonomous_system.in_(affected_list_temp)).all():
                 affected_list.append(affected.id)
+            affected_list.sort()
 
             print('targets')
 
@@ -87,6 +89,7 @@ class AttackScenario(object):
                     filter_by(id_topology=id_topology_base).\
                     filter(models.AutonomousSystem.autonomous_system.in_(target_list_temp)).all():
                 target_list.append(target.id)
+            target_list.sort()
 
             topology_type = dbsession.query(models.TopologyType).\
                 filter(func.lower(models.TopologyType.topology_type) == 'attack scenario').first()
@@ -223,59 +226,53 @@ class AttackScenario(object):
         print('montando o grafo')
 
         t1 = time.time()
-        #topology_graph = self.topology_graph()
-        print(time.time() - t1)
+        topology_graph = self.topology_graph()
+        os.system('echo "montando o grafo: %s" >> /tmp/teste.txt' % str(time.time() - t1))
 
-        print('\nmontando o peers_for_query')
+        print('\nmontando o peers_for_query\n')
+
+        #self.affected = list(range(1, 10001))
+        #self.target = list(range(1, 10001))
 
         t1 = time.time()
         # peers_for_query = [[1,2], [3,4], [5,6], [7,8], [9,1]]
         peers_for_query = list()
         # for each affected AS
-        for affected_as in self.affected:
-            number = affected_as / 1000
-            if number.is_integer():
-                print(affected_as)
-            #print('affected: ', affected_as)
-            # for each target AS
-            for target_as in self.target:
-                #print('target_as: ', target_as)
-                # look for the path only if this path has not been found before
-                #if affected_as == target_as:
-                #    break
-                #if peers_for_query.loc[affected_as]['id_autonomous_system1'] == target_as:
-                #    break
-                #if peers_for_query.loc[(peers_for_query['id_autonomous_system1'] == target_as) & (peers_for_query['id_autonomous_system2'] == affected_as)].empty:
-                #    break
-                # put the affected - target in the "peers_for_query" list
-                #print('if ---->')
-                peers_for_query.append([affected_as, target_as])
-        os.system('echo "inserção: %s" > /tmp/teste.txt' % str(time.time() - t1))
+        #print('self.affected: ', self.affected)
+        #print('self.target: ', self.target)
 
-        t1 = time.time()
-        for affected_as in self.affected:
-            number = affected_as / 1000
+        set_affected = set(self.affected)
+        set_target = set(self.target)
+
+        for affected_as in set_affected:
+            number = affected_as / 100
             if number.is_integer():
-                print(affected_as)
-            #print('affected: ', affected_as)
+                os.system('free -h | grep Mem >> /tmp/teste.txt')
+                os.system('echo "%s - %s" >> /tmp/teste.txt' % (str(affected_as), str(time.time() - t1)))
+                os.system('echo "" >> /tmp/teste.txt')
             # for each target AS
-            for target_as in self.target:
-                #print('target_as: ', target_as)
+            for target_as in set_target:
+                #print(affected_as, target_as)
                 # look for the path only if this path has not been found before
                 if affected_as == target_as:
-                    a = 1
-                if [affected_as, target_as] in peers_for_query:
-                    a = 1
-                if [target_as, affected_as] in peers_for_query:
-                    a = 1
-        os.system('echo "consulta: %s" >> /tmp/teste.txt' % str(time.time() - t1))
+                    #print('continue')
+                    continue
+                if target_as < affected_as and target_as in set_affected and affected_as in set_target:
+                    #print('continue')
+                    continue
+                #print('vou apendar', affected_as, target_as)
+                peers_for_query.append([affected_as, target_as])
+
+        os.system('echo "quantidade de peers: %s" >> /tmp/teste.txt' % str(len(peers_for_query)))
+        os.system('echo "inserção: %s" >> /tmp/teste.txt' % str(time.time() - t1))
+        os.system('free -h | grep Mem >> /tmp/teste.txt')
 
         print('\niniciando o multiprocessing')
 
-#        function = partial(self.bfs_shortest_path, topology_graph)
-#        all_paths = self.pool.map(function, peers_for_query)
+        function = partial(self.bfs_shortest_path, topology_graph)
+        all_paths = self.pool.map(function, peers_for_query)
 
-#        print(all_paths)
+        os.system('echo "%s" > /tmp/paths.txt' % str(all_paths))
 
 
 def clear_database(dbsession, scenario_id):
@@ -403,6 +400,7 @@ def main(argv=sys.argv[1:]):
         setup_logging(args.config_uri)
         env = bootstrap(args.config_uri)
         try:
+            os.system('free -h | grep Mem > /tmp/teste.txt')
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
