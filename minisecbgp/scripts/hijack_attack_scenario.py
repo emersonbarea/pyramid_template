@@ -213,7 +213,7 @@ class AttackScenario(object):
                             path_found = True
                         if not path_found:
                             queue.append(new_path)
-        os.system('echo "%s" >> /tmp/paths.txt' % str(all_paths))
+        os.system('echo "%s" >> /tmp/all_paths.txt' % str(all_paths))
         return all_paths
 
     @staticmethod
@@ -224,58 +224,139 @@ class AttackScenario(object):
         return False
 
     def attack_scenario(self):
-        print('montando o grafo')
+        print('estou no attack_scenario')
+        if not self.failed:
+            # topology
+            try:
+                self.dbsession.add(models.Topology(id_topology_type=self.id_topology_type,
+                                                   topology=(self.scenario_name + ' - ' + self.topology_base)[:50],
+                                                   description=self.scenario_description))
+                self.dbsession.flush()
+            except Exception as error:
+                self.dbsession.rollback()
+                print(error)
+                return
 
+            scenario_topology = self.dbsession.query(models.Topology).\
+                filter_by(topology=(self.scenario_name + ' - ' + self.topology_base)[:50]).first()
+
+            # scenario
+            try:
+                self.dbsession.add(models.Scenario(id_scenario_attack_type=self.id_scenario_attack_type,
+                                                   id_topology=scenario_topology.id))
+                self.dbsession.flush()
+            except Exception as error:
+                self.dbsession.rollback()
+                print(error)
+                return
+
+            # scenario_item / path / path_item
+            if self.attacker and self.affected and self.target:
+                if self.scenario_attack_type == 'attraction':
+                    self.attraction_attack_type()
+                elif self.scenario_attack_type == 'interception':
+                    self.interception_attack_type()
+                else:
+                    print('attack type unknown')
+                    return
+
+    @staticmethod
+    def interception_attack_type():
+        print('estou no interception')
+
+    def attraction_attack_type(self):
+        print('estou no attaction')
+
+        print('montando o grafo')
         t1 = time.time()
         topology_graph = self.topology_graph()
-        os.system('echo "montando o grafo: %s" >> /tmp/teste.txt' % str(time.time() - t1))
+        os.system('echo "montando o grafo da topologia: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
+        os.system('echo "" > /tmp/all_paths.txt')
+
+        ''' 
+            affected AS to target AS
+        '''
+        # 1 - creates the list (peers_for_query) with all valid combinations of affected AS and target AS pairs to search for the shortest path between them
+        # 2 - get all valid shortest paths between all peers from peers_for_query list and put them to the paths list (all_paths)
 
         print('\nmontando o peers_for_query\n')
-
-        #self.affected = list(range(1, 10001))
-        #self.target = list(range(1, 10001))
-
         t1 = time.time()
-        # peers_for_query = [[1,2], [3,4], [5,6], [7,8], [9,1]]
-        peers_for_query = list()
-        # for each affected AS
-        #print('self.affected: ', self.affected)
-        #print('self.target: ', self.target)
-
+        affected_to_target_peers_for_query = list()
         set_affected = set(self.affected)
         set_target = set(self.target)
 
-        for affected_as in set_affected:
+        '''
+            1 - create the "peers_for_query" list
+        '''
+
+        # for each affected AS
+        for affected_as in self.affected:
+
             number = affected_as / 100
             if number.is_integer():
-                os.system('free -h | grep Mem >> /tmp/teste.txt')
-                os.system('echo "%s - %s" >> /tmp/teste.txt' % (str(affected_as), str(time.time() - t1)))
-                os.system('echo "" >> /tmp/teste.txt')
+                os.system('free -h | grep Mem >> /tmp/attraction_attack_type.txt')
+                os.system('echo "%s - %s" >> /tmp/attraction_attack_type.txt' % (str(affected_as), str(time.time() - t1)))
+                os.system('echo "" >> /tmp/attraction_attack_type.txt')
+
             # for each target AS
-            for target_as in set_target:
-                #print(affected_as, target_as)
-                # look for the path only if this path has not been found before
+            for target_as in self.target:
                 if affected_as == target_as:
-                    #print('continue')
                     continue
                 if target_as < affected_as and target_as in set_affected and affected_as in set_target:
-                    #print('continue')
                     continue
-                #print('vou apendar', affected_as, target_as)
-                peers_for_query.append([affected_as, target_as])
+                affected_to_target_peers_for_query.append([affected_as, target_as])
 
-        os.system('echo "quantidade de peers: %s" >> /tmp/teste.txt' % str(len(peers_for_query)))
-        os.system('echo "inserção: %s" >> /tmp/teste.txt' % str(time.time() - t1))
-        os.system('free -h | grep Mem >> /tmp/teste.txt')
+        os.system('echo "quantidade de peers: %s" >> /tmp/attraction_attack_type.txt' % str(len(affected_to_target_peers_for_query)))
+        os.system('echo "tempo total para inserção: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
+        os.system('free -h | grep Mem >> /tmp/attraction_attack_type.txt')
 
-        print(peers_for_query)
+        '''
+            2 - find all valid shortest paths between all "affected_to_target_peers_for_query" peers combination
+            Obs.: using Python multiprocessing for it
+        '''
 
-        print('\niniciando o multiprocessing')
-
+        print('\niniciando o multiprocessing: affected - target')
         function = partial(self.bfs_shortest_path, topology_graph)
-        all_paths = self.pool.map(function, peers_for_query)
+        all_paths = self.pool.map(function, affected_to_target_peers_for_query)
 
-        #os.system('echo "%s" > /tmp/paths.txt' % str(all_paths))
+        ''' 
+            affected AS to attacker AS
+        '''
+        # verifica se precisa incluir algum item na lista peers_for_query para fazer uma nova consulta por menor caminho para algum par de ASs não consultado anteriormente
+        # se precisou incluir (criar uma nova lista), então procura o menor caminho para esse novo par e apenda na lista de all_paths anteriores
+        # depois é só trabalhar com essa lista (all_paths)
+
+        '''
+            1 - checks for pairs of all attacker AS with every affected AS in the "peers_for_query" list
+            Obs.: we do it looking for all attacker AS in target AS set list
+        '''
+        set_attacker = set(self.attacker)
+        set_attacker_not_peer_yet = (set_attacker ^ set_target) & set_attacker
+        list_attacker_not_peer_yet = list(set_attacker_not_peer_yet)
+        list_attacker_not_peer_yet.sort()
+
+        if list_attacker_not_peer_yet:
+            affected_to_attacker_peers_for_query = list()
+            # for each affected AS
+            for affected_as in self.affected:
+                # for each target AS
+                for attacker_as in list_attacker_not_peer_yet:
+                    if affected_as == attacker_as:
+                        continue
+                    if attacker_as < affected_as and attacker_as in set_affected and affected_as in set_attacker_not_peer_yet:
+                        continue
+                    affected_to_attacker_peers_for_query.append([affected_as, attacker_as])
+
+            '''
+                2 - find all valid shortest paths between all "affected_to_attacker_peers_for_query" peers combination
+                Obs.: using Python multiprocessing for it
+            '''
+
+            print('\niniciando o multiprocessing: affected - attacker')
+            function = partial(self.bfs_shortest_path, topology_graph)
+            all_paths = all_paths + self.pool.map(function, affected_to_attacker_peers_for_query)
+
+        #print('\nall_paths: ', all_paths)
 
 
 def clear_database(dbsession, scenario_id):
@@ -403,7 +484,7 @@ def main(argv=sys.argv[1:]):
         setup_logging(args.config_uri)
         env = bootstrap(args.config_uri)
         try:
-            os.system('free -h | grep Mem > /tmp/teste.txt')
+            os.system('free -h | grep Mem > /tmp/attraction_attack_type.txt')
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,

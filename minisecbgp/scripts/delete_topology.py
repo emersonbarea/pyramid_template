@@ -15,6 +15,19 @@ class DeleteTopology(object):
     @staticmethod
     def delete(dbsession, id_topology):
         try:
+            # attack scenario data
+            path_item = 'delete from path_item where id_path = (' \
+                        'select id from path where id_scenario_item in (' \
+                        'select id from scenario_item where id_scenario = (' \
+                        'select id from scenario where id_topology = %s)));' % id_topology
+            path = 'delete from path where id_scenario_item in (' \
+                   'select id from scenario_item where id_scenario = (' \
+                   'select id from scenario where id_topology = %s));' % id_topology
+            scenario_item = 'delete from scenario_item where id_scenario = (' \
+                            'select id from scenario where id_topology = %s);' % id_topology
+            scenario = 'delete from scenario where id_topology = %s;' % id_topology
+
+            # topology data
             router_id = 'delete from router_id where id_autonomous_system in (' \
                         'select id from autonomous_system where id_topology = %s);' % id_topology
             prefix = 'delete from prefix where id_autonomous_system in (' \
@@ -34,6 +47,11 @@ class DeleteTopology(object):
 
             region = 'delete from region where id_topology = %s;' % id_topology
             topology = 'delete from topology where id = %s;' % id_topology
+
+            dbsession.bind.execute(path_item)
+            dbsession.bind.execute(path)
+            dbsession.bind.execute(scenario_item)
+            dbsession.bind.execute(scenario)
 
             dbsession.bind.execute(router_id)
             dbsession.bind.execute(prefix)
