@@ -213,6 +213,7 @@ class AttackScenario(object):
                             path_found = True
                         if not path_found:
                             queue.append(new_path)
+        os.system('echo "%s" >> /tmp/paths.txt' % str(all_paths))
         return all_paths
 
     @staticmethod
@@ -267,12 +268,14 @@ class AttackScenario(object):
         os.system('echo "inserção: %s" >> /tmp/teste.txt' % str(time.time() - t1))
         os.system('free -h | grep Mem >> /tmp/teste.txt')
 
+        print(peers_for_query)
+
         print('\niniciando o multiprocessing')
 
         function = partial(self.bfs_shortest_path, topology_graph)
         all_paths = self.pool.map(function, peers_for_query)
 
-        os.system('echo "%s" > /tmp/paths.txt' % str(all_paths))
+        #os.system('echo "%s" > /tmp/paths.txt' % str(all_paths))
 
 
 def clear_database(dbsession, scenario_id):
