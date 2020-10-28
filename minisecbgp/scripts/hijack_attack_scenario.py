@@ -356,7 +356,7 @@ class AttackScenario(object):
             function = partial(self.bfs_shortest_path, topology_graph)
             all_paths = all_paths + self.pool.map(function, affected_to_attacker_peers_for_query)
 
-        #print('\nall_paths: ', all_paths)
+        print('\nall_paths: ', all_paths)
 
 
 def clear_database(dbsession, scenario_id):
