@@ -6,7 +6,7 @@ import time
 
 import pandas as pd
 
-from multiprocessing import Pool
+import multiprocessing as mp
 from functools import partial
 
 from pyramid.paster import bootstrap, setup_logging
@@ -21,7 +21,7 @@ class AttackScenario(object):
                  topology, attacker, affected, target, attack_type, number_of_shortest_paths):
         self.failed = False
         num_processes = os.cpu_count()
-        self.pool = Pool(processes=num_processes)
+        self.pool = mp.Pool(processes=num_processes)
 
         try:
             if scenario_id:
@@ -185,6 +185,13 @@ class AttackScenario(object):
             vector.append({row[0]: row[1]})
             graph[index] = vector
 
+        os.system('echo "{" > /tmp/topology_graph.txt')
+        for key, value in graph.items():
+            os.system('echo "%s: %s," >> /tmp/topology_graph.txt' % (str(key), str(value)))
+        os.system('echo "}" >> /tmp/topology_graph.txt')
+
+        print(graph)
+
         return graph
 
     @staticmethod
@@ -213,7 +220,10 @@ class AttackScenario(object):
                             path_found = True
                         if not path_found:
                             queue.append(new_path)
-        os.system('echo "%s" >> /tmp/all_paths.txt' % str(all_paths))
+                        #print('origem: ', peers_for_query[0], ' - destino: ', peers_for_query[1], ' - path length: ', path_found_length)
+
+        current = mp.current_process()
+        os.system('echo "%s - %s: %s" >> /tmp/all_paths_process_%s.txt' % (str(peers_for_query[0]), str(peers_for_query[1]), str(all_paths), str(list(current._identity)[0])))
         return all_paths
 
     @staticmethod
@@ -271,7 +281,6 @@ class AttackScenario(object):
         t1 = time.time()
         topology_graph = self.topology_graph()
         os.system('echo "montando o grafo da topologia: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
-        os.system('echo "" > /tmp/all_paths.txt')
 
         ''' 
             affected AS to target AS
@@ -305,6 +314,7 @@ class AttackScenario(object):
                 if target_as < affected_as and target_as in set_affected and affected_as in set_target:
                     continue
                 affected_to_target_peers_for_query.append([affected_as, target_as])
+                os.system('echo "%s,%s" >> /tmp/peers_for_query.txt' % (str(affected_as), str(target_as)))
 
         os.system('echo "quantidade de peers: %s" >> /tmp/attraction_attack_type.txt' % str(len(affected_to_target_peers_for_query)))
         os.system('echo "tempo total para inserção: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
@@ -346,6 +356,7 @@ class AttackScenario(object):
                     if attacker_as < affected_as and attacker_as in set_affected and affected_as in set_attacker_not_peer_yet:
                         continue
                     affected_to_attacker_peers_for_query.append([affected_as, attacker_as])
+                    os.system('echo "%s,%s" >> /tmp/peers_for_query.txt' % (str(affected_as), str(attacker_as)))
 
             '''
                 2 - find all valid shortest paths between all "affected_to_attacker_peers_for_query" peers combination
@@ -356,7 +367,11 @@ class AttackScenario(object):
             function = partial(self.bfs_shortest_path, topology_graph)
             all_paths = all_paths + self.pool.map(function, affected_to_attacker_peers_for_query)
 
-        print('\nall_paths: ', all_paths)
+        #print('\nall_paths: ', all_paths)
+
+        #for path_group in all_paths:
+        #    for path in path_group:
+        #        print('--> ', path, path[0], path[-1])
 
 
 def clear_database(dbsession, scenario_id):
@@ -484,7 +499,9 @@ def main(argv=sys.argv[1:]):
         setup_logging(args.config_uri)
         env = bootstrap(args.config_uri)
         try:
-            os.system('free -h | grep Mem > /tmp/attraction_attack_type.txt')
+
+            os.system('rm /tmp/*.txt')
+
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 aa = AttackScenario(dbsession, scenario_id, scenario_name, scenario_description, topology,
