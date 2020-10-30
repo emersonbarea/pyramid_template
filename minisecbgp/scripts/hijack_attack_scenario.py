@@ -3,10 +3,9 @@ import getopt
 import os
 import sys
 import time
-
 import pandas as pd
-
 import multiprocessing as mp
+
 from functools import partial
 
 from pyramid.paster import bootstrap, setup_logging
@@ -190,8 +189,6 @@ class AttackScenario(object):
             os.system('echo "%s: %s," >> /tmp/topology_graph.txt' % (str(key), str(value)))
         os.system('echo "}" >> /tmp/topology_graph.txt')
 
-        print(graph)
-
         return graph
 
     @staticmethod
@@ -200,30 +197,41 @@ class AttackScenario(object):
         all_paths = list()
         path_found = False
         while queue:
+            print('\nqueue: ', queue)
             path = queue.pop(0)
             node = list(path[-1].keys())[0]
             neighbours = graph[node]
+            print('neighbours do ', node, ': ', neighbours)
             for neighbour in neighbours:
+                print('neighbour: ', neighbour)
                 parent_agreement = list(path[-1].values())[0]
                 neighbour_agreement = list(neighbour.values())[0]
+                print('agreement que vinha: ', parent_agreement, ' - agreement que veio: ', neighbour_agreement)
                 if parent_agreement == 1 or (parent_agreement > 1 and neighbour_agreement == 3):
+                    print('passou no agreement')
                     neighbour_key = list(neighbour.keys())[0]
                     new_path = path[:-1] + [list(path[-1].keys())[0]]
                     new_path.append(neighbour)
+                    print('new_path:  ', peers_for_query[0], peers_for_query[1], new_path)
                     if neighbour_key not in path:
+                        print('new_path1: ', peers_for_query[0], peers_for_query[1], new_path)
                         if neighbour_key == peers_for_query[1]:
                             path_found_length = len(new_path[:-1] + [list(new_path[-1].keys())[0]])
                             for i in range(len(queue) - 1, -1, -1):
                                 if len(queue[i]) >= path_found_length:
                                     queue.pop(i)
-                            all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
+                            #all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
                             path_found = True
                         if not path_found:
                             queue.append(new_path)
+                        all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
                         #print('origem: ', peers_for_query[0], ' - destino: ', peers_for_query[1], ' - path length: ', path_found_length)
+                else:
+                    print('não passou no agreement')
 
         current = mp.current_process()
         os.system('echo "%s - %s: %s" >> /tmp/all_paths_process_%s.txt' % (str(peers_for_query[0]), str(peers_for_query[1]), str(all_paths), str(list(current._identity)[0])))
+        print('all_paths de ' ,peers_for_query[0], ' para ', peers_for_query[1], ': ', all_paths)
         return all_paths
 
     @staticmethod
@@ -367,7 +375,7 @@ class AttackScenario(object):
             function = partial(self.bfs_shortest_path, topology_graph)
             all_paths = all_paths + self.pool.map(function, affected_to_attacker_peers_for_query)
 
-        #print('\nall_paths: ', all_paths)
+        print('\nALL_PATHS FINALZÃO: ', all_paths)
 
         #for path_group in all_paths:
         #    for path in path_group:
