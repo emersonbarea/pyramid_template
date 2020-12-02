@@ -295,6 +295,10 @@ class ManualTopology(object):
                 list_stub.append(data['links'][row1]['source'])
                 list_stub.append(data['links'][row1]['destination'])
 
+            for i in range(len(list_link_agreement)):
+                if list_link_agreement[i] is None:
+                    list_link_agreement[i] = 'a2a'
+
             df_link = pd.DataFrame({'id_link_agreement': list_link_agreement,
                                     'id_autonomous_system1': list_link_source,
                                     'id_autonomous_system2': list_link_destination,

@@ -21,7 +21,7 @@ class AttackScenario(object):
         self.failed = False
         num_processes = os.cpu_count()
         self.pool = mp.Pool(processes=num_processes)
-
+        self.manager = mp.Manager()
         try:
             if scenario_id:
                 scenario = dbsession.query(models.ScenarioStuff).\
@@ -66,7 +66,8 @@ class AttackScenario(object):
             attacker_list = list()
             for attacker in dbsession.query(models.AutonomousSystem).\
                     filter_by(id_topology=id_topology_base).\
-                    filter(models.AutonomousSystem.autonomous_system.in_(attacker_list_temp)).all():
+                    filter(models.AutonomousSystem.autonomous_system.in_(attacker_list_temp)).\
+                    filter(models.AutonomousSystem.stub.is_(False)).all():
                 attacker_list.append(attacker.id)
             attacker_list.sort()
 
@@ -76,7 +77,8 @@ class AttackScenario(object):
             affected_list = list()
             for affected in dbsession.query(models.AutonomousSystem).\
                     filter_by(id_topology=id_topology_base).\
-                    filter(models.AutonomousSystem.autonomous_system.in_(affected_list_temp)).all():
+                    filter(models.AutonomousSystem.autonomous_system.in_(affected_list_temp)).\
+                    filter(models.AutonomousSystem.stub.is_(False)).all():
                 affected_list.append(affected.id)
             affected_list.sort()
 
@@ -86,7 +88,8 @@ class AttackScenario(object):
             target_list = list()
             for target in dbsession.query(models.AutonomousSystem).\
                     filter_by(id_topology=id_topology_base).\
-                    filter(models.AutonomousSystem.autonomous_system.in_(target_list_temp)).all():
+                    filter(models.AutonomousSystem.autonomous_system.in_(target_list_temp)).\
+                    filter(models.AutonomousSystem.stub.is_(False)).all():
                 target_list.append(target.id)
             target_list.sort()
 
@@ -115,7 +118,10 @@ class AttackScenario(object):
                     'l.id_autonomous_system2 as id_autonomous_system2, ' \
                     '(select la.agreement from link_agreement la where la.id = l.id_link_agreement) as agreement ' \
                     'from link l ' \
-                    'where l.id_topology = %s;' % id_topology_base
+                    'where l.id_topology = %s ' \
+                    'and id_autonomous_system1 in (select id from autonomous_system where id_topology = %s and not stub) ' \
+                    'and id_autonomous_system2 in (select id from autonomous_system where id_topology = %s and not stub);' \
+                    % (id_topology_base, id_topology_base, id_topology_base)
             result_proxy = dbsession.bind.execute(query)
             link_raw = pd.DataFrame(result_proxy, columns=['id_autonomous_system1',
                                                            'id_autonomous_system2',
@@ -184,54 +190,43 @@ class AttackScenario(object):
             vector.append({row[0]: row[1]})
             graph[index] = vector
 
-        os.system('echo "{" > /tmp/topology_graph.txt')
-        for key, value in graph.items():
-            os.system('echo "%s: %s," >> /tmp/topology_graph.txt' % (str(key), str(value)))
-        os.system('echo "}" >> /tmp/topology_graph.txt')
-
         return graph
 
     @staticmethod
-    def bfs_shortest_path(graph, peers_for_query):
-        queue = [[{peers_for_query[0]: 1}]]
-        all_paths = list()
+    def bfs_shortest_path(all_paths, topology_graph, set_affected, set_target, affected_as, target_as):
+        current = mp.current_process()
+        if affected_as == target_as:
+            return
+        if target_as < affected_as and target_as in set_affected and affected_as in set_target:
+            return
+        queue = [[{affected_as: 1}]]
         path_found = False
         while queue:
-            print('\nqueue: ', queue)
             path = queue.pop(0)
             node = list(path[-1].keys())[0]
-            neighbours = graph[node]
-            print('neighbours do ', node, ': ', neighbours)
+            neighbours = topology_graph[node]
             for neighbour in neighbours:
-                print('neighbour: ', neighbour)
                 parent_agreement = list(path[-1].values())[0]
                 neighbour_agreement = list(neighbour.values())[0]
-                print('agreement que vinha: ', parent_agreement, ' - agreement que veio: ', neighbour_agreement)
                 if parent_agreement == 1 or (parent_agreement > 1 and neighbour_agreement == 3):
-                    print('passou no agreement')
                     neighbour_key = list(neighbour.keys())[0]
                     new_path = path[:-1] + [list(path[-1].keys())[0]]
                     new_path.append(neighbour)
-                    print('new_path:  ', peers_for_query[0], peers_for_query[1], new_path)
                     if neighbour_key not in path:
-                        print('new_path1: ', peers_for_query[0], peers_for_query[1], new_path)
-                        if neighbour_key == peers_for_query[1]:
+                        if neighbour_key == target_as:
                             path_found_length = len(new_path[:-1] + [list(new_path[-1].keys())[0]])
                             for i in range(len(queue) - 1, -1, -1):
                                 if len(queue[i]) >= path_found_length:
                                     queue.pop(i)
-                            #all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
+                            all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
+                            print(str(list(current._identity)[0]), all_paths)
                             path_found = True
                         if not path_found:
                             queue.append(new_path)
-                        all_paths.append(new_path[:-1] + [list(new_path[-1].keys())[0]])
-                        #print('origem: ', peers_for_query[0], ' - destino: ', peers_for_query[1], ' - path length: ', path_found_length)
-                else:
-                    print('não passou no agreement')
+        #current = mp.current_process()
+        #os.system('echo "%s - %s: %s" >> /tmp/all_paths_process_%s.txt' % (str(affected_as), str(target_as), str(all_paths), str(list(current._identity)[0])))
+        #print('print no final da função: ', str(list(current._identity)[0]), all_paths)
 
-        current = mp.current_process()
-        os.system('echo "%s - %s: %s" >> /tmp/all_paths_process_%s.txt' % (str(peers_for_query[0]), str(peers_for_query[1]), str(all_paths), str(list(current._identity)[0])))
-        print('all_paths de ' ,peers_for_query[0], ' para ', peers_for_query[1], ': ', all_paths)
         return all_paths
 
     @staticmethod
@@ -286,100 +281,29 @@ class AttackScenario(object):
         print('estou no attaction')
 
         print('montando o grafo')
-        t1 = time.time()
         topology_graph = self.topology_graph()
-        os.system('echo "montando o grafo da topologia: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
 
-        ''' 
-            affected AS to target AS
-        '''
-        # 1 - creates the list (peers_for_query) with all valid combinations of affected AS and target AS pairs to search for the shortest path between them
-        # 2 - get all valid shortest paths between all peers from peers_for_query list and put them to the paths list (all_paths)
-
-        print('\nmontando o peers_for_query\n')
-        t1 = time.time()
-        affected_to_target_peers_for_query = list()
         set_affected = set(self.affected)
         set_target = set(self.target)
 
-        '''
-            1 - create the "peers_for_query" list
-        '''
-
-        # for each affected AS
-        for affected_as in self.affected:
-
-            number = affected_as / 100
-            if number.is_integer():
-                os.system('free -h | grep Mem >> /tmp/attraction_attack_type.txt')
-                os.system('echo "%s - %s" >> /tmp/attraction_attack_type.txt' % (str(affected_as), str(time.time() - t1)))
-                os.system('echo "" >> /tmp/attraction_attack_type.txt')
-
-            # for each target AS
-            for target_as in self.target:
-                if affected_as == target_as:
-                    continue
-                if target_as < affected_as and target_as in set_affected and affected_as in set_target:
-                    continue
-                affected_to_target_peers_for_query.append([affected_as, target_as])
-                os.system('echo "%s,%s" >> /tmp/peers_for_query.txt' % (str(affected_as), str(target_as)))
-
-        os.system('echo "quantidade de peers: %s" >> /tmp/attraction_attack_type.txt' % str(len(affected_to_target_peers_for_query)))
-        os.system('echo "tempo total para inserção: %s" >> /tmp/attraction_attack_type.txt' % str(time.time() - t1))
-        os.system('free -h | grep Mem >> /tmp/attraction_attack_type.txt')
-
-        '''
-            2 - find all valid shortest paths between all "affected_to_target_peers_for_query" peers combination
-            Obs.: using Python multiprocessing for it
-        '''
+        print('self.affected: ', self.affected)
+        print('set_affected: ', set_affected)
+        print('self.target: ', self.target)
+        print('set_target: ', set_target)
 
         print('\niniciando o multiprocessing: affected - target')
-        function = partial(self.bfs_shortest_path, topology_graph)
-        all_paths = self.pool.map(function, affected_to_target_peers_for_query)
 
-        ''' 
-            affected AS to attacker AS
-        '''
-        # verifica se precisa incluir algum item na lista peers_for_query para fazer uma nova consulta por menor caminho para algum par de ASs não consultado anteriormente
-        # se precisou incluir (criar uma nova lista), então procura o menor caminho para esse novo par e apenda na lista de all_paths anteriores
-        # depois é só trabalhar com essa lista (all_paths)
+        all_paths = self.manager.list()
+        for affected_as in self.affected:
 
-        '''
-            1 - checks for pairs of all attacker AS with every affected AS in the "peers_for_query" list
-            Obs.: we do it looking for all attacker AS in target AS set list
-        '''
-        set_attacker = set(self.attacker)
-        set_attacker_not_peer_yet = (set_attacker ^ set_target) & set_attacker
-        list_attacker_not_peer_yet = list(set_attacker_not_peer_yet)
-        list_attacker_not_peer_yet.sort()
+            print('affected_as: ', affected_as)
 
-        if list_attacker_not_peer_yet:
-            affected_to_attacker_peers_for_query = list()
-            # for each affected AS
-            for affected_as in self.affected:
-                # for each target AS
-                for attacker_as in list_attacker_not_peer_yet:
-                    if affected_as == attacker_as:
-                        continue
-                    if attacker_as < affected_as and attacker_as in set_affected and affected_as in set_attacker_not_peer_yet:
-                        continue
-                    affected_to_attacker_peers_for_query.append([affected_as, attacker_as])
-                    os.system('echo "%s,%s" >> /tmp/peers_for_query.txt' % (str(affected_as), str(attacker_as)))
+            function = partial(self.bfs_shortest_path, all_paths, topology_graph, set_affected, set_target, affected_as)
+            self.pool.map(function, self.target)
 
-            '''
-                2 - find all valid shortest paths between all "affected_to_attacker_peers_for_query" peers combination
-                Obs.: using Python multiprocessing for it
-            '''
+            #print(all_paths)
 
-            print('\niniciando o multiprocessing: affected - attacker')
-            function = partial(self.bfs_shortest_path, topology_graph)
-            all_paths = all_paths + self.pool.map(function, affected_to_attacker_peers_for_query)
-
-        print('\nALL_PATHS FINALZÃO: ', all_paths)
-
-        #for path_group in all_paths:
-        #    for path in path_group:
-        #        print('--> ', path, path[0], path[-1])
+        print('\nprint final: \n', all_paths)
 
 
 def clear_database(dbsession, scenario_id):

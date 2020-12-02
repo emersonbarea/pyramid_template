@@ -27,10 +27,16 @@
       <div class="row-fluid">
         <div class="span12">
           <div class="span4" align="left">
-            <p><img src="{{request.static_url('minisecbgp:static/img/to.png')}}" alt="To" style="width:20px;height:10px;">
-               provider (arrow) to customer agreement (p2c)</p>
-            <p><img src="{{request.static_url('minisecbgp:static/img/tofrom.png')}}" alt="To" style="width:20px;height:10px;">
-               peer (arrow) to peer (arrow) agreement (p2p)</p>
+            <p>
+              <img src="{{request.static_url('minisecbgp:static/img/to.png')}}" style="width:20px;height:10px;">
+              provider (arrow) to customer agreement (p2c)
+              <br>
+              <img src="{{request.static_url('minisecbgp:static/img/tofrom.png')}}" style="width:20px;height:10px;">
+              peer (arrow) to peer (arrow) agreement (p2p)
+              <br>
+              <img src="{{request.static_url('minisecbgp:static/img/all.png')}}" style="width:20px;height:4px;">
+              all to all agreement (a2a)
+            </p>
           </div>
           <div class="span4" align="center">
             <strong>
@@ -66,9 +72,8 @@
 	    var edges = new vis.DataSet([
           {% for edge in edges %}
             {from: {{ edge.id_autonomous_system1 }}, to: {{ edge.id_autonomous_system2 }},
-            arrows: ( {{ edge.id_link_agreement }} == 1 ? 'from' : ( {{ edge.id_link_agreement }} == 2 ? 'to, from' : '')),
-            color: { color: ( {{ edge.id_link_agreement }} == 1 ? '#AAAAAA' : ( {{ edge.id_link_agreement }} == 2 ? '#000000' : '#FFFFFF')) } },
-
+            arrows: ( {{ edge.id_link_agreement }} == 1 ? 'from' : ( {{ edge.id_link_agreement }} == 2 ? 'to, from' : ({{ edge.id_link_agreement }} == 3 ? '': ''))),
+            color: { color: ( {{ edge.id_link_agreement }} == 1 ? '#AAAAAA' : ( {{ edge.id_link_agreement }} == 2 ? '#000000' : ( {{ edge.id_link_agreement }} == 3 ? '#55555' : '#FFFFFF')) ) } },
           {% endfor %}
 	    ]);
 

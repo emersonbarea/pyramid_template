@@ -70,8 +70,12 @@ def setup_models(dbsession):
                                               description='A p2p link connects two ISPs who have agreed to exchange '
                                                           'traffic on a quid pro quo basis. The format is: <peer-as> - <peer-as>')
 
+    link_agreement_none = models.LinkAgreement(agreement='a2a',
+                                               description='It means the absence of an agreement between the peers, '
+                                                           'so all BGP traffic is allowed (all to all).')
     dbsession.add(link_agreement_c2p)
     dbsession.add(link_agreement_p2p)
+    dbsession.add(link_agreement_none)
 
     id_link_agreement_c2p = dbsession.query(models.LinkAgreement.id).filter_by(agreement='p2c')
     realistic_topology_link_agreement_c2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_c2p,
@@ -82,7 +86,6 @@ def setup_models(dbsession):
     realistic_topology_link_agreement_p2p = models.RealisticTopologyLinkAgreement(id_link_agreement=id_link_agreement_p2p,
                                                                                   value='0')
     dbsession.add(realistic_topology_link_agreement_p2p)
-
     dbsession.add(realistic_topology_link_agreement_p2p)
 
     download_parameters = models.RealisticTopologyDownloadParameter(url='http://data.caida.org/datasets/as-relationships/serial-2/',

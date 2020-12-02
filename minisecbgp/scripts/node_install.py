@@ -574,7 +574,7 @@ def main(argv=sys.argv[1:]):
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
-                ccn.install_containernet()
+                #ccn.install_containernet()
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
