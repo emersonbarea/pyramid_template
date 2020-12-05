@@ -228,7 +228,8 @@ class RealisticAnalysis(object):
         self.df_create_bgpd_neighbor = pd.DataFrame(list_create_bgpd_neighbor)
         self.df_create_bgpd_neighbor.set_index('AS', inplace=True)
         self.df_create_bgpd_prefix = pd.DataFrame(list_create_bgpd_prefix)
-        self.df_create_bgpd_prefix.set_index('AS', inplace=True)
+        if not self.df_prefix.empty:
+            self.df_create_bgpd_prefix.set_index('AS', inplace=True)
         self.df_create_bgpd_router_id = pd.DataFrame(list_create_bgpd_router_id)
         if not self.df_create_bgpd_router_id.empty:
             self.df_create_bgpd_router_id.set_index('AS', inplace=True)
@@ -321,7 +322,10 @@ class RealisticAnalysis(object):
         """
 
         # erase previews configuration
-        shutil.rmtree('/tmp/MiniSecBGP/output/topology/')
+        try:
+            shutil.rmtree(self.output_dir)
+        except FileNotFoundError as error:
+            pass
         os.makedirs(self.output_dir + 'AS')
         os.makedirs(self.output_dir + 'log')
 

@@ -546,7 +546,7 @@ def hijack_realistic_analysis_detail(request):
                 return response
 
             if form.emulate_button.data:
-                pass
+                print('emaulate button pressed')
 
     except Exception as error:
         dictionary['message'] = error

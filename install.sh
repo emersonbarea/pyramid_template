@@ -128,24 +128,24 @@ install_app() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Sample Topologies ...'
 
         printf '\n%s\n' 'CAIDA AS-Relationship realistic topology 20191201.as-rel2 ...'
-        cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
-        MiniSecBGP_realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
+        #cp "$LOCAL_HOME"/minisecbgp/static/topology/20191201.as-rel2.txt.bz2 /tmp/
+        #MiniSecBGP_realistic_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='20191201.as-rel2.txt.bz2'
 
         printf '\n%s\n' 'Manual topology Minimal-Topology-Example.MiniSecBGP ...'
-        cp "$LOCAL_HOME"/minisecbgp/static/topology/Minimal-Topology-Example.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
+        #cp "$LOCAL_HOME"/minisecbgp/static/topology/Minimal-Topology-Example.MiniSecBGP /tmp/
+        #MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/Minimal-Topology-Example.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology1.MiniSecBGP ...'
-        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology1.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology1.MiniSecBGP'
+        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology1.MiniSecBGP /tmp/
+        #MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology1.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology2.MiniSecBGP ...'
-        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology2.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology2.MiniSecBGP'
+        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology2.MiniSecBGP /tmp/
+        #MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology2.MiniSecBGP'
 
         printf '\n%s\n' 'Manual topology manual_topology3.MiniSecBGP ...'
-        cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology3.MiniSecBGP /tmp/
-        MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology3.MiniSecBGP'
+        #cp "$LOCAL_HOME"/minisecbgp/static/topology/manual_topology3.MiniSecBGP /tmp/
+        #MiniSecBGP_manual_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/manual_topology3.MiniSecBGP'
 
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
         MiniSecBGP_node_create --config-file=minisecbgp.ini --node-ip-address=$var_ip --master=True

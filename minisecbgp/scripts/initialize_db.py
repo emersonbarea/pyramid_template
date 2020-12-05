@@ -101,13 +101,14 @@ def setup_models(dbsession):
 
     # Color
 
-    colors = [{'background': 'FF0000', 'text': '000000'},
-              {'background': '00FF00', 'text': '000000'},
+    colors = [{'background': 'C0C0C0', 'text': '000000'},
+              {'background': '000000', 'text': 'FFFFFF'},
               {'background': '0000FF', 'text': 'FFFFFF'},
+              {'background': 'FF0000', 'text': '000000'},
+              {'background': '00FF00', 'text': '000000'},
               {'background': 'FFFF00', 'text': '000000'},
               {'background': '00FFFF', 'text': '000000'},
               {'background': 'FF00FF', 'text': '000000'},
-              {'background': 'C0C0C0', 'text': '000000'},
               {'background': '808080', 'text': '000000'},
               {'background': '800000', 'text': 'FFFFFF'},
               {'background': '808000', 'text': '000000'},
@@ -116,7 +117,6 @@ def setup_models(dbsession):
               {'background': '008080', 'text': '000000'},
               {'background': '000080', 'text': 'FFFFFF'},
               {'background': 'FFFFFF', 'text': '000000'},
-              {'background': '000000', 'text': 'FFFFFF'},
               {'background': 'FF8C00', 'text': '000000'},
               {'background': '90EE90', 'text': '000000'},
               {'background': 'D8BFD8', 'text': '000000'},

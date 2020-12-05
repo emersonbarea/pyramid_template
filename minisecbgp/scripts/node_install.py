@@ -46,8 +46,9 @@ class ConfigClusterNode(object):
 
             if node_install_status(self.dbsession, self.node_ip_address):
 
-                commands = ['sudo apt update',
-                            'sudo apt upgrade -y',
+                commands = ['export DEBIAN_FRONTEND=noninteractive; '
+                            'sudo -E apt update; '
+                            'sudo -E apt upgrade -yq',
                             'sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
                             'pip3 install --upgrade --force-reinstall -U Pyro4',
                             'sudo timedatectl set-timezone America/Sao_Paulo']
@@ -137,10 +138,12 @@ class ConfigClusterNode(object):
 
             if node_install_status(self.dbsession, self.node_ip_address):
 
+                #commands = [
+                #    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
+                #    'cd /home/minisecbgpuser/containernet/ansible; '
+                #    'sudo ansible-playbook -i "localhost," -c local install.yml']
                 commands = [
-                    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
-                    'cd /home/minisecbgpuser/containernet/ansible; '
-                    'sudo ansible-playbook -i "localhost," -c local install.yml']
+                    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.node_ip_address, 'minisecbgpuser', self.password, command)
@@ -254,6 +257,7 @@ class ConfigClusterNode(object):
             if node_install_status(self.dbsession, self.node_ip_address):
 
                 # install MaxiNet on all cluster nodes
+                print('github download and install')
                 commands = ['git clone git://github.com/MaxiNet/MaxiNet.git',
                             'cd /home/minisecbgpuser/MaxiNet;'
                             'git checkout v1.2;'
@@ -350,7 +354,7 @@ class ConfigClusterNode(object):
 
                 # send MaxiNet.cfg and MaxiNetWorker.service files to all Workers cluster nodes
                 for node in nodes:
-                    if node.master:
+                    if not node.master:
                         command = 'sudo -u minisecbgpuser bash -c \'' \
                                   'scp -o StrictHostKeyChecking=no /etc/MaxiNet.cfg minisecbgpuser@%s:/home/minisecbgpuser; ' \
                                   'scp -o StrictHostKeyChecking=no /etc/systemd/system/MaxiNetWorker.service minisecbgpuser@%s:/home/minisecbgpuser; ' \
@@ -574,7 +578,7 @@ def main(argv=sys.argv[1:]):
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
-                #ccn.install_containernet()
+                ccn.install_containernet()
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)

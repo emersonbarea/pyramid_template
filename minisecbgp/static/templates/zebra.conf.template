@@ -1,5 +1,3 @@
-log file /tmp/AS*AS*-zebra.log
-
 hostname AS*AS*
 password en
 enable password en
