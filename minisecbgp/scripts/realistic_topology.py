@@ -46,9 +46,9 @@ class RealisticTopology(object):
 
     def topology(self, dbsession):
         topology = models.Topology(topology=self.topology_name,
-                                   description='CAIDA AS Relationship - %s' % self.file,
+                                   description='CAIDA AS-Relationship - %s' % self.file,
                                    id_topology_type=dbsession.query(models.TopologyType.id).filter(
-                                       func.lower(models.TopologyType.topology_type) == 'realistic'))
+                                       func.lower(models.TopologyType.topology_type) == 'caida as-relationship'))
         dbsession.add(topology)
 
     def get_topology_id(self, dbsession):

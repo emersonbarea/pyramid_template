@@ -70,6 +70,7 @@ setup(
             'MiniSecBGP_realistic_topology = minisecbgp.scripts.realistic_topology:main',
             'MiniSecBGP_delete_topology = minisecbgp.scripts.delete_topology:main',
             'MiniSecBGP_manual_topology = minisecbgp.scripts.manual_topology:main',
+            'MiniSecBGP_bgplay_topology = minisecbgp.scripts.bgplay_topology:main',
             'MiniSecBGP_hijack_realistic_analysis = minisecbgp.scripts.hijack_realistic_analysis:main',
             'MiniSecBGP_hijack_attack_scenario = minisecbgp.scripts.hijack_attack_scenario:main'
         ],

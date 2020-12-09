@@ -1,0 +1,44 @@
+{% extends "bgplayTopologies.jinja2" %}
+
+{% block contentBGPlayTopology %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Upload Scenario from BGPlay json File</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+
+      <form action="{{ request.route_url('bgplayTopologiesAction',action='upload') }}" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+        <div class="form-field">
+          <br>
+          <label for="topology_file">
+            <p>Choose a valid <strong>BGPlay</strong> json scenario file to upload (Ex.: <a href="{{request.static_url('minisecbgp:static/topology/Youtube_vs_PakistanTelecom.BGPlay')}}" target="_blank">Youtube_vs_PakistanTelecom.BGPlay</a>):</p>
+          </label>
+          <p>
+            {% if updating != 1 %}
+              <input id="topology_file" name="topology_file" type="file" value="" />
+            {% else %}
+              <input name="topology_file" type="file" value="" disabled=True />
+            {% endif %}
+          </p>
+          <br>
+        </div>
+        <div class="form-button">
+          <p>
+            {% if updating != 1 %}
+              <button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+            {% else %}
+              <button type="submit" name="submit" value="submit" class="btn btn-primary" disabled="True">Submit</button>
+            {% endif %}
+          </p>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock contentBGPlayTopology %}

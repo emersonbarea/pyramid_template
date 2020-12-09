@@ -1,10 +1,8 @@
 
-info('*** Running CLI\n')
-CLI(net)
+print('*** Exposing the CLI')
+maxinet.Experiment.CLI(exp, None, None)
 
-info('*** Stopping network')
-net.stop
+print('*** Closing all')
+exp.stop()
 
-info('*** Killing all router process')
-os.system('pkill -9 zebra')
-os.system('pkill -9 bgpd')
+print('*** Killing all router process')

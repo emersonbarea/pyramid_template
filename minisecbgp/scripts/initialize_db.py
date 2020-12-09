@@ -53,9 +53,10 @@ def setup_models(dbsession):
 
     # Topology
 
-    topology_types = [{'topology_type': 'Manual', 'description': 'Manually Created Topologies'},
-                      {'topology_type': 'Realistic', 'description': 'CAIDA AS-Relationship imported topologies'},
-                      {'topology_type': 'Attack Scenario', 'description': 'Topologies automatically generated from the Attack Scenario procedure'}]
+    topology_types = [{'topology_type': 'MiniSecBGP (json)', 'description': 'Manually Created Topologies'},
+                      {'topology_type': 'CAIDA AS-Relationship', 'description': 'CAIDA AS-Relationship imported topologies'},
+                      {'topology_type': 'Attack Scenario', 'description': 'Topologies automatically generated from the Attack Scenario procedure'},
+                      {'topology_type': 'RIPE NCC BGPlay', 'description': 'RIPE NCC BGPlay imported topologies'}]
     for topology_type in topology_types:
         dbsession.add(models.TopologyType(topology_type=topology_type['topology_type'],
                                           description=topology_type['description']))
@@ -154,7 +155,8 @@ def setup_models(dbsession):
 
     # Hijack
 
-    topology_distribution_methods = ['Customer Cone', 'Metis', 'Manual', 'Round Robin']
+    #topology_distribution_methods = ['Customer Cone', 'Metis', 'Manual', 'Round Robin']
+    topology_distribution_methods = ['Round Robin', 'Vertex Degree']
     for topology_distribution_method in topology_distribution_methods:
         dbsession.add(models.TopologyDistributionMethod(topology_distribution_method=topology_distribution_method))
 

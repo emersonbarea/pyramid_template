@@ -58,7 +58,7 @@ def realistic_topologies(request):
     dictionary = dict()
     dictionary['topologies'] = request.dbsession.query(models.Topology, models.TopologyType).\
         filter(models.Topology.id_topology_type == models.TopologyType.id).\
-        filter(func.lower(models.TopologyType.topology_type) == 'realistic').all()
+        filter(func.lower(models.TopologyType.topology_type) == 'caida as-relationship').all()
     downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
         dictionary['message'] = 'Warning: there is an update process running in the background. ' \

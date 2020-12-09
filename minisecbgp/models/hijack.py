@@ -112,6 +112,7 @@ class RealisticAnalysis(Base):
     output_path = Column(String(250))
     number_of_autonomous_systems = Column(String(250))
     time_get_data = Column(String(250))
+    time_autonomous_system_per_server = Column(String(250))
     time_emulate_platform_commands = Column(String(250))
     time_router_platform_commands = Column(String(250))
     time_write_files = Column(String(250))

@@ -1,4 +1,4 @@
 
-info('*** Starting network\n')
-net.start()
-
+print('*** Starting the experiment on cluster')
+exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch, hostnamemapping=hnmap)
+exp.setup()

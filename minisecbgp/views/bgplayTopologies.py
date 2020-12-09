@@ -17,8 +17,8 @@ class TopologyDataForm(Form):
     topology_list = SelectField('Choose topology to download: ', coerce=int, validators=[InputRequired()])
 
 
-@view_config(route_name='manualTopologies', renderer='minisecbgp:templates/topology/manualTopologiesShow.jinja2')
-def manualTopologies(request):
+@view_config(route_name='bgplayTopologies', renderer='minisecbgp:templates/topology/bgplayTopologiesShow.jinja2')
+def bgplay_topologies(request):
     user = request.user
     if user is None:
         raise HTTPForbidden
@@ -26,7 +26,7 @@ def manualTopologies(request):
     dictionary = dict()
     dictionary['topologies'] = request.dbsession.query(models.Topology, models.TopologyType).\
         filter(models.Topology.id_topology_type == models.TopologyType.id).\
-        filter(func.lower(models.TopologyType.topology_type) == 'minisecbgp (json)').all()
+        filter(func.lower(models.TopologyType.topology_type) == 'ripe ncc bgplay').all()
     downloading = request.dbsession.query(models.DownloadingTopology).first()
     if downloading.downloading == 1:
         dictionary['message'] = 'Warning: there is an update process running in the background. ' \
@@ -34,14 +34,14 @@ def manualTopologies(request):
         dictionary['css_class'] = 'warningMessage'
 
     dictionary['updating'] = downloading.downloading
-    dictionary['manualTopologies_url'] = request.route_url('manualTopologies')
+    dictionary['bgplayTopologies_url'] = request.route_url('bgplayTopologies')
     dictionary['topologiesDetail_url'] = request.route_url('topologiesDetail', id_topology='')
 
     return dictionary
 
 
-@view_config(route_name='manualTopologiesAction', match_param='action=upload',
-             renderer='minisecbgp:templates/topology/manualTopologiesUpload.jinja2')
+@view_config(route_name='bgplayTopologiesAction', match_param='action=upload',
+             renderer='minisecbgp:templates/topology/bgplayTopologiesUpload.jinja2')
 def upload(request):
     user = request.user
     if user is None or (user.role != 'admin'):
@@ -59,7 +59,7 @@ def upload(request):
 
         if request.method == 'POST':
             filename = request.POST['topology_file'].filename
-            if not filename.endswith('.MiniSecBGP'):
+            if not filename.endswith('.BGPlay'):
                 dictionary['message'] = 'File %s has a invalid file extension name. ' \
                                         'Please verify and upload again.' % filename
                 dictionary['css_class'] = 'errorMessage'
@@ -75,13 +75,13 @@ def upload(request):
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--file=%s' % file_path]
-            result = subprocess.Popen(['./venv/bin/MiniSecBGP_manual_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.Popen(['./venv/bin/MiniSecBGP_bgplay_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             command_result, command_result_error = result.communicate()
             if command_result:
                 dictionary['message'] = command_result
                 dictionary['css_class'] = 'errorMessage'
                 return dictionary
-            url = request.route_url('manualTopologies')
+            url = request.route_url('bgplayTopologies')
             return HTTPFound(location=url)
 
     except Exception as error:

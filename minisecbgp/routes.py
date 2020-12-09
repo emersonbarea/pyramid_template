@@ -41,6 +41,8 @@ def includeme(config):
     config.add_route('realisticTopologiesAction', '/realisticTopologies/{action}')
     config.add_route('manualTopologies', '/manualTopologies')
     config.add_route('manualTopologiesAction', '/manualTopologies/{action}')
+    config.add_route('bgplayTopologies', '/bgplayTopologies')
+    config.add_route('bgplayTopologiesAction', '/bgplayTopologies/{action}')
     config.add_route('hijack', '/hijack')
     config.add_route('hijackAttackScenario', '/hijackAttackScenario')
     config.add_route('hijackAttackScenarioDetail', '/hijackAttackScenarioDetail')

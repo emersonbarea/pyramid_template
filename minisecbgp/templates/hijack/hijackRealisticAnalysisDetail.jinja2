@@ -69,6 +69,17 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
+                {% if realistic_analysis[0]['time_autonomous_system_per_server'] %}
+                    <p>
+                        <strong> Time spent to spawn the topology on cluster node: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_autonomous_system_per_server'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time spent to spawn the topology on cluster node: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
                 {% if realistic_analysis[0]['time_emulate_platform_commands'] %}
                     <p>
                         <strong> Time spent to create emulation commands: </strong>
@@ -132,7 +143,7 @@
                     </div>
                     <div class="modal-body">
                       <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
-                      <p>This process can take a long time due to the topology size, and will block some MiniSecBGP functions until it finish.</p>
+                      <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
                     </div>
                     <div class="modal-footer">
                       <div class="form-group">

@@ -31,7 +31,7 @@ class DownloadTopology(object):
                 databases.sort(reverse=True)
                 installed_databases = self.dbsession.query(models.Topology, models.TopologyType).\
                     filter(models.Topology.id_topology_type == models.TopologyType.id). \
-                    filter(func.lower(models.TopologyType.topology_type) == 'realistic').all()
+                    filter(func.lower(models.TopologyType.topology_type) == 'caida as-relationship').all()
                 for installed_database in installed_databases:
                     if databases[0] == installed_database.Topology.topology:
                         print('Topology already installed')

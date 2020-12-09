@@ -447,6 +447,12 @@ def hijack_realistic_analysis(request):
                 request.dbsession.query(models.RealisticAnalysis).delete()
                 topology = request.dbsession.query(models.Topology). \
                     filter_by(id=form.topology_list.data).first()
+                cluster_list = list()
+                query = request.dbsession.query(models.Node). \
+                    filter(models.Node.id.in_(form.cluster_list.data))
+                result_proxy = query.all()
+                for cluster_node in result_proxy:
+                    cluster_list.append(cluster_node.hostname)
                 topology_distribution_method = request.dbsession.query(models.TopologyDistributionMethod). \
                     filter_by(id=form.topology_distribution_method_list.data).first()
                 emulation_platform = request.dbsession.query(models.EmulationPlatform). \
@@ -469,6 +475,7 @@ def hijack_realistic_analysis(request):
             arguments = ['--config-file=minisecbgp.ini',
                          '--topology=%s' % form.topology_list.data,
                          '--include-stub=%s' % include_stub,
+                         '--cluster-list=%s' % cluster_list,
                          '--topology-distribution-method=%s' % form.topology_distribution_method_list.data,
                          '--emulation-platform=%s' % form.emulation_platform_list.data,
                          '--router-platform=%s' % form.router_platform_list.data]
@@ -506,6 +513,7 @@ def hijack_realistic_analysis_detail(request):
                 'ra.output_path as output_path, ' \
                 'ra.number_of_autonomous_systems as number_of_autonomous_systems, ' \
                 'ra.time_get_data as time_get_data, ' \
+                'ra.time_autonomous_system_per_server as time_autonomous_system_per_server, ' \
                 'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
                 'ra.time_router_platform_commands as time_router_platform_commands, ' \
                 'ra.time_write_files as time_write_files ' \
@@ -521,6 +529,7 @@ def hijack_realistic_analysis_detail(request):
                                        'output_path': realistic_analyze.output_path,
                                        'number_of_autonomous_systems': realistic_analyze.number_of_autonomous_systems,
                                        'time_get_data': realistic_analyze.time_get_data,
+                                       'time_autonomous_system_per_server': realistic_analyze.time_autonomous_system_per_server,
                                        'time_emulate_platform_commands': realistic_analyze.time_emulate_platform_commands,
                                        'time_router_platform_commands': realistic_analyze.time_router_platform_commands,
                                        'time_write_files': realistic_analyze.time_write_files,
@@ -546,7 +555,8 @@ def hijack_realistic_analysis_detail(request):
                 return response
 
             if form.emulate_button.data:
-                print('emaulate button pressed')
+                os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
+                          str(dictionary['realistic_analysis'][0]['output_path']).replace(' ', '\ '))
 
     except Exception as error:
         dictionary['message'] = error

@@ -1,11 +1,15 @@
+import sys
 import json
 import ipaddress
+from datetime import datetime
+from datetime import timezone
 
 
 class BGPlay(object):
-    def __init__(self):
-        self.file_from = 'BGPlay.json'
-        self.file_to = 'Youtbe_vs_PakistanTelecom.MiniSecBGP'
+    def __init__(self, argv):
+        self.file_from = argv
+        self.file_topology = str(argv.split('.')[:-1]).replace('[\'','').replace('\']', '') + '.MiniSecBGP'
+        self.file_event = str(argv.split('.')[:-1]).replace('[\'','').replace('\']', '') + '.events'
 
     def head(self):
         head = {'topology_name': "Youtube vs. Pakistan Telecom"}
@@ -95,7 +99,6 @@ class BGPlay(object):
         prefix_ip = 16777216
 
         hops = []
-
         for path in paths:
             previous_autonomous_system = ''
             for autonomous_system in path:
@@ -158,19 +161,143 @@ class BGPlay(object):
         return data_peers
 
     def json(self, head, autonomous_systems, peers):
-        with open(self.file_to, 'w') as file:
+        with open(self.file_topology, 'w') as file:
             data = head
             data.update(autonomous_systems)
             data.update(peers)
             json.dump(data, file)
 
+    def bgp_events(self):
 
-def main():    
-    bgplay = BGPlay()
+        def announce_timestamp(phrase, query_starttime, query_endtime):
+            timestamp = input('%s' % phrase)
+            try:
+                if datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S') < \
+                datetime.strptime(query_starttime.replace('T', ' '), '%Y-%m-%d %H:%M:%S') or \
+                datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S') > \
+                datetime.strptime(query_endtime.replace('T', ' '), '%Y-%m-%d %H:%M:%S'):
+                    raise excpection                
+            except Exception:
+                print('Not a valid timestamp')
+                return announce_timestamp(phrase, query_starttime, query_endtime)            
+
+            return timestamp
+
+        def announce_prefix(phrase):
+            prefix = input('%s' % phrase)
+            try:
+                ipaddress.ip_network(prefix)
+            except Exception:
+                print('Not a valid network address')
+                return announce_prefix(phrase)
+
+            return prefix            
+
+        def announce_autonomous_system(phrase, autonomous_systems):
+            autonomous_system = input('%s' % phrase)
+            try:
+                if int(autonomous_system) not in autonomous_systems:
+                    raise excpection
+            except Exception:
+                print('Not a valid Autonomous System in topology')
+                return announce_autonomous_system(phrase, autonomous_systems)
+
+            return autonomous_system            
+
+        def times_prepended(phrase):
+            is_int = False
+            while not is_int:
+                try:
+                    times = int(input('%s' % phrase))
+                    is_int = True
+                except ValueError:
+                    print('Only int. values')
+                    return times_prepended(phrase)
+
+            return times
+
+        # read BGPlay json file and parse it
+        with open(self.file_from) as file: 
+            data_from = json.load(file)
+
+        query_starttime = data_from['data']['query_starttime']
+        query_endtime = data_from['data']['query_endtime']
+
+        nodes = data_from['data']['nodes']
+        autonomous_systems = []
+        for node in nodes:
+            autonomous_systems.append(node['as_number'])
+
+        print('\nThis scenario reproduces the use case Youtube vs. Pakistan Telecom, ' \
+              'covering the period between %s and %s.' % (query_starttime, query_endtime))
+        
+        option = ''
+        announcements = []
+        prepends = []
+        while option not in ('x', 'X'):
+            print('\nChoose the option below that corresponds to the type of event you want ' \
+                  'to create or exit.\n')
+            print('1 - Add a prefix announcement\n' \
+                  '2 - Prepend an Autonomous System\n' \
+                  'X - exit\n')
+            option = input('Option: ')
+            
+            while option not in ('1', '2', 'x', 'X'):
+                print('press only valid options')
+                option = input('Option: ')
+
+            if option == '1':
+
+                phrase = 'Write the timestamp of the prefix announcement (Ex.: 2008-02-24 18:47:57): '
+                timestamp = announce_timestamp(phrase, query_starttime, query_endtime)
+                
+                phrase = 'Write the prefix/mask to announce (Ex.: 200.1.2.0/24): '
+                prefix = announce_prefix(phrase)
+                
+                phrase = 'Write the Autonomous System that will announced (Ex.: 1916): '
+                autonomous_system = announce_autonomous_system(phrase, autonomous_systems)
+                
+                announcements.append([timestamp, prefix, autonomous_system])
+
+            elif option == '2':
+                
+                phrase = 'Write the timestamp of the prepend announcement (Ex.: 2008-02-24 18:47:57): '
+                timestamp = announce_timestamp(phrase, query_starttime, query_endtime)
+                
+                phrase = 'Write the Autonomous System that will be prepended (Ex.: 1916): '
+                prepended_AS = announce_autonomous_system(phrase, autonomous_systems)
+
+                phrase = 'Write how many times AS %s will be prepende (Ex.: 2): ' % prepended_AS
+                times = times_prepended(phrase)
+                
+                phrase = 'Write the Autonomous System that will originate the prepended announcements (Ex.: 1916): '
+                prepender_AS = announce_autonomous_system(phrase, autonomous_systems)
+
+                prepends.append([timestamp, prepended_AS, times, prepender_AS])
+
+            elif option in ('x', 'X'):
+                return
+
+            print('\nAnnouncements added until now:\n')
+            for announce in announcements:    
+                print('Timestamp: %s - Prefix: %s - Source: %s' % 
+                    (announce[0], announce[1], announce[2]))
+            
+            print('\nPrepends added until now:\n')
+            for prepend in prepends:    
+                print('Timestamp: %s - Prepended AS: %s - How many times: %s - Prepender AS: %s' % 
+                    (prepend[0], prepend[1], prepend[2], prepend[3]))
+
+        
+
+
+def main(argv=sys.argv[1]):    
+    bgplay = BGPlay(argv)
     head = bgplay.head()
     autonomous_systems = bgplay.autonomous_systems()
     peers = bgplay.peers()
     bgplay.json(head, autonomous_systems, peers)
+    bgplay.bgp_events()
 
 
 if __name__ == '__main__':

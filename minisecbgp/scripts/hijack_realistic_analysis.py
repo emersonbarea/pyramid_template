@@ -16,13 +16,15 @@ from minisecbgp import models
 
 
 class RealisticAnalysis(object):
-    def __init__(self, dbsession, id_topology, include_stub, topology_distribution_method,
-                 emulation_platform, router_platform):
+    def __init__(self, dbsession, id_topology, include_stub, cluster_list,
+                 topology_distribution_method, emulation_platform, router_platform):
         self.dbsession = dbsession
         self.topology = dbsession.query(models.Topology).filter_by(id=id_topology).first()
         self.output_dir = '/tmp/MiniSecBGP/output/topology/%s/' % self.topology.topology
         self.id_topology = id_topology
         self.include_stub = include_stub
+        cluster_list = list(map(str, cluster_list.strip('][').split(',')))
+        self.cluster_list = cluster_list
         self.topology_distribution_method = topology_distribution_method
         self.emulation_platform = emulation_platform
         self.router_platform = router_platform
@@ -128,32 +130,118 @@ class RealisticAnalysis(object):
 
         save_to_database(self.dbsession, ['number_of_autonomous_systems'], [len(self.sr_unique_as)])
 
+    def autonomous_system_per_server(self):
+        topology_distribution_method = self.dbsession.query(models.TopologyDistributionMethod).\
+            filter_by(id=self.topology_distribution_method).first()
+
+        if topology_distribution_method.topology_distribution_method == 'Round Robin':
+            pass
+        elif topology_distribution_method.topology_distribution_method == 'Vertex Degree':
+
+            # pesquisar qual é o grau de cada AS
+
+            query = 'select source.id_as as id, ' \
+                    'sum(source.count) as degree ' \
+                    'from (select l.id_autonomous_system1 as id_as, ' \
+                    'count(l.id) as count ' \
+                    'from link l ' \
+                    'where l.id_topology = %s ' \
+                    'group by l.id_autonomous_system1 ' \
+                    'union all ' \
+                    'select l.id_autonomous_system2 as id_as, ' \
+                    'count(l.id) as count ' \
+                    'from link l ' \
+                    'where l.id_topology = %s ' \
+                    'group by l.id_autonomous_system2) as source ' \
+                    'group by source.id_as;' % (self.id_topology, self.id_topology)
+            result_proxy = self.dbsession.bind.execute(query)
+            #  id | degree
+            # ----+--------
+            #   1 | 2
+            #   3 | 1
+            #   4 | 1
+            #   2 | 2
+            # (4 rows)
+
+            as_degree = list()
+            for row in result_proxy:
+                as_degree.append([int(row[0]), int(row[1])])
+
+            query = 'select count(source.id), ' \
+                    'source.degree ' \
+                    'from (select count(source1.id_as) as id, ' \
+                    'sum(source1.count) as degree ' \
+                    'from (select l.id_autonomous_system1 as id_as, ' \
+                    'count(l.id) as count ' \
+                    'from link l ' \
+                    'where l.id_topology = %s ' \
+                    'group by l.id_autonomous_system1 ' \
+                    'union all ' \
+                    'select l.id_autonomous_system2 as id_as, ' \
+                    'count(l.id) as count ' \
+                    'from link l ' \
+                    'where l.id_topology = %s ' \
+                    'group by l.id_autonomous_system2) as source1 ' \
+                    'group by source1.id_as) as source ' \
+                    'group by source.degree;' % (self.id_topology, self.id_topology)
+            result_proxy = self.dbsession.bind.execute(query)
+            #  count | degree
+            # -------+--------
+            #      2 | 1
+            #      2 | 2
+            # (2 rows)
+
+            # dividir os AS com maior grau de acordo com o número de servidores
+
+            # colocar os AS filhos (com apenas 1 pai) no respectivo servidor do AS pai
+
+            # distribuir os AS filhos (com múltiplos pais) no respectivo servidor (round robin? e se tiver 3 pais?)
+
+
     def emulation_commands(self):
         emulation_platform = self.dbsession.query(models.EmulationPlatform).\
             filter_by(id=self.emulation_platform).first()
 
+        # Start Cluster
+        max_workers = len(self.cluster_list)
+        self.start_cluster = 'print("*** Starting cluster")\ncluster = maxinet.Cluster(minWorkers=1, maxWorkers=%s)' % max_workers
+
+        # Cluster node mapping
+        self.cluster_node_mapping = 'print("*** Starting cluster node mapping")\nhnmap = {'
+        mapping = ''
+        for i, cluster_node in enumerate(self.cluster_list):
+            if mapping:
+                mapping = mapping + ', "%s":%s' % (cluster_node.strip().replace('\'', ''), str(i))
+            else:
+                mapping = '"%s":%s' % (cluster_node.strip().replace('\'', ''), str(i))
+        self.cluster_node_mapping = self.cluster_node_mapping + mapping + '}'
+
+        # Switches
+
         # Mininet elements
-        self.list_create_mininet_elements_commands = list()
-        if emulation_platform.emulation_platform.lower() == 'mininet':                                                     # mininet / docker
+        self.list_create_mininet_elements_commands = ['\nprint("*** Creating nodes")']
+        if emulation_platform.emulation_platform.lower() == 'mininet':
+            # Add Mininet nodes
             for AS in self.sr_unique_as:
-                self.list_create_mininet_elements_commands.append("AS%s = net.addHost('AS%s', ip=None)" % (AS, AS))
+                self.list_create_mininet_elements_commands.append("AS%s = exp.addHost('AS%s', ip=None, wid=0)" % (AS, AS))
         elif emulation_platform.emulation_platform.lower() == 'docker':
+            # Add Docker nodes
             for AS in self.sr_unique_as:
                 self.list_create_mininet_elements_commands.append(
-                    "AS%s = net.addDocker('AS%s', ip=None, dimage='alpine-quagga:latest')" % (AS, AS))
+                    "AS%s = exp.addDocker('AS%s', ip=None, dimage='alpine-quagga:latest')" % (AS, AS))
 
         # print(self.list_create_mininet_elements_commands)
-        # AS25970 = net.addHost('AS25970', ip=None)
-        # AS265702 = net.addHost('AS265702', ip=None)
+        # AS25970 = exp.addHost('AS25970', ip=None)
+        # AS265702 = exp.addHost('AS265702', ip=None)
 
         # Mininet elements links
-        self.list_create_mininet_links_commands = list()
+        self.list_create_mininet_links_commands = ['\nprint("*** Creating links")']
         for row in self.df_as.itertuples():
             if row[6] in self.sr_unique_as.values and \
                     row[8] in self.sr_unique_as.values:                                         # do not link stub ASes if necessary
                 self.list_create_mininet_links_commands.\
-                    append("net.addLink(AS%s, AS%s, intfName1='%s-%s', intfName2 = '%s-%s', "
-                           "params1={'ip':'%s/%s'}, params2={'ip':'%s/%s'})" %
+                    append("exp.addLink(AS%s, AS%s, intfName1='%s-%s', intfName2 = '%s-%s', "
+                           "params1={'ip':'%s/%s'}, params2={'ip':'%s/%s'}, autoconf=True)" %
                            (row[6], row[8], row[6], row[8], row[8], row[6],
                             str(ipaddress.ip_address(row[9])), row[11], str(ipaddress.ip_address(row[10])), row[11]))
 
@@ -207,21 +295,23 @@ class RealisticAnalysis(object):
                 list_create_bgpd_prefix.append({'AS': int(row[3]), 'command': '  network %s\n' % (
                         str(ipaddress.ip_address(row[1])) + '/' + str(row[2]))})
 
-        list_startup_zebra_commands = list()
-        list_startup_bgpd_commands = list()
+        list_startup_zebra_commands = ['\nprint("*** Creating zebra commands")']
+        list_startup_bgpd_commands = ['\nprint("*** Creating bgpd commands")']
         for AS in self.sr_unique_as.values:
             # zebra startup commands
             list_startup_zebra_commands.append('AS%s.cmd(\'/home/minisecbgpuser/quagga-1.2.4/sbin/./zebra '
-                                               '-f ./AS/%s/zebra.conf '
+                                               '-f %s/AS/%s/zebra.conf '
                                                '-z /var/run/quagga/%s.socket '
                                                '-i /var/run/quagga/zebra-%s.pid > '
-                                               './log/zebra-%s.log &\')' % (AS, AS, AS, AS, AS))
+                                               '%s/log/zebra-%s.log &\')' %
+                                               (AS, self.output_dir.replace(' ', '\\ '), AS, AS, AS, self.output_dir.replace(' ', '\\ '), AS))
             # bgpd startup commands
             list_startup_bgpd_commands.append('AS%s.cmd (\'/home/minisecbgpuser/quagga-1.2.4/sbin/./bgpd '
-                                              '-f ./AS/%s/bgpd.conf '
+                                              '-f %s/AS/%s/bgpd.conf '
                                               '-z /var/run/quagga/%s.socket '
                                               '-i /var/run/quagga/bgpd-%s.pid > '
-                                              './log/bgpd-%s.log &\')' % (AS, AS, AS, AS, AS))
+                                              '%s/log/bgpd-%s.log &\')' %
+                                              (AS, self.output_dir.replace(' ', '\\ '), AS, AS, AS, self.output_dir.replace(' ', '\\ '), AS))
 
         self.df_create_zebra_interfaces = pd.DataFrame(list_create_zebra_interfaces)
         self.df_create_zebra_interfaces.set_index('AS', inplace=True)
@@ -334,20 +424,34 @@ class RealisticAnalysis(object):
             with open('./minisecbgp/static/templates/mininet_begin.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
-            for mininet_element in self.list_create_mininet_elements_commands:
-                file_topology.write(mininet_element + '\n')
-            for mininet_link in self.list_create_mininet_links_commands:
-                file_topology.write(mininet_link + '\n')
+
+            file_topology.write('\n' + self.start_cluster + '\n')
+            file_topology.write('\n' + self.cluster_node_mapping + '\n')
+
             with open('./minisecbgp/static/templates/mininet_middle.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
+
+            for mininet_element in self.list_create_mininet_elements_commands:
+                file_topology.write(mininet_element + '\n')
+
+            for mininet_link in self.list_create_mininet_links_commands:
+                file_topology.write(mininet_link + '\n')
+
             for startup_zebra_command in self.list_startup_zebra_commands:
                 file_topology.write(startup_zebra_command + '\n')
+
             for startup_bgpd_command in self.list_startup_bgpd_commands:
                 file_topology.write(startup_bgpd_command + '\n')
+
             with open('./minisecbgp/static/templates/mininet_end.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
+
+            for cluster_node in self.cluster_list:
+                file_topology.write("os.system(\"sudo -u minisecbgpuser -s ssh %s sudo pkill -9 zebra\")\n" % cluster_node.replace('\'', ''))
+                file_topology.write("os.system(\"sudo -u minisecbgpuser -s ssh %s sudo pkill -9 bgpd\")\n" % cluster_node.replace('\'', ''))
+
         file_topology.close()
         os.chmod(self.output_dir + 'topology.py', 0o755)
 
@@ -426,13 +530,14 @@ def parse_args(config_file):
 def main(argv=sys.argv[1:]):
     try:
         opts, args = getopt.getopt(argv, "h:",
-                                   ["config-file=", "topology=", "include-stub=", "topology-distribution-method=",
-                                    "emulation-platform=", "router-platform="])
+                                   ["config-file=", "topology=", "include-stub=", "cluster-list=",
+                                    "topology-distribution-method=", "emulation-platform=", "router-platform="])
     except getopt.GetoptError as error:
         print('MiniSecBGP_hijack_realistic_analysis '
               '--config-file=<pyramid config file .ini> '
               '--topology=<Topology ID> '
               '--include-stub=<True|False> '
+              '--cluster-list=<hostname list of cluster nodes> '
               '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
               '--emulation-platform=<Emulation platform ID (MININET|DOCKER)> '
               '--router-platform=<Router platform ID (QUAGGA|BIRD)>')
@@ -443,6 +548,7 @@ def main(argv=sys.argv[1:]):
                   '--config-file=<pyramid config file .ini> '
                   '--topology=<Topology ID> '
                   '--include-stub=<True|False> '
+                  '--cluster-list=<hostname list of cluster nodes> '
                   '--topology-distribution-method=<Topology distribution method ID (CUSTOMER CONE|METIS|MANUAL|ROUND ROBIN)> '
                   '--emulation-platform=<Emulation platform ID (MININET|DOCKER)> '
                   '--router-platform=<Router platform ID (QUAGGA|BIRD)>')
@@ -453,6 +559,8 @@ def main(argv=sys.argv[1:]):
             id_topology = arg
         elif opt == '--include-stub':
             include_stub = str2bool(arg)
+        elif opt == '--cluster-list':
+            cluster_list = arg
         elif opt == '--topology-distribution-method':
             topology_distribution_method = arg
         elif opt == '--emulation-platform':
@@ -470,7 +578,7 @@ def main(argv=sys.argv[1:]):
             quagga = dbsession.query(models.RouterPlatform.id). \
                 filter(func.lower(models.RouterPlatform.router_platform) == 'quagga').first()
 
-            ra = RealisticAnalysis(dbsession, id_topology, include_stub,
+            ra = RealisticAnalysis(dbsession, id_topology, include_stub, cluster_list,
                                    topology_distribution_method, emulation_platform, router_platform)
 
             time_get_data = time.time()
@@ -478,6 +586,11 @@ def main(argv=sys.argv[1:]):
             ra.data_frames()
             time_get_data = time.time() - time_get_data
             save_to_database(dbsession, ['time_get_data'], [time_get_data])
+
+            time_autonomous_system_per_server = time.time()
+            ra.autonomous_system_per_server()
+            time_autonomous_system_per_server = time.time() - time_autonomous_system_per_server
+            save_to_database(dbsession, ['time_autonomous_system_per_server'], [time_autonomous_system_per_server])
 
             time_emulate_platform_commands = time.time()
             ra.emulation_commands()

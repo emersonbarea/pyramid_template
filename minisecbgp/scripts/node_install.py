@@ -49,8 +49,10 @@ class ConfigClusterNode(object):
                 commands = ['export DEBIAN_FRONTEND=noninteractive; '
                             'sudo -E apt update; '
                             'sudo -E apt upgrade -yq',
-                            'sudo apt install python-pip python3-pip cmake ansible git aptitude -y',
-                            'pip3 install --upgrade --force-reinstall -U Pyro4',
+                            'sudo apt install git autoconf screen cmake build-essential sysstat expect '
+                            'python-matplotlib uuid-runtime ansible aptitude python-pip python3-pip -y',
+                            'pip install setuptools docker',
+                            'pip3 install --upgrade --force-reinstall -U Pyro4 docker',
                             'sudo timedatectl set-timezone America/Sao_Paulo']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
@@ -96,8 +98,7 @@ class ConfigClusterNode(object):
 
                 commands = [
                     'git clone git://github.com/mininet/mininet /home/minisecbgpuser/mininet',
-                    'sed -i -- \'s/iproute /iproute2 /g\' /home/minisecbgpuser/mininet/util/install.sh',
-                    'sudo /home/minisecbgpuser/mininet/util/install.sh -a']
+                    'cd /home/minisecbgpuser/mininet; git checkout -b 2.2.1rc1 2.2.1rc1; cd util/; ./install.sh']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.node_ip_address, 'minisecbgpuser', self.password, command)
@@ -127,8 +128,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_containernet(self):
-        print('\nInstalling Containernet ...\n'
-              'take a coffee and wait ...')
+        print('\nInstalling Containernet ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -138,24 +138,31 @@ class ConfigClusterNode(object):
 
             if node_install_status(self.dbsession, self.node_ip_address):
 
-                #commands = [
-                #    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
-                #    'cd /home/minisecbgpuser/containernet/ansible; '
-                #    'sudo ansible-playbook -i "localhost," -c local install.yml']
-                commands = [
-                    'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet']
+                commands = ['grep "localhost ansible_connection=local" /etc/ansible/hosts >/dev/null; '
+                            'if [ $? -ne 0 ]; then echo "localhost ansible_connection=local" | '
+                            'sudo tee -a /etc/ansible/hosts; fi',
+                            'sudo rm -rf /home/minisecbgpuser/openflow &> /dev/null',
+                            'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
+                            'cd /home/minisecbgpuser/containernet/ansible; '
+                            'sudo ansible-playbook -i "localhost," -c local install.yml',
+                            'cd /home/minisecbgpuser/containernet/; sudo python setup.py install',
+                            'sudo pip uninstall backports.ssl-match-hostname -y',
+                            'sudo apt-get install python-backports.ssl-match-hostname -y']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
                         ssh.ssh(self.node_ip_address, 'minisecbgpuser', self.password, command)
                     if service_ssh == 1:
                         node_install.NodeInstall.status = service_ssh
+                        print(service_ssh)
                         node_install.NodeInstall.log = service_ssh_status[:250]
+                        print(service_ssh_status)
                         self.dbsession.flush()
                         return
                     else:
                         if command_status != 0:
                             node_install.NodeInstall.status = 1
                             node_install.NodeInstall.log = command_error_warning[:250]
+                            print(command_error_warning)
                             self.dbsession.flush()
                             return
                 node_install.NodeInstall.status = 0
@@ -182,7 +189,7 @@ class ConfigClusterNode(object):
                 filter(models.Install.install == 'metis').first()
 
             if node_install_status(self.dbsession, self.node_ip_address):
-                if node_install.Node.master:                                                        # install Metis only on master node
+                if node_install.Node.master:    # install Metis only on master node
                     try:
                         command = 'sshpass -p "%s" scp -o StrictHostKeyChecking=no ./programs/metis-5.1.0.tar.gz ' \
                                   'minisecbgpuser@%s:/home/minisecbgpuser/' % (self.password, self.node_ip_address)
@@ -243,8 +250,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_maxinet(self):
-        print('\nInstalling Maxinet ...\n'
-              'take a coffee and wait ...')
+        print('\nInstalling Maxinet ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -257,7 +263,6 @@ class ConfigClusterNode(object):
             if node_install_status(self.dbsession, self.node_ip_address):
 
                 # install MaxiNet on all cluster nodes
-                print('github download and install')
                 commands = ['git clone git://github.com/MaxiNet/MaxiNet.git',
                             'cd /home/minisecbgpuser/MaxiNet;'
                             'git checkout v1.2;'
@@ -432,8 +437,7 @@ class ConfigClusterNode(object):
                   (ipaddress.ip_address(self.node_ip_address), error))
 
     def install_quagga(self):
-        print('\nInstalling Quagga router ...\n'
-              'take a coffee and wait ...')
+        print('\nInstalling Quagga router ...')
         try:
             node_install = self.dbsession.query(models.Node, models.NodeInstall, models.Install). \
                 filter(models.Node.node == self.node_ip_address). \
@@ -469,8 +473,8 @@ class ConfigClusterNode(object):
                             self.dbsession.flush()
                             return
 
-                command = 'sshpass -p "%s" scp -o StrictHostKeyChecking=no ./programs/quagga-1.2.4.tar.gz ' \
-                          'minisecbgpuser@%s:/home/minisecbgpuser/' % (self.password, self.node_ip_address)
+                command = 'ssh-keygen -R %s; sshpass -p "%s" scp -o StrictHostKeyChecking=no ./programs/quagga-1.2.4.tar.gz ' \
+                          'minisecbgpuser@%s:/home/minisecbgpuser/' % (self.node_ip_address, self.password, self.node_ip_address)
                 result = local_command.local_command(command)
                 if result[0] == 1:
                     node_install.NodeInstall.status = 1
@@ -591,6 +595,7 @@ def main(argv=sys.argv[1:]):
                 dbsession = env['request'].dbsession
                 ccn = ConfigClusterNode(dbsession, node_ip_address, username, password)
                 ccn.install_quagga()
+            print('that\'s all')
         except OperationalError:
             print('Database error')
     else:

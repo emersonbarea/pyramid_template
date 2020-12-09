@@ -3,7 +3,7 @@
 {% block contentDashboard %}
 
   <div class="navbar">
-    <h2 align="center">MiniSecBGP (json) Topologies</h2>
+    <h2 align="center"><a href="https://stat.ripe.net/widget/bgplay" target="_blank">RIPE NCC BGPlay</a> topologies</h2>
     <div class="navbar-inner">
       <div class="container">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -15,7 +15,7 @@
           <ul class="nav">
             {% if request.user.role == 'admin' %}
               <li>
-                <a href="{{ request.route_url('manualTopologiesAction',action='upload') }}">Upload Topology File</a>
+                <a href="{{ request.route_url('bgplayTopologiesAction',action='upload') }}">Upload Scenario from File</a>
               </li>
             {% endif %}
           </ul>
@@ -28,6 +28,6 @@
     <p> {{ message }} </p>
   </div>
 
-  {% block contentManualTopology %} {% endblock contentManualTopology %}
+  {% block contentBGPlayTopology %} {% endblock contentBGPlayTopology %}
 
 {% endblock contentDashboard %}

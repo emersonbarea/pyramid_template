@@ -27,7 +27,7 @@ class ManualTopology(object):
         # Topology
         try:
             topology_type = dbsession.query(models.TopologyType).\
-                filter(func.lower(models.TopologyType.topology_type) == 'manual').first()
+                filter(func.lower(models.TopologyType.topology_type) == 'minisecbgp (json)').first()
             dictionary_topology = {'id_topology_type': [topology_type.id],
                                    'topology': [data['topology_name']],
                                    'description': ['Manual topology (from json file)']}
