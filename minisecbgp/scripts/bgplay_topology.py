@@ -51,6 +51,7 @@ class BGPlayTopology(object):
             events = data['data']['events']
             for event in events:
                 if event['type'] == 'A':
+                    print(event['attr']['target_prefix'])
                     origin_autonomous_system.append(event['attrs']['path'][-1])
             origin_autonomous_system = set(origin_autonomous_system)
 
