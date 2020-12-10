@@ -14,7 +14,7 @@ class TestClusterNode(object):
     def __init__(self, dbsession, execution_type, node_ip_address, username, password):
         self.dbsession = dbsession
         self.execution_type = execution_type
-        self.node_ip_address = int(ipaddress.ip_address(node_ip_address))
+        self.node_ip_address = str(ipaddress.ip_address(node_ip_address))
         self.username = username
         self.password = password
 
@@ -39,7 +39,7 @@ class TestClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for ping test on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for ping test on node: %s - %s' % (self.node_ip_address, error))
 
     def test_ssh(self):
         print('\nTesting ssh ...')
@@ -66,7 +66,7 @@ class TestClusterNode(object):
 
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for ssh test on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for ssh test on node: %s - %s' % (self.node_ip_address, error))
 
 
 def parse_args(config_file):

@@ -16,6 +16,7 @@ from minisecbgp import models
 
 
 class BGPlayDataForm(Form):
+    scenario_name = StringField('Scenario name (will be used to name the <strong>topology</strong>)', validators=[InputRequired()])
     query_start_time = DateTimeField('Start time period: ', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()])
     query_end_time = DateTimeField('End time period: ', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()])
     resource = StringField('Resource value: (Format: [0..n]<strong>Prefix,</strong>[0..n]<strong>IP,</strong>[0..n]<strong>ASN</strong>)', validators=[InputRequired()])
@@ -128,7 +129,8 @@ def upload_from_site(request):
                 bgplay_url = 'https://stat.ripe.net/data/bgplay/data.json?resource=%s&starttime=%s&endtime=%s' % \
                              (form.resource.data, form.query_start_time.data, form.query_end_time.data)
 
-                file_path = '/tmp/0909090-teste.BGPlay'
+                file_path = '/tmp/' + str(re.sub(r"[' ':.-]", "", str(datetime.datetime.now()))) + '-' + \
+                            str(form.scenario_name.data.replace(' ', '_').replace('.', '_')) + '.BGPlay'
 
                 urllib.request.urlretrieve(bgplay_url.replace(' ', 'T'), file_path)
 

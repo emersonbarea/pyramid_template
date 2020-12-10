@@ -119,11 +119,7 @@ class BGPlayTopology(object):
             for autonomous_system in autonomous_systems:
                 df_router_id.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
             df_router_id = df_router_id.reset_index().copy()
-            df_router_id.reset_index()
-            df_router_id.set_index('router_id', inplace=True)
-            for row in df_router_id.itertuples():
-                df_router_id.rename(index={row[0]: str(int(ipaddress.ip_address(row[0])))}, inplace=True)
-            df_router_id = df_router_id.reset_index().copy()
+
             df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
 
             # Peers
@@ -131,6 +127,7 @@ class BGPlayTopology(object):
             data_peers['links'] = list()
 
             events = data['data']['events']
+
             paths = list()
             # for each event
             for event in events:
@@ -139,10 +136,8 @@ class BGPlayTopology(object):
                     paths.append(event['attrs']['path'])
 
             # remove duplicated paths
-            paths = set(tuple(i) for i in paths)
 
-            # initialize IP address variable (1.0.0.0)
-            prefix_ip = 16777216
+            paths = set(tuple(i) for i in paths)
 
             hops = []
             for path in paths:
@@ -155,8 +150,16 @@ class BGPlayTopology(object):
 
                     previous_autonomous_system = autonomous_system
 
-            # remove duplicated hops
+            # removes duplicated hops
             hops = set(tuple(i) for i in hops)
+
+            # removes duplicated inverted hops
+            final_hops = []
+            for hop in hops:
+                inverted_hop = tuple([hop[1], hop[0]])
+                if inverted_hop not in final_hops:
+                    final_hops.append(tuple([hop[0], hop[1]]))
+            hops = final_hops
 
             list_link_source = list()
             list_link_destination = list()
@@ -170,11 +173,14 @@ class BGPlayTopology(object):
             list_link_load = list()
             list_stub = list()
 
+            # initialize IP address variable (1.0.0.0)
+            prefix_ip = 16777216
+
             for hop in hops:
                 list_link_source.append(hop[0])
                 list_link_destination.append(hop[1])
-                list_link_ip_source.append(prefix_ip + 1)
-                list_link_ip_destination.append(prefix_ip + 2)
+                list_link_ip_source.append(str(ipaddress.ip_address(prefix_ip + 1)))
+                list_link_ip_destination.append(str(ipaddress.ip_address(prefix_ip + 2)))
                 list_link_mask.append(30)
                 list_link_description.append(None)
                 list_link_agreement.append(None)
@@ -248,7 +254,7 @@ class BGPlayTopology(object):
         entry.downloading = downloading
 
     def erase_file(self):
-        os.remove(self.file)
+        os.remove(self.file_from)
 
 
 def parse_args(config_file):

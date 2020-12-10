@@ -254,8 +254,8 @@ def autonomousSystemAddEdit(request):
                 links.append({'autonomous_system1': link.autonomous_system1,
                               'autonomous_system2': link.autonomous_system2,
                               'description': (link.description if link.description else '--'),
-                              'ip_autonomous_system1': ipaddress.ip_address(link.ip_autonomous_system1),
-                              'ip_autonomous_system2': ipaddress.ip_address(link.ip_autonomous_system2),
+                              'ip_autonomous_system1': str(ipaddress.ip_address(link.ip_autonomous_system1)),
+                              'ip_autonomous_system2': str(ipaddress.ip_address(link.ip_autonomous_system2)),
                               'mask': '/' + str(link.mask),
                               'bandwidth': (link.bandwidth if link.bandwidth else '--'),
                               'load': (link.load if link.load else '--'),
@@ -270,7 +270,7 @@ def autonomousSystemAddEdit(request):
             result_proxy = request.dbsession.bind.execute(query)
             prefixes = list()
             for prefix in result_proxy:
-                prefixes.append({'prefix': ipaddress.ip_address(prefix.prefix),
+                prefixes.append({'prefix': str(ipaddress.ip_address(prefix.prefix)),
                                  'mask': '/' + str(prefix.mask)})
             dictionary['prefixes'] = prefixes
 

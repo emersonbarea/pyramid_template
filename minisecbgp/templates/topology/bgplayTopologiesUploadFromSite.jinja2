@@ -13,6 +13,11 @@
       <form action="{{ request.route_url('bgplayTopologiesAction',action='upload_from_site') }}" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 
         <div class="form-field">
+          {{ form.scenario_name.label }}
+          {{ form.scenario_name }}
+        </div>
+
+        <div class="form-field">
           {{ form.query_start_time.label }}
           {{ form.query_start_time }} Format: <strong>%Y-%m-%d %H:%M:%S</strong>
         </div>

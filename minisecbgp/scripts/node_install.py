@@ -31,7 +31,7 @@ def node_install_status(dbsession, node):
 class ConfigClusterNode(object):
     def __init__(self, dbsession, node_ip_address, username, password):
         self.dbsession = dbsession
-        self.node_ip_address = int(ipaddress.ip_address(node_ip_address))
+        self.node_ip_address = str(ipaddress.ip_address(node_ip_address))
         self.username = username
         self.password = password
 
@@ -81,8 +81,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for remote prerequisites installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for remote prerequisites installation on node: %s - %s' % (self.node_ip_address, error))
 
     def install_mininet(self):
         print('\nInstalling Mininet ...\n'
@@ -124,8 +123,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for Mininet installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for Mininet installation on node: %s - %s' % (self.node_ip_address, error))
 
     def install_containernet(self):
         print('\nInstalling Containernet ...')
@@ -176,8 +174,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for Containernet installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for Containernet installation on node: %s - %s' % (self.node_ip_address, error))
 
     def install_metis(self):
         print('\nInstalling Metis ...')
@@ -226,8 +223,7 @@ class ConfigClusterNode(object):
                         self.dbsession.flush()
                     except Exception as error:
                         self.dbsession.rollback()
-                        print('Database error for Metis installation on node: %s - %s' %
-                              (ipaddress.ip_address(self.node_ip_address), error))
+                        print('Database error for Metis installation on node: %s - %s' % (self.node_ip_address, error))
                 else:
                     try:
                         node_install.NodeInstall.status = 0
@@ -236,8 +232,7 @@ class ConfigClusterNode(object):
                         self.dbsession.flush()
                     except Exception as error:
                         self.dbsession.rollback()
-                        print('Database error for Metis installation on node: %s - %s' %
-                              (ipaddress.ip_address(self.node_ip_address), error))
+                        print('Database error for Metis installation on node: %s - %s' % (self.node_ip_address, error))
 
             else:
                 node_install.NodeInstall.status = 1
@@ -246,8 +241,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for Metis installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for Metis installation on node: %s - %s' % (self.node_ip_address, error))
 
     def install_maxinet(self):
         print('\nInstalling Maxinet ...')
@@ -337,7 +331,7 @@ class ConfigClusterNode(object):
                                   '[FrontendServer]\n' \
                                   'ip = %s\n' \
                                   'threadpool = 256\n" | sudo tee /etc/MaxiNet.cfg; \'' % \
-                                  (ipaddress.ip_address(node.node), ipaddress.ip_address(node.node))
+                                  (node.node, node.node)
                         result = local_command.local_command(command)
                         if result[0] == 1:
                             node_install.NodeInstall.status = 1
@@ -349,7 +343,7 @@ class ConfigClusterNode(object):
                               'echo "[%s]\n' \
                               'ip = %s\n' \
                               'share = 1\n" | sudo tee --append /etc/MaxiNet.cfg; \'' % \
-                              (node.hostname, ipaddress.ip_address(node.node))
+                              (node.hostname, node.node)
                     result = local_command.local_command(command)
                     if result[0] == 1:
                         node_install.NodeInstall.status = 1
@@ -387,7 +381,7 @@ class ConfigClusterNode(object):
                     for host in nodes:
                         command = 'sudo -u minisecbgpuser bash -c \'' \
                                   'ssh %s "echo %s %s \# MiniSecBGP cluster node | sudo tee --append /etc/hosts"; \'' \
-                                  % (node.node, ipaddress.ip_address(host.node), host.hostname)
+                                  % (node.node, host.node, host.hostname)
                         result = local_command.local_command(command)
                         if result[0] == 1:
                             node_install.NodeInstall.status = 1
@@ -433,8 +427,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for MaxiNet installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for MaxiNet installation on node: %s - %s' % (self.node_ip_address, error))
 
     def install_quagga(self):
         print('\nInstalling Quagga router ...')
@@ -514,8 +507,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for Quagga installation on node: %s - %s' %
-                  (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for Quagga installation on node: %s - %s' % (self.node_ip_address, error))
 
 
 def parse_args(config_file):

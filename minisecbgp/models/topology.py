@@ -52,7 +52,7 @@ class RouterId(Base):
     __tablename__ = 'router_id'
     id = Column(Integer, primary_key=True)
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
-    router_id = Column(BigInteger, nullable=False)
+    router_id = Column(String(39), nullable=False)
     Index('IndexId1_autonomous_system', id_autonomous_system)
 
 
@@ -60,7 +60,7 @@ class Prefix(Base):
     __tablename__ = 'prefix'
     id = Column(Integer, primary_key=True)
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
-    prefix = Column(BigInteger, nullable=False)
+    prefix = Column(String(39), nullable=False)
     mask = Column(Integer, nullable=False)
     Index('IndexId2_autonomous_system', id_autonomous_system)
 
@@ -72,8 +72,8 @@ class Link(Base):
     id_link_agreement = Column(Integer, ForeignKey('link_agreement.id'))
     id_autonomous_system1 = Column(Integer, ForeignKey('autonomous_system.id'))
     id_autonomous_system2 = Column(Integer, ForeignKey('autonomous_system.id'))
-    ip_autonomous_system1 = Column(BigInteger)
-    ip_autonomous_system2 = Column(BigInteger)
+    ip_autonomous_system1 = Column(String(39))
+    ip_autonomous_system2 = Column(String(39))
     mask = Column(Integer)
     description = Column(String(50))
     bandwidth = Column(Integer)  # kbps

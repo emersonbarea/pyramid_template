@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, BigInteger, Boolean, ForeignKey, Index
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Index
 from .meta import Base
 from sqlalchemy.orm import relationship
 
@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 class Node(Base):
     __tablename__ = 'node'
     id = Column(Integer, primary_key=True)
-    node = Column(BigInteger, nullable=False, unique=True)                                # node IP address
+    node = Column(String(39), nullable=False, unique=True)                                # node IP address
     hostname = Column(String(255))
     master = Column(Boolean, nullable=False)                                              # True = 'master' | false = 'worker'
     node_service = relationship('NodeService', foreign_keys='NodeService.id_node')

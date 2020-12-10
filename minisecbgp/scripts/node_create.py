@@ -12,7 +12,7 @@ from minisecbgp import models
 class CreateClusterNode(object):
     def __init__(self, dbsession, node_ip_address, master):
         self.dbsession = dbsession
-        self.node_ip_address = int(ipaddress.ip_address(node_ip_address))
+        self.node_ip_address = str(ipaddress.ip_address(node_ip_address))
         self.master = master
 
     def create_cluster_node(self):
@@ -46,12 +46,12 @@ class CreateClusterNode(object):
                                                       log="installing"))
 
             self.dbsession.flush()
-        except IntegrityError as error:
+        except IntegrityError:
             self.dbsession.rollback()
-            print('Node "%s" already exists in cluster.' % ipaddress.ip_address(self.node_ip_address))
+            print('Node "%s" already exists in cluster.' % self.node_ip_address)
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for create node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for create node: %s - %s' % self.node_ip_address, error)
 
 
 def parse_args(config_file):

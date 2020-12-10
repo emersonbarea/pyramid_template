@@ -140,11 +140,6 @@ class ManualTopology(object):
             for autonomous_system in autonomous_systems:
                 df_router_id.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
             df_router_id = df_router_id.reset_index().copy()
-            df_router_id.reset_index()
-            df_router_id.set_index('router_id', inplace=True)
-            for row in df_router_id.itertuples():
-                df_router_id.rename(index={row[0]: str(int(ipaddress.ip_address(row[0])))}, inplace=True)
-            df_router_id = df_router_id.reset_index().copy()
             df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
 
             # Autonomous System in Internet eXchange Point
@@ -260,12 +255,6 @@ class ManualTopology(object):
                 df_prefix.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
             df_prefix = df_prefix.reset_index().copy()
 
-            df_prefix.reset_index()
-            df_prefix.set_index('prefix', inplace=True)
-            for row in df_prefix.itertuples():
-                df_prefix.rename(index={row[0]: str(int(ipaddress.ip_address(row[0])))}, inplace=True)
-            df_prefix = df_prefix.reset_index().copy()
-
             df_prefix.to_sql('prefix', con=dbsession.bind, if_exists='append', index=False)
 
             # Link
@@ -284,8 +273,8 @@ class ManualTopology(object):
             for row1 in range(len(data['links'])):
                 list_link_source.append(data['links'][row1]['source'])
                 list_link_destination.append(data['links'][row1]['destination'])
-                list_link_ip_source.append(int(ipaddress.ip_address(data['links'][row1]['ip_source'])))
-                list_link_ip_destination.append(int(ipaddress.ip_address(data['links'][row1]['ip_destination'])))
+                list_link_ip_source.append(str(ipaddress.ip_address(data['links'][row1]['ip_source'])))
+                list_link_ip_destination.append(str(ipaddress.ip_address(data['links'][row1]['ip_destination'])))
                 list_link_mask.append(data['links'][row1]['mask'])
                 list_link_description.append(data['links'][row1]['description'])
                 list_link_agreement.append(data['links'][row1]['agreement'])

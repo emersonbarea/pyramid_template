@@ -14,7 +14,7 @@ from minisecbgp.scripts.services import local_command
 class ClusterDataForm(Form):
     node = StringField('Cluster node IP address (Ex.: 192.168.1.1): *',
                        validators=[InputRequired(),
-                                   IPAddress(ipv4=True, message='Enter only IPv4 address format.')])
+                                   IPAddress(ipv4=True, ipv6=True, message='Enter only IPv4 or IPv6 address format.')])
     username = StringField('Cluster node Username: *',
                            validators=[InputRequired(),
                                        Length(min=1, max=50, message=('Username must be between 1 and 50 characters '
@@ -123,7 +123,7 @@ def create(request):
     if request.method == 'POST' and form.validate():
         try:
             node = request.dbsession.query(models.Node).\
-                filter_by(node=int(ipaddress.ip_address(form.node.data))).first()
+                filter_by(node=str(ipaddress.ip_address(form.node.data))).first()
             if not node:
                 arguments = ['--config-file=minisecbgp.ini',
                              '--node-ip-address=%s' % form.node.data,

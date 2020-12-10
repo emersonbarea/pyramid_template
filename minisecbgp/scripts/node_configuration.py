@@ -25,7 +25,7 @@ def node_configuration_status(dbsession, node):
 class ConfigClusterNode(object):
     def __init__(self, dbsession, node_ip_address, username, password):
         self.dbsession = dbsession
-        self.node_ip_address = int(ipaddress.ip_address(node_ip_address))
+        self.node_ip_address = str(ipaddress.ip_address(node_ip_address))
         self.username = username
         self.password = password
 
@@ -57,8 +57,8 @@ class ConfigClusterNode(object):
                     for node in nodes:
                         if node.hostname == command_output and node.id != node_configuration.Node.id:
                             node_configuration.NodeConfiguration.status = 1
-                            node_configuration.NodeConfiguration.log = 'Hostname already configured on another cluster node: %s' % \
-                                                                       ipaddress.ip_address(node.node)
+                            node_configuration.NodeConfiguration.log = \
+                                'Hostname already configured on another cluster node: %s' % node.node
                             self.dbsession.flush()
                             return
                 node_configuration.NodeConfiguration.status = 0
@@ -71,7 +71,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for hostname validation on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for hostname validation on node: %s - %s' % (self.node_ip_address, error))
 
     def create_minisecbgpuser(self):
         print('\nCreating user "minisecbgpuser" ...')
@@ -117,7 +117,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for "minisecbgpuser" creation on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for "minisecbgpuser" creation on node: %s - %s' % (self.node_ip_address, error))
 
     def configure_ssh(self):
         print('\nConfiguring ssh ...')
@@ -184,7 +184,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for ssh configuration on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for ssh configuration on node: %s - %s' % (self.node_ip_address, error))
 
     def configure_crontab(self):
         print('\nConfiguring crontab ...')
@@ -203,8 +203,7 @@ class ConfigClusterNode(object):
                           '--execution-type=scheduled ' \
                           '--node-ip-address=%s" | ' \
                           'sudo tee /etc/cron.d/MiniSecBGP_node_service_%s\'' % \
-                          (ipaddress.ip_address(self.node_ip_address), home_dir, home_dir,
-                           ipaddress.ip_address(self.node_ip_address), self.node_ip_address)
+                          (self.node_ip_address, home_dir, home_dir, self.node_ip_address, self.node_ip_address)
                 result = local_command.local_command(command)
                 if result[0] == 1:
                     node_configuration.NodeConfiguration.status = 1
@@ -221,7 +220,7 @@ class ConfigClusterNode(object):
             self.dbsession.flush()
         except Exception as error:
             self.dbsession.rollback()
-            print('Database error for crontab configuration on node: %s - %s' % (ipaddress.ip_address(self.node_ip_address), error))
+            print('Database error for crontab configuration on node: %s - %s' % (self.node_ip_address, error))
 
 
 def parse_args(config_file):
