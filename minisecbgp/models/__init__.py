@@ -33,6 +33,7 @@ from .topology import (
     Region,
     InternetExchangePoint,
     AutonomousSystemInternetExchangePoint,
+    BGPlay,
     Color)
 from .hijack import (
     TopologyDistributionMethod,

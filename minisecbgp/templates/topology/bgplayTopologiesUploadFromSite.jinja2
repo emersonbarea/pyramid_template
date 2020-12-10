@@ -1,0 +1,39 @@
+{% extends "bgplayTopologies.jinja2" %}
+
+{% block contentBGPlayTopology %}
+
+<div id="aum" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3 align="center">Scenario parameters</h3>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <form action="{{ request.route_url('bgplayTopologiesAction',action='upload_from_site') }}" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+
+        <div class="form-field">
+          {{ form.query_start_time.label }}
+          {{ form.query_start_time }} Format: <strong>%Y-%m-%d %H:%M:%S</strong>
+        </div>
+
+        <div class="form-field">
+          {{ form.query_end_time.label }}
+          {{ form.query_end_time }} Format: <strong>%Y-%m-%d %H:%M:%S</strong>
+        </div>
+
+        <div class="form-field">
+          {{ form.resource.label }}
+          {{ form.resource }} Ex.: 200.0.0.0/24,200.0.0.1,1916
+        </div>
+
+        <div class="form-button">
+          <button type="submit" name="form.submitted" class="btn btn-primary">Generate URL</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock contentBGPlayTopology %}

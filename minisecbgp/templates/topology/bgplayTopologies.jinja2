@@ -15,7 +15,10 @@
           <ul class="nav">
             {% if request.user.role == 'admin' %}
               <li>
-                <a href="{{ request.route_url('bgplayTopologiesAction',action='upload') }}">Upload Scenario from File</a>
+                <a href="{{ request.route_url('bgplayTopologiesAction',action='upload_from_file') }}">Upload Scenario from File</a>
+              </li>
+              <li>
+                <a href="{{ request.route_url('bgplayTopologiesAction',action='upload_from_site') }}">Download Scenario from BGPlay site</a>
               </li>
             {% endif %}
           </ul>

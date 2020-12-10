@@ -1,20 +1,24 @@
-import datetime
 import os
 import re
 import shutil
 import subprocess
+import datetime
+import urllib
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
 from sqlalchemy import func
-from wtforms import Form, SelectField
-from wtforms.validators import InputRequired
+from wtforms import Form, StringField
+from wtforms.fields.html5 import DateTimeField
+from wtforms.validators import InputRequired, ValidationError
 
 from minisecbgp import models
 
 
-class TopologyDataForm(Form):
-    topology_list = SelectField('Choose topology to download: ', coerce=int, validators=[InputRequired()])
+class BGPlayDataForm(Form):
+    query_start_time = DateTimeField('Start time period: ', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()])
+    query_end_time = DateTimeField('End time period: ', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()])
+    resource = StringField('Resource value: (Format: [0..n]<strong>Prefix,</strong>[0..n]<strong>IP,</strong>[0..n]<strong>ASN</strong>)', validators=[InputRequired()])
 
 
 @view_config(route_name='bgplayTopologies', renderer='minisecbgp:templates/topology/bgplayTopologiesShow.jinja2')
@@ -40,9 +44,9 @@ def bgplay_topologies(request):
     return dictionary
 
 
-@view_config(route_name='bgplayTopologiesAction', match_param='action=upload',
-             renderer='minisecbgp:templates/topology/bgplayTopologiesUpload.jinja2')
-def upload(request):
+@view_config(route_name='bgplayTopologiesAction', match_param='action=upload_from_file',
+             renderer='minisecbgp:templates/topology/bgplayTopologiesUploadFromFile.jinja2')
+def upload_from_file(request):
     user = request.user
     if user is None or (user.role != 'admin'):
         raise HTTPForbidden
@@ -75,7 +79,9 @@ def upload(request):
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--file=%s' % file_path]
-            result = subprocess.Popen(['./venv/bin/MiniSecBGP_bgplay_topology'] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            result = subprocess.Popen(['./venv/bin/MiniSecBGP_bgplay_topology'] +
+                                      arguments, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
             command_result, command_result_error = result.communicate()
             if command_result:
                 dictionary['message'] = command_result
@@ -87,5 +93,66 @@ def upload(request):
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'
+
+    return dictionary
+
+
+@view_config(route_name='bgplayTopologiesAction', match_param='action=upload_from_site',
+             renderer='minisecbgp:templates/topology/bgplayTopologiesUploadFromSite.jinja2')
+def upload_from_site(request):
+    user = request.user
+    if user is None or (user.role != 'admin'):
+        raise HTTPForbidden
+
+    form = BGPlayDataForm(request.POST)
+    dictionary = dict()
+    try:
+        downloading = request.dbsession.query(models.DownloadingTopology).first()
+        if downloading.downloading == 1:
+            dictionary['message'] = 'Warning: there is an update process running in the background. ' \
+                                    'Wait for it finish to see the new topology installed and access topology detail.'
+            dictionary['css_class'] = 'warningMessage'
+
+        dictionary['updating'] = downloading.downloading
+
+        if request.method == 'POST':
+            try:
+                if not form.query_start_time.data or \
+                        not form.query_start_time.data or \
+                        not datetime.datetime.strptime(str(form.query_start_time.data), '%Y-%m-%d %H:%M:%S') or \
+                        not datetime.datetime.strptime(str(form.query_start_time.data), '%Y-%m-%d %H:%M:%S'):
+                    raise ValidationError("Dates must be in %Y-%m-%d %H:%M:%S format. Ex.: 2008-12-05 21:00:01")
+                elif form.query_start_time.data >= form.query_end_time.data:
+                    raise ValidationError("End date must not be earlier than start date.")
+
+                bgplay_url = 'https://stat.ripe.net/data/bgplay/data.json?resource=%s&starttime=%s&endtime=%s' % \
+                             (form.resource.data, form.query_start_time.data, form.query_end_time.data)
+
+                file_path = '/tmp/0909090-teste.BGPlay'
+
+                urllib.request.urlretrieve(bgplay_url.replace(' ', 'T'), file_path)
+
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--file=%s' % file_path]
+                result = subprocess.Popen(['./venv/bin/MiniSecBGP_bgplay_topology'] +
+                                          arguments, stdout=subprocess.PIPE,
+                                          stderr=subprocess.PIPE)
+                command_result, command_result_error = result.communicate()
+                if command_result:
+                    dictionary['message'] = command_result
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+                url = request.route_url('bgplayTopologies')
+                return HTTPFound(location=url)
+
+            except Exception as error:
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
+
+    dictionary['form'] = form
 
     return dictionary
