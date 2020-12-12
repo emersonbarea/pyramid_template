@@ -155,7 +155,6 @@ install_app() {
         cp "$LOCAL_HOME"/minisecbgp/static/topology/BGPlay_Test_Scenario.BGPlay /tmp/
         MiniSecBGP_bgplay_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/BGPlay_Test_Scenario.BGPlay'
 
-
         printf '\n\e[1;33m%-6s\e[m\n' '-- Configuring MiniSecBGP Application ...'
         MiniSecBGP_node_create --config-file=minisecbgp.ini --node-ip-address=$var_ip --master=True
 

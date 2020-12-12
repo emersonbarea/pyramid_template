@@ -5,8 +5,6 @@ import os
 import subprocess
 import sys
 import ipaddress
-import datetime
-import time
 
 import pandas as pd
 
@@ -41,18 +39,27 @@ class BGPlayTopology(object):
 
         # Topology
         try:
+
+            try:
+                topology_name = self.file_from.split('-')[1:][0].split('.')[:-1][0]
+            except IndexError:
+                try:
+                    topology_name = self.file_from.split('/')[-1:][0].split('.')[:-1][0]
+                except Exception:
+                    topology_name = self.file_from.split('.')[:-1][0]
+
             topology_type = dbsession.query(models.TopologyType).\
                 filter(func.lower(models.TopologyType.topology_type) == 'ripe ncc bgplay').first()
             dictionary_topology = {'id_topology_type': [topology_type.id],
-                                   'topology': [self.file_from.split('-')[1:][0].split('.')[:-1][0]],
+                                   'topology': [topology_name],
                                    'description': ['RIPE NCC BGPlay topology (from json file)']}
             df_topology = pd.DataFrame(data=dictionary_topology)
             df_topology.to_sql('topology', con=dbsession.bind, if_exists='append', index=False)
 
             # get Topology ID
-            id_topology = dbsession.query(models.Topology.id).filter_by(topology=self.file_from.split('-')[1:][0].split('.')[:-1][0]).first()
+            id_topology = dbsession.query(models.Topology.id).filter_by(topology=topology_name).first()
         except IntegrityError as error:
-            return 'The topology name "%s" already exists.' % self.file_from.split('-')[1:][0].split('.')[:-1][0]
+            return 'The topology name "%s" already exists.' % topology_name
         except Exception as error:
             return error
 
