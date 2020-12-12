@@ -197,9 +197,10 @@ class BGPlay(Base):
     __tablename__ = 'bgplay'
     id = Column(Integer, primary_key=True)
     id_topology = Column(Integer, ForeignKey('topology.id'))
-    query_start_time = Column(Date, nullable=False)
-    query_end_time = Column(Date, nullable=False)
+    query_start_time = Column(String(19), nullable=False)
+    query_end_time = Column(String(19), nullable=False)
     resource = Column(String(255), nullable=False)
+    url = Column(String(512), nullable=False)
     Index('IndexId8_topology', id_topology)
 
 

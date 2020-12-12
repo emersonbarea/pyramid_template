@@ -5,6 +5,8 @@ import os
 import subprocess
 import sys
 import ipaddress
+import datetime
+import time
 
 import pandas as pd
 
@@ -20,6 +22,18 @@ class BGPlayTopology(object):
         self.file_from = file
 
     def create(self, dbsession):
+
+        def validIPv4(ip_address):
+            try:
+                return True if type(ipaddress.ip_address(ip_address)) is ipaddress.IPv4Address else False
+            except ValueError:
+                return False
+
+        def validNetworkIPv4(ip_address):
+            try:
+                return True if type(ipaddress.ip_network(ip_address)) is ipaddress.IPv4Network else False
+            except ValueError:
+                return False
 
         with open(self.file_from) as json_file:
             data = json.load(json_file)
@@ -38,11 +52,50 @@ class BGPlayTopology(object):
             # get Topology ID
             id_topology = dbsession.query(models.Topology.id).filter_by(topology=self.file_from.split('-')[1:][0].split('.')[:-1][0]).first()
         except IntegrityError as error:
-            return 'The topology name "%s" already exists.' % data['topology_name']
+            return 'The topology name "%s" already exists.' % self.file_from.split('-')[1:][0].split('.')[:-1][0]
         except Exception as error:
             return error
 
         try:
+
+            # get bgplay data
+            query_start_time = data['data']['query_starttime']
+            query_end_time = data['data']['query_endtime']
+
+            list_resource = list()
+            resources = [data['data']['resource']]
+            for resource in resources:
+                list_resource.append(resource)
+            resources = str(list_resource).strip('[]').replace('\'', '').replace(' ', '')
+            url = 'https://stat.ripe.net/data/bgplay/data.json?resource=%s&starttime=%s&endtime=%s' % \
+                  (resources, query_start_time, query_end_time)
+
+            dictionary_bgplay = {'id_topology': [id_topology[0]],
+                                 'query_start_time': [query_start_time.replace('T', ' ')],
+                                 'query_end_time': [query_end_time.replace('T', ' ')],
+                                 'resource': [resources],
+                                 'url': [url]}
+            df_bgplay = pd.DataFrame(data=dictionary_bgplay)
+            df_bgplay.to_sql('bgplay', con=dbsession.bind, if_exists='append', index=False)
+
+            # get unique IPv4 Autonomous Systems (from "initial_state" and "events")
+            list_valid_autonomous_system = list()
+
+            events = data['data']['events']
+            for event in events:
+                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
+                    for autonomous_system in list(event['attrs']['path']):
+                        list_valid_autonomous_system.append(autonomous_system)
+
+            initial_states = data['data']['initial_state']
+            for initial_state in initial_states:
+                if validNetworkIPv4(initial_state['target_prefix']):
+                    for autonomous_system in list(initial_state['path']):
+                        list_valid_autonomous_system.append(autonomous_system)
+
+            list_valid_autonomous_system = set(list_valid_autonomous_system)
+
+            # get Autonomous Systems that announces prefixes at update "events"
             list_autonomous_system = list()
             list_router_id_ip_address = list()
             list_region_autonomous_system = list()
@@ -50,33 +103,36 @@ class BGPlayTopology(object):
             origin_autonomous_system = list()
             events = data['data']['events']
             for event in events:
-                if event['type'] == 'A':
-                    print(event['attr']['target_prefix'])
+                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
                     origin_autonomous_system.append(event['attrs']['path'][-1])
             origin_autonomous_system = set(origin_autonomous_system)
 
+            # get all Autonomous Systens (from nodes + sources) **
             nodes = data['data']['nodes']
+
             for node in nodes:
+                # ** but the Autonomous System must be in IPv4 valid "initial_state" or "events" groups
+                if node['as_number'] in list_valid_autonomous_system:
 
-                # "autonomous_system"
-                autonomous_system = str(node['as_number'])
+                    # "autonomous_system"
+                    autonomous_system = str(node['as_number'])
 
-                # "region" and "router_id"
-                region = "other"
-                router_id = None
-                sources = data['data']['sources']
+                    # "region" and "router_id"
+                    region = "other"
+                    router_id = None
+                    sources = data['data']['sources']
 
-                for source in sources:
-                    if node['as_number'] == source['as_number']:
-                        region = "Collector peer"
-                        router_id = source['id'].split('-')[1]
+                    for source in sources:
+                        if node['as_number'] == source['as_number']:
+                            region = "Collector peer"
+                            router_id = source['id'].split('-')[1] if validIPv4(source['id'].split('-')[1]) else None
 
-                if node['as_number'] in origin_autonomous_system:
-                    region = "Origin AS"
+                    if node['as_number'] in origin_autonomous_system:
+                        region = "Origin AS"
 
-                list_autonomous_system.append(autonomous_system)
-                list_router_id_ip_address.append(router_id)
-                list_region_autonomous_system.append(region)
+                    list_autonomous_system.append(autonomous_system)
+                    list_router_id_ip_address.append(router_id)
+                    list_region_autonomous_system.append(region)
 
             # Region
             list_region = list(['-- undefined region --']) + list_region_autonomous_system
@@ -126,18 +182,23 @@ class BGPlayTopology(object):
             # Peers
             data_peers = dict()
             data_peers['links'] = list()
+            paths = list()
 
             events = data['data']['events']
-
-            paths = list()
             # for each event
             for event in events:
-                # if it is an update event (because withdraw event has no path)
-                if event['type'] == 'A':
+                # if it is an update event (because withdraw event has no path) and only IPv4
+                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
                     paths.append(event['attrs']['path'])
 
-            # remove duplicated paths
+            initial_states = data['data']['initial_state']
+            # for each initial_state
+            for initial_state in initial_states:
+                # only IPv4
+                if validNetworkIPv4(initial_state['target_prefix']):
+                    paths.append(initial_state['path'])
 
+            # remove duplicated paths
             paths = set(tuple(i) for i in paths)
 
             hops = []
@@ -160,6 +221,7 @@ class BGPlayTopology(object):
                 inverted_hop = tuple([hop[1], hop[0]])
                 if inverted_hop not in final_hops:
                     final_hops.append(tuple([hop[0], hop[1]]))
+
             hops = final_hops
 
             list_link_source = list()
@@ -208,6 +270,11 @@ class BGPlayTopology(object):
                                     'delay': list_link_delay,
                                     'load': list_link_load})
 
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+            pd.set_option('display.width', None)
+            pd.set_option('display.max_colwidth', None)
+
             link_agreements = dbsession.query(models.LinkAgreement).all()
             df_link.reset_index()
             df_link.set_index('id_link_agreement', inplace=True)
@@ -228,6 +295,7 @@ class BGPlayTopology(object):
             df_link = df_link.reset_index().copy()
 
             df_link = pd.concat([df_link.assign(id_topology=id_topology) for id_topology in id_topology])
+
             df_link.to_sql('link', con=dbsession.bind, if_exists='append', index=False)
 
             # Autonomous System Stub
@@ -242,6 +310,30 @@ class BGPlayTopology(object):
             for row in df_stub.itertuples():
                 autonomous_system = dbsession.query(models.AutonomousSystem).filter_by(id=row[1]).first()
                 autonomous_system.stub = True
+
+            # Prefix
+            list_prefix_autonomous_system = list()
+            list_prefix = list()
+            list_prefix_mask = list()
+            initial_states = data['data']['initial_state']
+            for initial_state in initial_states:
+                if validNetworkIPv4(initial_state['target_prefix']):
+                    list_prefix_autonomous_system.append(initial_state['path'][-1])
+                    list_prefix.append(str(initial_state['target_prefix']).split('/')[0])
+                    list_prefix_mask.append(str(initial_state['target_prefix']).split('/')[1])
+
+            df_prefix = pd.DataFrame({'id_autonomous_system': list_prefix_autonomous_system,
+                                      'prefix': list_prefix,
+                                      'mask': list_prefix_mask})
+
+            df_prefix = df_prefix.drop_duplicates(keep='first')
+            df_prefix.reset_index()
+            df_prefix.set_index('id_autonomous_system', inplace=True)
+            for autonomous_system in autonomous_systems:
+                df_prefix.rename(index={autonomous_system.autonomous_system: autonomous_system.id}, inplace=True)
+            df_prefix = df_prefix.reset_index().copy()
+
+            df_prefix.to_sql('prefix', con=dbsession.bind, if_exists='append', index=False)
 
         except Exception as error:
             arguments = ['--config-file=minisecbgp.ini',

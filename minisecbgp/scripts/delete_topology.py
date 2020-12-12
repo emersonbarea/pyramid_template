@@ -27,6 +27,9 @@ class DeleteTopology(object):
                             'select id from scenario where id_topology = %s);' % id_topology
             scenario = 'delete from scenario where id_topology = %s;' % id_topology
 
+            #bgplay data
+            bgplay = 'delete from bgplay where id_topology = %s;' % id_topology
+
             # topology data
             router_id = 'delete from router_id where id_autonomous_system in (' \
                         'select id from autonomous_system where id_topology = %s);' % id_topology
@@ -52,6 +55,8 @@ class DeleteTopology(object):
             dbsession.bind.execute(path)
             dbsession.bind.execute(scenario_item)
             dbsession.bind.execute(scenario)
+
+            dbsession.bind.execute(bgplay)
 
             dbsession.bind.execute(router_id)
             dbsession.bind.execute(prefix)

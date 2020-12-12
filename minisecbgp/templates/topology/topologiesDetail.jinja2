@@ -54,6 +54,19 @@
             </div>
           </div>
 
+          {% if bgplay %}
+          <div class="span12">
+            <p><hr></p>
+            <p><h4 align="center">BGPlay scenario detail:</h4></p>
+            {% for data in bgplay %}
+              <p>Query start time: <strong>{{ data.query_start_time }}</strong></p>
+              <p>Query end time: <strong>{{ data.query_end_time }}</strong></p>
+              <p>Queried resources: <strong>{{ data.resource }}</strong></p>
+            <p>BGPlay permanent URL: <a href="{{ data.url }}" target="_blank">{{ data.url }}</a></p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
           {% if request.user.role == 'admin' %}
           <div class="span12">
             <div class="form-button">

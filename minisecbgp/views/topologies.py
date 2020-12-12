@@ -98,6 +98,14 @@ def topologies_detail(request):
             filter(models.AutonomousSystem.stub.is_(False)). \
             filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
 
+        query = 'select b.query_start_time as query_start_time, ' \
+                'b.query_end_time as query_end_time, ' \
+                'b.resource as resource, ' \
+                'b.url as url ' \
+                'from bgplay b ' \
+                'where b.id_topology = %s;' % request.matchdict["id_topology"]
+        dictionary['bgplay'] = request.dbsession.bind.execute(query)
+
     except Exception as error:
         dictionary['message'] = error
         dictionary['css_class'] = 'errorMessage'

@@ -1,0 +1,29 @@
+{
+    "messages": [
+        [
+            "info",
+            "IP address (200.218.1.11) has been converted to its encompassing routed prefix (200.218.0.0/20)"
+        ]
+    ],
+    "see_also": [],
+    "version": "1.2",
+    "data_call_status": "supported - connecting to ursa",
+    "cached": false,
+    "data": {
+        "resource": "200.218.0.0/20",
+        "query_starttime": "2008-02-01T01:00:00",
+        "query_endtime": "2008-02-20T01:00:00",
+        "initial_state": [],
+        "events": [],
+        "nodes": [],
+        "sources": [],
+        "targets": []
+    },
+    "query_id": "20201211212433-49fe7372-e8f8-4f67-8058-d0a918dd8b39",
+    "process_time": 175,
+    "server_id": "app149",
+    "build_version": "live.2020.12.9.114",
+    "status": "ok",
+    "status_code": 200,
+    "time": "2020-12-11T21:24:33.490403"
+}
