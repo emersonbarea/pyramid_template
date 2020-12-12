@@ -1,6 +1,7 @@
 import bz2
 import argparse
 import getopt
+import ipaddress
 import os
 import sys
 
@@ -98,7 +99,7 @@ class RealisticTopology(object):
         router_id_ip = 2147483647
         list_router_id = list()
         for row in df_router_id.itertuples():
-            list_router_id.append(router_id_ip)
+            list_router_id.append(str(ipaddress.ip_address(router_id_ip)))
             router_id_ip = router_id_ip - 1
         df_router_id['router_id'] = list_router_id
         df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
@@ -114,7 +115,7 @@ class RealisticTopology(object):
         list_prefix = list()
         list_mask = list()
         for row in df_prefix.itertuples():
-            list_prefix.append(prefix_ip)
+            list_prefix.append(str(ipaddress.ip_address(prefix_ip)))
             list_mask.append(30)
             prefix_ip = prefix_ip + 4
 
@@ -163,8 +164,8 @@ class RealisticTopology(object):
         list_ip_autonomous_system2 = list()
         list_mask = list()
         for row in df_link.itertuples():
-            list_ip_autonomous_system1.append(prefix_ip + 1)
-            list_ip_autonomous_system2.append(prefix_ip + 2)
+            list_ip_autonomous_system1.append(str(ipaddress.ip_address(prefix_ip + 1)))
+            list_ip_autonomous_system2.append(str(ipaddress.ip_address(prefix_ip + 2)))
             list_mask.append(30)
             prefix_ip = prefix_ip + 4
 
