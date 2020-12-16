@@ -66,8 +66,8 @@ class BGPlayTopology(object):
         try:
 
             # get bgplay data
-            query_start_time = data['data']['query_starttime']
-            query_end_time = data['data']['query_endtime']
+            start_datetime = data['data']['query_starttime']
+            end_datetime = data['data']['query_endtime']
 
             list_resource = list()
             resources = [data['data']['resource']]
@@ -75,15 +75,21 @@ class BGPlayTopology(object):
                 list_resource.append(resource)
             resources = str(list_resource).strip('[]').replace('\'', '').replace(' ', '')
             url = 'https://stat.ripe.net/data/bgplay/data.json?resource=%s&starttime=%s&endtime=%s' % \
-                  (resources, query_start_time, query_end_time)
+                  (resources, start_datetime, end_datetime)
 
-            dictionary_bgplay = {'id_topology': [id_topology[0]],
-                                 'query_start_time': [query_start_time.replace('T', ' ')],
-                                 'query_end_time': [query_end_time.replace('T', ' ')],
-                                 'resource': [resources],
-                                 'url': [url]}
-            df_bgplay = pd.DataFrame(data=dictionary_bgplay)
-            df_bgplay.to_sql('bgplay', con=dbsession.bind, if_exists='append', index=False)
+            event_behaviour = models.EventBehaviour(id_topology=id_topology[0],
+                                                    start_datetime=start_datetime.replace('T', ' '),
+                                                    end_datetime=end_datetime.replace('T', ' '))
+            dbsession.add(event_behaviour)
+
+            dbsession.flush()
+
+            id_event_behaviour = event_behaviour.id
+
+            bgplay = models.BGPlay(id_event_behaviour=id_event_behaviour,
+                                   resource=resources,
+                                   url=url)
+            dbsession.add(bgplay)
 
             # get unique IPv4 Autonomous Systems (from "initial_state" and "events")
             list_valid_autonomous_system = list()
@@ -183,7 +189,6 @@ class BGPlayTopology(object):
             for autonomous_system in autonomous_systems:
                 df_router_id.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
             df_router_id = df_router_id.reset_index().copy()
-
             df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
 
             # Peers

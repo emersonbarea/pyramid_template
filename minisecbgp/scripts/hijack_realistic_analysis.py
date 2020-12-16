@@ -29,7 +29,7 @@ class RealisticAnalysis(object):
         self.emulation_platform = emulation_platform
         self.router_platform = router_platform
 
-        save_to_database(self.dbsession, ['output_path'], [self.output_dir])
+        save_to_database(self.dbsession, ['output_path'], [self.output_dir], self.id_topology)
 
     def dfs_from_database(self):
         query = 'select l.id as id_link, ' \
@@ -128,7 +128,7 @@ class RealisticAnalysis(object):
         # print('Number of ASes: %s' % len(self.sr_unique_as))
         # Number of ASes: 43049
 
-        save_to_database(self.dbsession, ['number_of_autonomous_systems'], [len(self.sr_unique_as)])
+        save_to_database(self.dbsession, ['number_of_autonomous_systems'], [len(self.sr_unique_as)], self.id_topology)
 
     def autonomous_system_per_server(self):
         topology_distribution_method = self.dbsession.query(models.TopologyDistributionMethod).\
@@ -496,10 +496,10 @@ class RealisticAnalysis(object):
             file_bgpd.close()
 
 
-def save_to_database(dbsession, field, value):
+def save_to_database(dbsession, field, value, id_topology):
     try:
         for i in range(len(field)):
-            update = 'update realistic_analysis set %s = \'%s\'' % (field[i], str(value[i]))
+            update = 'update realistic_analysis set %s = \'%s\' where id_topology = %s' % (field[i], str(value[i]), id_topology)
             dbsession.bind.execute(update)
             dbsession.flush()
     except Exception as error:
@@ -585,29 +585,29 @@ def main(argv=sys.argv[1:]):
             ra.dfs_from_database()
             ra.data_frames()
             time_get_data = time.time() - time_get_data
-            save_to_database(dbsession, ['time_get_data'], [time_get_data])
+            save_to_database(dbsession, ['time_get_data'], [time_get_data], id_topology)
 
             time_autonomous_system_per_server = time.time()
             ra.autonomous_system_per_server()
             time_autonomous_system_per_server = time.time() - time_autonomous_system_per_server
-            save_to_database(dbsession, ['time_autonomous_system_per_server'], [time_autonomous_system_per_server])
+            save_to_database(dbsession, ['time_autonomous_system_per_server'], [time_autonomous_system_per_server], id_topology)
 
             time_emulate_platform_commands = time.time()
             ra.emulation_commands()
             time_emulate_platform_commands = time.time() - time_emulate_platform_commands
-            save_to_database(dbsession, ['time_emulate_platform_commands'], [time_emulate_platform_commands])
+            save_to_database(dbsession, ['time_emulate_platform_commands'], [time_emulate_platform_commands], id_topology)
 
             # Router platform
             time_router_platform_commands = time.time()
             if router_platform == str(quagga[0]):
                 ra.quagga_commands()
             time_router_platform_commands = time.time() - time_router_platform_commands
-            save_to_database(dbsession, ['time_router_platform_commands'], [time_router_platform_commands])
+            save_to_database(dbsession, ['time_router_platform_commands'], [time_router_platform_commands], id_topology)
 
             time_write_files = time.time()
             ra.write_to_file()
             time_write_files = time.time() - time_write_files
-            save_to_database(dbsession, ['time_write_files'], [time_write_files])
+            save_to_database(dbsession, ['time_write_files'], [time_write_files], id_topology)
 
     except OperationalError:
         print('Database error')

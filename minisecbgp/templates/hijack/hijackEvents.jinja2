@@ -1,0 +1,410 @@
+{% extends "hijack.jinja2" %}
+
+{% block contentHijack %}
+
+    <div id="aum" class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+          <h3 align="center">Events and Behavior - {{ topology.topology }}</h3>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+
+        <!-- Datetime -->
+
+        <div class="span12">
+          <form action="#" method="POST">
+            <div class="frame-color">
+              <div class="form-field">
+                <p>
+                  {{ form_datetime.start_datetime.label }}
+                  {{ form_datetime.start_datetime(disabled=True) }}
+                </p>
+              </div>
+              <div class="form-field">
+                <p>
+                  {{ form_datetime.end_datetime.label }}
+                  {{ form_datetime.end_datetime(disabled=True) }}
+                </p>
+              </div>
+              <div class="form-field">
+                <p>
+                  Format: <strong>%Y-%m-%d %H:%M:%S</strong>
+                </p>
+              </div>
+            </div>
+            <br>
+            <div class="form-group" align="center">
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editDatetimeConfirmationModal">Edit Datetime</button>
+            </div>
+
+            <div class="modal fade" id="editDatetimeConfirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmation</h4>
+                  </div>
+                  <div class="modal-body">
+                    <div class="form-field">
+                      <p>
+                        {{ form_datetime.start_datetime.label }}
+                        {{ form_datetime.start_datetime }}
+                      </p>
+                    </div>
+                    <div class="form-field">
+                      <p>
+                        {{ form_datetime.end_datetime.label }}
+                        {{ form_datetime.end_datetime }}
+                      </p>
+                    </div>
+                    <div class="form-field">
+                      <p>
+                        Format: <strong>%Y-%m-%d %H:%M:%S</strong>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      {{ form_datetime.edit_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {% if event_behaviour %}
+
+          <!-- Announcement -->
+
+          <div class="span12">
+            <form action="#" method="POST">
+              <p><hr></p>
+              <div class="form-field">
+                <p>Prefix Announcements:</p>
+                <div class="frame-color">
+                  <table style="width:100%">
+                    <tr>
+                      <td align="center"><strong>Datetime</strong></td>
+                      <td align="center"><strong>Announced Prefix</strong></td>
+                      <td align="center"><strong>AS Announcer</strong></td>
+                      <td></td>
+                    </tr>
+                    {% for event in events %}
+                      {% if event.TypeOfEvent.type_of_event == 'Announcement' %}
+                        <div class="form-inline">
+                          <tr>
+                            <td align="center">{{ event.Event.event_datetime }}</td>
+                            <td align="center">{{ event.Event.announced_prefix }}</td>
+                            <td align="center">{{ event.Event.announcer }}</td>
+                            <td align="center"><button type="button" onclick="eventAnnouncement({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteAnnouncementModal">Del</button></td>
+                          </tr>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+              <br>
+              <div class="form-group" align="center">
+                <p>
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationAnnouncementModal">Add Announcement</button>
+                </p>
+              </div>
+
+              <div class="modal fade" id="confirmationAnnouncementModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      {{ form_announcement.announcement_id_event(type="hidden") }}
+                      <p>
+                        {{ form_announcement.announcement_datetime.label }}
+                        {{ form_announcement.announcement_datetime(value="0001-01-01 01:00:00") }} Format: %Y-%m-%d %H:%M:%S
+                      </p>
+                      <p>
+                        {{ form_announcement.announced_prefix.label }}
+                        {{ form_announcement.announced_prefix(value="0.0.0./0") }} Ex.: 1.0.0.0/8 or 200.233.127.252/24
+                      </p>
+                      <p>
+                        {{ form_announcement.announcer.label }}
+                        {{ form_announcement.announcer(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_announcement.create_announcement_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="confirmationDeleteAnnouncementModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel2" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want remove this event?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_announcement.delete_announcement_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- withdraw -->
+
+          <div class="span12">
+            <form action="#" method="POST">
+              <p><hr></p>
+              <div class="form-field">
+                <p>Prefix Withdrawn:</p>
+                <div class="frame-color">
+                  <table style="width:100%">
+                    <tr>
+                      <td align="center"><strong>Datetime</strong></td>
+                      <td align="center"><strong>Withdrawn Prefix</strong></td>
+                      <td align="center"><strong>AS Withdrawer</strong></td>
+                      <td></td>
+                    </tr>
+                    {% for event in events %}
+                      {% if event.TypeOfEvent.type_of_event == 'Withdrawn' %}
+                        <div class="form-inline">
+                          <tr>
+                            <td align="center">{{ event.Event.event_datetime }}</td>
+                            <td align="center">{{ event.Event.withdrawn_prefix }}</td>
+                            <td align="center">{{ event.Event.withdrawer }}</td>
+                            <td align="center"><button type="button" onclick="eventWithdrawn({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteWithdrawnModal">Del</button></td>
+                          </tr>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+              <br>
+              <div class="form-group" align="center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationWithdrawModal">Add Withdraw</button>
+              </div>
+
+              <div class="modal fade" id="confirmationWithdrawModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      {{ form_withdrawn.withdrawn_id_event(type="hidden") }}
+                      <p>
+                        {{ form_withdrawn.withdrawn_datetime.label }}
+                        {{ form_withdrawn.withdrawn_datetime(value="0001-01-01 01:00:00") }} Format: %Y-%m-%d %H:%M:%S
+                      </p>
+                      <p>
+                        {{ form_withdrawn.withdrawn_prefix.label }}
+                        {{ form_withdrawn.withdrawn_prefix(value="0.0.0.0/0") }} Ex.: 1.0.0.0/8 or 200.233.127.252/24
+                      </p>
+                      <p>
+                        {{ form_withdrawn.withdrawer.label }}
+                        {{ form_withdrawn.withdrawer(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_withdrawn.create_withdraw_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="confirmationDeleteWithdrawnModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel2" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want remove this event?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_withdrawn.delete_withdrawn_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- prepend -->
+
+          <div class="span12">
+            <form action="#" method="POST">
+              <p><hr></p>
+              <div class="form-field">
+                <p>Autonomous System Prepend:</p>
+                <div class="frame-color">
+                  <table style="width:100%">
+                    <tr>
+                      <td align="center"><strong>Datetime</strong></td>
+                      <td align="center"><strong>Prepended AS</strong></td>
+                      <td align="center"><strong>AS Prepender</strong></td>
+                      <td align="center"><strong>How many times</strong></td>
+                      <td></td>
+                    </tr>
+                    {% for event in events %}
+                      {% if event.TypeOfEvent.type_of_event == 'Prepend' %}
+                        <div class="form-inline">
+                          <tr>
+                            <td align="center">{{ event.Event.event_datetime }}</td>
+                            <td align="center">{{ event.Event.prepended }}</td>
+                            <td align="center">{{ event.Event.prepender }}</td>
+                            <td align="center">{{ event.Event.times_prepended }}</td>
+                            <td align="center"><button type="button" onclick="eventPrepend({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeletePrependModal">Del</button></td>
+                          </tr>
+                        </div>
+
+                      {% endif %}
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+              <br>
+              <div class="form-group" align="center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationPrependModal">Add Prepend</button>
+              </div>
+
+              <div class="modal fade" id="confirmationPrependModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      {{ form_prepend.prepend_id_event(type="hidden") }}
+                      <p>
+                        {{ form_prepend.prepend_datetime.label }}
+                        {{ form_prepend.prepend_datetime(value="0001-01-01 01:00:00") }} Format: %Y-%m-%d %H:%M:%S
+                      </p>
+                      <p>
+                        {{ form_prepend.prepended.label }}
+                        {{ form_prepend.prepended(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                      <p>
+                        {{ form_prepend.prepender.label }}
+                        {{ form_prepend.prepender(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                      <p>
+                        {{ form_prepend.times_prepended.label }}
+                        {{ form_prepend.times_prepended(value="0") }} negative numbers means withdrawal of prepends
+                      </p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_prepend.create_prepend_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="confirmationDeletePrependModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel2" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want remove this event?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_prepend.delete_prepend_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        {% endif %}
+
+        <!-- download emulate button -->
+
+        <div class="span12">
+          <form action="#" method="POST">
+            <p><hr></p>
+            <div class="form-group" align="center">
+              {{ form_button.download_button(class="btn btn-primary") }}
+              <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+            </div>
+
+            <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmation</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
+                    <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      {{ form_button.emulate_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <script>
+
+        function eventWithdrawn(id_event) {
+          withdrawn_id_event.value = id_event;
+        };
+        function eventPrepend(id_event) {
+          prepend_id_event.value = id_event;
+        };
+        function eventAnnouncement(id_event) {
+          announcement_id_event.value = id_event;
+        };
+      </script>
+
+    </div>
+
+{% endblock contentHijack %}

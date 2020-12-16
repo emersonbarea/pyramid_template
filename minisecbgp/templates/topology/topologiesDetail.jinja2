@@ -9,6 +9,10 @@
       </div>
     </div>
 
+    <div class=" {{ css_class }} ">
+      <p> {{ message }} </p>
+    </div>
+
     <div class="row-fluid" style="text-align: center;">
       <div class="span12">
 
@@ -21,7 +25,7 @@
           <h4>Non Stub Topology</h4>
         </div>
 
-        <form class="form-horizontal" action="{{ request.route_url('topologiesAction',action='delete', id_topology = topology.id) }}" method="post">
+        <form class="form-horizontal" action="#" method="post">
           <div class="span5">
             <p>Unique ASs: {{ unique_as }}</p>
             {% for p2c in p2cs %}
@@ -54,31 +58,202 @@
             </div>
           </div>
 
+          <div class="span12" align="left">
+            <p><hr></p>
+            <p><h4 align="center">Events and Behaviour:</h4></p>
+            {% if event_behaviour %}
+              <p>Start time: <strong>{{ event_behaviour[0][0] }}</strong></p>
+              <p>End time: <strong>{{ event_behaviour[0][1] }}</strong></p>
+            {% else %}
+              <p>Start time: <i>not configured yet</i></p>
+              <p>End time: <i>not configured yet</i></p>
+            {% endif %}
+          </div>
+
+          <div class="span12" align="left">
+            <p><hr></p>
+            <p><h4 align="center">Events:</h4></p>
+            {% for type_of_event in types_of_event %}
+              <p>Type of Event: <strong>{{ type_of_event[0] }}</strong></p>
+              {% if type_of_event[0] == 'Announcement' %}
+                <p>
+                  <div class="frame-color">
+                    <table style="width:100%">
+                      <tr>
+                        <td align="center"><strong>Datetime</strong></td>
+                        <td align="center"><strong>Announced Prefix</strong></td>
+                        <td align="center"><strong>AS Announcer</strong></td>
+                      </tr>
+                      {% for event in events %}
+                        {% if event.type_of_event == type_of_event.type_of_event == 'Announcement' %}
+                          <div class="form-inline">
+                            <tr>
+                              <td align="center">{{ event[1] }}</td>
+                              <td align="center">{{ event[2] }}</td>
+                              <td align="center">{{ event[3] }}</td>
+                            </tr>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </table>
+                  </div>
+                </p>
+              {% endif %}
+
+              {% if type_of_event[0] == 'Prepend' %}
+                <p>
+                  <div class="frame-color">
+                    <table style="width:100%">
+                      <tr>
+                        <td align="center"><strong>Datetime</strong></td>
+                        <td align="center"><strong>Prepended AS</strong></td>
+                        <td align="center"><strong>AS Prepender</strong></td>
+                        <td align="center"><strong>How many times</strong></td>
+                      </tr>
+                      {% for event in events %}
+                        {% if event.type_of_event == type_of_event.type_of_event == 'Prepend' %}
+                          <div class="form-inline">
+                            <tr>
+                              <td align="center">{{ event[1] }}</td>
+                              <td align="center">{{ event[6] }}</td>
+                              <td align="center">{{ event[7] }}</td>
+                              <td align="center">{{ event[8] }}</td>
+                            </tr>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </table>
+                  </div>
+                </p>
+              {% endif %}
+
+              {% if type_of_event[0] == 'Withdrawn' %}
+                <p>
+                  <div class="frame-color">
+                    <table style="width:100%">
+                      <tr>
+                        <td align="center"><strong>Datetime</strong></td>
+                        <td align="center"><strong>Withdrawn Prefix</strong></td>
+                        <td align="center"><strong>AS Withdrawer</strong></td>
+                      </tr>
+                      {% for event in events %}
+                        {% if event.type_of_event == type_of_event.type_of_event == 'Withdrawn' %}
+                          <div class="form-inline">
+                            <tr>
+                              <td align="center">{{ event[1] }}</td>
+                              <td align="center">{{ event[4] }}</td>
+                              <td align="center">{{ event[5] }}</td>
+                            </tr>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </table>
+                  </div>
+                </p>
+              {% endif %}
+            {% endfor %}
+          </div>
+
           {% if bgplay %}
-            <div class="span12">
-              {% for data in bgplay %}
-                <p><hr></p>
-                <p><h4 align="center">BGPlay scenario detail:</h4></p>
-                <p>Query start time: <strong>{{ data.query_start_time }}</strong></p>
-                <p>Query end time: <strong>{{ data.query_end_time }}</strong></p>
-                <p>Queried resources: <strong>{{ data.resource }}</strong></p>
-                <p>BGPlay permanent URL: <a href="{{ data.url }}" target="_blank">{{ data.url }}</a></p>
-              {% endfor %}
+            <div class="span12" align="left">
+              <p><hr></p>
+              <p><h4 align="center">BGPlay:</h4></p>
+              <p>Resource: <strong>{{ bgplay[0][0] }}</strong></p>
+              <p>URL: <a href="{{ bgplay[0][1] }}" target='_blank'>{{ bgplay[0][1] }}</a></p>
             </div>
           {% endif %}
+
+          <div class="span12" align="left">
+            <p><hr></p>
+            <p><h4 align="center">Realistic Analysis:</h4></p>
+            {% if realistic_analysis %}
+
+              <p>Include stub ASs: <font color="green"> {{ realistic_analysis[0][0] }}</font></p>
+
+              <p>Topology distribution Method: <font color="green"> {{ realistic_analysis[0][1] }}</font></p>
+
+              <p>Emulation platform: <font color="green"> {{ realistic_analysis[0][2] }}</font></p>
+
+              <p>Router platform: <font color="green"> {{ realistic_analysis[0][3] }}</font></p>
+
+              <p>Output configuration files: <font color="green"> {{ realistic_analysis[0][4] }}</font></p>
+
+              <p>Time to get data from topology: <font color="green"> {{ realistic_analysis[0][5] }} sec</font></p>
+
+              <p>Time to define the topology distribution on cluster nodes: <font color="green"> {{ realistic_analysis[0][6] }} sec</font></p>
+
+              <p>Time to create emulation commands: <font color="green"> {{ realistic_analysis[0][7] }} sec</font></p>
+
+              <p>Time to create router platform commands: <font color="green"> {{ realistic_analysis[0][8] }} sec</font></p>
+
+              <p>Time to write configuration files: <font color="green"> {{ realistic_analysis[0][9] }} sec</font></p>
+
+              <p>Total time: <font color="green"> {{ realistic_analysis[0][10] }} sec</font></p>
+
+              <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Confirmation</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
+                        <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <div class="form-group">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                          {{ form.emulate_button(class="btn btn-primary", id_topology=topology.id, topology_name=form.topology_name) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+            {% else %}
+              <p><i>- There is no realistic analysis configured yet</i></p>
+            {% endif %}
+          </div>
 
           {% if request.user.role == 'admin' %}
           <div class="span12">
             <div class="form-button">
               <p><hr></p>
               <p>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Delete Topology</button>
+                {% if realistic_analysis %}
+                  <button type="button" onclick="topologyName()" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+                  {{ form.download_button(class="btn btn-primary", onclick="topologyName()", id_topology=topology.id, topology_name=form.topology_name) }}
+                {% endif %}
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#duplicateConfirmationModal">Duplicate Topology</button>
+                <button type="button" onclick="topologyName()" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal">Delete Topology</button>
               </p>
             </div>
           </div>
           {% endif %}
 
-          <div class="modal fade"  style="text-align: left;" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+          <div class="modal fade"  style="text-align: left;" id="duplicateConfirmationModal" tabindex='-1' role="dialog" aria-labelledby="duplicateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                  <p>{{ form.topology_name.label }} {{ form.topology_name }}</p>
+                  <p>Click in duplicate button if you really want to duplicate all data of this topology</p>
+                </div>
+                <div class="modal-footer">
+                  <div class="form-group">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    {{ form.duplicate_button(class="btn btn-primary", id_topology=topology.id, topology_name=form.topology_name) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade"  style="text-align: left;" id="deleteConfirmationModal" tabindex='-1' role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
@@ -91,7 +266,7 @@
                 <div class="modal-footer">
                   <div class="form-group">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" name="form.submitted" value="Delete" class="btn btn-danger">Delete</button>
+                    {{ form.delete_button(class="btn btn-danger", id_topology=topology.id, topology_name=form.topology_name) }}
                   </div>
                 </div>
               </div>
@@ -151,6 +326,13 @@
         </form>
       </div>
     </div>
+
+    <script>
+      function topologyName() {
+        topology_name.value = 'unnecessary information';
+      }
+    </script>
+
   </div>
 
 {% endblock contentTopologiesDetailBase %}

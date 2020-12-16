@@ -33,7 +33,6 @@ from .topology import (
     Region,
     InternetExchangePoint,
     AutonomousSystemInternetExchangePoint,
-    BGPlay,
     Color)
 from .hijack import (
     TopologyDistributionMethod,
@@ -46,7 +45,11 @@ from .hijack import (
     Path,
     PathItem,
     ScenarioStuff,
-    RealisticAnalysis)
+    RealisticAnalysis,
+    EventBehaviour,
+    BGPlay,
+    TypeOfEvent,
+    Event)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

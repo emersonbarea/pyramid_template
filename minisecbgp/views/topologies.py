@@ -1,9 +1,25 @@
+import os
 import subprocess
+import tarfile
 
+from pyramid.response import FileResponse
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPFound
+from wtforms import Form, SubmitField, StringField
+from wtforms.validators import Length, InputRequired
 
 from minisecbgp import models
+
+
+class TopologiesDetailDataForm(Form):
+    topology_name = StringField('Type the name for the new topology: ',
+                                validators=[InputRequired(),
+                                            Length(min=1, max=255,
+                                                   message='Topology name string must be between 1 and 255 characters long.')])
+    download_button = SubmitField('Download')
+    duplicate_button = SubmitField('Duplicate Topology')
+    delete_button = SubmitField('Delete Topology')
+    emulate_button = SubmitField('Confirm')
 
 
 @view_config(route_name='topologies', renderer='minisecbgp:templates/topology/topologiesShow.jinja2')
@@ -50,6 +66,60 @@ def topologies_detail(request):
         raise HTTPForbidden
 
     dictionary = dict()
+    form = TopologiesDetailDataForm(request.POST)
+
+    if request.method == 'POST' and form.validate():
+
+        if form.download_button.data:
+            realistic_analysis = request.dbsession.query(models.RealisticAnalysis).\
+                filter_by(id_topology=request.matchdict['id_topology']).first()
+            query = 'select t.topology ' \
+                    'from topology t ' \
+                    'where t.id = %s;' % request.matchdict['id_topology']
+            topology_name = list(request.dbsession.bind.execute(query))[0][0]
+
+            source_dir = str(realistic_analysis.output_path[:-1])
+            output_filename = topology_name + '.tar.gz'
+
+            with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
+                tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+            response = FileResponse(source_dir + '/' + output_filename)
+            response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
+            return response
+
+        elif form.duplicate_button.data:
+            topology_already_exist = request.dbsession.query(models.Topology).\
+                filter_by(topology=form.topology_name.data).first()
+
+            if topology_already_exist:
+                dictionary['message'] = 'The topology name you choose already exist (%s). Please choose another name and try again.' % form.topology_name.data
+                dictionary['css_class'] = 'errorMessage'
+            else:
+                arguments = ['--config-file=minisecbgp.ini',
+                             '--topology=%s' % request.matchdict["id_topology"],
+                             '--new-topology-name=%s' % form.topology_name.data]
+                result = subprocess.Popen(['./venv/bin/MiniSecBGP_duplicate_topology'] + arguments,
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                command_result, command_result_error = result.communicate()
+                if command_result:
+                    dictionary['message'] = command_result
+                    dictionary['css_class'] = 'errorMessage'
+                    return dictionary
+                url = request.route_url('topologies')
+                return HTTPFound(location=url)
+
+        elif form.delete_button.data:
+            return HTTPFound(location=request.route_url('topologiesAction', action='delete', id_topology=request.matchdict['id_topology']))
+
+        elif form.emulate_button.data:
+            output_path = request.dbsession.query(models.RealisticAnalysis.output_path).\
+                filter_by(id_topology=request.matchdict["id_topology"]).first()
+            os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
+                      str(output_path[0]).replace(' ', '\ '))
+
+    dictionary['form'] = form
+
     try:
         dictionary['topology'] = request.dbsession.query(models.Topology).\
             filter_by(id=request.matchdict["id_topology"]).first()
@@ -98,13 +168,73 @@ def topologies_detail(request):
             filter(models.AutonomousSystem.stub.is_(False)). \
             filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
 
-        query = 'select b.query_start_time as query_start_time, ' \
-                'b.query_end_time as query_end_time, ' \
-                'b.resource as resource, ' \
+        query = 'select eb.start_datetime as start_datetime, ' \
+                'eb.end_datetime as end_datetime ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s;' % request.matchdict["id_topology"]
+        dictionary['event_behaviour'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select b.resource as resource, ' \
                 'b.url as url ' \
                 'from bgplay b ' \
-                'where b.id_topology = %s;' % request.matchdict["id_topology"]
-        dictionary['bgplay'] = request.dbsession.bind.execute(query)
+                'where b.id_event_behaviour = (' \
+                'select eb.id ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s);' % request.matchdict["id_topology"]
+        dictionary['bgplay'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select toe.type_of_event as type_of_event ' \
+                'from type_of_event toe ' \
+                'order by toe.type_of_event;'
+        dictionary['types_of_event'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select count(toe.id) as count ' \
+                'from type_of_event toe;'
+        dictionary['count_types_of_event'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select ' \
+                '(select toe.type_of_event ' \
+                'from type_of_event toe ' \
+                'where toe.id = e.id_type_of_event) as type_of_event, ' \
+                'event_datetime as event_datetime, ' \
+                'announced_prefix as announced_prefix, ' \
+                'announcer as announcer, ' \
+                'withdrawn_prefix as withdrawn_prefix, ' \
+                'withdrawer as withdrawer, ' \
+                'prepended as prepended, ' \
+                'prepender as prepender, ' \
+                'times_prepended as times_prepended ' \
+                'from event e ' \
+                'where e.id_event_behaviour = (' \
+                'select eb.id ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s);' % request.matchdict["id_topology"]
+        dictionary['events'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select ra.include_stub as include_stub, ' \
+                '(select tdm.topology_distribution_method ' \
+                'from topology_distribution_method tdm ' \
+                'where tdm.id = ra.id_topology_distribution_method) as topology_distribution_method, ' \
+                '(select ep.emulation_platform ' \
+                'from emulation_platform ep ' \
+                'where ep.id = ra.id_emulation_platform) as emulation_platform, ' \
+                '(select rp.router_platform ' \
+                'from router_platform rp ' \
+                'where rp.id = ra.id_router_platform) as router_platform, ' \
+                'ra.output_path as output_path, ' \
+                'ra.time_get_data as time_get_data, ' \
+                'ra.time_autonomous_system_per_server as time_autonomous_system_per_server, ' \
+                'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
+                'ra.time_router_platform_commands as time_router_platform_commands, ' \
+                'ra.time_write_files as time_write_files,' \
+                'cast(ra.time_get_data as float) + ' \
+                'cast(ra.time_autonomous_system_per_server as float) + ' \
+                'cast(ra.time_emulate_platform_commands as float) + ' \
+                'cast(ra.time_router_platform_commands as float) + ' \
+                'cast(ra.time_write_files as float) as total_time ' \
+                'from realistic_analysis ra ' \
+                'where ra.id_topology = %s;' % request.matchdict["id_topology"]
+        dictionary['realistic_analysis'] = list(request.dbsession.bind.execute(query))
 
     except Exception as error:
         dictionary['message'] = error
@@ -121,8 +251,10 @@ def topologies_delete(request):
         raise HTTPForbidden
 
     dictionary = dict()
+
     try:
-        if request.method == 'POST':
+        if request.matchdict.get('id_topology'):
+
             topology = request.dbsession.query(models.Topology.topology).\
                 filter_by(id=request.matchdict["id_topology"]).first()
 

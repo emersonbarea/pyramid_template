@@ -53,7 +53,7 @@ def setup_models(dbsession):
 
     # Topology
 
-    topology_types = [{'topology_type': 'MiniSecBGP (json)', 'description': 'Manually Created Topologies'},
+    topology_types = [{'topology_type': 'MiniSecBGP', 'description': 'Manually Created Topologies'},
                       {'topology_type': 'CAIDA AS-Relationship', 'description': 'CAIDA AS-Relationship imported topologies'},
                       {'topology_type': 'Attack Scenario', 'description': 'Topologies automatically generated from the Attack Scenario procedure'},
                       {'topology_type': 'RIPE NCC BGPlay', 'description': 'RIPE NCC BGPlay imported topologies'}]
@@ -189,6 +189,10 @@ def setup_models(dbsession):
     for vantage_point_actor in vantage_point_actors:
         dbsession.add(models.VantagePointActor(vantage_point_actor=vantage_point_actor['vantage_point_actor'],
                                                description=vantage_point_actor['description']))
+
+    types_of_event = ['Announcement', 'Prepend', 'Withdrawn']
+    for type_of_event in types_of_event:
+        dbsession.add(models.TypeOfEvent(type_of_event=type_of_event))
 
 
 def parse_args(config_file):

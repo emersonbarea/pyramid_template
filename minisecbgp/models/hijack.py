@@ -107,7 +107,7 @@ class RealisticAnalysis(Base):
     id_topology_distribution_method = Column(Integer, ForeignKey('topology_distribution_method.id'))
     id_emulation_platform = Column(Integer, ForeignKey('emulation_platform.id'))
     id_router_platform = Column(Integer, ForeignKey('router_platform.id'))
-    topology = Column(String(50))
+    id_topology = Column(Integer, ForeignKey('topology.id'))
     include_stub = Column(Boolean)
     output_path = Column(String(250))
     number_of_autonomous_systems = Column(String(250))
@@ -119,3 +119,48 @@ class RealisticAnalysis(Base):
     Index('IndexId_topology_distribution_method', id_topology_distribution_method)
     Index('IndexId_emulation_platform', id_emulation_platform)
     Index('IndexId_router_platform', id_router_platform)
+    Index('IndexId8_topology', id_topology)
+
+
+class EventBehaviour(Base):
+    __tablename__ = 'event_behaviour'
+    id = Column(Integer, primary_key=True)
+    id_topology = Column(Integer, ForeignKey('topology.id'))
+    start_datetime = Column(String(19), nullable=False)
+    end_datetime = Column(String(19), nullable=False)
+    bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_event_behaviour')
+    event = relationship('Event', foreign_keys='Event.id_event_behaviour')
+    Index('IndexId9_topology', id_topology)
+
+
+class BGPlay(Base):
+    __tablename__ = 'bgplay'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    resource = Column(String(255), nullable=False)
+    url = Column(String(512), nullable=False)
+    Index('IndexId1_event_behaviour', id_event_behaviour)
+
+
+class TypeOfEvent(Base):
+    __tablename__ = 'type_of_event'
+    id = Column(Integer, primary_key=True)
+    type_of_event = Column(String(255), nullable=False)
+    event = relationship('Event', foreign_keys='Event.id_type_of_event')
+
+
+class Event(Base):
+    __tablename__ = 'event'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    id_type_of_event = Column(Integer, ForeignKey('type_of_event.id'))
+    event_datetime = Column(String(19), nullable=False)
+    announced_prefix = Column(String(255))      # A prefix that's will be announced by an announcer AS
+    announcer = Column(String(255))             # the AS that announces a prefix
+    withdrawn_prefix = Column(String(255))      # A prefix that's will be withdrawn by an withdrawer AS
+    withdrawer = Column(String(255))            # the AS that withdraws a prefix
+    prepended = Column(String(255))             # the AS that's will be announced by an prepender AS
+    prepender = Column(String(255))             # the AS that prepends another AS
+    times_prepended = Column(String(255))       # how many times the AS will be prepended by a prepender AS (negative values removes prepends)
+    Index('IndexId2_event_behaviour', id_event_behaviour)
+    Index('IndexId_type_of_event', id_type_of_event)

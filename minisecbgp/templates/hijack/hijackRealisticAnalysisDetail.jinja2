@@ -26,7 +26,7 @@
                     <font color="green"> {{ realistic_analysis[0]['include_stub'] }} </font>
                 </p>
                 <p>
-                    <strong> Method to spawn the topology on cluster nodes: </strong>
+                    <strong> Topology distribution method: </strong>
                     <font color="green"> {{ realistic_analysis[0]['topology_distribution_method'] }} </font> </p>
                 <p>
                     <strong> Emulation platform: </strong>
@@ -60,51 +60,51 @@
                 {% endif %}
                 {% if realistic_analysis[0]['time_get_data'] %}
                     <p>
-                        <strong> Time spent to get data from topology: </strong>
+                        <strong> Time to get data from topology: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_get_data'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time spent to get data from topology: </strong>
+                        <strong> Time to get data from topology: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
                 {% if realistic_analysis[0]['time_autonomous_system_per_server'] %}
                     <p>
-                        <strong> Time spent to spawn the topology on cluster node: </strong>
+                        <strong> Time to define the topology distribution on cluster nodes: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_autonomous_system_per_server'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time spent to spawn the topology on cluster node: </strong>
+                        <strong> Time to define the topology distribution on cluster nodes: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
                 {% if realistic_analysis[0]['time_emulate_platform_commands'] %}
                     <p>
-                        <strong> Time spent to create emulation commands: </strong>
+                        <strong> Time to create emulation commands: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_emulate_platform_commands'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time spent to create emulation commands: </strong>
+                        <strong> Time to create emulation commands: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
                 {% if realistic_analysis[0]['time_router_platform_commands'] %}
                     <p>
-                        <strong> Time spent to create router platform commands: </strong>
+                        <strong> Time to create router platform commands: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_router_platform_commands'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time spent to create router platform commands: </strong>
+                        <strong> Time to create router platform commands: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
                 {% if realistic_analysis[0]['time_write_files'] %}
                     <p>
-                        <strong> Time spent to write configuration files: </strong>
+                        <strong> Time to write configuration files: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_write_files'] }} sec </font>
                     </p>
                     <p>
@@ -113,7 +113,7 @@
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time spent to write configuration files: </strong>
+                        <strong> Time to write configuration files: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                     <p>
@@ -129,32 +129,9 @@
         {% if not realistic_analysis[0]['time_write_files'] %}
             <p align="center">* fields status checked automatically every 5 seconds</p>
         {% else %}
-            <div class="form-group" align="center">
-                {{ form.download_button(class="btn btn-primary") }}
-                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
-            </div>
-
-              <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Confirmation</h4>
-                    </div>
-                    <div class="modal-body">
-                      <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
-                      <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
-                    </div>
-                    <div class="modal-footer">
-                      <div class="form-group">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        {{ form.emulate_button(class="btn btn-primary") }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="form-group" align="center">
+                {{ form.events_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis[0]['id_realistic_analysis']) }}
               </div>
-            </div>
         {% endif %}
     </form>
 </div>

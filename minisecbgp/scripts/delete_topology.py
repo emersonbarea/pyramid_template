@@ -3,7 +3,6 @@ import getopt
 import sys
 
 from pyramid.paster import bootstrap, setup_logging
-from sqlalchemy.exc import OperationalError
 
 from minisecbgp import models
 
@@ -27,8 +26,15 @@ class DeleteTopology(object):
                             'select id from scenario where id_topology = %s);' % id_topology
             scenario = 'delete from scenario where id_topology = %s;' % id_topology
 
-            #bgplay data
-            bgplay = 'delete from bgplay where id_topology = %s;' % id_topology
+            # hijack events data
+            event = 'delete from event where id_event_behaviour in (' \
+                    'select id from event_behaviour where id_topology = %s);' % id_topology
+            bgplay = 'delete from bgplay where id_event_behaviour in (' \
+                     'select id from event_behaviour where id_topology = %s);' % id_topology
+            event_behaviour = 'delete from event_behaviour where id_topology = %s;' % id_topology
+
+            # realistic analysis
+            realistic_analysis = 'delete from realistic_analysis where id_topology = %s;' % id_topology
 
             # topology data
             router_id = 'delete from router_id where id_autonomous_system in (' \
@@ -56,7 +62,11 @@ class DeleteTopology(object):
             dbsession.bind.execute(scenario_item)
             dbsession.bind.execute(scenario)
 
+            dbsession.bind.execute(event)
             dbsession.bind.execute(bgplay)
+            dbsession.bind.execute(event_behaviour)
+
+            dbsession.bind.execute(realistic_analysis)
 
             dbsession.bind.execute(router_id)
             dbsession.bind.execute(prefix)

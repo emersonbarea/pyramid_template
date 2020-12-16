@@ -2,11 +2,13 @@ import ipaddress
 import subprocess
 import tarfile
 import os.path
+from datetime import datetime
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPForbidden, HTTPFound
 from pyramid.response import FileResponse
-from wtforms import Form, SelectField, StringField, SubmitField, SelectMultipleField, widgets, IntegerField
+from wtforms import Form, SelectField, StringField, SubmitField, SelectMultipleField, widgets, IntegerField, \
+    DateTimeField
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets.html5 import NumberInput
 
@@ -88,8 +90,79 @@ class RealisticAnalysisDataForm(Form):
 
 
 class RealisticAnalysisDetailDataForm(Form):
-    emulate_button = SubmitField('Submit')
+    events_button = SubmitField('Events and Behavior')
+
+
+class HijackEventsDateTimeDataForm(Form):
+    start_datetime = DateTimeField('Start time: ',
+                                   format='%Y-%m-%d %H:%M:%S',
+                                   validators=[InputRequired()])
+    end_datetime = DateTimeField('End time: ',
+                                 format='%Y-%m-%d %H:%M:%S',
+                                 validators=[InputRequired()])
+    edit_button = SubmitField('Save')
+
+
+class HijackEventsAnnouncementDataForm(Form):
+    announcement_datetime = DateTimeField('Start time: ',
+                                           format='%Y-%m-%d %H:%M:%S',
+                                           validators=[InputRequired()])
+    announced_prefix = StringField('Announced Prefix: ',
+                                   validators=[InputRequired(),
+                                               Length(min=9, max=18,
+                                               message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
+
+    announcer = StringField('AS announcer: ',
+                            validators=[InputRequired(),
+                                        Length(min=1, max=18,
+                                               message='Only a valid ASN in this topology.')])
+    create_announcement_button = SubmitField('Save')
+    announcement_id_event = IntegerField()
+    delete_announcement_button = SubmitField('Del')
+
+
+class HijackEventsWithdrawDataForm(Form):
+    withdrawn_datetime = DateTimeField('Start time: ',
+                                        format='%Y-%m-%d %H:%M:%S',
+                                        validators=[InputRequired()])
+    withdrawn_prefix = StringField('Withdrawn Prefix: ',
+                                   validators=[InputRequired(),
+                                               Length(min=9, max=18,
+                                                      message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
+
+    withdrawer = StringField('AS Withdrawer: ',
+                             validators=[InputRequired(),
+                                         Length(min=1, max=18,
+                                                message='Only a valid ASN in this topology.')])
+    create_withdraw_button = SubmitField('Save')
+    withdrawn_id_event = IntegerField()
+    delete_withdrawn_button = SubmitField('Del')
+
+
+class HijackEventsPrependDataForm(Form):
+    prepend_datetime = DateTimeField('Start time: ',
+                                     format='%Y-%m-%d %H:%M:%S',
+                                     validators=[InputRequired()])
+    prepended = StringField('Prepended AS: ',
+                            validators=[InputRequired(),
+                                        Length(min=1, max=18,
+                                               message='Only a valid ASN in this topology.')])
+    prepender = StringField('AS Prepender: ',
+                            validators=[InputRequired(),
+                                        Length(min=1, max=18,
+                                               message='Only a valid ASN in this topology.')])
+    times_prepended = IntegerField('How many times will be prepended:',
+                                   validators=[InputRequired(),
+                                               Length(min=1, max=10,
+                                                      message='How many times the AS will be prepended.')])
+    create_prepend_button = SubmitField('Save')
+    prepend_id_event = IntegerField()
+    delete_prepend_button = SubmitField('Del')
+
+
+class HijackEventsButtonDataForm(Form):
     download_button = SubmitField('Download')
+    emulate_button = SubmitField('Confirm')
 
 
 def node_status(dbsession, node):
@@ -444,7 +517,6 @@ def hijack_realistic_analysis(request):
                 include_stub = False
 
             try:
-                request.dbsession.query(models.RealisticAnalysis).delete()
                 topology = request.dbsession.query(models.Topology). \
                     filter_by(id=form.topology_list.data).first()
                 cluster_list = list()
@@ -459,13 +531,22 @@ def hijack_realistic_analysis(request):
                     filter_by(id=form.emulation_platform_list.data).first()
                 router_platform = request.dbsession.query(models.RouterPlatform). \
                     filter_by(id=form.router_platform_list.data).first()
-                request.dbsession.add(
-                    models.RealisticAnalysis(id_topology_distribution_method=topology_distribution_method.id,
-                                             id_emulation_platform=emulation_platform.id,
-                                             id_router_platform=router_platform.id,
-                                             topology=topology.topology,
-                                             include_stub=include_stub))
+
+                # delete previous realistic analysis if exist
+                request.dbsession.query(models.RealisticAnalysis).filter_by(id_topology=topology.id).delete()
+
+                # create new realistic analysis database entry
+                realistic_analysis = models.RealisticAnalysis(
+                    id_topology_distribution_method=topology_distribution_method.id,
+                    id_emulation_platform=emulation_platform.id,
+                    id_router_platform=router_platform.id,
+                    id_topology=topology.id,
+                    include_stub=include_stub)
+                request.dbsession.add(realistic_analysis)
                 request.dbsession.flush()
+
+                id_realistic_analysis = realistic_analysis.id
+
             except Exception as error:
                 request.dbsession.rollback()
                 dictionary['message'] = error
@@ -481,7 +562,7 @@ def hijack_realistic_analysis(request):
                          '--router-platform=%s' % form.router_platform_list.data]
             subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_realistic_analysis'] + arguments)
 
-            return HTTPFound(location=request.route_path('hijackRealisticAnalysisDetail'))
+            return HTTPFound(location=request.route_path('hijackRealisticAnalysisDetail', id_realistic_analysis=id_realistic_analysis))
 
     except Exception as error:
         request.dbsession.rollback()
@@ -500,9 +581,11 @@ def hijack_realistic_analysis_detail(request):
 
     dictionary = dict()
     form = RealisticAnalysisDetailDataForm(request.POST)
+
+    id_realistic_analysis = request.matchdict['id_realistic_analysis']
+
     try:
-        query = 'select ra.id as id, ' \
-                'ra.topology as topology, ' \
+        query = 'select (select t.topology from topology t where t.id = ra.id_topology) as topology, ' \
                 '(select tdm.topology_distribution_method from topology_distribution_method tdm ' \
                 'where tdm.id = ra.id_topology_distribution_method) as topology_distribution_method, ' \
                 '(select ep.emulation_platform from emulation_platform ep ' \
@@ -517,11 +600,14 @@ def hijack_realistic_analysis_detail(request):
                 'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
                 'ra.time_router_platform_commands as time_router_platform_commands, ' \
                 'ra.time_write_files as time_write_files ' \
-                'from realistic_analysis ra;'
+                'from realistic_analysis ra ' \
+                'where ra.id = %s;' % id_realistic_analysis
         result_proxy = request.dbsession.bind.execute(query)
+
         realistic_analysis = list()
         for realistic_analyze in result_proxy:
-            realistic_analysis.append({'topology': realistic_analyze.topology,
+            realistic_analysis.append({'id_realistic_analysis': id_realistic_analysis,
+                                       'topology': realistic_analyze.topology,
                                        'topology_distribution_method': realistic_analyze.topology_distribution_method,
                                        'emulation_platform': realistic_analyze.emulation_platform,
                                        'router_platform': realistic_analyze.router_platform,
@@ -534,29 +620,18 @@ def hijack_realistic_analysis_detail(request):
                                        'time_router_platform_commands': realistic_analyze.time_router_platform_commands,
                                        'time_write_files': realistic_analyze.time_write_files,
                                        'total_time': (float(realistic_analyze.time_get_data) if realistic_analyze.time_get_data else 0) +
+                                                     (float(realistic_analyze.time_autonomous_system_per_server) if realistic_analyze.time_autonomous_system_per_server else 0) +
                                                      (float(realistic_analyze.time_emulate_platform_commands) if realistic_analyze.time_emulate_platform_commands else 0) +
                                                      (float(realistic_analyze.time_router_platform_commands) if realistic_analyze.time_router_platform_commands else 0) +
                                                      (float(realistic_analyze.time_write_files) if realistic_analyze.time_write_files else 0)})
+
         dictionary['realistic_analysis'] = realistic_analysis
         dictionary['form'] = form
-        dictionary['hijackRealisticAnalysisDetail_url'] = request.route_url('hijackRealisticAnalysisDetail')
+        dictionary['hijackRealisticAnalysisDetail_url'] = request.route_url('hijackRealisticAnalysisDetail', id_realistic_analysis=id_realistic_analysis)
 
         if request.method == 'POST' and form.validate():
-
-            if form.download_button.data:
-                realistic_analysis = request.dbsession.query(models.RealisticAnalysis).first()
-                source_dir = str(realistic_analysis.output_path[:-1])
-                output_filename = str(realistic_analysis.topology) + '.tar.gz'
-                with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
-                    tar.add(source_dir, arcname=os.path.basename(source_dir))
-
-                response = FileResponse(source_dir + '/' + output_filename)
-                response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
-                return response
-
-            if form.emulate_button.data:
-                os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
-                          str(dictionary['realistic_analysis'][0]['output_path']).replace(' ', '\ '))
+            if form.events_button.data:
+                return HTTPFound(location=request.route_path('hijackEvents', id_realistic_analysis=id_realistic_analysis))
 
     except Exception as error:
         dictionary['message'] = error
@@ -573,5 +648,253 @@ def hijack_attack_type(request):
 
     dictionary = dict()
     dictionary['attack_types'] = request.dbsession.query(models.ScenarioAttackType).all()
+
+    return dictionary
+
+
+@view_config(route_name='hijackEvents', renderer='minisecbgp:templates/hijack/hijackEvents.jinja2')
+def hijack_events(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    dictionary = dict()
+    form_datetime = HijackEventsDateTimeDataForm(request.POST)
+    form_announcement = HijackEventsAnnouncementDataForm(request.POST)
+    form_withdrawn = HijackEventsWithdrawDataForm(request.POST)
+    form_prepend = HijackEventsPrependDataForm(request.POST)
+
+    form_button = HijackEventsButtonDataForm(request.POST)
+
+    realistic_analysis = request.dbsession.query(models.RealisticAnalysis).\
+        filter_by(id=request.matchdict['id_realistic_analysis']).first()
+
+    topology = request.dbsession.query(models.Topology).\
+        filter_by(id=realistic_analysis.id_topology).first()
+
+    event_behaviour = request.dbsession.query(models.EventBehaviour).\
+        filter_by(id_topology=topology.id).first()
+
+    if event_behaviour:
+        dictionary['event_behaviour'] = True
+
+    if request.method == 'POST':
+        if form_datetime.edit_button.data:
+            try:
+                start_datetime = datetime.strptime(str(form_datetime.start_datetime.data), '%Y-%m-%d %H:%M:%S')
+                end_datetime = datetime.strptime(str(form_datetime.end_datetime.data), '%Y-%m-%d %H:%M:%S')
+
+                if start_datetime > end_datetime:
+                    raise ValueError('Start datetime must be less than end datetime.')
+
+                if event_behaviour:
+                    event_behaviour.start_datetime = start_datetime
+                    event_behaviour.end_datetime = end_datetime
+                else:
+                    event_behaviour = (models.EventBehaviour(id_topology=realistic_analysis.id_topology,
+                                                             start_datetime=start_datetime,
+                                                             end_datetime=end_datetime))
+                    request.dbsession.add(event_behaviour)
+                request.dbsession.flush()
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_announcement.create_announcement_button.data:
+            try:
+                type_of_event = request.dbsession.query(models.TypeOfEvent).\
+                    filter_by(type_of_event='Announcement').first()
+
+                if not datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
+
+                if datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S') < \
+                        datetime.strptime(str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S') or \
+                        datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S') > \
+                        datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
+
+                if not type(ipaddress.ip_network(form_announcement.announced_prefix.data)) is ipaddress.IPv4Network:
+                    raise ValueError('Announced prefix must be a valid IPv4 network.')
+
+                announcer = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=topology.id).\
+                    filter_by(autonomous_system=form_announcement.announcer.data).first()
+                if not announcer:
+                    raise ValueError('The AS announcer must be a valid ASN in topology.')
+
+                event = models.Event(event_datetime=datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                                     announced_prefix=form_announcement.announced_prefix.data,
+                                     announcer=form_announcement.announcer.data,
+                                     id_event_behaviour=event_behaviour.id,
+                                     id_type_of_event=type_of_event.id)
+                request.dbsession.add(event)
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_withdrawn.create_withdraw_button.data:
+            try:
+                type_of_event = request.dbsession.query(models.TypeOfEvent).\
+                    filter_by(type_of_event='Withdrawn').first()
+
+                if not datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
+
+                if datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S') < \
+                        datetime.strptime(str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S') or \
+                        datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S') > \
+                        datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
+
+                if not type(ipaddress.ip_network(form_withdrawn.withdrawn_prefix.data)) is ipaddress.IPv4Network:
+                    raise ValueError('Withdrawn prefix must be a valid IPv4 network.')
+
+                withdrawer = request.dbsession.query(models.AutonomousSystem).\
+                    filter_by(id_topology=topology.id).\
+                    filter_by(autonomous_system=form_withdrawn.withdrawer.data).first()
+                if not withdrawer:
+                    raise ValueError('The AS withdrawer must be a valid ASN in topology.')
+
+                event = models.Event(event_datetime=datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                                     withdrawn_prefix=form_withdrawn.withdrawn_prefix.data,
+                                     withdrawer=form_withdrawn.withdrawer.data,
+                                     id_event_behaviour=event_behaviour.id,
+                                     id_type_of_event=type_of_event.id)
+                request.dbsession.add(event)
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_prepend.create_prepend_button.data:
+            try:
+                type_of_event = request.dbsession.query(models.TypeOfEvent). \
+                    filter_by(type_of_event='Prepend').first()
+
+                if not datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
+
+                if datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S') < \
+                        datetime.strptime(str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S') or \
+                        datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S') > \
+                        datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
+                    raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
+
+                prepended = request.dbsession.query(models.AutonomousSystem). \
+                    filter_by(id_topology=topology.id). \
+                    filter_by(autonomous_system=form_prepend.prepended.data).first()
+                if not prepended:
+                    raise ValueError('The prepended AS must be a valid ASN in topology.')
+
+                prepender = request.dbsession.query(models.AutonomousSystem). \
+                    filter_by(id_topology=topology.id). \
+                    filter_by(autonomous_system=form_prepend.prepender.data).first()
+                if not prepender:
+                    raise ValueError('The AS prepender must be a valid ASN in topology.')
+
+                event = models.Event(
+                    event_datetime=datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                    prepended=form_prepend.prepended.data,
+                    prepender=form_prepend.prepender.data,
+                    times_prepended=form_prepend.times_prepended.data,
+                    id_event_behaviour=event_behaviour.id,
+                    id_type_of_event=type_of_event.id)
+                request.dbsession.add(event)
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_announcement.delete_announcement_button.data:
+            try:
+                request.dbsession.query(models.Event).\
+                    filter_by(id=form_announcement.announcement_id_event.data).delete()
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_withdrawn.delete_withdrawn_button.data:
+            try:
+                request.dbsession.query(models.Event).\
+                    filter_by(id=form_withdrawn.withdrawn_id_event.data).delete()
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_prepend.delete_prepend_button.data:
+            try:
+                request.dbsession.query(models.Event).\
+                    filter_by(id=form_prepend.prepend_id_event.data).delete()
+
+                return HTTPFound(location=request.route_path(
+                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
+
+            except Exception as error:
+                request.dbsession.rollback()
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_button.download_button.data:
+            realistic_analysis = request.dbsession.query(models.RealisticAnalysis). \
+                filter_by(id=request.matchdict['id_realistic_analysis']).first()
+            source_dir = str(realistic_analysis.output_path[:-1])
+            output_filename = topology.topology + '.tar.gz'
+            with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
+                tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+            response = FileResponse(source_dir + '/' + output_filename)
+            response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
+            return response
+
+        if form_button.emulate_button.data:
+            os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
+                      str(realistic_analysis.output_path).replace(' ', '\ '))
+
+    if event_behaviour:
+        form_datetime.start_datetime.data = datetime.strptime(
+            str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S')
+        form_datetime.end_datetime.data = datetime.strptime(
+            str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S')
+
+        dictionary['events'] = request.dbsession.query(models.Event, models.TypeOfEvent).\
+            filter(models.Event.id_event_behaviour == event_behaviour.id).\
+            filter(models.Event.id_type_of_event == models.TypeOfEvent.id).all()
+
+    dictionary['realistic_analysis'] = realistic_analysis
+    dictionary['topology'] = topology
+    dictionary['form_datetime'] = form_datetime
+    dictionary['form_announcement'] = form_announcement
+    dictionary['form_withdrawn'] = form_withdrawn
+    dictionary['form_prepend'] = form_prepend
+    dictionary['form_button'] = form_button
 
     return dictionary

@@ -24,7 +24,8 @@ class Topology(Base):
     type_of_user = relationship('TypeOfUser', foreign_keys='TypeOfUser.id_topology')
     type_of_service = relationship('TypeOfService', foreign_keys='TypeOfService.id_topology')
     scenario = relationship('Scenario', foreign_keys='Scenario.id_topology')
-    bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_topology')
+    event_behaviour = relationship('EventBehaviour', foreign_keys='EventBehaviour.id_topology')
+    realistic_analysis = relationship('RealisticAnalysis', foreign_keys='RealisticAnalysis.id_topology')
     Index('IndexId_topology_type', id_topology_type)
 
 
@@ -191,17 +192,6 @@ class AutonomousSystemInternetExchangePoint(Base):
     id_autonomous_system = Column(Integer, ForeignKey('autonomous_system.id'))
     Index('IndexId_internet_exchange_point', id_internet_exchange_point)
     Index('IndexId5_autonomous_system', id_autonomous_system)
-
-
-class BGPlay(Base):
-    __tablename__ = 'bgplay'
-    id = Column(Integer, primary_key=True)
-    id_topology = Column(Integer, ForeignKey('topology.id'))
-    query_start_time = Column(String(19), nullable=False)
-    query_end_time = Column(String(19), nullable=False)
-    resource = Column(String(255), nullable=False)
-    url = Column(String(512), nullable=False)
-    Index('IndexId8_topology', id_topology)
 
 
 class Color(Base):
