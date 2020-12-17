@@ -887,7 +887,8 @@ def hijack_events(request):
 
         dictionary['events'] = request.dbsession.query(models.Event, models.TypeOfEvent).\
             filter(models.Event.id_event_behaviour == event_behaviour.id).\
-            filter(models.Event.id_type_of_event == models.TypeOfEvent.id).all()
+            filter(models.Event.id_type_of_event == models.TypeOfEvent.id).\
+            order_by(models.Event.event_datetime).all()
 
     dictionary['realistic_analysis'] = realistic_analysis
     dictionary['topology'] = topology

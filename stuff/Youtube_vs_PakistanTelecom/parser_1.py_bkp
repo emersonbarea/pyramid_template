@@ -1,0 +1,53 @@
+import sys
+import json
+import ipaddress
+from datetime import datetime
+from datetime import timezone
+import time
+
+
+class BGPlay(object):
+    def __init__(self, argv):
+        self.file_from = argv
+
+    def get_events(self):
+
+        # read BGPlay json file and parse it
+        with open(self.file_from) as file:
+            data_from = json.load(file)
+
+        events_update_list = list()
+        events_withdrawn_list = list()
+
+        events = data_from['data']['events']
+        for observed_event in events:
+            if observed_event['type'] == 'A':
+                observed_event_source = observed_event['attrs']['path'][-1]
+                observed_event_prefix = observed_event['attrs']['target_prefix']
+                if events_update_list:
+                    for i, event in enumerate(events_update_list):
+                        if [observed_event_source, observed_event_prefix] == [event[1], event[2]]:
+                            break
+                        if i == len(events_update_list) - 1:
+                            events_update_list.append([observed_event['timestamp'], observed_event_source, observed_event_prefix])
+                else:
+                    events_update_list.append([observed_event['timestamp'], observed_event_source, observed_event_prefix])
+            elif observed_event['type'] == 'W':
+                events_withdrawn_list.append([observed_event['timestamp'], observed_event['attrs']['source_id'], observed_event['attrs']['target_prefix']])
+
+
+
+        #for item in events_update_list:
+        #    print(item)
+
+        for item in events_withdrawn_list:
+            print(item)
+
+
+def main(argv=sys.argv[1]):    
+    bgplay = BGPlay(argv)
+    bgplay.get_events()
+
+
+if __name__ == '__main__':
+    main()

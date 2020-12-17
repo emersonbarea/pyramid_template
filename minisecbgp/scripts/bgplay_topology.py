@@ -84,9 +84,9 @@ class BGPlayTopology(object):
 
             dbsession.flush()
 
-            id_event_behaviour = event_behaviour.id
+            self.id_event_behaviour = event_behaviour.id
 
-            bgplay = models.BGPlay(id_event_behaviour=id_event_behaviour,
+            bgplay = models.BGPlay(id_event_behaviour=self.id_event_behaviour,
                                    resource=resources,
                                    url=url)
             dbsession.add(bgplay)
@@ -351,7 +351,138 @@ class BGPlayTopology(object):
             arguments = ['--config-file=minisecbgp.ini',
                          '--topology=%s' % id_topology]
             subprocess.Popen(['./venv/bin/MiniSecBGP_delete_topology'] + arguments)
-            return error
+            print(error)
+
+    def event(self, dbsession):
+        with open(self.file_from) as json_file:
+            data = json.load(json_file)
+        json_file.close()
+
+        try:
+
+            announcement_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
+                filter_by(type_of_event='Announcement').first()
+            prepend_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
+                filter_by(type_of_event='Prepend').first()
+            withdrawn_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
+                filter_by(type_of_event='Withdrawn').first()
+
+            events = data['data']['events']
+
+            # Announcement
+            announcement_events_list = list()
+            for observed_event in events:
+                if observed_event['type'] == 'A':
+                    observed_event_source = observed_event['attrs']['path'][-1]
+                    observed_event_prefix = observed_event['attrs']['target_prefix']
+                    if announcement_events_list:
+                        for i, event in enumerate(announcement_events_list):
+                            if [str(observed_event_prefix), str(observed_event_source)] == \
+                                    [str(event['announced_prefix']), str(event['announcer'])]:
+                                break
+                            if i == len(announcement_events_list) - 1:
+                                announcement_events_list.append({
+                                    'id_event_behaviour': int(self.id_event_behaviour),
+                                    'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
+                                    'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                                    'announced_prefix': str(observed_event_prefix),
+                                    'announcer': str(observed_event_source)
+                                })
+                    else:
+                        announcement_events_list.append({
+                            'id_event_behaviour': int(self.id_event_behaviour),
+                            'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
+                            'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                            'announced_prefix': str(observed_event_prefix),
+                            'announcer': str(observed_event_source)
+                        })
+
+            if announcement_events_list:
+                df_announcement_events = pd.DataFrame(announcement_events_list)
+                df_announcement_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+
+            # Withdrawn
+            sources = data['data']['sources']
+            withdrawn_events_list_temp = list()
+            withdrawn_events_list = list()
+            for observed_event in events:
+                if observed_event['type'] == 'W':
+                    for source in sources:
+                        if str(source['id']) == str(observed_event['attrs']['source_id']):
+                            withdrawer = source['as_number']
+                    withdrawn_events_list_temp.append({
+                        'id_event_behaviour': int(self.id_event_behaviour),
+                        'id_type_of_event': int(list(withdrawn_id_type_of_event)[0]),
+                        'event_datetime': str(observed_event['timestamp']),
+                        'withdrawer': str(withdrawer),
+                        'withdrawn_prefix': str(observed_event['attrs']['target_prefix'])
+                    })
+
+            if withdrawn_events_list_temp:
+                for withdrawn_event_temp in withdrawn_events_list_temp:
+                    if not withdrawn_events_list:
+                        withdrawn_events_list.append(withdrawn_event_temp)
+                    else:
+                        for i, withdrawn_event in enumerate(withdrawn_events_list):
+                            if (str(withdrawn_event['withdrawer'])) == str(withdrawn_event_temp['withdrawer']) and \
+                                    (str(withdrawn_event['withdrawn_prefix']) == str(withdrawn_event_temp['withdrawn_prefix'])):
+                                break
+                            if i == len(withdrawn_events_list) - 1:
+                                withdrawn_events_list.append(withdrawn_event_temp)
+
+            if withdrawn_events_list:
+                df_withdrawn_events = pd.DataFrame(withdrawn_events_list)
+                df_withdrawn_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+
+            # Prepend
+            prepend_events_list_temp = list()
+            prepend_events_list = list()
+            for observed_event in events:
+                if observed_event['type'] == 'A':
+                    path = observed_event['attrs']['path']
+                    previous_hop = ''
+                    for elem in path:
+                        if path.count(elem) > 1:
+
+                            # get the AS prepender
+                            for hop in path:
+                                if not previous_hop:
+                                    previous_hop = hop
+                                else:
+                                    if hop == elem:
+                                        prepender = previous_hop
+                                        break
+                                    else:
+                                        previous_hop = hop
+
+                            prepend_events_list_temp.append({
+                                'id_event_behaviour': int(self.id_event_behaviour),
+                                'id_type_of_event': int(list(prepend_id_type_of_event)[0]),
+                                'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                                'prepended': str(elem),
+                                'prepender': str(prepender),
+                                'times_prepended': str(path.count(elem))
+                            })
+
+            if prepend_events_list_temp:
+                for prepend_event_temp in prepend_events_list_temp:
+                    if not prepend_events_list:
+                        prepend_events_list.append(prepend_event_temp)
+                    else:
+                        for i, prepend_event in enumerate(prepend_events_list):
+                            if (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
+                                    (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
+                                    (str(prepend_event['times_prepended']) == str(prepend_event_temp['times_prepended'])):
+                                break
+                            if i == len(prepend_events_list) - 1:
+                                prepend_events_list.append(prepend_event_temp)
+
+            if prepend_events_list:
+                df_prepend_events = pd.DataFrame(prepend_events_list)
+                df_prepend_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+
+        except Exception as error:
+            print(error)
 
     @staticmethod
     def downloading(dbsession, downloading):
@@ -414,14 +545,15 @@ def main(argv=sys.argv[1:]):
                 bgplayt.downloading(dbsession, downloading)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
-                result = bgplayt.create(dbsession)
+                bgplayt.create(dbsession)
+            with env['request'].tm:
+                dbsession = env['request'].dbsession
+                bgplayt.event(dbsession)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 downloading = 0
                 bgplayt.downloading(dbsession, downloading)
             bgplayt.erase_file()
-            if result:
-                print(result)
         except OperationalError:
             print('Database error')
     else:

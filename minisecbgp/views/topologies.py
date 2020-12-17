@@ -208,7 +208,8 @@ def topologies_detail(request):
                 'where e.id_event_behaviour = (' \
                 'select eb.id ' \
                 'from event_behaviour eb ' \
-                'where eb.id_topology = %s);' % request.matchdict["id_topology"]
+                'where eb.id_topology = %s)' \
+                'order by event_datetime;' % request.matchdict["id_topology"]
         dictionary['events'] = list(request.dbsession.bind.execute(query))
 
         query = 'select ra.include_stub as include_stub, ' \
