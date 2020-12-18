@@ -1,0 +1,43 @@
+#!/usr/bin/python
+
+import os
+import sys
+import time
+
+from mininet.topo import Topo
+from mininet.node import OVSSwitch
+
+from MaxiNet.Frontend import maxinet
+from MaxiNet.Frontend.container import Docker
+from MaxiNet.tools import Tools
+
+
+class Run(object):
+    def __init__(self, server, workers):
+        self.server = server
+        self.workers = workers
+        self.option = 1000
+        self.option_executed = list()
+        self.exp = ''
+
+    def start_topology(self):
+
+        print('\n*** Trying to start topology emulation. If the application freezes for a long time, type ctrl-c to finish it, '
+              'and run the application again choosing the option [9] before starting the topology again.\n')
+        time.sleep(2)
+
+        print('*** Restarting MaxiNetFrontendServer and MaxiNetWorkers')
+        self.restart_MaxiNet()
+
+        print('*** Creating topology')
+        topo = Topo()
+
+        print("*** Starting cluster")
+        cluster = maxinet.Cluster(minWorkers=1, maxWorkers=*maxWorkers*)
+
+        print("*** Starting cluster node mapping")
+        hnmap = *hnmap*
+
+        print('*** Starting the experiment on cluster')
+        self.exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch, hostnamemapping=hnmap)
+        self.exp.setup()

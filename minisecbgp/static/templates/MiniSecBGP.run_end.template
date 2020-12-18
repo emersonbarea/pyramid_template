@@ -1,0 +1,93 @@
+        self.option_executed.append(1)
+
+    def cli_mode(self):
+        print('\n*** Exposing the CLI')
+        maxinet.Experiment.CLI(self.exp, None, None)
+
+    def stop_topology(self):
+        print('\n*** Closing all')
+        self.exp.stop()
+        print('*** Killing all router process')
+        os.system('sudo -u minisecbgpuser -s ssh %s sudo pkill -9 zebra' % self.server)
+        os.system('sudo -u minisecbgpuser -s ssh %s sudo pkill -9 bgpd' % self.server)
+        self.option_executed.remove(1)
+
+    def restart_MaxiNet(self):
+        print('\n*** Restarting MaxiNetFrontendServer on "%s"' % self.server)
+        os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetFrontendServer\'' % self.server)
+        time.sleep(3)
+        print('*** Restarting MaxiNetWorker')
+        for worker in self.workers:
+            print('  * on "%s" worker' % worker)
+            os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetWorker\'' % worker)
+        time.sleep(5)
+        print('\n*** MaxiNetStatus')
+        os.system('sudo -u minisecbgpuser bash -c \'MaxiNetStatus\'')
+
+    @staticmethod
+    def input_to_continue(phrase):
+        try:
+            print('\nAttention: %s. Press any key to continue...' % phrase)
+            input()
+        except SyntaxError:
+            pass
+
+    def menu(self):
+        clear = lambda: os.system('clear')
+
+        while self.option != 0:
+
+            while True:
+                try:
+                    clear()
+
+                    print('\n\n'
+                          '    [ 1 ] start topology emulation\n'
+                          '    [ 2 ] enter CLI mode\n'
+                          '    [ 3 ] stop topology emulation\n'
+                          '    [ 9 ] restart MaxiNetFrontendServer and MaxiNetWorkers\n'
+                          '    [ 0 ] exit\n')
+
+                    self.option = int(input('\n>>> Choose an option: '))
+                    break
+                except Exception:
+                    self.input_to_continue('Choose a valid option')
+
+            if self.option == 0:
+                if 1 in self.option_executed:
+                    self.stop_topology()
+                print('\nexiting...\n')
+
+            elif self.option == 1:
+                if self.option not in self.option_executed:
+                    self.start_topology()
+                    self.input_to_continue('Topology emulation started successfully')
+                else:
+                    self.input_to_continue('Topology already started')
+
+            elif self.option == 2:
+                if 1 in self.option_executed:
+                    self.cli_mode()
+                else:
+                    self.input_to_continue('You need start topology first [ 1 ]')
+
+            elif self.option == 3:
+                if 1 in self.option_executed:
+                    self.stop_topology()
+                    self.input_to_continue('Topology emulation stopped successfully')
+                else:
+                    self.input_to_continue('You need start topology first [ 1 ]')
+
+            elif self.option == 9:
+                self.restart_MaxiNet()
+                self.input_to_continue('MaxiNet Services restarted successfully')
+
+            else:
+                self.input_to_continue('Choose a valid option')
+
+
+if __name__ == '__main__':
+    server = *server*
+    workers = ['lpttch']
+    run = Run(server, workers)
+    run.menu()
