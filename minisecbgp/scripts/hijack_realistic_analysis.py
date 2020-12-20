@@ -1,6 +1,7 @@
 import argparse
 import getopt
 import ipaddress
+import socket
 import sys
 import time
 
@@ -25,6 +26,11 @@ class RealisticAnalysis(object):
         self.include_stub = include_stub
         cluster_list = list(map(str, cluster_list.strip('][').split(',')))
         self.cluster_list = cluster_list
+        self.server = socket.gethostname()
+        self.remote_cluster_nodes = list()
+        for cluster_node in self.cluster_list:
+            if cluster_node.replace('\'', '') != self.server:
+                self.remote_cluster_nodes.append(cluster_node.replace('\'', '').strip())
         self.topology_distribution_method = topology_distribution_method
         self.emulation_platform = emulation_platform
         self.router_platform = router_platform
@@ -197,53 +203,54 @@ class RealisticAnalysis(object):
 
             # distribuir os AS filhos (com múltiplos pais) no respectivo servidor (round robin? e se tiver 3 pais?)
 
-
     def emulation_commands(self):
         emulation_platform = self.dbsession.query(models.EmulationPlatform).\
             filter_by(id=self.emulation_platform).first()
 
         # Start Cluster
         max_workers = len(self.cluster_list)
-        self.start_cluster = 'print("*** Starting cluster")\ncluster = maxinet.Cluster(minWorkers=1, maxWorkers=%s)' % max_workers
+        self.start_cluster = '        print("*** Starting MaxiNet cluster nodes")\n        cluster = maxinet.Cluster(minWorkers=1, maxWorkers=%s)' % max_workers
 
         # Cluster node mapping
-        self.cluster_node_mapping = 'print("*** Starting cluster node mapping")\nhnmap = {'
+        self.cluster_node_mapping = '        print("*** Starting cluster node mapping")\n        hnmap = {'
         mapping = ''
         for i, cluster_node in enumerate(self.cluster_list):
             if mapping:
-                mapping = mapping + ', "%s":%s' % (cluster_node.strip().replace('\'', ''), str(i))
+                mapping = mapping + ', "%s": %s' % (cluster_node.strip().replace('\'', ''), str(i))
             else:
-                mapping = '"%s":%s' % (cluster_node.strip().replace('\'', ''), str(i))
+                mapping = '"%s": %s' % (cluster_node.strip().replace('\'', ''), str(i))
         self.cluster_node_mapping = self.cluster_node_mapping + mapping + '}'
 
         # Switches
 
         # Mininet elements
-        self.list_create_mininet_elements_commands = ['\nprint("*** Creating nodes")']
+        self.list_create_mininet_elements_commands = ['\n        print("*** Creating nodes")']
         if emulation_platform.emulation_platform.lower() == 'mininet':
             # Add Mininet nodes
             for AS in self.sr_unique_as:
-                self.list_create_mininet_elements_commands.append("AS%s = exp.addHost('AS%s', ip=None, wid=0)" % (AS, AS))
+                self.list_create_mininet_elements_commands.append(
+                    "        AS%s = self.exp.addHost('AS%s', ip=None, wid=0)" % (AS, AS))
         elif emulation_platform.emulation_platform.lower() == 'docker':
             # Add Docker nodes
             for AS in self.sr_unique_as:
                 self.list_create_mininet_elements_commands.append(
-                    "AS%s = exp.addDocker('AS%s', ip=None, dimage='alpine-quagga:latest')" % (AS, AS))
+                    "        AS%s = self.exp.addDocker('AS%s', ip=None, dimage='alpine-quagga:latest')" % (AS, AS))
 
         # print(self.list_create_mininet_elements_commands)
         # AS25970 = exp.addHost('AS25970', ip=None)
         # AS265702 = exp.addHost('AS265702', ip=None)
 
         # Mininet elements links
-        self.list_create_mininet_links_commands = ['\nprint("*** Creating links")']
+        self.list_create_mininet_links_commands = ['\n        print("*** Creating links")']
         for row in self.df_as.itertuples():
             if row[6] in self.sr_unique_as.values and \
                     row[8] in self.sr_unique_as.values:                                         # do not link stub ASes if necessary
                 self.list_create_mininet_links_commands.\
-                    append("exp.addLink(AS%s, AS%s, intfName1='%s-%s', intfName2 = '%s-%s', "
+                    append("        self.exp.addLink(AS%s, AS%s, intfName1='%s-%s', intfName2 = '%s-%s', "
                            "params1={'ip':'%s/%s'}, params2={'ip':'%s/%s'}, autoconf=True)" %
                            (row[6], row[8], row[6], row[8], row[8], row[6],
-                            str(ipaddress.ip_address(row[9])), row[11], str(ipaddress.ip_address(row[10])), row[11]))
+                            str(ipaddress.ip_address(row[9])), row[11],
+                            str(ipaddress.ip_address(row[10])), row[11]))
 
         # print(self.list_create_mininet_links_commands)
         # net.addLink(AS1, AS2, intfName1='1-2', intfName2='2-1', params1={'ip': '1.1.1.1/24'}, params2={'ip': '1.1.1.254/24'})
@@ -295,18 +302,18 @@ class RealisticAnalysis(object):
                 list_create_bgpd_prefix.append({'AS': int(row[3]), 'command': '  network %s\n' % (
                         str(ipaddress.ip_address(row[1])) + '/' + str(row[2]))})
 
-        list_startup_zebra_commands = ['\nprint("*** Creating zebra commands")']
-        list_startup_bgpd_commands = ['\nprint("*** Creating bgpd commands")']
+        list_startup_zebra_commands = ['\n        print("*** Creating zebra commands")']
+        list_startup_bgpd_commands = ['\n        print("*** Creating bgpd commands")']
         for AS in self.sr_unique_as.values:
             # zebra startup commands
-            list_startup_zebra_commands.append('AS%s.cmd(\'/home/minisecbgpuser/quagga-1.2.4/sbin/./zebra '
+            list_startup_zebra_commands.append('        AS%s.cmd(\'/home/minisecbgpuser/quagga-1.2.4/sbin/./zebra '
                                                '-f %s/AS/%s/zebra.conf '
                                                '-z /var/run/quagga/%s.socket '
                                                '-i /var/run/quagga/zebra-%s.pid > '
                                                '%s/log/zebra-%s.log &\')' %
                                                (AS, self.output_dir.replace(' ', '\\ '), AS, AS, AS, self.output_dir.replace(' ', '\\ '), AS))
             # bgpd startup commands
-            list_startup_bgpd_commands.append('AS%s.cmd (\'/home/minisecbgpuser/quagga-1.2.4/sbin/./bgpd '
+            list_startup_bgpd_commands.append('        AS%s.cmd (\'/home/minisecbgpuser/quagga-1.2.4/sbin/./bgpd '
                                               '-f %s/AS/%s/bgpd.conf '
                                               '-z /var/run/quagga/%s.socket '
                                               '-i /var/run/quagga/bgpd-%s.pid > '
@@ -408,7 +415,7 @@ class RealisticAnalysis(object):
 
     def write_to_file(self):
         """
-            Write configuration to files
+            Write configuration files to server filesystem
         """
 
         # erase previews configuration
@@ -421,14 +428,14 @@ class RealisticAnalysis(object):
 
         # Mininet
         with open(self.output_dir + 'topology.py', 'w') as file_topology:
-            with open('./minisecbgp/static/templates/mininet_begin.template', 'r') as file_to_read:
+            with open('./minisecbgp/static/templates/mininet_1.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
 
             file_topology.write('\n' + self.start_cluster + '\n')
             file_topology.write('\n' + self.cluster_node_mapping + '\n')
 
-            with open('./minisecbgp/static/templates/mininet_middle.template', 'r') as file_to_read:
+            with open('./minisecbgp/static/templates/mininet_2.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
 
@@ -444,13 +451,14 @@ class RealisticAnalysis(object):
             for startup_bgpd_command in self.list_startup_bgpd_commands:
                 file_topology.write(startup_bgpd_command + '\n')
 
-            with open('./minisecbgp/static/templates/mininet_end.template', 'r') as file_to_read:
+            with open('./minisecbgp/static/templates/mininet_3.template', 'r') as file_to_read:
                 file_topology.write(file_to_read.read())
             file_to_read.close()
 
-            for cluster_node in self.cluster_list:
-                file_topology.write("os.system(\"sudo -u minisecbgpuser -s ssh %s sudo pkill -9 zebra\")\n" % cluster_node.replace('\'', ''))
-                file_topology.write("os.system(\"sudo -u minisecbgpuser -s ssh %s sudo pkill -9 bgpd\")\n" % cluster_node.replace('\'', ''))
+            file_topology.write("    server = '%s'\n"
+                                "    workers = %s\n"
+                                "    run = Run(server, workers)\n"
+                                "    run.menu()\n" % (self.server, self.cluster_list))
 
         file_topology.close()
         os.chmod(self.output_dir + 'topology.py', 0o755)
@@ -494,6 +502,20 @@ class RealisticAnalysis(object):
             with open(self.output_dir + 'AS/' + str(row[0]) + '/bgpd.conf', 'a') as file_bgpd:
                 file_bgpd.write(row[1])
             file_bgpd.close()
+
+    def copy_files_to_cluster_nodes(self):
+        """
+            Copy configuration files to cluster nodes filesystem
+            PS.: only to cluster nodes used in topology
+        """
+
+        try:
+            for remote_cluster_node in list(self.remote_cluster_nodes):
+                os.system('sudo -u minisecbgpuser ssh %s "rm -rf %s; exit"' % (remote_cluster_node, str(self.output_dir).replace(' ', '\ ')))
+                os.system('sudo -u minisecbgpuser ssh %s "mkdir -p %s; exit"' % (remote_cluster_node, str(self.output_dir).replace(' ', '\ ')))
+                os.system('sudo -u minisecbgpuser scp -r %s/* %s:"%s"' % (str(self.output_dir).replace(' ', '\ '), remote_cluster_node, str(self.output_dir).replace(' ', '\ ')))
+        except Exception as error:
+            print(error)
 
 
 def save_to_database(dbsession, field, value, id_topology):
@@ -608,6 +630,11 @@ def main(argv=sys.argv[1:]):
             ra.write_to_file()
             time_write_files = time.time() - time_write_files
             save_to_database(dbsession, ['time_write_files'], [time_write_files], id_topology)
+
+            time_copy_files = time.time()
+            ra.copy_files_to_cluster_nodes()
+            time_copy_files = time.time() - time_copy_files
+            save_to_database(dbsession, ['time_copy_files'], [time_copy_files], id_topology)
 
     except OperationalError:
         print('Database error')

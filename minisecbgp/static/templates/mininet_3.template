@@ -1,3 +1,4 @@
+
         self.option_executed.append(1)
 
     def cli_mode(self):
@@ -13,21 +14,27 @@
         self.option_executed.remove(1)
 
     def restart_MaxiNet(self):
-        print('\n*** Restarting MaxiNetFrontendServer on "%s"' % self.server)
+        print('\n*** Restarting MiniSecBGP cluster nodes (MaxiNet)')
+        print('\n  * Restarting MaxiNetFrontendServer on node "%s"' % self.server)
         os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetFrontendServer\'' % self.server)
         time.sleep(3)
-        print('*** Restarting MaxiNetWorker')
+        print('  * Restarting MaxiNetWorkers')
         for worker in self.workers:
-            print('  * on "%s" worker' % worker)
+            print('    * on node "%s"' % worker)
             os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetWorker\'' % worker)
         time.sleep(5)
         print('\n*** MaxiNetStatus')
         os.system('sudo -u minisecbgpuser bash -c \'MaxiNetStatus\'')
 
+    def start_hijack_scenario(self):
+        # *start_hijack_scenario_begin*
+        pass
+        # *start_hijack_scenario_end*
+
     @staticmethod
-    def input_to_continue(phrase):
+    def input_to_continue(phrase, color):
         try:
-            print('\nAttention: %s. Press any key to continue...' % phrase)
+            print(colored('\nAttention: %s. Press any key to continue...' % phrase, color))
             input()
         except SyntaxError:
             pass
@@ -45,49 +52,64 @@
                           '    [ 1 ] start topology emulation\n'
                           '    [ 2 ] enter CLI mode\n'
                           '    [ 3 ] stop topology emulation\n'
+                          '    [ 4 ] start hijack scenario\n'
                           '    [ 9 ] restart MaxiNetFrontendServer and MaxiNetWorkers\n'
                           '    [ 0 ] exit\n')
 
                     self.option = int(input('\n>>> Choose an option: '))
                     break
                 except Exception:
-                    self.input_to_continue('Choose a valid option')
+                    self.input_to_continue('Choose a valid option', 'red')
 
             if self.option == 0:
                 if 1 in self.option_executed:
                     self.stop_topology()
                 print('\nexiting...\n')
+                exit()
 
             elif self.option == 1:
                 if self.option not in self.option_executed:
                     self.start_topology()
-                    self.input_to_continue('Topology emulation started successfully')
+                    self.input_to_continue('Topology emulation started successfully', 'green')
                 else:
-                    self.input_to_continue('Topology already started')
+                    self.input_to_continue('Topology already started', 'red')
 
             elif self.option == 2:
                 if 1 in self.option_executed:
                     self.cli_mode()
                 else:
-                    self.input_to_continue('You need start topology first [ 1 ]')
+                    self.input_to_continue('You need start topology first (menu option [1])', 'red')
 
             elif self.option == 3:
                 if 1 in self.option_executed:
                     self.stop_topology()
-                    self.input_to_continue('Topology emulation stopped successfully')
+                    self.input_to_continue('Topology emulation stopped successfully', 'green')
                 else:
-                    self.input_to_continue('You need start topology first [ 1 ]')
+                    self.input_to_continue('You need start topology first (menu option [1])', 'red')
+
+            elif self.option == 4:
+                try:
+                    with open('./events_commands.MiniSecBGP', 'r') as file:
+                        events_commands = file.readlines()
+                    file.close()
+                except Exception as error:
+                    self.input_to_continue('There is no event created', 'yellow')
+                else:
+                    if events_commands:
+                        if 1 in self.option_executed:
+                            self.start_hijack_scenario(events_commands)
+                            self.input_to_continue('Hijacking attack scenario started successfully.\n\nYou can interact with this scenario through the Mininet terminal (menu option [2])', 'green')
+                        else:
+                            self.input_to_continue('You need start topology first (menu option [1])', 'red')
+                    else:
+                        self.input_to_continue('There is no event created', 'yellow')
 
             elif self.option == 9:
                 self.restart_MaxiNet()
-                self.input_to_continue('MaxiNet Services restarted successfully')
+                self.input_to_continue('MaxiNet Services restarted successfully', 'green')
 
             else:
-                self.input_to_continue('Choose a valid option')
+                self.input_to_continue('Choose a valid option', 'red')
 
 
 if __name__ == '__main__':
-    server = *server*
-    workers = ['lpttch']
-    run = Run(server, workers)
-    run.menu()

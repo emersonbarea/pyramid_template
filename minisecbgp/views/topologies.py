@@ -115,7 +115,7 @@ def topologies_detail(request):
         elif form.emulate_button.data:
             output_path = request.dbsession.query(models.RealisticAnalysis.output_path).\
                 filter_by(id_topology=request.matchdict["id_topology"]).first()
-            os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
+            os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
                       str(output_path[0]).replace(' ', '\ '))
 
     dictionary['form'] = form
@@ -227,12 +227,14 @@ def topologies_detail(request):
                 'ra.time_autonomous_system_per_server as time_autonomous_system_per_server, ' \
                 'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
                 'ra.time_router_platform_commands as time_router_platform_commands, ' \
-                'ra.time_write_files as time_write_files,' \
+                'ra.time_write_files as time_write_files, ' \
+                'ra.time_copy_files as time_copy_files, ' \
                 'cast(ra.time_get_data as float) + ' \
                 'cast(ra.time_autonomous_system_per_server as float) + ' \
                 'cast(ra.time_emulate_platform_commands as float) + ' \
                 'cast(ra.time_router_platform_commands as float) + ' \
-                'cast(ra.time_write_files as float) as total_time ' \
+                'cast(ra.time_write_files as float) + ' \
+                'cast(ra.time_copy_files as float) as total_time ' \
                 'from realistic_analysis ra ' \
                 'where ra.id_topology = %s;' % request.matchdict["id_topology"]
         dictionary['realistic_analysis'] = list(request.dbsession.bind.execute(query))

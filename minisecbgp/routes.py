@@ -50,3 +50,4 @@ def includeme(config):
     config.add_route('hijackRealisticAnalysisDetail', '/hijackRealisticAnalysisDetail/{id_realistic_analysis}')
     config.add_route('hijackAttackType', '/hijack/hijackAttackType')
     config.add_route('hijackEvents', '/hijack/hijackEvents/{id_realistic_analysis}')
+    config.add_route('hijackEventsDetail', '/hijack/hijackEventsDetail/{id_event_behaviour}')

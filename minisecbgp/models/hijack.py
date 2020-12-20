@@ -116,6 +116,7 @@ class RealisticAnalysis(Base):
     time_emulate_platform_commands = Column(String(250))
     time_router_platform_commands = Column(String(250))
     time_write_files = Column(String(250))
+    time_copy_files = Column(String(250))
     Index('IndexId_topology_distribution_method', id_topology_distribution_method)
     Index('IndexId_emulation_platform', id_emulation_platform)
     Index('IndexId_router_platform', id_router_platform)
@@ -130,6 +131,7 @@ class EventBehaviour(Base):
     end_datetime = Column(String(19), nullable=False)
     bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_event_behaviour')
     event = relationship('Event', foreign_keys='Event.id_event_behaviour')
+    event_detail = relationship('EventDetail', foreign_keys='EventDetail.id_event_behaviour')
     Index('IndexId9_topology', id_topology)
 
 
@@ -164,3 +166,15 @@ class Event(Base):
     times_prepended = Column(String(255))       # how many times the AS will be prepended by a prepender AS (negative values removes prepends)
     Index('IndexId2_event_behaviour', id_event_behaviour)
     Index('IndexId_type_of_event', id_type_of_event)
+
+
+class EventDetail(Base):
+    __tablename__ = 'event_detail'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    time_get_data = Column(String(250))
+    time_announcement_commands = Column(String(250))
+    time_withdrawn_commands = Column(String(250))
+    time_prepends_commands = Column(String(250))
+    time_write_files = Column(String(250))
+    Index('IndexId3_event_behaviour', id_event_behaviour)

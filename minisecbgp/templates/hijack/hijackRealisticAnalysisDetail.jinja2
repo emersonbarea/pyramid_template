@@ -5,7 +5,7 @@
 <div id="aum" class="container-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="row-fluid">
         <div class="span12">
-            {% if not realistic_analysis[0]['time_write_files'] %}
+            {% if not realistic_analysis[0]['time_copy_files'] %}
                 <meta http-equiv="refresh" content="5;URL= '{{ hijackRealisticAnalysisDetail_url }}'">
                 <h3 align="center">Creating Scenario Configuration</h3>
             {% else %}
@@ -15,7 +15,6 @@
     </div>
     <form action="#" method="POST">
         <div class="row-fluid">
-            {{ message }}
             <div class="span12">
                 <p>
                     <strong> Topology name: </strong>
@@ -107,13 +106,24 @@
                         <strong> Time to write configuration files: </strong>
                         <font color="green"> {{ realistic_analysis[0]['time_write_files'] }} sec </font>
                     </p>
+                {% else %}
+                    <p>
+                        <strong> Time to write configuration files: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if realistic_analysis[0]['time_copy_files'] %}
+                    <p>
+                        <strong> Time to copy files to cluster nodes: </strong>
+                        <font color="green"> {{ realistic_analysis[0]['time_copy_files'] }} sec </font>
+                    </p>
                     <p>
                         <strong> Total time: </strong>
                         <font color="green"> {{ realistic_analysis[0]['total_time'] }} sec </font>
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time to write configuration files: </strong>
+                        <strong> Time to copy files to cluster nodes: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                     <p>
@@ -126,13 +136,36 @@
 
         <p><hr></p>
 
-        {% if not realistic_analysis[0]['time_write_files'] %}
+        {% if not realistic_analysis[0]['time_copy_files'] %}
             <p align="center">* fields status checked automatically every 5 seconds</p>
         {% else %}
-              <div class="form-group" align="center">
+            <div class="form-group" align="center">
                 {{ form.events_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis[0]['id_realistic_analysis']) }}
-              </div>
+                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+            </div>
         {% endif %}
+
+        <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
+                        <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
+                    </div>
+                    {{ realistic_analysis.id }}
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            {{ form_button.emulate_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
 

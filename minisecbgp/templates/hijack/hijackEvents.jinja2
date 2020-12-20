@@ -357,14 +357,13 @@
 
         {% endif %}
 
-        <!-- download emulate button -->
+        <!-- generate events button -->
 
         <div class="span12">
           <form action="#" method="POST">
             <p><hr></p>
             <div class="form-group" align="center">
-              {{ form_button.download_button(class="btn btn-primary") }}
-              <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Generate Event Files</button>
             </div>
 
             <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
@@ -375,13 +374,13 @@
                     <h4 class="modal-title">Confirmation</h4>
                   </div>
                   <div class="modal-body">
-                    <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
-                    <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
+                    <p><strong>Attention:</strong> Are you sure you want to create events file?</p>
+                      <p>This process can take a long time due to the topology size, and will block some MiniSecBGP functions until it finish.</p>
                   </div>
                   <div class="modal-footer">
                     <div class="form-group">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                      {{ form_button.emulate_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      {{ form_button.generate_files_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
                     </div>
                   </div>
                 </div>

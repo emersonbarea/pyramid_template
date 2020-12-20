@@ -49,7 +49,8 @@ from .hijack import (
     EventBehaviour,
     BGPlay,
     TypeOfEvent,
-    Event)
+    Event,
+    EventDetail)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

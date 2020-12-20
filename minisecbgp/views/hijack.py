@@ -161,6 +161,7 @@ class HijackEventsPrependDataForm(Form):
 
 
 class HijackEventsButtonDataForm(Form):
+    generate_files_button = SubmitField('Submit')
     download_button = SubmitField('Download')
     emulate_button = SubmitField('Confirm')
 
@@ -581,6 +582,7 @@ def hijack_realistic_analysis_detail(request):
 
     dictionary = dict()
     form = RealisticAnalysisDetailDataForm(request.POST)
+    form_button = HijackEventsButtonDataForm(request.POST)
 
     id_realistic_analysis = request.matchdict['id_realistic_analysis']
 
@@ -599,7 +601,8 @@ def hijack_realistic_analysis_detail(request):
                 'ra.time_autonomous_system_per_server as time_autonomous_system_per_server, ' \
                 'ra.time_emulate_platform_commands as time_emulate_platform_commands, ' \
                 'ra.time_router_platform_commands as time_router_platform_commands, ' \
-                'ra.time_write_files as time_write_files ' \
+                'ra.time_write_files as time_write_files, ' \
+                'ra.time_copy_files as time_copy_files ' \
                 'from realistic_analysis ra ' \
                 'where ra.id = %s;' % id_realistic_analysis
         result_proxy = request.dbsession.bind.execute(query)
@@ -619,19 +622,26 @@ def hijack_realistic_analysis_detail(request):
                                        'time_emulate_platform_commands': realistic_analyze.time_emulate_platform_commands,
                                        'time_router_platform_commands': realistic_analyze.time_router_platform_commands,
                                        'time_write_files': realistic_analyze.time_write_files,
+                                       'time_copy_files': realistic_analyze.time_copy_files,
                                        'total_time': (float(realistic_analyze.time_get_data) if realistic_analyze.time_get_data else 0) +
                                                      (float(realistic_analyze.time_autonomous_system_per_server) if realistic_analyze.time_autonomous_system_per_server else 0) +
                                                      (float(realistic_analyze.time_emulate_platform_commands) if realistic_analyze.time_emulate_platform_commands else 0) +
                                                      (float(realistic_analyze.time_router_platform_commands) if realistic_analyze.time_router_platform_commands else 0) +
-                                                     (float(realistic_analyze.time_write_files) if realistic_analyze.time_write_files else 0)})
+                                                     (float(realistic_analyze.time_write_files) if realistic_analyze.time_write_files else 0) +
+                                                     (float(realistic_analyze.time_copy_files) if realistic_analyze.time_copy_files else 0)})
 
         dictionary['realistic_analysis'] = realistic_analysis
         dictionary['form'] = form
+        dictionary['form_button'] = form_button
         dictionary['hijackRealisticAnalysisDetail_url'] = request.route_url('hijackRealisticAnalysisDetail', id_realistic_analysis=id_realistic_analysis)
 
-        if request.method == 'POST' and form.validate():
+        if request.method == 'POST':
             if form.events_button.data:
                 return HTTPFound(location=request.route_path('hijackEvents', id_realistic_analysis=id_realistic_analysis))
+
+            if form_button.emulate_button.data:
+                os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
+                          str(realistic_analysis[0]['output_path']).replace(' ', '\ '))
 
     except Exception as error:
         dictionary['message'] = error
@@ -863,21 +873,21 @@ def hijack_events(request):
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
-        if form_button.download_button.data:
-            realistic_analysis = request.dbsession.query(models.RealisticAnalysis). \
-                filter_by(id=request.matchdict['id_realistic_analysis']).first()
-            source_dir = str(realistic_analysis.output_path[:-1])
-            output_filename = topology.topology + '.tar.gz'
-            with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
-                tar.add(source_dir, arcname=os.path.basename(source_dir))
+        if form_button.generate_files_button:
 
-            response = FileResponse(source_dir + '/' + output_filename)
-            response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
-            return response
+            # delete previous event detail if exist
+            request.dbsession.query(models.EventDetail).filter_by(id_event_behaviour=event_behaviour.id).delete()
 
-        if form_button.emulate_button.data:
-            os.system('gnome-terminal -- /bin/bash -c "cd %s; exec bash"' %
-                      str(realistic_analysis.output_path).replace(' ', '\ '))
+            # create new event detail database entry
+            event_detail = models.EventDetail(id_event_behaviour=event_behaviour.id)
+            request.dbsession.add(event_detail)
+            request.dbsession.flush()
+
+            arguments = ['--config-file=minisecbgp.ini',
+                         '--event-behaviour=%s' % event_behaviour.id]
+            subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events'] + arguments)
+
+            return HTTPFound(location=request.route_path('hijackEventsDetail', id_event_behaviour=event_behaviour.id))
 
     if event_behaviour:
         form_datetime.start_datetime.data = datetime.strptime(
@@ -897,5 +907,72 @@ def hijack_events(request):
     dictionary['form_withdrawn'] = form_withdrawn
     dictionary['form_prepend'] = form_prepend
     dictionary['form_button'] = form_button
+
+    return dictionary
+
+
+@view_config(route_name='hijackEventsDetail', renderer='minisecbgp:templates/hijack/hijackEventsDetail.jinja2')
+def hijack_events_detail(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+
+    id_event_behaviour = request.matchdict['id_event_behaviour']
+    dictionary = dict()
+    form_button = HijackEventsButtonDataForm(request.POST)
+
+    try:
+        query = 'select (select t.topology ' \
+                'from topology t, ' \
+                'event_behaviour eb ' \
+                'where t.id = eb.id_topology ' \
+                'and eb.id = ed.id_event_behaviour) as topology, ' \
+                'ed.time_get_data as time_get_data, ' \
+                'ed.time_announcement_commands as time_announcement_commands, ' \
+                'ed.time_withdrawn_commands as time_withdrawn_commands, ' \
+                'ed.time_prepends_commands as time_prepends_commands, ' \
+                'ed.time_write_files as time_write_files ' \
+                'from event_detail ed ' \
+                'where ed.id_event_behaviour = %s;' % id_event_behaviour
+        result_proxy = request.dbsession.bind.execute(query)
+
+        events = list()
+        for event in result_proxy:
+            events.append({'topology': event.topology,
+                           'time_get_data': event.time_get_data,
+                           'time_announcement_commands': event.time_announcement_commands,
+                           'time_withdrawn_commands': event.time_withdrawn_commands,
+                           'time_prepends_commands': event.time_prepends_commands,
+                           'time_write_files': event.time_write_files,
+                           'total_time': (float(event.time_get_data) if event.time_get_data else 0) +
+                                         (float(event.time_announcement_commands) if event.time_announcement_commands else 0) +
+                                         (float(event.time_withdrawn_commands) if event.time_withdrawn_commands else 0) +
+                                         (float(event.time_write_files) if event.time_write_files else 0)})
+
+        dictionary['events'] = events
+        dictionary['form_button'] = form_button
+        dictionary['hijackEventsDetail_url'] = request.route_url('hijackEventsDetail', id_event_behaviour=id_event_behaviour)
+
+        if request.method == 'POST':
+            pass
+#            if form_button.download_button.data:
+#                realistic_analysis = request.dbsession.query(models.RealisticAnalysis). \
+#                    filter_by(id=request.matchdict['id_realistic_analysis']).first()
+#                source_dir = str(realistic_analysis.output_path[:-1])
+#                output_filename = topology.topology + '.tar.gz'
+#                with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
+#                    tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+#                response = FileResponse(source_dir + '/' + output_filename)
+#                response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
+#                return response
+
+#            if form_button.emulate_button.data:
+#                os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
+#                          str(realistic_analysis.output_path).replace(' ', '\ '))
+
+    except Exception as error:
+        dictionary['message'] = error
+        dictionary['css_class'] = 'errorMessage'
 
     return dictionary

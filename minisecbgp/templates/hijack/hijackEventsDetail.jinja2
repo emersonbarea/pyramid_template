@@ -1,0 +1,123 @@
+{% extends "hijack.jinja2" %}
+
+{% block contentHijack %}
+
+<div id="aum" class="container-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row-fluid">
+        <div class="span12">
+            {% if not events[0]['time_write_files'] %}
+                <meta http-equiv="refresh" content="5;URL= '{{ hijackEventsDetail_url }}'">
+                <h3 align="center">Creating Events Configuration</h3>
+            {% else %}
+                <h3 align="center">Events Configuration</h3>
+            {% endif %}
+        </div>
+    </div>
+    <form action="#" method="POST">
+        <div class="row-fluid">
+            <div class="span12">
+                <p>
+                    <strong> Topology name: </strong>
+                    <font color="green"> {{ events[0]['topology'] }} </font>
+                </p>
+                {% if events[0]['time_get_data'] %}
+                    <p>
+                        <strong> Time to get event data: </strong>
+                        <font color="green"> {{ events[0]['time_get_data'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to get event data: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_announcement_commands'] %}
+                    <p>
+                        <strong> Time to create announcement commands: </strong>
+                        <font color="green"> {{ events[0]['time_announcement_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to create announcement commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_withdrawn_commands'] %}
+                    <p>
+                        <strong> Time to create withdrawn commands: </strong>
+                        <font color="green"> {{ events[0]['time_withdrawn_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to create withdrawn commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_prepends_commands'] %}
+                    <p>
+                        <strong> Time to create prepend commands: </strong>
+                        <font color="green"> {{ events[0]['time_prepends_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to create prepend commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_write_files'] %}
+                    <p>
+                        <strong> Time to write configuration files: </strong>
+                        <font color="green"> {{ events[0]['time_write_files'] }} sec </font>
+                    </p>
+                    <p>
+                        <strong> Total time: </strong>
+                        <font color="green"> {{ events[0]['total_time'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to write configuration files: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                    <p>
+                        <strong> Total time: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <p><hr></p>
+
+        {% if not events[0]['time_write_files'] %}
+            <p align="center">* fields status checked automatically every 5 seconds</p>
+        {% else %}
+            <div class="form-group" align="center">
+                {{ form.events_button(class="btn btn-primary", id_realistic_analysis=1) }}
+                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
+            </div>
+        {% endif %}
+
+        <div class="modal fade" id="confirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Attention:</strong> Are you sure you want to start the emulation process?</p>
+                        <p>This process open a shell terminal where you can interact directly in the emulation process.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            {{ form_button.emulate_button(class="btn btn-primary", id_realistic_analysis=1) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock contentHijack %}

@@ -1,0 +1,38 @@
+#!/usr/bin/python
+
+import os
+import sys
+import time
+
+from termcolor import colored
+
+from mininet.topo import Topo
+from mininet.node import OVSSwitch
+
+from MaxiNet.Frontend import maxinet
+from MaxiNet.Frontend.container import Docker
+from MaxiNet.tools import Tools
+
+
+class Run(object):
+    def __init__(self, server, workers):
+        self.server = server
+        self.workers = workers
+        self.option = 1000
+        self.option_executed = list()
+        self.exp = ''
+
+    def start_topology(self):
+
+        print('\n*** Trying to start topology emulation.')
+        time.sleep(2)
+
+        self.restart_MaxiNet()
+
+        print('*** Creating topology')
+        topo = Topo()
+
+        print(colored('\n*** If the application freezes for a long time, type ctrl-c to finish it '
+                      'and execute the command "./topology.py" to run the application again.\n', 'yellow'))
+
+

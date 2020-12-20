@@ -1,8 +1,0 @@
-
-print('*** Exposing the CLI')
-maxinet.Experiment.CLI(exp, None, None)
-
-print('*** Closing all')
-exp.stop()
-
-print('*** Killing all router process')

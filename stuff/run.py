@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
 import os
-import sys
 import time
+
+from termcolor import colored
 
 from mininet.topo import Topo
 from mininet.node import OVSSwitch
@@ -22,17 +23,18 @@ class Run(object):
 
     def start_topology(self):
 
-        print('\n*** Trying to start topology emulation. If the application freezes for a long time, type ctrl-c to finish it, '
-              'and run the application again choosing the option [9] before starting the topology again.\n')
+        print('\n*** Trying to start topology emulation.')
         time.sleep(2)
 
-        print('*** Restarting MaxiNetFrontendServer and MaxiNetWorkers')
         self.restart_MaxiNet()
 
         print('*** Creating topology')
         topo = Topo()
 
-        print("*** Starting cluster")
+        print(colored('\n*** If the application freezes for a long time, type ctrl-c to finish it '
+                      'and execute the command "./topology.py" to run the application again.\n', 'yellow'))
+
+        print("*** Starting MaxiNet cluster nodes")
         cluster = maxinet.Cluster(minWorkers=1, maxWorkers=1)
 
         print("*** Starting cluster node mapping")
@@ -91,21 +93,25 @@ class Run(object):
         self.option_executed.remove(1)
 
     def restart_MaxiNet(self):
-        print('\n*** Restarting MaxiNetFrontendServer on "%s"' % self.server)
+        print('\n*** Restarting MiniSecBGP cluster nodes (MaxiNet)')
+        print('\n  * Restarting MaxiNetFrontendServer on node "%s"' % self.server)
         os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetFrontendServer\'' % self.server)
         time.sleep(3)
-        print('*** Restarting MaxiNetWorker')
+        print('  * Restarting MaxiNetWorkers')
         for worker in self.workers:
-            print('  * on "%s" worker' % worker)
+            print('    * on node "%s"' % worker)
             os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetWorker\'' % worker)
         time.sleep(5)
         print('\n*** MaxiNetStatus')
         os.system('sudo -u minisecbgpuser bash -c \'MaxiNetStatus\'')
 
+    def start_hijack_scenario(self):
+        pass
+
     @staticmethod
-    def input_to_continue(phrase):
+    def input_to_continue(phrase, color):
         try:
-            print('\nAttention: %s. Press any key to continue...' % phrase)
+            print(colored('\nAttention: %s. Press any key to continue...' % phrase, color))
             input()
         except SyntaxError:
             pass
@@ -123,45 +129,54 @@ class Run(object):
                           '    [ 1 ] start topology emulation\n'
                           '    [ 2 ] enter CLI mode\n'
                           '    [ 3 ] stop topology emulation\n'
+                          '    [ 4 ] start hijack scenario\n'
                           '    [ 9 ] restart MaxiNetFrontendServer and MaxiNetWorkers\n'
                           '    [ 0 ] exit\n')
 
                     self.option = int(input('\n>>> Choose an option: '))
                     break
                 except Exception:
-                    self.input_to_continue('Choose a valid option')
+                    self.input_to_continue('Choose a valid option', 'red')
 
             if self.option == 0:
                 if 1 in self.option_executed:
                     self.stop_topology()
                 print('\nexiting...\n')
+                exit()
 
             elif self.option == 1:
                 if self.option not in self.option_executed:
                     self.start_topology()
-                    self.input_to_continue('Topology emulation started successfully')
+                    self.input_to_continue('Topology emulation started successfully', 'green')
                 else:
-                    self.input_to_continue('Topology already started')
+                    self.input_to_continue('Topology already started', 'red')
 
             elif self.option == 2:
                 if 1 in self.option_executed:
                     self.cli_mode()
                 else:
-                    self.input_to_continue('You need start topology first [ 1 ]')
+                    self.input_to_continue('You need start topology first (menu option [1])', 'red')
 
             elif self.option == 3:
                 if 1 in self.option_executed:
                     self.stop_topology()
-                    self.input_to_continue('Topology emulation stopped successfully')
+                    self.input_to_continue('Topology emulation stopped successfully', 'green')
                 else:
-                    self.input_to_continue('You need start topology first [ 1 ]')
+                    self.input_to_continue('You need start topology first (menu option [1])', 'red')
+
+            elif self.option == 4:
+                if 1 in self.option_executed:
+                    self.start_hijack_scenario()
+                    self.input_to_continue('Hijacking attack scenario started successfully.\n\nYou can interact with this scenario through the Mininet terminal (menu option [2])', 'green')
+                else:
+                    self.input_to_continue('You need start topology first (menu option [1])', 'red')
 
             elif self.option == 9:
                 self.restart_MaxiNet()
-                self.input_to_continue('MaxiNet Services restarted successfully')
+                self.input_to_continue('MaxiNet Services restarted successfully', 'green')
 
             else:
-                self.input_to_continue('Choose a valid option')
+                self.input_to_continue('Choose a valid option', 'red')
 
 
 if __name__ == '__main__':

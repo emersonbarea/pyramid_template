@@ -1,0 +1,4 @@
+
+        print('*** Starting the experiment on cluster')
+        self.exp = maxinet.Experiment(cluster, topo, switch=OVSSwitch, hostnamemapping=hnmap)
+        self.exp.setup()
