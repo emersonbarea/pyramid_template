@@ -31,6 +31,8 @@ class DeleteTopology(object):
                     'select id from event_behaviour where id_topology = %s);' % id_topology
             bgplay = 'delete from bgplay where id_event_behaviour in (' \
                      'select id from event_behaviour where id_topology = %s);' % id_topology
+            event_detail = 'delete from event_detail where id_event_behaviour in (' \
+                           'select id from event_behaviour where id_topology = %s);' % id_topology
             event_behaviour = 'delete from event_behaviour where id_topology = %s;' % id_topology
 
             # realistic analysis
@@ -64,6 +66,7 @@ class DeleteTopology(object):
 
             dbsession.bind.execute(event)
             dbsession.bind.execute(bgplay)
+            dbsession.bind.execute(event_detail)
             dbsession.bind.execute(event_behaviour)
 
             dbsession.bind.execute(realistic_analysis)

@@ -51,7 +51,7 @@ class ConfigClusterNode(object):
                             'sudo -E apt upgrade -yq',
                             'sudo apt install git autoconf screen cmake build-essential sysstat expect '
                             'python-matplotlib uuid-runtime ansible aptitude python-pip python3-pip -y',
-                            'pip install termcolor pexpect setuptools docker',
+                            'pip install pathlib termcolor pexpect setuptools docker',
                             'pip3 install --upgrade --force-reinstall -U Pyro4 docker',
                             'sudo timedatectl set-timezone America/Sao_Paulo']
                 for command in commands:

@@ -173,6 +173,7 @@ class EventDetail(Base):
     id = Column(Integer, primary_key=True)
     id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
     time_get_data = Column(String(250))
+    time_pid_commands = Column(String(250))
     time_announcement_commands = Column(String(250))
     time_withdrawn_commands = Column(String(250))
     time_prepends_commands = Column(String(250))

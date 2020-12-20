@@ -1,10 +1,13 @@
 import argparse
+import datetime
 import getopt
 import json
 import os
+import shutil
 import subprocess
 import sys
 import ipaddress
+import time
 
 import pandas as pd
 
@@ -15,482 +18,215 @@ from sqlalchemy.exc import OperationalError, IntegrityError
 from minisecbgp import models
 
 
-class HijackEvent(object):
-    def __init__(self, event_behaviour):
-        self.event_behaviour = event_behaviour
+class EventDetail(object):
+    def __init__(self, dbsession, id_event_behaviour):
+        self.dbsession = dbsession
+        self.id_event_behaviour = id_event_behaviour
+        self.topology = dbsession.query(models.Topology, models.EventBehaviour).\
+            filter(models.EventBehaviour.id == self.id_event_behaviour).\
+            filter(models.EventBehaviour.id_topology == models.Topology.id).first()
+        self.event_behaviour = self.dbsession.query(models.EventBehaviour).\
+            filter_by(id=self.id_event_behaviour).first()
+        self.output_file = '/tmp/MiniSecBGP/output/topology/%s/event_commands.MiniSecBGP' % self.topology.Topology.topology
+        self.start_datetime = str(
+            datetime.datetime.strptime(str(self.event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.end_datetime = str(
+            datetime.datetime.strptime(str(self.event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
+        self.current_time = str(
+            datetime.datetime.strptime(str(self.event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
 
-    def hijack_event(self, dbsession):
+    def dfs_from_database(self):
 
-        def validIPv4(ip_address):
-            try:
-                return True if type(ipaddress.ip_address(ip_address)) is ipaddress.IPv4Address else False
-            except ValueError:
-                return False
+        # get PID from
+        query = 'select e.announcer as autonomous_system ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'announcement\') ' \
+                '' \
+                'union ' \
+                '' \
+                'select e.withdrawer as autonomous_system ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'withdrawn\') ' \
+                '' \
+                'union ' \
+                'select e.prepender as autonomous_system ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'prepend\');' % \
+                (self.id_event_behaviour, self.id_event_behaviour, self.id_event_behaviour)
+        result_proxy = self.dbsession.bind.execute(query)
+        self.pid = list()
+        for row in result_proxy:
+            self.pid.append(row['autonomous_system'])
 
-        def validNetworkIPv4(ip_address):
-            try:
-                return True if type(ipaddress.ip_network(ip_address)) is ipaddress.IPv4Network else False
-            except ValueError:
-                return False
+        # Announcement
+        query = 'select e.event_datetime as event_datetime, ' \
+                'e.announced_prefix as announced_prefix, ' \
+                'e.announcer as announcer ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'announcement\');' % self.id_event_behaviour
+        result_proxy = self.dbsession.bind.execute(query)
+        self.df_announcement = pd.DataFrame(result_proxy, columns=['event_datetime', 'announced_prefix', 'announcer'])
+        # print(self.df_announcement)
+        #         event_datetime announced_prefix announcer
+        # 0  2020-12-20 08:00:30    33.44.55.0/24     65001
+        # 1  2020-12-20 08:01:40    55.55.55.0/24     65003
+        # 2  2020-12-20 08:00:40    55.66.77.0/24     65004
 
-        with open(self.file_from) as json_file:
-            data = json.load(json_file)
-        json_file.close()
+        # Withdrawn
+        query = 'select e.event_datetime as event_datetime, ' \
+                'e.withdrawn_prefix as withdrawn_prefix, ' \
+                'e.withdrawer as withdrawer ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'withdrawn\');' % self.id_event_behaviour
+        result_proxy = self.dbsession.bind.execute(query)
+        self.df_withdrawn = pd.DataFrame(result_proxy, columns=['event_datetime', 'withdrawn_prefix', 'withdrawer'])
+        # print(self.df_withdrawn)
+        #         event_datetime withdrawn_prefix withdrawer
+        # 0  2020-12-20 08:01:00    55.66.77.0/24      65004
+        # 1  2020-12-20 08:01:20    33.44.55.0/24      65002
 
-        # Topology
+        # Prepend
+        query = 'select e.event_datetime as event_datetime, ' \
+                'e.prepended as prepended, ' \
+                'e.prepender as prepender, ' \
+                'e.times_prepended as times_prepended ' \
+                'from event e ' \
+                'where e.id_event_behaviour = %s ' \
+                'and e.id_type_of_event = (' \
+                'select toe.id ' \
+                'from type_of_event toe ' \
+                'where lower(toe.type_of_event) = \'prepend\');' % self.id_event_behaviour
+        result_proxy = self.dbsession.bind.execute(query)
+        self.df_prepend = pd.DataFrame(result_proxy, columns=['event_datetime', 'prepended', 'prepender', 'times_prepended'])
+        # print(self.df_prepend)
+        #         event_datetime prepended prepender times_prepended
+        # 0  2020-12-20 08:01:50     65003     65002               3
+
+    def pid_commands(self):
+        self.pid_commands_list = list()
+        for pid in self.pid:
+            self.pid_commands_list.append(
+                'AS%s = str(os.popen(\'ps ax | grep "mininet:AS%s" | grep bash | grep -v mnexec | awk \\\'{print $1};\\\'\').read()).strip()' %
+                (pid, pid))
+
+    def announcement_commands(self):
+        self.announcement_commands_list = list()
+        for row in self.df_announcement.itertuples():
+            self.announcement_commands_list.\
+                append('    '
+                       'if current_time == %s:\n'
+                       '        '
+                       'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                       '/usr/bin/python -c \\"import pexpect; '
+                       'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                       'child.expect(\'Password: \'); '
+                       'child.sendline(\'en\'); '
+                       'child.expect(\'.+>\'); '
+                       'child.sendline(\'enable\'); '
+                       'child.expect([\'Password: \',\'.+#\']); '
+                       'child.sendline(\'en\'); '
+                       'child.expect(\'.+#\'); '
+                       'child.sendline(\'configure terminal\'); '
+                       'child.expect(\'.+#\'); '
+                       'child.sendline(\'router bgp %s\'); '
+                       'child.expect(\'.+#\'); '
+                       'child.sendline(\'network %s\'); '
+                       'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                       (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                        '%s', str(row[3]), str(row[2]), '%', str(row[3])))
+
+    def withdrawn_commands(self):
+        self.withdrawn_commands_list = list()
+
+    def prepend_commands(self):
+        self.prepend_commands_list = list()
+
+    def time_write_files(self):
+        """
+            Write configuration files to server filesystem
+        """
+
+        # erase previews configuration
         try:
+            os.remove(self.output_file)
+        except FileNotFoundError:
+            pass
 
-            try:
-                topology_name = self.file_from.split('-')[1:][0].split('.')[:-1][0]
-            except IndexError:
-                try:
-                    topology_name = self.file_from.split('/')[-1:][0].split('.')[:-1][0]
-                except Exception:
-                    topology_name = self.file_from.split('.')[:-1][0]
+        with open(self.output_file, 'w') as file:
 
-            topology_type = dbsession.query(models.TopologyType).\
-                filter(func.lower(models.TopologyType.topology_type) == 'ripe ncc bgplay').first()
-            dictionary_topology = {'id_topology_type': [topology_type.id],
-                                   'topology': [topology_name],
-                                   'description': ['RIPE NCC BGPlay topology (from json file)']}
-            df_topology = pd.DataFrame(data=dictionary_topology)
-            df_topology.to_sql('topology', con=dbsession.bind, if_exists='append', index=False)
+            # get template
+            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
 
-            # get Topology ID
-            id_topology = dbsession.query(models.Topology.id).filter_by(topology=topology_name).first()
-        except IntegrityError as error:
-            return 'The topology name "%s" already exists.' % topology_name
-        except Exception as error:
-            return error
+            # start_datetime and end_datetime
+            file.write('\n\n## timers\n\nstart_datetime = %s\nend_datetime = %s\ncurrent_time = %s' %
+                       (self.start_datetime, self.end_datetime, self.current_time))
 
-        try:
+            # PID
+            file.write('\n\n## get Mininet nodes PID\n\n')
+            for pid_command in self.pid_commands_list:
+                file.write(pid_command + '\n')
 
-            # get bgplay data
-            start_datetime = data['data']['query_starttime']
-            end_datetime = data['data']['query_endtime']
+            # timer loop begin
+            file.write('\n\n## events\n\n')
+            file.write('while current_time != %s:\n' % self.end_datetime)
 
-            list_resource = list()
-            resources = [data['data']['resource']]
-            for resource in resources:
-                list_resource.append(resource)
-            resources = str(list_resource).strip('[]').replace('\'', '').replace(' ', '')
-            url = 'https://stat.ripe.net/data/bgplay/data.json?resource=%s&starttime=%s&endtime=%s' % \
-                  (resources, start_datetime, end_datetime)
-
-            event_behaviour = models.EventBehaviour(id_topology=id_topology[0],
-                                                    start_datetime=start_datetime.replace('T', ' '),
-                                                    end_datetime=end_datetime.replace('T', ' '))
-            dbsession.add(event_behaviour)
-
-            dbsession.flush()
-
-            self.id_event_behaviour = event_behaviour.id
-
-            bgplay = models.BGPlay(id_event_behaviour=self.id_event_behaviour,
-                                   resource=resources,
-                                   url=url)
-            dbsession.add(bgplay)
-
-            # get unique IPv4 Autonomous Systems (from "initial_state" and "events")
-            list_valid_autonomous_system = list()
-
-            events = data['data']['events']
-            for event in events:
-                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
-                    for autonomous_system in list(event['attrs']['path']):
-                        list_valid_autonomous_system.append(autonomous_system)
-
-            initial_states = data['data']['initial_state']
-            for initial_state in initial_states:
-                if validNetworkIPv4(initial_state['target_prefix']):
-                    for autonomous_system in list(initial_state['path']):
-                        list_valid_autonomous_system.append(autonomous_system)
-
-            list_valid_autonomous_system = set(list_valid_autonomous_system)
-
-            # get Autonomous Systems that announces prefixes at update "events"
-            list_autonomous_system = list()
-            list_router_id_ip_address = list()
-            list_region_autonomous_system = list()
-
-            origin_autonomous_system = list()
-            events = data['data']['events']
-            for event in events:
-                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
-                    origin_autonomous_system.append(event['attrs']['path'][-1])
-            origin_autonomous_system = set(origin_autonomous_system)
-
-            # get all Autonomous Systens (from nodes + sources) **
-            nodes = data['data']['nodes']
-
-            for node in nodes:
-                # ** but the Autonomous System must be in IPv4 valid "initial_state" or "events" groups
-                if node['as_number'] in list_valid_autonomous_system:
-
-                    # "autonomous_system"
-                    autonomous_system = str(node['as_number'])
-
-                    # "region" and "router_id"
-                    region = "other"
-                    router_id = None
-                    sources = data['data']['sources']
-
-                    for source in sources:
-                        if node['as_number'] == source['as_number']:
-                            region = "Collector peer"
-                            router_id = source['id'].split('-')[1] if validIPv4(source['id'].split('-')[1]) else None
-
-                    if node['as_number'] in origin_autonomous_system:
-                        region = "Origin AS"
-
-                    list_autonomous_system.append(autonomous_system)
-                    list_router_id_ip_address.append(router_id)
-                    list_region_autonomous_system.append(region)
-
-            # Region
-            list_region = list(['-- undefined region --']) + list_region_autonomous_system
-            df_region = pd.DataFrame({'region': list_region})
-            df_region = df_region.drop_duplicates(keep='first')
-            df_region = df_region.dropna()
-            df_region = df_region.reset_index(drop=True)
-
-            colors = dbsession.query(models.Color.id).all()
-            df_region = pd.concat([df_region, pd.DataFrame({'id_color': colors})], axis=1)
-            df_region = df_region.dropna()
-
-            df_region = pd.concat([df_region.assign(id_topology=id_topology) for id_topology in id_topology])
-            df_region.to_sql('region', con=dbsession.bind, if_exists='append', index=False)
-            # get Region ID
-            regions = dbsession.query(models.Region).filter_by(id_topology=id_topology).all()
-
-            # Autonomous System
-            df_autonomous_system = pd.DataFrame({'autonomous_system': list_autonomous_system,
-                                                 'id_region': list_region_autonomous_system,
-                                                 'stub': False})
-            df_autonomous_system.fillna(value='-- undefined region --', inplace=True)
-            df_autonomous_system.reset_index()
-            df_autonomous_system.set_index('id_region', inplace=True)
-            for region in regions:
-                df_autonomous_system.rename(index={region.region: region.id}, inplace=True)
-            df_autonomous_system = df_autonomous_system.reset_index().copy()
-            df_autonomous_system = df_autonomous_system.drop_duplicates(keep='first')
-            df_autonomous_system = pd.concat(
-                [df_autonomous_system.assign(id_topology=id_topology) for id_topology in id_topology])
-            df_autonomous_system.to_sql('autonomous_system', con=dbsession.bind, if_exists='append', index=False)
-            # get Autonomous System ID
-            autonomous_systems = dbsession.query(models.AutonomousSystem).filter_by(id_topology=id_topology).all()
-
-            # Router_id
-            df_router_id = pd.DataFrame({'id_autonomous_system': list_autonomous_system,
-                                         'router_id': list_router_id_ip_address})
-            df_router_id = df_router_id.dropna()
-            df_router_id.reset_index()
-            df_router_id.set_index('id_autonomous_system', inplace=True)
-            for autonomous_system in autonomous_systems:
-                df_router_id.rename(index={str(autonomous_system.autonomous_system): autonomous_system.id}, inplace=True)
-            df_router_id = df_router_id.reset_index().copy()
-            df_router_id.to_sql('router_id', con=dbsession.bind, if_exists='append', index=False)
-
-            # Peers
-            data_peers = dict()
-            data_peers['links'] = list()
-            paths = list()
-
-            events = data['data']['events']
-            # for each event
-            for event in events:
-                # if it is an update event (because withdraw event has no path) and only IPv4
-                if event['type'] == 'A' and validNetworkIPv4(event['attrs']['target_prefix']):
-                    paths.append(event['attrs']['path'])
-
-            initial_states = data['data']['initial_state']
-            # for each initial_state
-            for initial_state in initial_states:
-                # only IPv4
-                if validNetworkIPv4(initial_state['target_prefix']):
-                    paths.append(initial_state['path'])
-
-            # remove duplicated paths
-            paths = set(tuple(i) for i in paths)
-
-            hops = []
-            for path in paths:
-                previous_autonomous_system = ''
-                for autonomous_system in path:
-
-                    # "and previous_autonomous_system != autonomous_system" -- to remove prepended ASs from paths
-                    if previous_autonomous_system and previous_autonomous_system != autonomous_system:
-                        hops.append([previous_autonomous_system, autonomous_system])
-
-                    previous_autonomous_system = autonomous_system
-
-            # removes duplicated hops
-            hops = set(tuple(i) for i in hops)
-
-            # removes duplicated inverted hops
-            final_hops = []
-            for hop in hops:
-                inverted_hop = tuple([hop[1], hop[0]])
-                if inverted_hop not in final_hops:
-                    final_hops.append(tuple([hop[0], hop[1]]))
-
-            hops = final_hops
-
-            list_link_source = list()
-            list_link_destination = list()
-            list_link_ip_source = list()
-            list_link_ip_destination = list()
-            list_link_mask = list()
-            list_link_description = list()
-            list_link_agreement = list()
-            list_link_bandwidth = list()
-            list_link_delay = list()
-            list_link_load = list()
-            list_stub = list()
-
-            # initialize IP address variable (1.0.0.0)
-            prefix_ip = 16777216
-
-            for hop in hops:
-                list_link_source.append(hop[0])
-                list_link_destination.append(hop[1])
-                list_link_ip_source.append(str(ipaddress.ip_address(prefix_ip + 1)))
-                list_link_ip_destination.append(str(ipaddress.ip_address(prefix_ip + 2)))
-                list_link_mask.append(30)
-                list_link_description.append(None)
-                list_link_agreement.append(None)
-                list_link_bandwidth.append(None)
-                list_link_delay.append(None)
-                list_link_load.append(None)
-                list_stub.append(hop[0])
-                list_stub.append(hop[1])
-
-                prefix_ip = prefix_ip + 4
-
-            for i in range(len(list_link_agreement)):
-                if list_link_agreement[i] is None:
-                    list_link_agreement[i] = 'a2a'
-
-            df_link = pd.DataFrame({'id_link_agreement': list_link_agreement,
-                                    'id_autonomous_system1': list_link_source,
-                                    'id_autonomous_system2': list_link_destination,
-                                    'ip_autonomous_system1': list_link_ip_source,
-                                    'ip_autonomous_system2': list_link_ip_destination,
-                                    'mask': list_link_mask,
-                                    'description': list_link_description,
-                                    'bandwidth': list_link_bandwidth,
-                                    'delay': list_link_delay,
-                                    'load': list_link_load})
-
-            pd.set_option('display.max_rows', None)
-            pd.set_option('display.max_columns', None)
-            pd.set_option('display.width', None)
-            pd.set_option('display.max_colwidth', None)
-
-            link_agreements = dbsession.query(models.LinkAgreement).all()
-            df_link.reset_index()
-            df_link.set_index('id_link_agreement', inplace=True)
-            for link_agreement in link_agreements:
-                df_link.rename(index={str(link_agreement.agreement): link_agreement.id}, inplace=True)
-            df_link = df_link.reset_index().copy()
-
-            df_link.reset_index()
-            df_link.set_index('id_autonomous_system1', inplace=True)
-            for autonomous_system in autonomous_systems:
-                df_link.rename(index={autonomous_system.autonomous_system: autonomous_system.id}, inplace=True)
-            df_link = df_link.reset_index().copy()
-
-            df_link.reset_index()
-            df_link.set_index('id_autonomous_system2', inplace=True)
-            for autonomous_system in autonomous_systems:
-                df_link.rename(index={autonomous_system.autonomous_system: autonomous_system.id}, inplace=True)
-            df_link = df_link.reset_index().copy()
-
-            df_link = pd.concat([df_link.assign(id_topology=id_topology) for id_topology in id_topology])
-
-            df_link.to_sql('link', con=dbsession.bind, if_exists='append', index=False)
-
-            # Autonomous System Stub
-            df_stub = pd.DataFrame({'id_autonomous_system': list_stub})
-            df_stub = df_stub.drop_duplicates(keep=False)
-
-            df_stub.reset_index()
-            df_stub.set_index('id_autonomous_system', inplace=True)
-            for autonomous_system in autonomous_systems:
-                df_stub.rename(index={autonomous_system.autonomous_system: autonomous_system.id}, inplace=True)
-            df_stub = df_stub.reset_index().copy()
-            for row in df_stub.itertuples():
-                autonomous_system = dbsession.query(models.AutonomousSystem).filter_by(id=row[1]).first()
-                autonomous_system.stub = True
-
-            # Prefix
-            list_prefix_autonomous_system = list()
-            list_prefix = list()
-            list_prefix_mask = list()
-            initial_states = data['data']['initial_state']
-            for initial_state in initial_states:
-                if validNetworkIPv4(initial_state['target_prefix']):
-                    list_prefix_autonomous_system.append(initial_state['path'][-1])
-                    list_prefix.append(str(initial_state['target_prefix']).split('/')[0])
-                    list_prefix_mask.append(str(initial_state['target_prefix']).split('/')[1])
-
-            df_prefix = pd.DataFrame({'id_autonomous_system': list_prefix_autonomous_system,
-                                      'prefix': list_prefix,
-                                      'mask': list_prefix_mask})
-
-            df_prefix = df_prefix.drop_duplicates(keep='first')
-            df_prefix.reset_index()
-            df_prefix.set_index('id_autonomous_system', inplace=True)
-            for autonomous_system in autonomous_systems:
-                df_prefix.rename(index={autonomous_system.autonomous_system: autonomous_system.id}, inplace=True)
-            df_prefix = df_prefix.reset_index().copy()
-
-            df_prefix.to_sql('prefix', con=dbsession.bind, if_exists='append', index=False)
-
-        except Exception as error:
-            arguments = ['--config-file=minisecbgp.ini',
-                         '--topology=%s' % id_topology]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_delete_topology'] + arguments)
-            print(error)
-
-    def event(self, dbsession):
-        with open(self.file_from) as json_file:
-            data = json.load(json_file)
-        json_file.close()
-
-        try:
-
-            announcement_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Announcement').first()
-            prepend_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Prepend').first()
-            withdrawn_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Withdrawn').first()
-
-            events = data['data']['events']
-
-            # Announcement
-            announcement_events_list = list()
-            for observed_event in events:
-                if observed_event['type'] == 'A':
-                    observed_event_source = observed_event['attrs']['path'][-1]
-                    observed_event_prefix = observed_event['attrs']['target_prefix']
-                    if announcement_events_list:
-                        for i, event in enumerate(announcement_events_list):
-                            if [str(observed_event_prefix), str(observed_event_source)] == \
-                                    [str(event['announced_prefix']), str(event['announcer'])]:
-                                break
-                            if i == len(announcement_events_list) - 1:
-                                announcement_events_list.append({
-                                    'id_event_behaviour': int(self.id_event_behaviour),
-                                    'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
-                                    'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                                    'announced_prefix': str(observed_event_prefix),
-                                    'announcer': str(observed_event_source)
-                                })
-                    else:
-                        announcement_events_list.append({
-                            'id_event_behaviour': int(self.id_event_behaviour),
-                            'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
-                            'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                            'announced_prefix': str(observed_event_prefix),
-                            'announcer': str(observed_event_source)
-                        })
-
-            if announcement_events_list:
-                df_announcement_events = pd.DataFrame(announcement_events_list)
-                df_announcement_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+            # Announcements
+            file.write('\n    ## Announcements\n\n')
+            for announcement_command in self.announcement_commands_list:
+                file.write(announcement_command + '\n')
 
             # Withdrawn
-            sources = data['data']['sources']
-            withdrawn_events_list_temp = list()
-            withdrawn_events_list = list()
-            for observed_event in events:
-                if observed_event['type'] == 'W':
-                    for source in sources:
-                        if str(source['id']) == str(observed_event['attrs']['source_id']):
-                            withdrawer = source['as_number']
-                    withdrawn_events_list_temp.append({
-                        'id_event_behaviour': int(self.id_event_behaviour),
-                        'id_type_of_event': int(list(withdrawn_id_type_of_event)[0]),
-                        'event_datetime': str(observed_event['timestamp']),
-                        'withdrawer': str(withdrawer),
-                        'withdrawn_prefix': str(observed_event['attrs']['target_prefix'])
-                    })
+            file.write('\n    ## Withdrawns\n\n')
+            for withdrawn_command in self.withdrawn_commands_list:
+                file.write(withdrawn_command + '\n')
 
-            if withdrawn_events_list_temp:
-                for withdrawn_event_temp in withdrawn_events_list_temp:
-                    if not withdrawn_events_list:
-                        withdrawn_events_list.append(withdrawn_event_temp)
-                    else:
-                        for i, withdrawn_event in enumerate(withdrawn_events_list):
-                            if (str(withdrawn_event['withdrawer'])) == str(withdrawn_event_temp['withdrawer']) and \
-                                    (str(withdrawn_event['withdrawn_prefix']) == str(withdrawn_event_temp['withdrawn_prefix'])):
-                                break
-                            if i == len(withdrawn_events_list) - 1:
-                                withdrawn_events_list.append(withdrawn_event_temp)
+            # Prepends
+            file.write('\n    ## Prepends\n\n')
+            for prepend_command in self.prepend_commands_list:
+                file.write(prepend_command + '\n')
 
-            if withdrawn_events_list:
-                df_withdrawn_events = pd.DataFrame(withdrawn_events_list)
-                df_withdrawn_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+            file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
+        file.close()
 
-            # Prepend
-            prepend_events_list_temp = list()
-            prepend_events_list = list()
-            for observed_event in events:
-                if observed_event['type'] == 'A':
-                    path = observed_event['attrs']['path']
-                    previous_hop = ''
-                    for elem in path:
-                        if path.count(elem) > 1:
-
-                            # get the AS prepender
-                            for hop in path:
-                                if not previous_hop:
-                                    previous_hop = hop
-                                else:
-                                    if hop == elem:
-                                        prepender = previous_hop
-                                        break
-                                    else:
-                                        previous_hop = hop
-
-                            prepend_events_list_temp.append({
-                                'id_event_behaviour': int(self.id_event_behaviour),
-                                'id_type_of_event': int(list(prepend_id_type_of_event)[0]),
-                                'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                                'prepended': str(elem),
-                                'prepender': str(prepender),
-                                'times_prepended': str(path.count(elem))
-                            })
-
-            if prepend_events_list_temp:
-                for prepend_event_temp in prepend_events_list_temp:
-                    if not prepend_events_list:
-                        prepend_events_list.append(prepend_event_temp)
-                    else:
-                        for i, prepend_event in enumerate(prepend_events_list):
-                            if (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
-                                    (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
-                                    (str(prepend_event['times_prepended']) == str(prepend_event_temp['times_prepended'])):
-                                break
-                            if i == len(prepend_events_list) - 1:
-                                prepend_events_list.append(prepend_event_temp)
-
-            if prepend_events_list:
-                df_prepend_events = pd.DataFrame(prepend_events_list)
-                df_prepend_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
-
-        except Exception as error:
-            print(error)
+        os.chmod(self.output_file, 0o755)
 
     @staticmethod
     def downloading(dbsession, downloading):
         entry = dbsession.query(models.DownloadingTopology).first()
         entry.downloading = downloading
 
-    def erase_file(self):
-        os.remove(self.file_from)
+
+def save_to_database(dbsession, field, value, id_event_behaviour):
+    try:
+        for i in range(len(field)):
+            update = 'update event_detail set %s = \'%s\' where id_event_behaviour = %s' % (field[i], str(value[i]), id_event_behaviour)
+            dbsession.bind.execute(update)
+            dbsession.flush()
+    except Exception as error:
+        dbsession.rollback()
+        print(error)
 
 
 def parse_args(config_file):
@@ -504,7 +240,7 @@ def parse_args(config_file):
 
 def main(argv=sys.argv[1:]):
     try:
-        opts, args = getopt.getopt(argv, "h", ["config-file=", "event-behaviour="])
+        opts, args = getopt.getopt(argv, "h", ["config-file=", "id-event-behaviour="])
     except getopt.GetoptError:
         print('\n'
               'Usage: MiniSecBGP_hijack_events [options]\n'
@@ -514,9 +250,9 @@ def main(argv=sys.argv[1:]):
               '-h                                               this help\n'
               '\n'
               '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
-              '--event-behaviour=<id_event_behaviour>           event behaviour ID\n')
+              '--id-event-behaviour=<id_event_behaviour>        event behaviour ID\n')
         sys.exit(2)
-    config_file = event_behaviour = ''
+    config_file = id_event_behaviour = ''
     for opt, arg in opts:
         if opt == '-h':
             print('\n'
@@ -527,30 +263,50 @@ def main(argv=sys.argv[1:]):
                   '-h                                               this help\n'
                   '\n'
                   '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
-                  '--event-behaviour=<id_event_behaviour>           event behaviour ID\n')
+                  '--id-event-behaviour=<id_event_behaviour>        event behaviour ID\n')
             sys.exit()
         elif opt == '--config-file':
             config_file = arg
-        elif opt == '--event-behaviour':
-            event_behaviour = arg
-    if config_file and event_behaviour:
+        elif opt == '--id-event-behaviour':
+            id_event_behaviour = arg
+    if config_file and id_event_behaviour:
         args = parse_args(config_file)
         setup_logging(args.config_uri)
         env = bootstrap(args.config_uri)
         try:
-            he = HijackEvent(event_behaviour)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
-                downloading = 1
-                he.downloading(dbsession, downloading)
-            with env['request'].tm:
-                dbsession = env['request'].dbsession
-                he.hijack_event(dbsession)
-            with env['request'].tm:
-                dbsession = env['request'].dbsession
-                downloading = 0
-                he.downloading(dbsession, downloading)
-            he.erase_file()
+                ed = EventDetail(dbsession, id_event_behaviour)
+
+                time_get_data = time.time()
+                ed.dfs_from_database()
+                time_get_data = time.time() - time_get_data
+                save_to_database(dbsession, ['time_get_data'], [time_get_data], id_event_behaviour)
+
+                time_pid_commands = time.time()
+                ed.pid_commands()
+                time_pid_commands = time.time() - time_pid_commands
+                save_to_database(dbsession, ['time_pid_commands'], [time_pid_commands], id_event_behaviour)
+
+                time_announcement_commands = time.time()
+                ed.announcement_commands()
+                time_announcement_commands = time.time() - time_announcement_commands
+                save_to_database(dbsession, ['time_announcement_commands'], [time_announcement_commands], id_event_behaviour)
+
+                time_withdrawn_commands = time.time()
+                ed.withdrawn_commands()
+                time_withdrawn_commands = time.time() - time_withdrawn_commands
+                save_to_database(dbsession, ['time_withdrawn_commands'], [time_withdrawn_commands], id_event_behaviour)
+
+                time_prepends_commands = time.time()
+                ed.prepend_commands()
+                time_prepends_commands = time.time() - time_prepends_commands
+                save_to_database(dbsession, ['time_prepends_commands'], [time_prepends_commands], id_event_behaviour)
+
+                time_write_files = time.time()
+                ed.time_write_files()
+                time_write_files = time.time() - time_write_files
+                save_to_database(dbsession, ['time_write_files'], [time_write_files], id_event_behaviour)
         except OperationalError:
             print('Database error')
     else:
@@ -562,4 +318,4 @@ def main(argv=sys.argv[1:]):
               '-h                                               this help\n'
               '\n'
               '--config-file=minisecbgp.ini                     pyramid config filename [.ini]\n'
-              '--event-behaviour=<id_event_behaviour>           event behaviour ID\n')
+              '--id-event-behaviour=<id_event_behaviour>        event behaviour ID\n')

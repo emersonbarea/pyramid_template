@@ -685,9 +685,6 @@ def hijack_events(request):
     event_behaviour = request.dbsession.query(models.EventBehaviour).\
         filter_by(id_topology=topology.id).first()
 
-    if event_behaviour:
-        dictionary['event_behaviour'] = True
-
     if request.method == 'POST':
         if form_datetime.edit_button.data:
             try:
@@ -707,11 +704,7 @@ def hijack_events(request):
                     request.dbsession.add(event_behaviour)
                 request.dbsession.flush()
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -745,11 +738,7 @@ def hijack_events(request):
                                      id_type_of_event=type_of_event.id)
                 request.dbsession.add(event)
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -783,11 +772,7 @@ def hijack_events(request):
                                      id_type_of_event=type_of_event.id)
                 request.dbsession.add(event)
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -826,11 +811,7 @@ def hijack_events(request):
                     id_type_of_event=type_of_event.id)
                 request.dbsession.add(event)
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -839,11 +820,7 @@ def hijack_events(request):
                 request.dbsession.query(models.Event).\
                     filter_by(id=form_announcement.announcement_id_event.data).delete()
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -852,11 +829,7 @@ def hijack_events(request):
                 request.dbsession.query(models.Event).\
                     filter_by(id=form_withdrawn.withdrawn_id_event.data).delete()
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
@@ -865,15 +838,11 @@ def hijack_events(request):
                 request.dbsession.query(models.Event).\
                     filter_by(id=form_prepend.prepend_id_event.data).delete()
 
-                return HTTPFound(location=request.route_path(
-                    'hijackEvents', id_realistic_analysis=request.matchdict['id_realistic_analysis']))
-
             except Exception as error:
-                request.dbsession.rollback()
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
-        if form_button.generate_files_button:
+        if form_button.generate_files_button.data:
 
             # delete previous event detail if exist
             request.dbsession.query(models.EventDetail).filter_by(id_event_behaviour=event_behaviour.id).delete()
@@ -884,7 +853,7 @@ def hijack_events(request):
             request.dbsession.flush()
 
             arguments = ['--config-file=minisecbgp.ini',
-                         '--event-behaviour=%s' % event_behaviour.id]
+                         '--id-event-behaviour=%s' % event_behaviour.id]
             subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events'] + arguments)
 
             return HTTPFound(location=request.route_path('hijackEventsDetail', id_event_behaviour=event_behaviour.id))
@@ -899,6 +868,9 @@ def hijack_events(request):
             filter(models.Event.id_event_behaviour == event_behaviour.id).\
             filter(models.Event.id_type_of_event == models.TypeOfEvent.id).\
             order_by(models.Event.event_datetime).all()
+
+    if event_behaviour:
+        dictionary['event_behaviour'] = True
 
     dictionary['realistic_analysis'] = realistic_analysis
     dictionary['topology'] = topology

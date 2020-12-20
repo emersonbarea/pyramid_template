@@ -27,9 +27,7 @@
         os.system('sudo -u minisecbgpuser bash -c \'MaxiNetStatus\'')
 
     def start_hijack_scenario(self):
-        # *start_hijack_scenario_begin*
-        pass
-        # *start_hijack_scenario_end*
+        subprocess.Popen(['./event_commands.MiniSecBGP'])
 
     @staticmethod
     def input_to_continue(phrase, color):
@@ -88,21 +86,16 @@
                     self.input_to_continue('You need start topology first (menu option [1])', 'red')
 
             elif self.option == 4:
-                try:
-                    with open('./events_commands.MiniSecBGP', 'r') as file:
-                        events_commands = file.readlines()
-                    file.close()
-                except Exception as error:
-                    self.input_to_continue('There is no event created', 'yellow')
-                else:
-                    if events_commands:
-                        if 1 in self.option_executed:
-                            self.start_hijack_scenario(events_commands)
-                            self.input_to_continue('Hijacking attack scenario started successfully.\n\nYou can interact with this scenario through the Mininet terminal (menu option [2])', 'green')
-                        else:
-                            self.input_to_continue('You need start topology first (menu option [1])', 'red')
+                file = pathlib.Path('event_commands.MiniSecBGP')
+                if file.exists():
+                    if 1 in self.option_executed:
+                        self.start_hijack_scenario()
+                        self.input_to_continue('Hijacking attack scenario started successfully.\n\n'
+                        'You can interact with this scenario through the Mininet terminal (menu option [2])', 'green')
                     else:
-                        self.input_to_continue('There is no event created', 'yellow')
+                        self.input_to_continue('You need start topology first (menu option [1])', 'red')
+                else:
+                    self.input_to_continue('There is no event created', 'yellow')
 
             elif self.option == 9:
                 self.restart_MaxiNet()

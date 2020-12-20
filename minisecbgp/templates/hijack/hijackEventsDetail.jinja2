@@ -92,7 +92,7 @@
             <p align="center">* fields status checked automatically every 5 seconds</p>
         {% else %}
             <div class="form-group" align="center">
-                {{ form.events_button(class="btn btn-primary", id_realistic_analysis=1) }}
+                {{ form_button.download_button(class="btn btn-primary", id_realistic_analysis=1) }}
                 <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#confirmationModal">Emulate</button>
             </div>
         {% endif %}
