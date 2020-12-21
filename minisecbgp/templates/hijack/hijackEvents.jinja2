@@ -94,17 +94,15 @@
                       <td align="center"><strong>AS Announcer</strong></td>
                       <td></td>
                     </tr>
-                    {% for event in events %}
-                      {% if event.TypeOfEvent.type_of_event == 'Announcement' %}
-                        <div class="form-inline">
-                          <tr>
-                            <td align="center">{{ event.Event.event_datetime }}</td>
-                            <td align="center">{{ event.Event.announced_prefix }}</td>
-                            <td align="center">{{ event.Event.announcer }}</td>
-                            <td align="center"><button type="button" onclick="eventAnnouncement({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteAnnouncementModal">Del</button></td>
-                          </tr>
-                        </div>
-                      {% endif %}
+                    {% for event in events_announcement %}
+                      <div class="form-inline">
+                        <tr>
+                          <td align="center">{{ event.event_datetime }}</td>
+                          <td align="center">{{ event.prefix }}</td>
+                          <td align="center">{{ event.announcer }}</td>
+                          <td align="center"><button type="button" onclick="eventAnnouncement({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteAnnouncementModal">Del</button></td>
+                        </tr>
+                      </div>
                     {% endfor %}
                   </table>
                 </div>
@@ -185,17 +183,15 @@
                       <td align="center"><strong>AS Withdrawer</strong></td>
                       <td></td>
                     </tr>
-                    {% for event in events %}
-                      {% if event.TypeOfEvent.type_of_event == 'Withdrawn' %}
-                        <div class="form-inline">
-                          <tr>
-                            <td align="center">{{ event.Event.event_datetime }}</td>
-                            <td align="center">{{ event.Event.withdrawn_prefix }}</td>
-                            <td align="center">{{ event.Event.withdrawer }}</td>
-                            <td align="center"><button type="button" onclick="eventWithdrawn({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteWithdrawnModal">Del</button></td>
-                          </tr>
-                        </div>
-                      {% endif %}
+                    {% for event in events_withdrawn %}
+                      <div class="form-inline">
+                        <tr>
+                          <td align="center">{{ event.event_datetime }}</td>
+                          <td align="center">{{ event.prefix }}</td>
+                          <td align="center">{{ event.withdrawer }}</td>
+                          <td align="center"><button type="button" onclick="eventWithdrawn({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteWithdrawnModal">Del</button></td>
+                        </tr>
+                      </div>
                     {% endfor %}
                   </table>
                 </div>
@@ -270,24 +266,25 @@
                   <table style="width:100%">
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
-                      <td align="center"><strong>Prepended AS</strong></td>
+                      <td align="center"><strong>In/Out</strong></td>
                       <td align="center"><strong>AS Prepender</strong></td>
-                      <td align="center"><strong>How many times</strong></td>
+                      <td align="center"><strong>Prepended AS</strong></td>
+                      <td align="center"><strong>Announced to AS</strong></td>
+                      <td align="center"><strong>HMT</strong></td>
                       <td></td>
                     </tr>
-                    {% for event in events %}
-                      {% if event.TypeOfEvent.type_of_event == 'Prepend' %}
-                        <div class="form-inline">
-                          <tr>
-                            <td align="center">{{ event.Event.event_datetime }}</td>
-                            <td align="center">{{ event.Event.prepended }}</td>
-                            <td align="center">{{ event.Event.prepender }}</td>
-                            <td align="center">{{ event.Event.times_prepended }}</td>
-                            <td align="center"><button type="button" onclick="eventPrepend({{ event.Event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeletePrependModal">Del</button></td>
-                          </tr>
-                        </div>
-
-                      {% endif %}
+                    {% for event in events_prepend %}
+                      <div class="form-inline">
+                        <tr>
+                          <td align="center">{{ event.event_datetime }}</td>
+                          <td align="center">{{ event.in_out }}</td>
+                          <td align="center">{{ event.prepender }}</td>
+                          <td align="center">{{ event.prepended }}</td>
+                          <td align="center">{{ event.peer }}</td>
+                          <td align="center">{{ event.hmt }}</td>
+                          <td align="center"><button type="button" onclick="eventPrepend({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeletePrependModal">Del</button></td>
+                        </tr>
+                      </div>
                     {% endfor %}
                   </table>
                 </div>
@@ -311,16 +308,36 @@
                         {{ form_prepend.prepend_datetime(value="0001-01-01 01:00:00") }} Format: %Y-%m-%d %H:%M:%S
                       </p>
                       <p>
-                        {{ form_prepend.prepended.label }}
-                        {{ form_prepend.prepended(value="0") }} Format: ASN (16/32 bits)
+                        {{ form_prepend.prepend_in_out.label }}
+                        {{ form_prepend.prepend_in_out }}
                       </p>
                       <p>
-                        {{ form_prepend.prepender.label }}
-                        {{ form_prepend.prepender(value="0") }} Format: ASN (16/32 bits)
+                        <table style="width:100%">
+                          <tr>
+                            <td align="left">{{ form_prepend.prepender.label }}</td>
+                            <td align="left">{{ form_prepend.prepended.label }}</td>
+                          </tr>
+                          <div class="form-inline">
+                            <tr>
+                              <td align="left">{{ form_prepend.prepender(value="0") }}</td>
+                              <td align="left">{{ form_prepend.prepended(value="0") }}</td>
+                            </tr>
+                          </div>
+                        </table>
                       </p>
                       <p>
-                        {{ form_prepend.times_prepended.label }}
-                        {{ form_prepend.times_prepended(value="0") }} negative numbers means withdrawal of prepends
+                        <table style="width:100%">
+                          <tr>
+                            <td align="left">{{ form_prepend.prepend_peer.label }}</td>
+                            <td align="left">{{ form_prepend.times_prepended.label }}</td>
+                          </tr>
+                          <div class="form-inline">
+                            <tr>
+                              <td align="left">{{ form_prepend.prepend_peer(value="0") }}</td>
+                              <td align="left">{{ form_prepend.times_prepended(value="0") }}</td>
+                            </tr>
+                          </div>
+                        </table>
                       </p>
                     </div>
                     <div class="modal-footer">
@@ -392,15 +409,14 @@
       </div>
 
       <script>
-
-        function eventWithdrawn(id_event) {
-          withdrawn_id_event.value = id_event;
+        function eventAnnouncement(id_event) {
+          announcement_id_event.value = id_event;
         };
         function eventPrepend(id_event) {
           prepend_id_event.value = id_event;
         };
-        function eventAnnouncement(id_event) {
-          announcement_id_event.value = id_event;
+        function eventWithdrawn(id_event) {
+          withdrawn_id_event.value = id_event;
         };
       </script>
 

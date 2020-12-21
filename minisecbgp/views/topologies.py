@@ -183,34 +183,41 @@ def topologies_detail(request):
                 'where eb.id_topology = %s);' % request.matchdict["id_topology"]
         dictionary['bgplay'] = list(request.dbsession.bind.execute(query))
 
-        query = 'select toe.type_of_event as type_of_event ' \
-                'from type_of_event toe ' \
-                'order by toe.type_of_event;'
-        dictionary['types_of_event'] = list(request.dbsession.bind.execute(query))
-
-        query = 'select count(toe.id) as count ' \
-                'from type_of_event toe;'
-        dictionary['count_types_of_event'] = list(request.dbsession.bind.execute(query))
-
-        query = 'select ' \
-                '(select toe.type_of_event ' \
-                'from type_of_event toe ' \
-                'where toe.id = e.id_type_of_event) as type_of_event, ' \
-                'event_datetime as event_datetime, ' \
-                'announced_prefix as announced_prefix, ' \
-                'announcer as announcer, ' \
-                'withdrawn_prefix as withdrawn_prefix, ' \
-                'withdrawer as withdrawer, ' \
-                'prepended as prepended, ' \
-                'prepender as prepender, ' \
-                'times_prepended as times_prepended ' \
-                'from event e ' \
-                'where e.id_event_behaviour = (' \
+        query = 'select event_datetime as event_datetime, ' \
+                'prefix as prefix, ' \
+                'announcer as announcer ' \
+                'from event_announcement ea ' \
+                'where ea.id_event_behaviour = (' \
                 'select eb.id ' \
                 'from event_behaviour eb ' \
                 'where eb.id_topology = %s)' \
                 'order by event_datetime;' % request.matchdict["id_topology"]
-        dictionary['events'] = list(request.dbsession.bind.execute(query))
+        dictionary['events_announcement'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select event_datetime as event_datetime, ' \
+                'prefix as prefix, ' \
+                'withdrawer as withdrawer ' \
+                'from event_withdrawn ew ' \
+                'where ew.id_event_behaviour = (' \
+                'select eb.id ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s)' \
+                'order by event_datetime;' % request.matchdict["id_topology"]
+        dictionary['events_withdrawn'] = list(request.dbsession.bind.execute(query))
+
+        query = 'select event_datetime as event_datetime, ' \
+                'in_out as in_out, ' \
+                'prepender as prepender, ' \
+                'prepended as prepended, ' \
+                'peer as peer, ' \
+                'hmt as hmt ' \
+                'from event_prepend ep ' \
+                'where ep.id_event_behaviour = (' \
+                'select eb.id ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s)' \
+                'order by event_datetime;' % request.matchdict["id_topology"]
+        dictionary['events_prepend'] = list(request.dbsession.bind.execute(query))
 
         query = 'select ra.include_stub as include_stub, ' \
                 '(select tdm.topology_distribution_method ' \

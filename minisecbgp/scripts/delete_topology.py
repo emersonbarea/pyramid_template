@@ -27,8 +27,12 @@ class DeleteTopology(object):
             scenario = 'delete from scenario where id_topology = %s;' % id_topology
 
             # hijack events data
-            event = 'delete from event where id_event_behaviour in (' \
-                    'select id from event_behaviour where id_topology = %s);' % id_topology
+            event_announcement = 'delete from event_announcement where id_event_behaviour in (' \
+                                 'select id from event_behaviour where id_topology = %s);' % id_topology
+            event_withdrawn = 'delete from event_withdrawn where id_event_behaviour in (' \
+                              'select id from event_behaviour where id_topology = %s);' % id_topology
+            event_prepend = 'delete from event_prepend where id_event_behaviour in (' \
+                            'select id from event_behaviour where id_topology = %s);' % id_topology
             bgplay = 'delete from bgplay where id_event_behaviour in (' \
                      'select id from event_behaviour where id_topology = %s);' % id_topology
             event_detail = 'delete from event_detail where id_event_behaviour in (' \
@@ -64,7 +68,9 @@ class DeleteTopology(object):
             dbsession.bind.execute(scenario_item)
             dbsession.bind.execute(scenario)
 
-            dbsession.bind.execute(event)
+            dbsession.bind.execute(event_announcement)
+            dbsession.bind.execute(event_withdrawn)
+            dbsession.bind.execute(event_prepend)
             dbsession.bind.execute(bgplay)
             dbsession.bind.execute(event_detail)
             dbsession.bind.execute(event_behaviour)

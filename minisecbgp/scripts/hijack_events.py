@@ -38,32 +38,17 @@ class EventDetail(object):
     def dfs_from_database(self):
 
         # get PID from
-        query = 'select e.announcer as autonomous_system ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'announcement\') ' \
-                '' \
+        query = 'select a.announcer as autonomous_system ' \
+                'from event_announcement a ' \
+                'where a.id_event_behaviour = %s ' \
                 'union ' \
-                '' \
-                'select e.withdrawer as autonomous_system ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'withdrawn\') ' \
-                '' \
+                'select w.withdrawer as autonomous_system ' \
+                'from event_withdrawn w ' \
+                'where w.id_event_behaviour = %s ' \
                 'union ' \
-                'select e.prepender as autonomous_system ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'prepend\');' % \
+                'select p.prepender as autonomous_system ' \
+                'from event_prepend p ' \
+                'where p.id_event_behaviour = %s; ' % \
                 (self.id_event_behaviour, self.id_event_behaviour, self.id_event_behaviour)
         result_proxy = self.dbsession.bind.execute(query)
         self.pid = list()
@@ -71,56 +56,53 @@ class EventDetail(object):
             self.pid.append(row['autonomous_system'])
 
         # Announcement
-        query = 'select e.event_datetime as event_datetime, ' \
-                'e.announced_prefix as announced_prefix, ' \
-                'e.announcer as announcer ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'announcement\');' % self.id_event_behaviour
+        query = 'select a.event_datetime as event_datetime, ' \
+                'a.prefix as prefix, ' \
+                'a.announcer as announcer ' \
+                'from event_announcement a ' \
+                'where a.id_event_behaviour = %s;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        self.df_announcement = pd.DataFrame(result_proxy, columns=['event_datetime', 'announced_prefix', 'announcer'])
+        self.df_announcement = pd.DataFrame(result_proxy, columns=['event_datetime', 'prefix', 'announcer'])
         # print(self.df_announcement)
-        #         event_datetime announced_prefix announcer
+        #         event_datetime           prefix  announcer
         # 0  2020-12-20 08:00:30    33.44.55.0/24     65001
         # 1  2020-12-20 08:01:40    55.55.55.0/24     65003
         # 2  2020-12-20 08:00:40    55.66.77.0/24     65004
 
         # Withdrawn
-        query = 'select e.event_datetime as event_datetime, ' \
-                'e.withdrawn_prefix as withdrawn_prefix, ' \
-                'e.withdrawer as withdrawer ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'withdrawn\');' % self.id_event_behaviour
+        query = 'select ' \
+                'w.event_datetime as event_datetime, ' \
+                'w.prefix as prefix, ' \
+                'w.withdrawer as withdrawer, ' \
+                'asys.id ' \
+                'from event_withdrawn w, ' \
+                'event_behaviour eb, ' \
+                'autonomous_system asys ' \
+                'where w.id_event_behaviour = %s ' \
+                'and w.id_event_behaviour = eb.id ' \
+                'and eb.id_topology = asys.id_topology ' \
+                'and w.withdrawer = asys.autonomous_system;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        self.df_withdrawn = pd.DataFrame(result_proxy, columns=['event_datetime', 'withdrawn_prefix', 'withdrawer'])
+        self.df_withdrawn = pd.DataFrame(result_proxy, columns=['event_datetime', 'prefix', 'withdrawer', 'id_autonomous_system'])
         # print(self.df_withdrawn)
-        #         event_datetime withdrawn_prefix withdrawer
-        # 0  2020-12-20 08:01:00    55.66.77.0/24      65004
-        # 1  2020-12-20 08:01:20    33.44.55.0/24      65002
+        #         event_datetime         prefix  withdrawer  id_autonomous_system
+        # 0  2020-12-20 08:01:00  55.66.77.0/24       65004                     6
+        # 1  2020-12-20 08:01:20  33.44.55.0/24       65002                     4
 
         # Prepend
-        query = 'select e.event_datetime as event_datetime, ' \
-                'e.prepended as prepended, ' \
-                'e.prepender as prepender, ' \
-                'e.times_prepended as times_prepended ' \
-                'from event e ' \
-                'where e.id_event_behaviour = %s ' \
-                'and e.id_type_of_event = (' \
-                'select toe.id ' \
-                'from type_of_event toe ' \
-                'where lower(toe.type_of_event) = \'prepend\');' % self.id_event_behaviour
+        query = 'select p.event_datetime as event_datetime, ' \
+                'p.in_out as in_out, ' \
+                'p.prepender as prepender, ' \
+                'p.prepended as prepended, ' \
+                'p.peer as peer, ' \
+                'p.hmt as hmt ' \
+                'from event_prepend p ' \
+                'where p.id_event_behaviour = %s;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        self.df_prepend = pd.DataFrame(result_proxy, columns=['event_datetime', 'prepended', 'prepender', 'times_prepended'])
+        self.df_prepend = pd.DataFrame(result_proxy, columns=['event_datetime', 'in_out', 'prepender', 'prepended', 'peer', 'hmt'])
         # print(self.df_prepend)
-        #         event_datetime prepended prepender times_prepended
-        # 0  2020-12-20 08:01:50     65003     65002               3
+        #         event_datetime in_out prepender prepended   peer hmt
+        # 0  2008-02-24 20:00:00    out     65001     65001  65002   5
 
     def pid_commands(self):
         self.pid_commands_list = list()
@@ -132,34 +114,110 @@ class EventDetail(object):
     def announcement_commands(self):
         self.announcement_commands_list = list()
         for row in self.df_announcement.itertuples():
-            self.announcement_commands_list.\
-                append('    '
-                       'if current_time == %s:\n'
-                       '        '
-                       'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
-                       '/usr/bin/python -c \\"import pexpect; '
-                       'child = pexpect.spawn(\'telnet 0 bgpd\'); '
-                       'child.expect(\'Password: \'); '
-                       'child.sendline(\'en\'); '
-                       'child.expect(\'.+>\'); '
-                       'child.sendline(\'enable\'); '
-                       'child.expect([\'Password: \',\'.+#\']); '
-                       'child.sendline(\'en\'); '
-                       'child.expect(\'.+#\'); '
-                       'child.sendline(\'configure terminal\'); '
-                       'child.expect(\'.+#\'); '
-                       'child.sendline(\'router bgp %s\'); '
-                       'child.expect(\'.+#\'); '
-                       'child.sendline(\'network %s\'); '
-                       'child.expect(\'.+#\')\\"" %s AS%s)\n' %
-                       (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                        '%s', str(row[3]), str(row[2]), '%', str(row[3])))
+            self.announcement_commands_list.append(
+                '    '
+                'if current_time == %s:\n'
+                '        '
+                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                '/usr/bin/python -c \\"import pexpect; '
+                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                'child.expect(\'Password: \'); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+>\'); '
+                'child.sendline(\'enable\'); '
+                'child.expect([\'Password: \',\'.+#\']); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'configure terminal\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'router bgp %s\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'network %s\'); '
+                'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                 '%s', str(row[3]), str(row[2]), '%', str(row[3])))
 
     def withdrawn_commands(self):
         self.withdrawn_commands_list = list()
+        for row in self.df_withdrawn.itertuples():
+            query = 'select l.ip_autonomous_system2 as ip_peer ' \
+                    'from link l ' \
+                    'where l.id_autonomous_system1 = %s ' \
+                    'union ' \
+                    'select l.ip_autonomous_system1 as ip_peer ' \
+                    'from link l ' \
+                    'where l.id_autonomous_system2 = %s;' % \
+                    (str(row[4]), str(row[4]))
+            result_proxy = self.dbsession.bind.execute(query)
+            distribute_list_commands = ''
+            for internal_row in result_proxy:
+                distribute_list_commands = distribute_list_commands + \
+                                           ' child.sendline(\'neighbor %s distribute-list %s out\'); ' \
+                                           'child.expect(\'.+#\');' % \
+                                           (str(list(internal_row)[0]), str(row[2]))
+
+            self.withdrawn_commands_list.append(
+                '    '
+                'if current_time == %s:\n'
+                '        '
+                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                '/usr/bin/python -c \\"import pexpect; '
+                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                'child.expect(\'Password: \'); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+>\'); '
+                'child.sendline(\'enable\'); '
+                'child.expect([\'Password: \',\'.+#\']); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'configure terminal\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'access-list %s deny %s exact-match\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'access-list %s permit any\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'router bgp %s\'); '
+                'child.expect(\'.+#\'); '
+                '%s'
+                ' child.sendline(\'exit\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'exit\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'clear ip bgp * soft\'); '                
+                'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                 '%s', str(row[2]), str(row[2]), str(row[2]), str(row[3]), distribute_list_commands,
+                 '%', str(row[3])))
 
     def prepend_commands(self):
         self.prepend_commands_list = list()
+        for row in self.df_prepend.itertuples():
+
+            print(row)
+
+
+            self.withdrawn_commands_list.append(
+                '    '
+                'if current_time == %s:\n'
+                '        '
+                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                '/usr/bin/python -c \\"import pexpect; '
+                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                'child.expect(\'Password: \'); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+>\'); '
+                'child.sendline(\'enable\'); '
+                'child.expect([\'Password: \',\'.+#\']); '
+                'child.sendline(\'en\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'configure terminal\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'router bgp %s\'); '
+                'child.expect(\'.+#\'); '
+                'child.sendline(\'no network %s\'); '
+                'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                 '%s', str(row[3]), str(row[2]), '%', str(row[3])))
 
     def time_write_files(self):
         """

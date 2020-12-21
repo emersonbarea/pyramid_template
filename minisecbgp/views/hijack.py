@@ -105,8 +105,8 @@ class HijackEventsDateTimeDataForm(Form):
 
 class HijackEventsAnnouncementDataForm(Form):
     announcement_datetime = DateTimeField('Start time: ',
-                                           format='%Y-%m-%d %H:%M:%S',
-                                           validators=[InputRequired()])
+                                          format='%Y-%m-%d %H:%M:%S',
+                                          validators=[InputRequired()])
     announced_prefix = StringField('Announced Prefix: ',
                                    validators=[InputRequired(),
                                                Length(min=9, max=18,
@@ -143,6 +143,10 @@ class HijackEventsPrependDataForm(Form):
     prepend_datetime = DateTimeField('Start time: ',
                                      format='%Y-%m-%d %H:%M:%S',
                                      validators=[InputRequired()])
+    prepend_in_out = SelectField('In/Out:',
+                                 validators=[InputRequired()],
+                                 choices=[('in', 'In'),
+                                          ('out', 'Out')])
     prepended = StringField('Prepended AS: ',
                             validators=[InputRequired(),
                                         Length(min=1, max=18,
@@ -151,6 +155,10 @@ class HijackEventsPrependDataForm(Form):
                             validators=[InputRequired(),
                                         Length(min=1, max=18,
                                                message='Only a valid ASN in this topology.')])
+    prepend_peer = StringField('Peer AS: ',
+                               validators=[InputRequired(),
+                                           Length(min=1, max=18,
+                                                  message='Only a valid ASN in this topology.')])
     times_prepended = IntegerField('How many times will be prepended:',
                                    validators=[InputRequired(),
                                                Length(min=1, max=10,
@@ -710,9 +718,6 @@ def hijack_events(request):
 
         if form_announcement.create_announcement_button.data:
             try:
-                type_of_event = request.dbsession.query(models.TypeOfEvent).\
-                    filter_by(type_of_event='Announcement').first()
-
                 if not datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
 
@@ -731,12 +736,12 @@ def hijack_events(request):
                 if not announcer:
                     raise ValueError('The AS announcer must be a valid ASN in topology.')
 
-                event = models.Event(event_datetime=datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S'),
-                                     announced_prefix=form_announcement.announced_prefix.data,
-                                     announcer=form_announcement.announcer.data,
-                                     id_event_behaviour=event_behaviour.id,
-                                     id_type_of_event=type_of_event.id)
-                request.dbsession.add(event)
+                event_announcement = models.EventAnnouncement(
+                    id_event_behaviour=event_behaviour.id,
+                    event_datetime=datetime.strptime(str(form_announcement.announcement_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                    prefix=form_announcement.announced_prefix.data,
+                    announcer=form_announcement.announcer.data)
+                request.dbsession.add(event_announcement)
 
             except Exception as error:
                 dictionary['message'] = error
@@ -744,9 +749,6 @@ def hijack_events(request):
 
         if form_withdrawn.create_withdraw_button.data:
             try:
-                type_of_event = request.dbsession.query(models.TypeOfEvent).\
-                    filter_by(type_of_event='Withdrawn').first()
-
                 if not datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
 
@@ -765,12 +767,12 @@ def hijack_events(request):
                 if not withdrawer:
                     raise ValueError('The AS withdrawer must be a valid ASN in topology.')
 
-                event = models.Event(event_datetime=datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'),
-                                     withdrawn_prefix=form_withdrawn.withdrawn_prefix.data,
-                                     withdrawer=form_withdrawn.withdrawer.data,
-                                     id_event_behaviour=event_behaviour.id,
-                                     id_type_of_event=type_of_event.id)
-                request.dbsession.add(event)
+                event_withdrawn = models.EventWithdrawn(
+                    id_event_behaviour=event_behaviour.id,
+                    event_datetime=datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                    prefix=form_withdrawn.withdrawn_prefix.data,
+                    withdrawer=form_withdrawn.withdrawer.data)
+                request.dbsession.add(event_withdrawn)
 
             except Exception as error:
                 dictionary['message'] = error
@@ -778,9 +780,6 @@ def hijack_events(request):
 
         if form_prepend.create_prepend_button.data:
             try:
-                type_of_event = request.dbsession.query(models.TypeOfEvent). \
-                    filter_by(type_of_event='Prepend').first()
-
                 if not datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
 
@@ -790,25 +789,51 @@ def hijack_events(request):
                         datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
 
-                prepended = request.dbsession.query(models.AutonomousSystem). \
-                    filter_by(id_topology=topology.id). \
-                    filter_by(autonomous_system=form_prepend.prepended.data).first()
-                if not prepended:
-                    raise ValueError('The prepended AS must be a valid ASN in topology.')
-
                 prepender = request.dbsession.query(models.AutonomousSystem). \
                     filter_by(id_topology=topology.id). \
                     filter_by(autonomous_system=form_prepend.prepender.data).first()
                 if not prepender:
                     raise ValueError('The AS prepender must be a valid ASN in topology.')
 
-                event = models.Event(
-                    event_datetime=datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'),
-                    prepended=form_prepend.prepended.data,
-                    prepender=form_prepend.prepender.data,
-                    times_prepended=form_prepend.times_prepended.data,
+                prepended = request.dbsession.query(models.AutonomousSystem). \
+                    filter_by(id_topology=topology.id). \
+                    filter_by(autonomous_system=form_prepend.prepended.data).first()
+                if not prepended:
+                    raise ValueError('The prepended AS must be a valid ASN in topology.')
+
+                peer = request.dbsession.query(models.AutonomousSystem). \
+                    filter_by(id_topology=topology.id). \
+                    filter_by(autonomous_system=form_prepend.prepend_peer.data).first()
+                if not prepended:
+                    raise ValueError('The peer AS must be a valid ASN in topology.')
+
+                query = 'select count(l.id) from link l where ' \
+                        '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s) ' \
+                        'or ' \
+                        '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s)' % \
+                        (prepender.id, peer.id, peer.id, prepender.id)
+                result_proxy = request.dbsession.bind.execute(query)
+                if int(list(result_proxy)[0][0]) == 0:
+                    raise ValueError('The prepender and peer AS must be BGP peer.')
+
+                if form_prepend.prepend_in_out.data == 'in':
+                    query = 'select count(l.id) from link l where ' \
+                            '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s) ' \
+                            'or ' \
+                            '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s)' % \
+                            (prepender.id, prepended.id, prepended.id, prepender.id)
+                    result_proxy = request.dbsession.bind.execute(query)
+                    if int(list(result_proxy)[0][0]) == 0:
+                        raise ValueError('AS Prepender and Prepended AS must be peer in an Inbound AS-Path Prepending.')
+
+                event = models.EventPrepend(
                     id_event_behaviour=event_behaviour.id,
-                    id_type_of_event=type_of_event.id)
+                    event_datetime=datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                    in_out=form_prepend.prepend_in_out.data,
+                    prepender=form_prepend.prepender.data,
+                    prepended=form_prepend.prepended.data,
+                    peer=form_prepend.prepend_peer.data,
+                    hmt=form_prepend.times_prepended.data)
                 request.dbsession.add(event)
 
             except Exception as error:
@@ -817,16 +842,15 @@ def hijack_events(request):
 
         if form_announcement.delete_announcement_button.data:
             try:
-                request.dbsession.query(models.Event).\
+                request.dbsession.query(models.EventAnnouncement).\
                     filter_by(id=form_announcement.announcement_id_event.data).delete()
-
             except Exception as error:
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
         if form_withdrawn.delete_withdrawn_button.data:
             try:
-                request.dbsession.query(models.Event).\
+                request.dbsession.query(models.EventWithdrawn).\
                     filter_by(id=form_withdrawn.withdrawn_id_event.data).delete()
 
             except Exception as error:
@@ -835,7 +859,7 @@ def hijack_events(request):
 
         if form_prepend.delete_prepend_button.data:
             try:
-                request.dbsession.query(models.Event).\
+                request.dbsession.query(models.EventPrepend).\
                     filter_by(id=form_prepend.prepend_id_event.data).delete()
 
             except Exception as error:
@@ -864,10 +888,17 @@ def hijack_events(request):
         form_datetime.end_datetime.data = datetime.strptime(
             str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S')
 
-        dictionary['events'] = request.dbsession.query(models.Event, models.TypeOfEvent).\
-            filter(models.Event.id_event_behaviour == event_behaviour.id).\
-            filter(models.Event.id_type_of_event == models.TypeOfEvent.id).\
-            order_by(models.Event.event_datetime).all()
+        dictionary['events_announcement'] = request.dbsession.query(models.EventAnnouncement). \
+            filter_by(id_event_behaviour=event_behaviour.id). \
+            order_by(models.EventAnnouncement.event_datetime).all()
+
+        dictionary['events_withdrawn'] = request.dbsession.query(models.EventWithdrawn). \
+            filter_by(id_event_behaviour=event_behaviour.id). \
+            order_by(models.EventWithdrawn.event_datetime).all()
+
+        dictionary['events_prepend'] = request.dbsession.query(models.EventPrepend). \
+            filter_by(id_event_behaviour=event_behaviour.id). \
+            order_by(models.EventPrepend.event_datetime).all()
 
     if event_behaviour:
         dictionary['event_behaviour'] = True

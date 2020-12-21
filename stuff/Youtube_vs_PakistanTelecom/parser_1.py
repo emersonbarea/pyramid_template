@@ -12,130 +12,66 @@ class BGPlay(object):
         self.file_from = argv
 
     def get_events(self):
+
         with open(self.file_from) as json_file:
             data = json.load(json_file)
         json_file.close()
 
         try:
 
-            # Announcement
-            
-            print('\nAnnouncement')
-
             events = data['data']['events']
-            announcement_events_list = list()
-            
-            for observed_event in events:
-                if observed_event['type'] == 'A':
-                    observed_event_source = observed_event['attrs']['path'][-1]
-                    observed_event_prefix = observed_event['attrs']['target_prefix']
-                    if announcement_events_list:
-                        for i, event in enumerate(announcement_events_list):
-                            if [observed_event_prefix, observed_event_source] == [list(event[1].values())[0], list(event[2].values())[0]]:
-                                break
-                            if i == len(announcement_events_list) - 1:
-                                announcement_events_list.append([
-                                    {'event_datetime': observed_event['timestamp']},
-                                    {'announced_prefix': observed_event_prefix},
-                                    {'announcer': observed_event_source}
-                                    ])
-                    else:
-                        announcement_events_list.append([
-                            {'event_datetime': observed_event['timestamp']},
-                            {'announced_prefix': observed_event_prefix},
-                            {'announcer': observed_event_source}
-                            ])
-            
-            for item in announcement_events_list:
-                pass #print(item)
-
-
-           
-            # Withdrawn
-
-            print('\nWithdrawn')
-
-            events = data['data']['events']
-            sources = data['data']['sources']
-            withdrawn_events_list_temp = list()
-            withdrawn_events_list = list()
-            
-            for observed_event in events:
-                if observed_event['type'] == 'W':
-                    for source in sources:
-                        if str(source['id']) == str(observed_event['attrs']['source_id']):
-                            withdrawer = source['as_number']
-
-                    withdrawn_events_list_temp.append({
-                        'event_datetime': observed_event['timestamp'], 
-                        'withdrawer': withdrawer, 
-                        'withdrawn': observed_event['attrs']['target_prefix']
-                        })
-
-            for item in withdrawn_events_list_temp:
-                print(item)
-
-            if withdrawn_events_list_temp:
-                for withdrawn_event_temp in withdrawn_events_list_temp:
-                    if not withdrawn_events_list:
-                        withdrawn_events_list.append(withdrawn_event_temp)
-                    else:
-                        for i, withdrawn_event in enumerate(withdrawn_events_list):
-                            if (str(withdrawn_event['withdrawer'])) == str(withdrawn_event_temp['withdrawer']) and \
-                                    (str(withdrawn_event['withdrawn']) == str(withdrawn_event_temp['withdrawn'])):
-                                break
-                            if i == len(withdrawn_events_list) - 1:
-                                withdrawn_events_list.append(withdrawn_event_temp)
-
-            print('\n')
-            for item in withdrawn_events_list:
-                print(item)
-
-
 
             # Prepend
-
-            print('\nPrepend')
-
-            events = data['data']['events']
+            prepend_events_list_temp = list()
             prepend_events_list = list()
 
             for observed_event in events:
-
                 if observed_event['type'] == 'A':
-
                     path = observed_event['attrs']['path']
-                    previours_hop = ''
-
+                    previous_hop = ''
                     for elem in path:
-
                         if path.count(elem) > 1:
-                            
+
                             # get the AS prepender
+                            peer_path = ['']
                             for hop in path:
-                                if not previours_hop:
-                                    previours_hop = hop
+                                if not previous_hop:
+                                    previous_hop = hop
                                 else:
                                     if hop == elem:
-                                        prepender = previours_hop
+                                        prepender = previous_hop
                                         break
                                     else:
-                                        previours_hop = hop
+                                        previous_hop = hop
+                                peer_path.append(hop)
 
+                            prepend_events_list_temp.append({
+                                'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                                'in_out': 'in',
+                                'prepender': str(prepender),
+                                'prepended': str(elem),
+                                'peer': str(peer_path[-2]), 
+                                'hmt': str(path.count(elem))
+                            })
 
-                            prepend_events_list.append([
-                                observed_event['timestamp'],
-                                elem,
-                                prepender,
-                                path.count(elem)
-                                ])
+#            prepend_events_list = prepend_events_list_temp
 
+            if prepend_events_list_temp:
+                for prepend_event_temp in prepend_events_list_temp:
+                    if not prepend_events_list:
+                        prepend_events_list.append(prepend_event_temp)
+                    else:
+                        for i, prepend_event in enumerate(prepend_events_list):
+                            if (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
+                                    (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
+                                    (str(prepend_event['peer'])) == str(prepend_event_temp['peer']) and \
+                                    (str(prepend_event['hmt']) == str(prepend_event_temp['hmt'])):
+                                break
+                            if i == len(prepend_events_list) - 1:
+                                prepend_events_list.append(prepend_event_temp)
 
-
-
-
-            #for item in prepend_events_list:
-            #    print(item)
+            for i in prepend_events_list:
+                print(i)
 
         except Exception as error:
             print(error)

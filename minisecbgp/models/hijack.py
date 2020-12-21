@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean, TEXT
+from sqlalchemy import Column, Integer, String, ForeignKey, Index, Boolean, TEXT, BigInteger
 from sqlalchemy.orm import relationship
 
 from .meta import Base
@@ -123,18 +123,6 @@ class RealisticAnalysis(Base):
     Index('IndexId8_topology', id_topology)
 
 
-class EventBehaviour(Base):
-    __tablename__ = 'event_behaviour'
-    id = Column(Integer, primary_key=True)
-    id_topology = Column(Integer, ForeignKey('topology.id'))
-    start_datetime = Column(String(19), nullable=False)
-    end_datetime = Column(String(19), nullable=False)
-    bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_event_behaviour')
-    event = relationship('Event', foreign_keys='Event.id_event_behaviour')
-    event_detail = relationship('EventDetail', foreign_keys='EventDetail.id_event_behaviour')
-    Index('IndexId9_topology', id_topology)
-
-
 class BGPlay(Base):
     __tablename__ = 'bgplay'
     id = Column(Integer, primary_key=True)
@@ -144,28 +132,18 @@ class BGPlay(Base):
     Index('IndexId1_event_behaviour', id_event_behaviour)
 
 
-class TypeOfEvent(Base):
-    __tablename__ = 'type_of_event'
+class EventBehaviour(Base):
+    __tablename__ = 'event_behaviour'
     id = Column(Integer, primary_key=True)
-    type_of_event = Column(String(255), nullable=False)
-    event = relationship('Event', foreign_keys='Event.id_type_of_event')
-
-
-class Event(Base):
-    __tablename__ = 'event'
-    id = Column(Integer, primary_key=True)
-    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
-    id_type_of_event = Column(Integer, ForeignKey('type_of_event.id'))
-    event_datetime = Column(String(19), nullable=False)
-    announced_prefix = Column(String(255))      # A prefix that's will be announced by an announcer AS
-    announcer = Column(String(255))             # the AS that announces a prefix
-    withdrawn_prefix = Column(String(255))      # A prefix that's will be withdrawn by an withdrawer AS
-    withdrawer = Column(String(255))            # the AS that withdraws a prefix
-    prepended = Column(String(255))             # the AS that's will be announced by an prepender AS
-    prepender = Column(String(255))             # the AS that prepends another AS
-    times_prepended = Column(String(255))       # how many times the AS will be prepended by a prepender AS (negative values removes prepends)
-    Index('IndexId2_event_behaviour', id_event_behaviour)
-    Index('IndexId_type_of_event', id_type_of_event)
+    id_topology = Column(Integer, ForeignKey('topology.id'))
+    start_datetime = Column(String(19), nullable=False)
+    end_datetime = Column(String(19), nullable=False)
+    bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_event_behaviour')
+    event_detail = relationship('EventDetail', foreign_keys='EventDetail.id_event_behaviour')
+    event_announcement = relationship('EventAnnouncement', foreign_keys='EventAnnouncement.id_event_behaviour')
+    event_withdrawn = relationship('EventWithdrawn', foreign_keys='EventWithdrawn.id_event_behaviour')
+    event_prepend = relationship('EventPrepend', foreign_keys='EventPrepend.id_event_behaviour')
+    Index('IndexId9_topology', id_topology)
 
 
 class EventDetail(Base):
@@ -178,4 +156,37 @@ class EventDetail(Base):
     time_withdrawn_commands = Column(String(250))
     time_prepends_commands = Column(String(250))
     time_write_files = Column(String(250))
+    Index('IndexId2_event_behaviour', id_event_behaviour)
+
+
+class EventAnnouncement(Base):
+    __tablename__ = 'event_announcement'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    event_datetime = Column(String(19), nullable=False)
+    prefix = Column(String(255))
+    announcer = Column(BigInteger)
     Index('IndexId3_event_behaviour', id_event_behaviour)
+
+
+class EventWithdrawn(Base):
+    __tablename__ = 'event_withdrawn'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    event_datetime = Column(String(19), nullable=False)
+    prefix = Column(String(255))
+    withdrawer = Column(BigInteger)                     # the withdrawer AS needs to announce the prefix earlier
+    Index('IndexId4_event_behaviour', id_event_behaviour)
+
+
+class EventPrepend(Base):
+    __tablename__ = 'event_prepend'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    event_datetime = Column(String(19), nullable=False)
+    in_out = Column(String(3))
+    prepender = Column(BigInteger)                      # AS where prepend will occurs
+    prepended = Column(BigInteger)                      # The prepended AS
+    peer = Column(BigInteger)                           # for which peer of prepender the prepend will be announced
+    hmt = Column(Integer)                              # How Many Times the prepended AS will be prepended
+    Index('IndexId5_event_behaviour', id_event_behaviour)

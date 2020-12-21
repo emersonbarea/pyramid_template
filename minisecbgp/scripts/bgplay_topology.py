@@ -360,13 +360,6 @@ class BGPlayTopology(object):
 
         try:
 
-            announcement_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Announcement').first()
-            prepend_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Prepend').first()
-            withdrawn_id_type_of_event = dbsession.query(models.TypeOfEvent.id). \
-                filter_by(type_of_event='Withdrawn').first()
-
             events = data['data']['events']
 
             # Announcement
@@ -378,28 +371,26 @@ class BGPlayTopology(object):
                     if announcement_events_list:
                         for i, event in enumerate(announcement_events_list):
                             if [str(observed_event_prefix), str(observed_event_source)] == \
-                                    [str(event['announced_prefix']), str(event['announcer'])]:
+                                    [str(event['prefix']), str(event['announcer'])]:
                                 break
                             if i == len(announcement_events_list) - 1:
                                 announcement_events_list.append({
                                     'id_event_behaviour': int(self.id_event_behaviour),
-                                    'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
                                     'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                                    'announced_prefix': str(observed_event_prefix),
-                                    'announcer': str(observed_event_source)
+                                    'prefix': str(observed_event_prefix),
+                                    'announcer': observed_event_source
                                 })
                     else:
                         announcement_events_list.append({
                             'id_event_behaviour': int(self.id_event_behaviour),
-                            'id_type_of_event': int(list(announcement_id_type_of_event)[0]),
                             'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                            'announced_prefix': str(observed_event_prefix),
+                            'prefix': str(observed_event_prefix),
                             'announcer': str(observed_event_source)
                         })
 
             if announcement_events_list:
                 df_announcement_events = pd.DataFrame(announcement_events_list)
-                df_announcement_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+                df_announcement_events.to_sql('event_announcement', con=dbsession.bind, if_exists='append', index=False)
 
             # Withdrawn
             sources = data['data']['sources']
@@ -412,10 +403,9 @@ class BGPlayTopology(object):
                             withdrawer = source['as_number']
                     withdrawn_events_list_temp.append({
                         'id_event_behaviour': int(self.id_event_behaviour),
-                        'id_type_of_event': int(list(withdrawn_id_type_of_event)[0]),
                         'event_datetime': str(observed_event['timestamp']),
-                        'withdrawer': str(withdrawer),
-                        'withdrawn_prefix': str(observed_event['attrs']['target_prefix'])
+                        'prefix': str(observed_event['attrs']['target_prefix']),
+                        'withdrawer': withdrawer
                     })
 
             if withdrawn_events_list_temp:
@@ -425,14 +415,14 @@ class BGPlayTopology(object):
                     else:
                         for i, withdrawn_event in enumerate(withdrawn_events_list):
                             if (str(withdrawn_event['withdrawer'])) == str(withdrawn_event_temp['withdrawer']) and \
-                                    (str(withdrawn_event['withdrawn_prefix']) == str(withdrawn_event_temp['withdrawn_prefix'])):
+                                    (str(withdrawn_event['prefix']) == str(withdrawn_event_temp['prefix'])):
                                 break
                             if i == len(withdrawn_events_list) - 1:
                                 withdrawn_events_list.append(withdrawn_event_temp)
 
             if withdrawn_events_list:
                 df_withdrawn_events = pd.DataFrame(withdrawn_events_list)
-                df_withdrawn_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+                df_withdrawn_events.to_sql('event_withdrawn', con=dbsession.bind, if_exists='append', index=False)
 
             # Prepend
             prepend_events_list_temp = list()
@@ -445,6 +435,7 @@ class BGPlayTopology(object):
                         if path.count(elem) > 1:
 
                             # get the AS prepender
+                            peer_path = [None]
                             for hop in path:
                                 if not previous_hop:
                                     previous_hop = hop
@@ -454,14 +445,16 @@ class BGPlayTopology(object):
                                         break
                                     else:
                                         previous_hop = hop
+                                peer_path.append(hop)
 
                             prepend_events_list_temp.append({
                                 'id_event_behaviour': int(self.id_event_behaviour),
-                                'id_type_of_event': int(list(prepend_id_type_of_event)[0]),
                                 'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                                'prepended': str(elem),
-                                'prepender': str(prepender),
-                                'times_prepended': str(path.count(elem))
+                                'in_out': 'in',
+                                'prepender': prepender,
+                                'prepended': elem,
+                                'peer': peer_path[-2],
+                                'hmt': path.count(elem)
                             })
 
             if prepend_events_list_temp:
@@ -470,16 +463,17 @@ class BGPlayTopology(object):
                         prepend_events_list.append(prepend_event_temp)
                     else:
                         for i, prepend_event in enumerate(prepend_events_list):
-                            if (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
-                                    (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
-                                    (str(prepend_event['times_prepended']) == str(prepend_event_temp['times_prepended'])):
+                            if (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
+                                    (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
+                                    (str(prepend_event['peer'])) == str(prepend_event_temp['peer']) and \
+                                    (str(prepend_event['hmt']) == str(prepend_event_temp['hmt'])):
                                 break
                             if i == len(prepend_events_list) - 1:
                                 prepend_events_list.append(prepend_event_temp)
 
             if prepend_events_list:
                 df_prepend_events = pd.DataFrame(prepend_events_list)
-                df_prepend_events.to_sql('event', con=dbsession.bind, if_exists='append', index=False)
+                df_prepend_events.to_sql('event_prepend', con=dbsession.bind, if_exists='append', index=False)
 
         except Exception as error:
             print(error)

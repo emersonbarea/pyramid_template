@@ -73,85 +73,76 @@
           <div class="span12" align="left">
             <p><hr></p>
             <p><h4 align="center">Events:</h4></p>
-            {% for type_of_event in types_of_event %}
-              <p>Type of Event: <strong>{{ type_of_event[0] }}</strong></p>
-              {% if type_of_event[0] == 'Announcement' %}
-                <p>
-                  <div class="frame-color">
-                    <table style="width:100%">
+            <p>Type of Event: <strong>Prefix Announcement:</strong></p>
+            <p>
+              <div class="frame-color">
+                <table style="width:100%">
+                  <tr>
+                    <td align="center"><strong>Datetime</strong></td>
+                    <td align="center"><strong>Announced Prefix</strong></td>
+                    <td align="center"><strong>AS Announcer</strong></td>
+                  </tr>
+                  {% for event in events_announcement %}
+                    <div class="form-inline">
                       <tr>
-                        <td align="center"><strong>Datetime</strong></td>
-                        <td align="center"><strong>Announced Prefix</strong></td>
-                        <td align="center"><strong>AS Announcer</strong></td>
+                        <td align="center">{{ event[0] }}</td>
+                        <td align="center">{{ event[1] }}</td>
+                        <td align="center">{{ event[2] }}</td>
                       </tr>
-                      {% for event in events %}
-                        {% if event.type_of_event == type_of_event.type_of_event == 'Announcement' %}
-                          <div class="form-inline">
-                            <tr>
-                              <td align="center">{{ event[1] }}</td>
-                              <td align="center">{{ event[2] }}</td>
-                              <td align="center">{{ event[3] }}</td>
-                            </tr>
-                          </div>
-                        {% endif %}
-                      {% endfor %}
-                    </table>
-                  </div>
-                </p>
-              {% endif %}
-
-              {% if type_of_event[0] == 'Prepend' %}
-                <p>
-                  <div class="frame-color">
-                    <table style="width:100%">
+                    </div>
+                  {% endfor %}
+                </table>
+              </div>
+            </p>
+            <p>Type of Event: <strong>Prefix Withdrawn:</strong></p>
+            <p>
+              <div class="frame-color">
+                <table style="width:100%">
+                  <tr>
+                    <td align="center"><strong>Datetime</strong></td>
+                    <td align="center"><strong>Withdrawn Prefix</strong></td>
+                    <td align="center"><strong>AS Withdrawer</strong></td>
+                  </tr>
+                  {% for event in events_withdrawn %}
+                    <div class="form-inline">
                       <tr>
-                        <td align="center"><strong>Datetime</strong></td>
-                        <td align="center"><strong>Prepended AS</strong></td>
-                        <td align="center"><strong>AS Prepender</strong></td>
-                        <td align="center"><strong>How many times</strong></td>
+                        <td align="center">{{ event[0] }}</td>
+                        <td align="center">{{ event[1] }}</td>
+                        <td align="center">{{ event[2] }}</td>
                       </tr>
-                      {% for event in events %}
-                        {% if event.type_of_event == type_of_event.type_of_event == 'Prepend' %}
-                          <div class="form-inline">
-                            <tr>
-                              <td align="center">{{ event[1] }}</td>
-                              <td align="center">{{ event[6] }}</td>
-                              <td align="center">{{ event[7] }}</td>
-                              <td align="center">{{ event[8] }}</td>
-                            </tr>
-                          </div>
-                        {% endif %}
-                      {% endfor %}
-                    </table>
-                  </div>
-                </p>
-              {% endif %}
-
-              {% if type_of_event[0] == 'Withdrawn' %}
-                <p>
-                  <div class="frame-color">
-                    <table style="width:100%">
+                    </div>
+                  {% endfor %}
+                </table>
+              </div>
+            </p>
+            <p>Type of Event: <strong>AS Prepend:</strong></p>
+            <p>
+              <div class="frame-color">
+                <table style="width:100%">
+                  <tr>
+                    <td align="center"><strong>Datetime</strong></td>
+                    <td align="center"><strong>In/Out</strong></td>
+                    <td align="center"><strong>AS Prepender</strong></td>
+                    <td align="center"><strong>Prepended AS</strong></td>
+                    <td align="center"><strong>Announced to AS</strong></td>
+                    <td align="center"><strong>HMT</strong></td>
+                  </tr>
+                  {% for event in events_prepend %}
+                    <div class="form-inline">
                       <tr>
-                        <td align="center"><strong>Datetime</strong></td>
-                        <td align="center"><strong>Withdrawn Prefix</strong></td>
-                        <td align="center"><strong>AS Withdrawer</strong></td>
+                        <td align="center">{{ event[0] }}</td>
+                        <td align="center">{{ event[1] }}</td>
+                        <td align="center">{{ event[2] }}</td>
+                        <td align="center">{{ event[3] }}</td>
+                        <td align="center">{{ event[4] }}</td>
+                        <td align="center">{{ event[5] }}</td>
+                        <td align="center">{{ event[6] }}</td>
                       </tr>
-                      {% for event in events %}
-                        {% if event.type_of_event == type_of_event.type_of_event == 'Withdrawn' %}
-                          <div class="form-inline">
-                            <tr>
-                              <td align="center">{{ event[1] }}</td>
-                              <td align="center">{{ event[4] }}</td>
-                              <td align="center">{{ event[5] }}</td>
-                            </tr>
-                          </div>
-                        {% endif %}
-                      {% endfor %}
-                    </table>
-                  </div>
-                </p>
-              {% endif %}
-            {% endfor %}
+                    </div>
+                  {% endfor %}
+                </table>
+              </div>
+            </p>
           </div>
 
           {% if bgplay %}

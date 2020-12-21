@@ -46,11 +46,12 @@ from .hijack import (
     PathItem,
     ScenarioStuff,
     RealisticAnalysis,
-    EventBehaviour,
     BGPlay,
-    TypeOfEvent,
-    Event,
-    EventDetail)
+    EventBehaviour,
+    EventDetail,
+    EventAnnouncement,
+    EventWithdrawn,
+    EventPrepend)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

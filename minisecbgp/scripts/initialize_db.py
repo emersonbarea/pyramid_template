@@ -190,10 +190,6 @@ def setup_models(dbsession):
         dbsession.add(models.VantagePointActor(vantage_point_actor=vantage_point_actor['vantage_point_actor'],
                                                description=vantage_point_actor['description']))
 
-    types_of_event = ['Announcement', 'Prepend', 'Withdrawn']
-    for type_of_event in types_of_event:
-        dbsession.add(models.TypeOfEvent(type_of_event=type_of_event))
-
 
 def parse_args(config_file):
     parser = argparse.ArgumentParser()
