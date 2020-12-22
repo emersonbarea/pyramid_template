@@ -403,7 +403,7 @@ class BGPlayTopology(object):
                             withdrawer = source['as_number']
                     withdrawn_events_list_temp.append({
                         'id_event_behaviour': int(self.id_event_behaviour),
-                        'event_datetime': str(observed_event['timestamp']),
+                        'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
                         'prefix': str(observed_event['attrs']['target_prefix']),
                         'withdrawer': withdrawer
                     })
@@ -447,15 +447,26 @@ class BGPlayTopology(object):
                                         previous_hop = hop
                                 peer_path.append(hop)
 
-                            prepend_events_list_temp.append({
-                                'id_event_behaviour': int(self.id_event_behaviour),
-                                'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                                'in_out': 'in',
-                                'prepender': prepender,
-                                'prepended': elem,
-                                'peer': peer_path[-2],
-                                'hmt': path.count(elem)
-                            })
+                            if peer_path[-2]:
+                                prepend_events_list_temp.append({
+                                    'id_event_behaviour': int(self.id_event_behaviour),
+                                    'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                                    'in_out': 'out',
+                                    'prepender': prepender,
+                                    'prepended': elem,
+                                    'peer': peer_path[-2],
+                                    'hmt': path.count(elem)
+                                })
+                            else:
+                                prepend_events_list_temp.append({
+                                    'id_event_behaviour': int(self.id_event_behaviour),
+                                    'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                                    'in_out': 'in',
+                                    'prepender': prepender,
+                                    'prepended': elem,
+                                    'peer': peer_path[-2],
+                                    'hmt': path.count(elem)
+                                })
 
             if prepend_events_list_temp:
                 for prepend_event_temp in prepend_events_list_temp:

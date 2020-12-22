@@ -123,8 +123,8 @@ class HijackEventsAnnouncementDataForm(Form):
 
 class HijackEventsWithdrawDataForm(Form):
     withdrawn_datetime = DateTimeField('Start time: ',
-                                        format='%Y-%m-%d %H:%M:%S',
-                                        validators=[InputRequired()])
+                                       format='%Y-%m-%d %H:%M:%S',
+                                       validators=[InputRequired()])
     withdrawn_prefix = StringField('Withdrawn Prefix: ',
                                    validators=[InputRequired(),
                                                Length(min=9, max=18,
@@ -145,8 +145,8 @@ class HijackEventsPrependDataForm(Form):
                                      validators=[InputRequired()])
     prepend_in_out = SelectField('In/Out:',
                                  validators=[InputRequired()],
-                                 choices=[('in', 'In'),
-                                          ('out', 'Out')])
+                                 choices=[('out', 'Out'),
+                                          ('in', 'In')])
     prepended = StringField('Prepended AS: ',
                             validators=[InputRequired(),
                                         Length(min=1, max=18,
@@ -789,34 +789,27 @@ def hijack_events(request):
                         datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
 
+                # must be (in/out)
+                # Prepender must be a valid ASN
                 prepender = request.dbsession.query(models.AutonomousSystem). \
                     filter_by(id_topology=topology.id). \
                     filter_by(autonomous_system=form_prepend.prepender.data).first()
                 if not prepender:
                     raise ValueError('The AS prepender must be a valid ASN in topology.')
 
-                prepended = request.dbsession.query(models.AutonomousSystem). \
-                    filter_by(id_topology=topology.id). \
-                    filter_by(autonomous_system=form_prepend.prepended.data).first()
-                if not prepended:
-                    raise ValueError('The prepended AS must be a valid ASN in topology.')
-
-                peer = request.dbsession.query(models.AutonomousSystem). \
-                    filter_by(id_topology=topology.id). \
-                    filter_by(autonomous_system=form_prepend.prepend_peer.data).first()
-                if not prepended:
-                    raise ValueError('The peer AS must be a valid ASN in topology.')
-
-                query = 'select count(l.id) from link l where ' \
-                        '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s) ' \
-                        'or ' \
-                        '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s)' % \
-                        (prepender.id, peer.id, peer.id, prepender.id)
-                result_proxy = request.dbsession.bind.execute(query)
-                if int(list(result_proxy)[0][0]) == 0:
-                    raise ValueError('The prepender and peer AS must be BGP peer.')
-
+                # must be (in)
                 if form_prepend.prepend_in_out.data == 'in':
+
+                    form_prepend.prepend_peer.data = None
+
+                    # Prepended must be a valid ASN
+                    prepended = request.dbsession.query(models.AutonomousSystem). \
+                        filter_by(id_topology=topology.id). \
+                        filter_by(autonomous_system=form_prepend.prepended.data).first()
+                    if not prepended:
+                        raise ValueError('The prepended AS must be a valid ASN in an Inbound AS-Path Prepending.')
+
+                    # Prepender and Prepended must be peer
                     query = 'select count(l.id) from link l where ' \
                             '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s) ' \
                             'or ' \
@@ -825,6 +818,26 @@ def hijack_events(request):
                     result_proxy = request.dbsession.bind.execute(query)
                     if int(list(result_proxy)[0][0]) == 0:
                         raise ValueError('AS Prepender and Prepended AS must be peer in an Inbound AS-Path Prepending.')
+
+                # must be (out)
+                if form_prepend.prepend_in_out.data == 'out':
+
+                    # Peer must be a valid ASN
+                    peer = request.dbsession.query(models.AutonomousSystem). \
+                        filter_by(id_topology=topology.id). \
+                        filter_by(autonomous_system=form_prepend.prepend_peer.data).first()
+                    if not prepended:
+                        raise ValueError('The peer AS must be a valid ASN in an Outbound AS-Path Prepending.')
+
+                    # Prepender and Peer must be peer
+                    query = 'select count(l.id) from link l where ' \
+                            '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s) ' \
+                            'or ' \
+                            '(l.id_autonomous_system1 = %s and l.id_autonomous_system2 = %s)' % \
+                            (prepender.id, peer.id, peer.id, prepender.id)
+                    result_proxy = request.dbsession.bind.execute(query)
+                    if int(list(result_proxy)[0][0]) == 0:
+                        raise ValueError('AS prepender and AS peer must be BGP peer in an Outbound AS-Path Prepending.')
 
                 event = models.EventPrepend(
                     id_event_behaviour=event_behaviour.id,
@@ -957,22 +970,23 @@ def hijack_events_detail(request):
         dictionary['hijackEventsDetail_url'] = request.route_url('hijackEventsDetail', id_event_behaviour=id_event_behaviour)
 
         if request.method == 'POST':
-            pass
-#            if form_button.download_button.data:
-#                realistic_analysis = request.dbsession.query(models.RealisticAnalysis). \
-#                    filter_by(id=request.matchdict['id_realistic_analysis']).first()
-#                source_dir = str(realistic_analysis.output_path[:-1])
-#                output_filename = topology.topology + '.tar.gz'
-#                with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
-#                    tar.add(source_dir, arcname=os.path.basename(source_dir))
+            realistic_analysis = request.dbsession.query(models.EventBehaviour, models.RealisticAnalysis). \
+                filter(models.EventBehaviour.id == id_event_behaviour). \
+                filter(models.EventBehaviour.id_topology == models.RealisticAnalysis.id_topology).first()
 
-#                response = FileResponse(source_dir + '/' + output_filename)
-#                response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
-#                return response
+            if form_button.download_button.data:
+                source_dir = str(realistic_analysis.RealisticAnalysis.output_path[:-1])
+                output_filename = dictionary['events'][0]['topology'] + '.tar.gz'
+                with tarfile.open(source_dir + '/' + output_filename, "w:gz") as tar:
+                    tar.add(source_dir, arcname=os.path.basename(source_dir))
 
-#            if form_button.emulate_button.data:
-#                os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
-#                          str(realistic_analysis.output_path).replace(' ', '\ '))
+                response = FileResponse(source_dir + '/' + output_filename)
+                response.headers['Content-Disposition'] = "attachment; filename=%s" % output_filename
+                return response
+
+            if form_button.emulate_button.data:
+                os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
+                          str(realistic_analysis.RealisticAnalysis.output_path).replace(' ', '\ '))
 
     except Exception as error:
         dictionary['message'] = error

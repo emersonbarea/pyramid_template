@@ -90,19 +90,38 @@ class EventDetail(object):
         # 1  2020-12-20 08:01:20  33.44.55.0/24       65002                     4
 
         # Prepend
-        query = 'select p.event_datetime as event_datetime, ' \
+        query = 'select ' \
+                'p.event_datetime as event_datetime, ' \
                 'p.in_out as in_out, ' \
                 'p.prepender as prepender, ' \
                 'p.prepended as prepended, ' \
                 'p.peer as peer, ' \
-                'p.hmt as hmt ' \
-                'from event_prepend p ' \
-                'where p.id_event_behaviour = %s;' % self.id_event_behaviour
+                'p.hmt as hmt, ' \
+                '(select asys.id ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = eb.id_topology ' \
+                'and asys.autonomous_system = p.prepender) as id_prepender, ' \
+                '(select asys.id ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = eb.id_topology ' \
+                'and asys.autonomous_system = p.prepended) as id_prepended, ' \
+                '(select asys.id ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = eb.id_topology ' \
+                'and asys.autonomous_system = p.peer) as id_peer ' \
+                'from event_prepend p, ' \
+                'event_behaviour eb ' \
+                'where p.id_event_behaviour = %s ' \
+                'and p.id_event_behaviour = eb.id;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        self.df_prepend = pd.DataFrame(result_proxy, columns=['event_datetime', 'in_out', 'prepender', 'prepended', 'peer', 'hmt'])
+        self.df_prepend = pd.DataFrame(result_proxy, columns=[
+            'event_datetime', 'in_out', 'prepender', 'prepended', 'peer', 'hmt', 'id_prepender', 'id_prepended', 'id_peer'])
         # print(self.df_prepend)
-        #         event_datetime in_out prepender prepended   peer hmt
-        # 0  2008-02-24 20:00:00    out     65001     65001  65002   5
+        #          event_datetime in_out  prepender  prepended     peer  hmt  id_prepender  id_prepended  id_peer
+        # 0   2008-02-24 20:00:00     in       3491      17557  33970.0    2          4227          4288   4327.0
+        # 1   2008-02-24 20:00:00     in       3491      17557      NaN   10          4227          4288      NaN
+        # 2   2008-02-24 18:48:08    out       1299       3491  29686.0    2          4211          4227   4319.0
+        # 3   2008-02-24 18:48:09    out       1299       3491  28917.0    2          4211          4227   4313.0
 
     def pid_commands(self):
         self.pid_commands_list = list()
@@ -193,31 +212,118 @@ class EventDetail(object):
         self.prepend_commands_list = list()
         for row in self.df_prepend.itertuples():
 
-            print(row)
+            if row[2] == 'in':
 
+                # get the IP address of the Prepended AS interface ot the link with the AS Prepender
+                query = 'select l.ip_autonomous_system2 as ip_prepended ' \
+                        'from link l ' \
+                        'where l.id_autonomous_system1 = %s ' \
+                        'and l.id_autonomous_system2 = %s ' \
+                        'union ' \
+                        'select l.ip_autonomous_system1 as ip_prepended ' \
+                        'from link l ' \
+                        'where l.id_autonomous_system1 = %s ' \
+                        'and l.id_autonomous_system2 = %s;' % \
+                        (str(row[7]), str(row[8]), str(row[8]), str(row[7]))
+                result_proxy = self.dbsession.bind.execute(query)
+                route_map_in_commands = ''
+                for internal_row in result_proxy:
+                    route_map_in_commands = route_map_in_commands + \
+                                            ' child.sendline(\'neighbor %s route-map in-%s in\'); ' \
+                                            'child.expect(\'.+#\');' % \
+                                            (str(list(internal_row)[0]), str(row[4]))
 
-            self.withdrawn_commands_list.append(
-                '    '
-                'if current_time == %s:\n'
-                '        '
-                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
-                '/usr/bin/python -c \\"import pexpect; '
-                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
-                'child.expect(\'Password: \'); '
-                'child.sendline(\'en\'); '
-                'child.expect(\'.+>\'); '
-                'child.sendline(\'enable\'); '
-                'child.expect([\'Password: \',\'.+#\']); '
-                'child.sendline(\'en\'); '
-                'child.expect(\'.+#\'); '
-                'child.sendline(\'configure terminal\'); '
-                'child.expect(\'.+#\'); '
-                'child.sendline(\'router bgp %s\'); '
-                'child.expect(\'.+#\'); '
-                'child.sendline(\'no network %s\'); '
-                'child.expect(\'.+#\')\\"" %s AS%s)\n' %
-                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                 '%s', str(row[3]), str(row[2]), '%', str(row[3])))
+                self.prepend_commands_list.append(
+                    '    '
+                    'if current_time == %s:\n'
+                    '        '
+                    'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                    '/usr/bin/python -c \\"import pexpect; '
+                    'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                    'child.expect(\'Password: \'); '
+                    'child.sendline(\'en\'); '
+                    'child.expect(\'.+>\'); '
+                    'child.sendline(\'enable\'); '
+                    'child.expect([\'Password: \',\'.+#\']); '
+                    'child.sendline(\'en\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'configure terminal\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'route-map in-%s permit 10\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'set as-path prepend last-as %s\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'router bgp %s\'); '
+                    'child.expect(\'.+#\'); '
+                    '%s'
+                    ' child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'clear ip bgp * soft\'); '
+                    'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                    (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                     '%s', str(row[4]), str(row[6]), str(row[3]), route_map_in_commands, '%', str(row[3])))
+
+            elif row[2] == 'out':
+
+                # get the IP address of the Peer AS interface ot the link with the AS Prepender
+                query = 'select l.ip_autonomous_system2 as ip_prepended ' \
+                        'from link l ' \
+                        'where l.id_autonomous_system1 = %s ' \
+                        'and l.id_autonomous_system2 = %s ' \
+                        'union ' \
+                        'select l.ip_autonomous_system1 as ip_prepended ' \
+                        'from link l ' \
+                        'where l.id_autonomous_system1 = %s ' \
+                        'and l.id_autonomous_system2 = %s;' % \
+                        (str(row[7]), str(row[9]), str(row[9]), str(row[7]))
+                result_proxy = self.dbsession.bind.execute(query)
+                route_map_in_commands = ''
+                for internal_row in result_proxy:
+                    route_map_in_commands = route_map_in_commands + \
+                                            ' child.sendline(\'neighbor %s route-map out-%s-%s out\'); ' \
+                                            'child.expect(\'.+#\');' % \
+                                            (str(list(internal_row)[0]), str(row[4]), int(row[5]))
+                hmt_list = ''
+                for hmt in range(row[6]):
+                    hmt_list = hmt_list + ' %s' % str(row[4])
+
+                self.prepend_commands_list.append(
+                    '    '
+                    'if current_time == %s:\n'
+                    '        '
+                    'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                    '/usr/bin/python -c \\"import pexpect; '
+                    'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+                    'child.expect(\'Password: \'); '
+                    'child.sendline(\'en\'); '
+                    'child.expect(\'.+>\'); '
+                    'child.sendline(\'enable\'); '
+                    'child.expect([\'Password: \',\'.+#\']); '
+                    'child.sendline(\'en\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'configure terminal\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'route-map out-%s-%s permit 10\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'set as-path prepend %s\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'router bgp %s\'); '
+                    'child.expect(\'.+#\'); '
+                    '%s'
+                    ' child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'exit\'); '
+                    'child.expect(\'.+#\'); '
+                    'child.sendline(\'clear ip bgp * soft\'); '
+                    'child.expect(\'.+#\')\\"" %s AS%s)\n' %
+                    (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                     '%s', str(row[4]), int(row[5]), hmt_list, str(row[3]), route_map_in_commands, '%', str(row[3])))
 
     def time_write_files(self):
         """

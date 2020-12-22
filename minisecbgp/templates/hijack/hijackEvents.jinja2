@@ -309,7 +309,7 @@
                       </p>
                       <p>
                         {{ form_prepend.prepend_in_out.label }}
-                        {{ form_prepend.prepend_in_out }}
+                        {{ form_prepend.prepend_in_out(onchange="inountFunction()") }}
                       </p>
                       <p>
                         <table style="width:100%">
@@ -417,6 +417,14 @@
         };
         function eventWithdrawn(id_event) {
           withdrawn_id_event.value = id_event;
+        };
+        function inountFunction() {
+          choose = document.getElementById("prepend_in_out").value;
+          if (choose == 'in') {
+            document.getElementById("prepend_peer").setAttribute("disabled","disabled");
+          } else if (choose == 'out') {
+            document.getElementById("prepend_peer").removeAttribute("disabled");
+          };
         };
       </script>
 
