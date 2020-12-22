@@ -145,10 +145,10 @@ def linkAddEditDelete(request):
         for l in links_temp:
             links.append({'id_link': l.id_link,
                           'link': 'AS ' + str(l.autonomous_system1) +
-                                  ' ( ' + str(ipaddress.ip_address(l.ip_autonomous_system1)) +
+                                  ' ( ' + l.ip_autonomous_system1 +
                                   ' / ' + str(l.mask) +
                                   ' ) <--> AS ' + str(l.autonomous_system2) +
-                                  ' ( ' + str(ipaddress.ip_address(l.ip_autonomous_system2)) +
+                                  ' ( ' + l.ip_autonomous_system2 +
                                   ' / ' + str(l.mask) +
                                   ' ) -- ( Bw : ' + (str(l.bandwidth) if l.bandwidth else '__') +
                                   ' Kbps ) -- ( Load : ' + (str(l.load) if l.load else '__') +
@@ -188,9 +188,7 @@ def linkAddEditDelete(request):
             dictionary['css_class'] = 'errorMessage'
             return dictionary
         ip1 = ipaddress.ip_address(ip_autonomous_system1)
-        ip1_to_int = int(ipaddress.ip_address(ip_autonomous_system1))
         ip2 = ipaddress.ip_address(ip_autonomous_system2)
-        ip2_to_int = int(ipaddress.ip_address(ip_autonomous_system2))
         network1 = ipaddress.ip_network(str(ip_autonomous_system1) + '/' + str(mask), strict=False)
         network2 = ipaddress.ip_network(str(ip_autonomous_system2) + '/' + str(mask), strict=False)
         if (network1 != network2) or \
@@ -198,14 +196,14 @@ def linkAddEditDelete(request):
                 (ip1 not in list(network2.hosts())) or \
                 (ip2 not in list(network1.hosts())):
             dictionary['message'] = 'Error detected in IP address: %s/%s - %s/%s' % (
-            ip1, mask, ip2, mask)
+                ip1, mask, ip2, mask)
             dictionary['css_class'] = 'errorMessage'
             return dictionary
         entry = 'insert into link (id_topology, id_link_agreement, id_autonomous_system1, id_autonomous_system2, ' \
                 'ip_autonomous_system1, ip_autonomous_system2, mask, description, bandwidth, delay, load) values ' \
-                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)' % (
+                '(%s, %s, %s, %s, \'%s\', \'%s\', %s, %s, %s, %s, %s)' % (
                  id_topology, id_link_agreement,
-                 as1_id.id, as2_id.id, ip1_to_int, ip2_to_int, mask,
+                 as1_id.id, as2_id.id, str(ip_autonomous_system1), str(ip_autonomous_system2), mask,
                  '\'' + str(description) + '\'' if description else 'Null',
                  bandwidth if bandwidth else 'Null',
                  delay if delay else 'Null',

@@ -85,7 +85,7 @@ def prefixAddEditDelete(request):
         prefixes = list()
         for p in prefixes_temp:
             prefixes.append({'id_prefix': p.id,
-                             'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
+                             'prefix': p.prefix + '/' + str(p.mask)})
         form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
 
         if request.method == 'POST':
@@ -94,7 +94,7 @@ def prefixAddEditDelete(request):
                 if form.prefix_add.validate(form.prefix_add.data):
                     ipaddress.ip_network(form.prefix_add.data)
                     entry = models.Prefix(id_autonomous_system=autonomousSystem.id,
-                                          prefix=int(ipaddress.ip_address(form.prefix_add.data.split('/')[0])),
+                                          prefix=form.prefix_add.data.split('/')[0],
                                           mask=int(form.prefix_add.data.split('/')[1]))
                     request.dbsession.add(entry)
                     request.dbsession.flush()
@@ -104,7 +104,7 @@ def prefixAddEditDelete(request):
                     prefixes = list()
                     for p in prefixes_temp:
                         prefixes.append({'id_prefix': p.id,
-                                         'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
+                                         'prefix': p.prefix + '/' + str(p.mask)})
                     form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
                     dictionary['message'] = 'BGP Prefix %s added successfully' % form.prefix_add.data
                     dictionary['css_class'] = 'successMessage'
@@ -125,7 +125,7 @@ def prefixAddEditDelete(request):
                     prefixes = list()
                     for p in prefixes_temp:
                         prefixes.append({'id_prefix': p.id,
-                                         'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
+                                         'prefix': p.prefix + '/' + str(p.mask)})
                     form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
                     dictionary['message'] = 'BGP Prefix %s successfully updated to %s.' % (value, form.prefix_edit.data)
                     dictionary['css_class'] = 'successMessage'
@@ -140,7 +140,7 @@ def prefixAddEditDelete(request):
                 prefixes = list()
                 for p in prefixes_temp:
                     prefixes.append({'id_prefix': p.id,
-                                     'prefix': str(ipaddress.ip_address(p.prefix)) + '/' + str(p.mask)})
+                                     'prefix': p.prefix + '/' + str(p.mask)})
                 form.prefix_list.choices = [(row['id_prefix'], row['prefix']) for row in prefixes]
                 dictionary['message'] = 'BGP Prefix %s removed successfully' % value
                 dictionary['css_class'] = 'successMessage'
@@ -169,7 +169,7 @@ def prefixShowAllTxt(request):
         prefixes = list()
         for p in prefixes_temp:
             prefixes.append({'id_prefix': p.Prefix.id,
-                             'prefix': str(ipaddress.ip_address(p.Prefix.prefix)),
+                             'prefix': p.Prefix.prefix,
                              'mask': p.Prefix.mask,
                              'id_autonomous_system': p.Prefix.id_autonomous_system,
                              'autonomous_system': p.AutonomousSystem.autonomous_system,

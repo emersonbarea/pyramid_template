@@ -29,8 +29,6 @@ class Run(object):
         print('\n*** Trying to start topology emulation.')
         time.sleep(2)
 
-        self.restart_MaxiNet()
-
         print('*** Creating topology')
         topo = Topo()
 

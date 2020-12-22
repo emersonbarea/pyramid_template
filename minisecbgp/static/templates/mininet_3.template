@@ -38,6 +38,9 @@
             pass
 
     def menu(self):
+
+        clear = lambda: os.system('clear')
+        self.restart_MaxiNet()
         clear = lambda: os.system('clear')
 
         while self.option != 0:
