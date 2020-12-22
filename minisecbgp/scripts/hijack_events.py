@@ -127,7 +127,7 @@ class EventDetail(object):
         self.pid_commands_list = list()
         for pid in self.pid:
             self.pid_commands_list.append(
-                'AS%s = str(os.popen(\'ps ax | grep "mininet:AS%s" | grep bash | grep -v mnexec | awk \\\'{print $1};\\\'\').read()).strip()' %
+                'AS%s = str(os.popen(\'ps ax | grep -w "mininet:AS%s" | grep bash | grep -v mnexec | awk \\\'{print $1};\\\'\').read()).strip()' %
                 (pid, pid))
 
     def announcement_commands(self):
