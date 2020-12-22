@@ -149,7 +149,7 @@ install_app() {
 
         printf '\n%s\n' 'BGPlay scenario Youtube_vs_PakistanTelecom.BGPlay ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/Youtube_vs_Pakistan_Telecom.BGPlay /tmp/
-        MiniSecBGP_bgplay_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/Youtube_vs_PakistanTelecom.BGPlay'
+        MiniSecBGP_bgplay_topology --config-file="$LOCAL_HOME"/minisecbgp.ini --file='/tmp/Youtube_vs_Pakistan_Telecom.BGPlay'
 
         printf '\n%s\n' 'BGPlay topology BGPlay_Test_Scenario.BGPlay ...'
         cp "$LOCAL_HOME"/minisecbgp/static/topology/BGPlay_Test_Scenario.BGPlay /tmp/
