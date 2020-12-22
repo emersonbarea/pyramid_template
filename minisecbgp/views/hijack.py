@@ -826,7 +826,7 @@ def hijack_events(request):
                     peer = request.dbsession.query(models.AutonomousSystem). \
                         filter_by(id_topology=topology.id). \
                         filter_by(autonomous_system=form_prepend.prepend_peer.data).first()
-                    if not prepended:
+                    if not peer:
                         raise ValueError('The peer AS must be a valid ASN in an Outbound AS-Path Prepending.')
 
                     # Prepender and Peer must be peer
@@ -938,7 +938,8 @@ def hijack_events_detail(request):
     form_button = HijackEventsButtonDataForm(request.POST)
 
     try:
-        query = 'select (select t.topology ' \
+        query = 'select ed.id_event_behaviour as id_event_behaviour, ' \
+                '(select t.topology ' \
                 'from topology t, ' \
                 'event_behaviour eb ' \
                 'where t.id = eb.id_topology ' \
@@ -954,7 +955,8 @@ def hijack_events_detail(request):
 
         events = list()
         for event in result_proxy:
-            events.append({'topology': event.topology,
+            events.append({'id_event_behaviour': event.id_event_behaviour,
+                           'topology': event.topology,
                            'time_get_data': event.time_get_data,
                            'time_announcement_commands': event.time_announcement_commands,
                            'time_withdrawn_commands': event.time_withdrawn_commands,
@@ -966,6 +968,7 @@ def hijack_events_detail(request):
                                          (float(event.time_write_files) if event.time_write_files else 0)})
 
         dictionary['events'] = events
+
         dictionary['form_button'] = form_button
         dictionary['hijackEventsDetail_url'] = request.route_url('hijackEventsDetail', id_event_behaviour=id_event_behaviour)
 

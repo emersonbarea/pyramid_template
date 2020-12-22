@@ -13,7 +13,7 @@
             {% endif %}
         </div>
     </div>
-    <form action="{{ request.route_url('hijackEventsDetail', id_event_behaviour = 34) }}" method="POST">
+    <form action="{{ request.route_url('hijackEventsDetail', id_event_behaviour = events[0]['id_event_behaviour']) }}" method="POST">
         <div class="row-fluid">
             <div class="span12">
                 <p>
