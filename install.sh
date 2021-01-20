@@ -96,7 +96,7 @@ virtualenv() {
 
 install_Python_reqs() {
         printf '\n\e[1;33m%-6s\e[m\n' '-- Installing Python prerequisites ...'
-        pip3 install --upgrade --force-reinstall -U wheel
+        pip3 install --upgrade --force-reinstall -U wheel plotnine
         pip3 install -r "$LOCAL_HOME"/requirements.txt;
 }
 
