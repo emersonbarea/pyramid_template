@@ -233,105 +233,6 @@ class Parser(object):
             except Exception as error:
                 print(error)
 
-    def announcements(self, number_of_slots, networks):
-        """
-            know which as_number announces which network
-        """
-        try:
-
-            # sources
-            sources = self.data_from['data']['sources']
-            sources_list = list()
-            for source in sources:
-                sources_list.append([source['id'], source['as_number']])
-            df_sources = pd.DataFrame(data=sources_list, columns=['id', 'id_as_number'])
-            df_sources.set_index('id', inplace=True)
-
-            #print('\n-------------------------\n')
-            #print('df_sources')
-            #print(df_sources)
-            #print('\n-------------------------\n')
-
-        except Exception as error:
-            print(error)
-
-        """
-            create the announcements list
-        """
-        try:
-            announcements = list()
-
-            # from initial state
-            initial_states = self.data_from['data']['initial_state']
-            for initial_state in initial_states:
-                for network in networks:
-                    if network == initial_state['target_prefix']:
-                        source = df_sources.loc[initial_state['source_id']]['id_as_number']
-                        announcements.append([network, source, initial_state['path'][-1], self.start_datetime])
-
-            # from events
-            events = self.data_from['data']['events']
-            for event in events:
-                # for announcement events only (not withdrawn events)
-                if event['type'] == 'A':
-                    for network in networks:
-                        if network == event['attrs']['target_prefix']:
-                            source = df_sources.loc[event['attrs']['source_id']]['id_as_number']
-                            announcements.append([network,
-                                                  source,
-                                                  event['attrs']['path'][-1],
-                                                  int(datetime.strptime(str(event['timestamp']).replace('T', ' '),
-                                                                        '%Y-%m-%d %H:%M:%S').strftime('%s'))])
-
-            print('\n-------------------------\n')
-            print('announcements\n')
-            for announcement in announcements:
-                print(announcement)
-            print('\n-------------------------\n')
-
-        except Exception as error:
-            print(error)
-
-        """
-            time slots
-        """
-        try:
-            # time interval and slots
-            slot_interval = (self.end_datetime - self.start_datetime) // number_of_slots
-            slots = list()
-            slot_value = self.start_datetime
-            while slot_value <= self.end_datetime:
-                slots.append(slot_value)
-                slot_value = slot_value + slot_interval
-
-            print('\n-------------------------\n')
-            print('slots\n')
-            print(slots)
-            print('\n-------------------------\n')
-
-        except Exception as error:
-            print(error)
-
-        """
-            get the last announcement per as_number per time slot
-        """
-        try:
-            # get the amount of ASs that announces networks per time slot
-            for slot in slots:
-                print('\n\n\nSLOT: ', slot)
-                for announcement in reversed(announcements):
-                    if announcement[3] <= slot:
-
-                        print(announcement)
-
-
-
-
-
-
-        except Exception as error:
-            print(error)
-
 
 def main(argv=sys.argv[1:]):
     try:
@@ -352,8 +253,7 @@ def main(argv=sys.argv[1:]):
         #networks = ['208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
         networks = ['147.65.0.0/16', '150.161.0.0/16', '208.65.153.128/25']
         #
-        #parser.network_by_autonomous_system(number_of_slots, networks)
-        parser.announcements(number_of_slots, networks)
+        parser.network_by_autonomous_system(number_of_slots, networks)
     except:
         print('usage: ./parser.py file.json')
 
