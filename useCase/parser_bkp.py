@@ -255,7 +255,7 @@ def main(argv=sys.argv[1:]):
         #
         parser.network_by_autonomous_system(number_of_slots, networks)
     except:
-        print('usage: ./parser.py file.json')
+        print('usage: ./parser_ripe.py file.json')
 
 
 if __name__ == '__main__':
