@@ -217,7 +217,7 @@ def main(argv=sys.argv[1:]):
 
         # 8400 seconds divided in 4 slots (minutes range: 2100, 4200, 6300)
         # Obs.: the extremes will be used too (0 and 8400)
-        number_of_slots = 4
+        number_of_slots = 10
         # look for path to networks
         networks = ['208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
         #
