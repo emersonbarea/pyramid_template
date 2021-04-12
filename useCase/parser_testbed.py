@@ -117,30 +117,27 @@ class Parser(object):
         try:
             print('\n')
             print('BGP prefix route origin per time slot:')
+            start_time = list()
+            end_time = list()
             for file in self.files:
                 data = self.read_file(file)
-                start_time = int(math.modf(datetime.timestamp(
-                    datetime.strptime(str(data.splitlines()[0].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1])
-                end_time = int(math.modf(datetime.timestamp(
-                    datetime.strptime(str(data.splitlines()[-1].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1])
+                start_time.append(int(math.modf(datetime.timestamp(
+                    datetime.strptime(str(data.splitlines()[0].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
+                end_time.append(int(math.modf(datetime.timestamp(
+                    datetime.strptime(str(data.splitlines()[-1].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
+            start_time = min(start_time)
+            end_time = max(end_time)
 
-                time_slots = list()
-                time_slot_interval = int(math.modf((end_time - start_time) / time_slot_number)[1])
-                for time_event in range(start_time, end_time, time_slot_interval):
-                    time_slots.append(time_event)
+            print('interval: ', end_time - start_time)
 
+            time_slot_number = time_slot_number - 1
 
+            time_slots = list()
+            time_slot_interval = int(math.modf((end_time - start_time) / time_slot_number)[1])
+            for time_event in range(start_time, end_time, time_slot_interval):
+                time_slots.append(time_event)
 
-
-                    print(time_event)
-
-
-
-
-                #print('start_time: ', start_time, ' - end_time: ', end_time, ' - time_interval: ', time_interval, ' - time_slot_interval: ', time_slot_interval)
-
-
-                break
+            print(time_slots)
 
         except Exception as error:
             print(error)
@@ -157,7 +154,7 @@ def main(argv=sys.argv[1:]):
         #parser.adjacency_time()
         #parser.original_route_convergence_time()
         #parser.original_route_path()
-        time_slot_number = 10
+        time_slot_number = 9
         parser.slot_route_origin(time_slot_number)
         #parser.slot_route_path()
     except:

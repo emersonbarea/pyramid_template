@@ -137,7 +137,7 @@ class EventDetail(object):
                 '    '
                 'if current_time == %s:\n'
                 '        '
-                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
                 '/usr/bin/python -c \\"import pexpect; '
                 'child = pexpect.spawn(\'telnet 0 bgpd\'); '
                 'child.expect(\'Password: \'); '
@@ -179,7 +179,7 @@ class EventDetail(object):
                 '    '
                 'if current_time == %s:\n'
                 '        '
-                'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
                 '/usr/bin/python -c \\"import pexpect; '
                 'child = pexpect.spawn(\'telnet 0 bgpd\'); '
                 'child.expect(\'Password: \'); '
@@ -237,7 +237,7 @@ class EventDetail(object):
                     '    '
                     'if current_time == %s:\n'
                     '        '
-                    'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                    'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
                     '/usr/bin/python -c \\"import pexpect; '
                     'child = pexpect.spawn(\'telnet 0 bgpd\'); '
                     'child.expect(\'Password: \'); '
@@ -295,7 +295,7 @@ class EventDetail(object):
                     '    '
                     'if current_time == %s:\n'
                     '        '
-                    'os.system("sudo -u minisecbgpuser sudo mnexec -a %s '
+                    'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
                     '/usr/bin/python -c \\"import pexpect; '
                     'child = pexpect.spawn(\'telnet 0 bgpd\'); '
                     'child.expect(\'Password: \'); '
@@ -339,13 +339,18 @@ class EventDetail(object):
         with open(self.output_file, 'w') as file:
 
             # get template
-            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP.template', 'r') as template_file:
+            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_1.template', 'r') as template_file:
                 file.write(template_file.read())
             template_file.close()
 
             # start_datetime and end_datetime
             file.write('\n\n## timers\n\nstart_datetime = %s\nend_datetime = %s\ncurrent_time = %s' %
                        (self.start_datetime, self.end_datetime, self.current_time))
+
+            # get template
+            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_2.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
 
             # PID
             file.write('\n\n## get Mininet nodes PID\n\n')
@@ -372,6 +377,12 @@ class EventDetail(object):
                 file.write(prepend_command + '\n')
 
             file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
+
+            # get template
+            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_3.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
+
         file.close()
 
         os.chmod(self.output_file, 0o755)

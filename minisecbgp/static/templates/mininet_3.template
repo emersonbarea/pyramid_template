@@ -15,13 +15,18 @@
 
     def restart_MaxiNet(self):
         print('\n*** Restarting MiniSecBGP cluster nodes (MaxiNet)')
+        print('\n  * Stopping  MaxiNetWorkers')
+        for worker in self.workers:
+            print('    * on node "%s"' % worker)
+            os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl stop MaxiNetWorker\'' % worker)
+        time.sleep(5)
         print('\n  * Restarting MaxiNetFrontendServer on node "%s"' % self.server)
         os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetFrontendServer\'' % self.server)
         time.sleep(3)
-        print('  * Restarting MaxiNetWorkers')
+        print('\n  * Starting MaxiNetWorkers')
         for worker in self.workers:
             print('    * on node "%s"' % worker)
-            os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl restart MaxiNetWorker\'' % worker)
+            os.system('sudo -u minisecbgpuser bash -c \'ssh %s sudo systemctl start MaxiNetWorker\'' % worker)
         time.sleep(5)
         print('\n*** MaxiNetStatus')
         os.system('sudo -u minisecbgpuser bash -c \'MaxiNetStatus\'')
