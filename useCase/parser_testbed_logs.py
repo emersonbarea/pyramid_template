@@ -30,6 +30,7 @@ class Parser(object):
         try:
             print('\n')
             print('BGP Adjacency time:')
+            print('\nAS,Adjacency time\n')
             for file in self.files:
                 data = self.read_file(file)
                 start_time = False
@@ -55,7 +56,9 @@ class Parser(object):
         try:
             print('\n')
             print('BGP Original route convergence time:')
+            print('\nAS,Original route convergence time\n')
             for file in self.files:
+                print(file)
                 data = self.read_file(file)
                 for line in data.splitlines():
 
@@ -85,6 +88,7 @@ class Parser(object):
         try:
             print('\n')
             print('BGP Original route path:')
+            print('\nAS,[Original route path]\n')
             for file in self.files:
                 data = self.read_file(file)
 
@@ -116,28 +120,39 @@ class Parser(object):
     def slot_route_origin(self, time_slot_number):
         try:
             print('\n')
-            print('BGP prefix route origin per time slot:')
+            print('BGP route origin per time slot:')
+
+            system_date_time = self.read_file('system_date_time')
+
+            print(system_date_time)
+
+
+
             start_time = list()
             end_time = list()
-            for file in self.files:
-                data = self.read_file(file)
-                start_time.append(int(math.modf(datetime.timestamp(
-                    datetime.strptime(str(data.splitlines()[0].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
-                end_time.append(int(math.modf(datetime.timestamp(
-                    datetime.strptime(str(data.splitlines()[-1].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
-            start_time = min(start_time)
-            end_time = max(end_time)
+#            for file in self.files:
+#                data = self.read_file(file)
+#                start_time.append(int(math.modf(datetime.timestamp(
+#                    datetime.strptime(str(data.splitlines()[0].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
+#                end_time.append(int(math.modf(datetime.timestamp(
+#                    datetime.strptime(str(data.splitlines()[-1].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
+#            start_time = min(start_time)
+#            end_time = max(end_time)
+#
+#            print('interval: %s sec. - %s min. - %s hrs' % (str(end_time - start_time), str((end_time - start_time)/60), str((end_time - start_time)/60/60)))
+#
+#            time_slot_number = time_slot_number - 1
+#
+#            time_slots = list()
+#            time_slot_interval = int(math.modf((end_time - start_time) / time_slot_number)[1])
+#            for time_event in range(start_time, end_time, time_slot_interval):
+#                time_slots.append(time_event)
+#
+#            print(time_slots)
 
-            print('interval: ', end_time - start_time)
 
-            time_slot_number = time_slot_number - 1
 
-            time_slots = list()
-            time_slot_interval = int(math.modf((end_time - start_time) / time_slot_number)[1])
-            for time_event in range(start_time, end_time, time_slot_interval):
-                time_slots.append(time_event)
 
-            print(time_slots)
 
         except Exception as error:
             print(error)
@@ -151,9 +166,9 @@ def main(argv=sys.argv[1:]):
         pd.set_option('display.max_colwidth', None)
 
         parser = Parser(argv[0])
-        #parser.adjacency_time()
-        #parser.original_route_convergence_time()
-        #parser.original_route_path()
+        parser.adjacency_time()
+        parser.original_route_convergence_time()
+        parser.original_route_path()
         time_slot_number = 9
         parser.slot_route_origin(time_slot_number)
         #parser.slot_route_path()

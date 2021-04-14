@@ -1,4 +1,4 @@
 
 
 # write startup system datetime
-os.system('echo start_datetime:%s > system_date_time' % str(time.mktime(datetime.now().timetuple()) + datetime.now().microsecond * 1e-6).split('.')[0])
+os.system('echo start_datetime:%s > log/system_date_time' % str(time.mktime(datetime.now().timetuple()) + datetime.now().microsecond * 1e-6).split('.')[0])
