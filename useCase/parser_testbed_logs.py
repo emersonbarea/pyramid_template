@@ -2,6 +2,7 @@
 import sys
 import os
 import math
+import time
 
 from datetime import datetime
 
@@ -28,9 +29,6 @@ class Parser(object):
 
     def adjacency_time(self):
         try:
-            print('\n')
-            print('BGP Adjacency time:')
-            print('\nAS,Adjacency time\n')
             for file in self.files:
                 data = self.read_file(file)
                 start_time = False
@@ -52,13 +50,9 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def original_route_convergence_time(self):
+    def original_convergence_time_for_prefix(self, prefix, prefix_hijacker):
         try:
-            print('\n')
-            print('BGP Original route convergence time:')
-            print('\nAS,Original route convergence time\n')
             for file in self.files:
-                print(file)
                 data = self.read_file(file)
                 for line in data.splitlines():
 
@@ -69,13 +63,13 @@ class Parser(object):
 
                 for line in data.splitlines():
 
-                    # # get last 208.65.152.0/22 valid route add event
-                    if 'Zebra send: IPv4 route add 208.65.152.0/22 nexthop' in line:
+                    # get last "prefix" valid route add event
+                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
                         last_route_add_event = datetime.timestamp(
                             datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
-                    # break when "rcvd UPDATE w/ attr: nexthop ... 17557" was found
-                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith('17557'):
+                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
+                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
                         break
 
                 # print the original route convergence time per AS
@@ -84,11 +78,8 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def original_route_path(self):
+    def original_route_path(self, prefix, prefix_hijacker):
         try:
-            print('\n')
-            print('BGP Original route path:')
-            print('\nAS,[Original route path]\n')
             for file in self.files:
                 data = self.read_file(file)
 
@@ -97,12 +88,12 @@ class Parser(object):
 
                     lines.append(line)
 
-                    # get last 208.65.152.0/22 valid route add event
-                    if 'Zebra send: IPv4 route add 208.65.152.0/22 nexthop' in line:
+                    # get last "prefix" valid route add event
+                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
                         nexthop = str(line.split('nexthop')[1].split(' ')[1])
 
-                    # break when "rcvd UPDATE w/ attr: nexthop ... 17557" was found
-                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith('17557'):
+                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
+                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
                         break
 
                 for line in reversed(lines):
@@ -117,42 +108,88 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def slot_route_origin(self, time_slot_number):
+    def original_AS_route_origin(self, prefix, prefix_hijacker):
         try:
-            print('\n')
-            print('BGP route origin per time slot:')
+            for file in self.files:
+                data = self.read_file(file)
 
-            system_date_time = self.read_file('system_date_time')
+                lines = list()
+                for line in data.splitlines():
 
-            print(system_date_time)
+                    lines.append(line)
+
+                    # get last "prefix" valid route add event
+                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
+                        nexthop = str(line.split('nexthop')[1].split(' ')[1])
+
+                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
+                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
+                        break
+
+                for line in reversed(lines):
+
+                    # get the original route path
+                    if '%s rcvd UPDATE w/ attr: nexthop %s, origin i,' % (nexthop, nexthop) in line:
+                        AS = line.split('path ')[1].split(' ')[-1]
+
+                # print the original route convergence time per AS
+                print('%s,%s' % (file.split('-')[1].split('.')[0], AS))
+
+        except Exception as error:
+            print(error)
+
+    def per_time_slot_route_path_per_prefix(self, prefixes, time_slot_number):
+        try:
+
+            # get start_datetime and end_datetime
+            data = self.read_file('system_date_time')
+            for line in data.splitlines():
+                if line.startswith('start_datetime:'):
+                    start_datetime = int(line.split(':')[-1])
+                elif line.startswith('end_datetime:'):
+                    end_datetime = int(line.split(':')[-1])
+
+            # defining time slots
+            time_slots = list()
+            time_slot_interval = int(math.modf((end_datetime - start_datetime) / time_slot_number)[1])
+            for time_event in range(start_datetime, end_datetime, time_slot_interval):
+                time_slots.append(time_event)
+
+            # for each prefix
 
 
 
-            start_time = list()
-            end_time = list()
-#            for file in self.files:
-#                data = self.read_file(file)
-#                start_time.append(int(math.modf(datetime.timestamp(
-#                    datetime.strptime(str(data.splitlines()[0].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
-#                end_time.append(int(math.modf(datetime.timestamp(
-#                    datetime.strptime(str(data.splitlines()[-1].split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f')))[1]))
-#            start_time = min(start_time)
-#            end_time = max(end_time)
-#
-#            print('interval: %s sec. - %s min. - %s hrs' % (str(end_time - start_time), str((end_time - start_time)/60), str((end_time - start_time)/60/60)))
-#
-#            time_slot_number = time_slot_number - 1
-#
-#            time_slots = list()
-#            time_slot_interval = int(math.modf((end_time - start_time) / time_slot_number)[1])
-#            for time_event in range(start_time, end_time, time_slot_interval):
-#                time_slots.append(time_event)
-#
-#            print(time_slots)
+            for prefix in prefixes:
+                for time_slot in time_slots:
+                    for file in self.files:
+                        data = self.read_file(file)
 
+                        announcer_path = list()
+                        nexthop = False
+                        found_route = False
+                        for line in reversed(data.splitlines()):
 
+                            # read all lines less than or equal to the time slot
+                            line_datetime = datetime.timestamp(datetime.strptime(line.split('.')[0], '%Y/%m/%d %H:%M:%S'))
+                            if int(line_datetime) <= int(time_slot):
 
+                                # tenho que verificar quando é o próprio emissor da rota
+                                # tenho que cuidar do prepend
+                                # tenho que cuidar do withdrawn
 
+                                if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
+                                    nexthop = line.split('nexthop ')[1].split(' ')[0]
+                                if 'BGP: %s rcvd UPDATE w/ attr: nexthop %s,' % (nexthop, nexthop) in line:
+                                    path = line.split(' path')[-1]
+                                    for hop in path.split(' '):
+                                        if hop:
+                                            announcer_path.append(int(hop))
+                                    found_route = True
+                                    break
+                        if not found_route:
+                            announcer_path.append(None)
+
+                        print('\'%s\',%s,%s,%s' % (prefix, time_slot, file.split('-')[1].split('.')[0], announcer_path))
 
         except Exception as error:
             print(error)
@@ -166,12 +203,46 @@ def main(argv=sys.argv[1:]):
         pd.set_option('display.max_colwidth', None)
 
         parser = Parser(argv[0])
+
+        print('\n')
+        print('BGP Adjacency time:')
+        print('\nAS,Adjacency time\n')
         parser.adjacency_time()
-        parser.original_route_convergence_time()
-        parser.original_route_path()
+
+        print('\n')
+        data = [['208.65.152.0/22', '17557']]
+        for prefix, prefix_hijacker in data:
+            print('Original BGP convergence time for prefix %s:' % prefix)
+            print('\nAS,Convergence_time\n')
+            parser.original_convergence_time_for_prefix(prefix, prefix_hijacker)
+
+        print('\n')
+        data = [['208.65.152.0/22', '17557']]
+        for prefix, prefix_hijacker in data:
+            print('Original BGP route path for prefix %s:' % prefix)
+            print('\nAS,[Route_path]\n')
+            parser.original_route_path(prefix, prefix_hijacker)
+
+        print('\n')
+        data = [['208.65.152.0/22', '17557']]
+        for prefix, prefix_hijacker in data:
+            print('Original announcer AS for the prefix %s:' % prefix)
+            print('\nAS,AS_announcer\n')
+            parser.original_AS_route_origin(prefix, prefix_hijacker)
+
+        print('\n')
+        print('PER TIME SLOT')
+
+        print('\n')
         time_slot_number = 9
-        parser.slot_route_origin(time_slot_number)
-        #parser.slot_route_path()
+        prefixes = ['208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
+        print('BGP route origin per time slot for the prefixes %s:' % prefixes)
+        print('\nprefix,time_slot,AS,[Route_path]\n')
+        parser.per_time_slot_route_path_per_prefix(prefixes, time_slot_number)
+
+        print('\n\n\n\n')
+        print('-- BGP route path per prefix per time slot')
+
     except:
         print('usage: ./parser_testbed.py <logs directory>')
 
