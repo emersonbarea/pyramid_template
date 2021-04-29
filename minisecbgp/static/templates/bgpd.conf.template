@@ -9,7 +9,11 @@ debug bgp events
 debug bgp filters
 debug bgp updates
 debug bgp zebra
+debug bgp allow-martians
+debug bgp nht
+debug bgp
 
+log commands
 log stdout
 
 router bgp *AS*

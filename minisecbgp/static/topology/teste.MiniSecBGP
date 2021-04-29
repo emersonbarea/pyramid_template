@@ -1,0 +1,211 @@
+{
+  "topology_name": "Teste",
+  "autonomous_systems": [
+    {
+      "autonomous_system": "65001",
+      "region": null,
+      "router_id": "192.168.0.1",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": null,
+          "mask": null
+        }
+      ]
+    },
+    {
+      "autonomous_system": "65002",
+      "region": null,
+      "router_id": "192.168.0.5",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": null,
+          "mask": null
+        }
+      ]
+    },
+    {
+      "autonomous_system": "65003",
+      "region": null,
+      "router_id": "192.168.0.9",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": null,
+          "mask": null
+        }
+      ]
+    },
+    {
+      "autonomous_system": "65004",
+      "region": null,
+      "router_id": "192.168.0.10",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": null,
+          "mask": null
+        }
+      ]
+    },
+    {
+      "autonomous_system": "65005",
+      "region": null,
+      "router_id": "192.168.0.14",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": "20.0.0.0",
+          "mask": 24
+        }
+      ]
+    },
+    {
+      "autonomous_system": "333",
+      "region": null,
+      "router_id": "192.168.0.18",
+      "internet_exchange_points": [
+        {
+          "internet_exchange_point": null,
+          "region": null
+        }
+      ],
+      "type_of_users": [
+        {
+          "type_of_user": null,
+          "number": null
+        }
+      ],
+      "type_of_services": [null],
+      "prefixes": [
+        {
+          "prefix": null,
+          "mask": null
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "source": "65001",
+      "destination": "65002",
+      "ip_source": "192.168.0.1",
+      "ip_destination": "192.168.0.2",
+      "mask": "30",
+      "description": "65001-65002",
+      "agreement": null,
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65002",
+      "destination": "65003",
+      "ip_source": "192.168.0.5",
+      "ip_destination": "192.168.0.6",
+      "mask": "30",
+      "description": "65002-65003",
+      "agreement": null,
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65003",
+      "destination": "65004",
+      "ip_source": "192.168.0.9",
+      "ip_destination": "192.168.0.10",
+      "mask": "30",
+      "description": "65003-65004",
+      "agreement": null,
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65004",
+      "destination": "65005",
+      "ip_source": "192.168.0.13",
+      "ip_destination": "192.168.0.14",
+      "mask": "30",
+      "description": "65004-65005",
+      "agreement": null,
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    },
+    {
+      "source": "65002",
+      "destination": "333",
+      "ip_source": "192.168.0.17",
+      "ip_destination": "192.168.0.18",
+      "mask": "30",
+      "description": "65002-333",
+      "agreement": null,
+      "bandwidth": null,
+      "delay": null,
+      "load": null
+    }
+  ]
+}

@@ -2,6 +2,18 @@ hostname AS*AS*
 password en
 enable password en
 
+log timestamp precision 6
+
+debug zebra events
+debug zebra fpm
+debug zebra kernel
+debug zebra nht
+debug zebra packet
+debug zebra rib
+
+log commands
+log stdout
+
 interface lo
   ip address 127.0.0.1/32
 

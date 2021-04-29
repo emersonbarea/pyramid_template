@@ -1,12 +1,18 @@
 import argparse
 import datetime
 import getopt
+import json
 import os
+import shutil
+import subprocess
 import sys
+import ipaddress
 import time
+
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
+from sqlalchemy import func
 from sqlalchemy.exc import OperationalError, IntegrityError
 
 from minisecbgp import models
@@ -318,9 +324,6 @@ class EventDetail(object):
                     'child.expect(\'.+#\')\\"" %s AS%s)\n' %
                     (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
                      '%s', str(row[4]), int(row[5]), hmt_list, str(row[3]), route_map_in_commands, '%', str(row[3])))
-
-    def time_slot_show_commands(self):
-        pass
 
     def time_write_files(self):
         """
