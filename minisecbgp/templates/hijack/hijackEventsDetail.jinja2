@@ -5,7 +5,7 @@
 <div id="aum" class="container-fluid" xmlns="http://www.w3.org/1999/html">
     <div class="row-fluid">
         <div class="span12">
-            {% if not events[0]['time_write_files'] %}
+            {% if not events[0]['time_write_config_files'] %}
                 <meta http-equiv="refresh" content="5;URL= '{{ hijackEventsDetail_url }}'">
                 <h3 align="center">Creating Events Configuration</h3>
             {% else %}
@@ -64,10 +64,32 @@
                         <font color="orange"> wait... </font>
                     </p>
                 {% endif %}
-                {% if events[0]['time_write_files'] %}
+                {% if events[0]['time_write_config_files'] %}
                     <p>
                         <strong> Time to write configuration files: </strong>
-                        <font color="green"> {{ events[0]['time_write_files'] }} sec </font>
+                        <font color="green"> {{ events[0]['time_write_config_files'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to write configuration files: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_monitoring_commands'] %}
+                    <p>
+                        <strong> Time to create monitoring commands: </strong>
+                        <font color="green"> {{ events[0]['time_monitoring_commands'] }} sec </font>
+                    </p>
+                {% else %}
+                    <p>
+                        <strong> Time to create monitoring commands: </strong>
+                        <font color="orange"> wait... </font>
+                    </p>
+                {% endif %}
+                {% if events[0]['time_write_monitoring_files'] %}
+                    <p>
+                        <strong> Time to write monitoring files: </strong>
+                        <font color="green"> {{ events[0]['time_write_monitoring_files'] }} sec </font>
                     </p>
                     <p>
                         <strong> Total time: </strong>
@@ -75,7 +97,7 @@
                     </p>
                 {% else %}
                     <p>
-                        <strong> Time to write configuration files: </strong>
+                        <strong> Time to write monitoring files: </strong>
                         <font color="orange"> wait... </font>
                     </p>
                     <p>
@@ -88,7 +110,7 @@
 
         <p><hr></p>
 
-        {% if not events[0]['time_write_files'] %}
+        {% if not events[0]['time_write_config_files'] %}
             <p align="center">* fields status checked automatically every 5 seconds</p>
         {% else %}
             <div class="form-group" align="center">

@@ -372,6 +372,129 @@
             </form>
           </div>
 
+
+
+          <!-- monitoring -->
+
+          <div class="span12">
+            <form action="#" method="POST">
+              <p><hr></p>
+              <div class="form-field">
+                <p>Monitoring Event Datetime:</p>
+                <div class="frame-color">
+                  <table style="width:100%">
+                    <tr>
+                      <td align="center"><strong>Datetime</strong></td>
+                      <td align="center"><strong>Monitored AS</strong></td>
+                      <td></td>
+                    </tr>
+                    {% for event in events_monitoring %}
+                      <div class="form-inline">
+                        <tr>
+                          <td align="center">{{ event.event_datetime }}</td>
+                          {% if event.all == None %}
+                            <td align="center">{{ event.monitor }}</td>
+                          {% else %}
+                            <td align="center">All</td>
+                          {% endif %}
+                          <td align="center"><button type="button" onclick="eventMonitoring({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteMonitoringModal">Del</button></td>
+                        </tr>
+                      </div>
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+              <br>
+              <div class="form-group" align="center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationMonitoringModal">Add Monitoring</button>
+              </div>
+
+              <div class="modal fade" id="confirmationMonitoringModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      {{ form_monitoring.monitoring_id_event(type="hidden") }}
+                      <p>
+                        {{ form_monitoring.monitor_by.label }}
+                        {{ form_monitoring.monitor_by(onchange="monitor_byFunction()") }}
+                      </p>
+                      <p>
+                        <table style="width:100%">
+                          <tr>
+                            <td align="left">{{ form_monitoring.amount_of_time_slot.label }}</td>
+                          </tr>
+                          <div class="form-inline">
+                            <tr>
+                              <td align="left">{{ form_monitoring.amount_of_time_slot(value="0") }}</td>
+                            </tr>
+                          </div>
+                        </table>
+                      </p>
+                      <p>
+                        {{ form_monitoring.monitoring_datetime.label }}
+                        {{ form_monitoring.monitoring_datetime(value="0001-01-01 01:00:00", disabled=True) }} Format: %Y-%m-%d %H:%M:%S
+                      </p>
+                      <p>
+                        {{ form_monitoring.which_as_will_be_monitored.label }}
+                        {{ form_monitoring.which_as_will_be_monitored(onchange="which_as_will_be_monitoredFunction()") }}
+                      </p>
+                      <p>
+                        <table style="width:100%">
+                          <tr>
+                            <td align="left">{{ form_monitoring.monitor.label }}</td>
+                          </tr>
+                          <div class="form-inline">
+                            <tr>
+                              <td align="left">{{ form_monitoring.monitor(value="0", disabled=True) }}</td>
+                            </tr>
+                          </div>
+                        </table>
+                      </p>
+
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_monitoring.create_monitoring_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="confirmationDeleteMonitoringModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel2" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want remove this event?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_monitoring.delete_monitoring_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+
+
+
+
+
+
+
         {% endif %}
 
         <!-- generate events button -->
@@ -418,12 +541,33 @@
         function eventWithdrawn(id_event) {
           withdrawn_id_event.value = id_event;
         };
+        function eventMonitoring(id_event) {
+          monitoring_id_event.value = id_event;
+        };
         function inountFunction() {
           choose = document.getElementById("prepend_in_out").value;
           if (choose == 'in') {
             document.getElementById("prepend_peer").setAttribute("disabled","disabled");
           } else if (choose == 'out') {
             document.getElementById("prepend_peer").removeAttribute("disabled");
+          };
+        };
+        function which_as_will_be_monitoredFunction() {
+          choose = document.getElementById("which_as_will_be_monitored").value;
+          if (choose == 'all') {
+            document.getElementById("monitor").setAttribute("disabled","disabled");
+          } else if (choose == 'only_one_as') {
+            document.getElementById("monitor").removeAttribute("disabled");
+          };
+        };
+        function monitor_byFunction() {
+          choose = document.getElementById("monitor_by").value;
+          if (choose == 'specific_time_slot') {
+            document.getElementById("amount_of_time_slot").setAttribute("disabled","disabled");
+            document.getElementById("monitoring_datetime").removeAttribute("disabled");
+          } else if (choose == 'automatic_time_slot') {
+            document.getElementById("amount_of_time_slot").removeAttribute("disabled");
+            document.getElementById("monitoring_datetime").setAttribute("disabled","disabled");
           };
         };
       </script>

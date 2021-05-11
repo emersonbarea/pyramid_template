@@ -33,6 +33,7 @@
 
     def start_hijack_scenario(self):
         subprocess.Popen(['./event_commands.MiniSecBGP'])
+        subprocess.Popen(['./event_monitoring.MiniSecBGP'])
 
     @staticmethod
     def input_to_continue(phrase, color):
@@ -94,8 +95,9 @@
                     self.input_to_continue('You need start topology first (menu option [1])', 'red')
 
             elif self.option == 4:
-                file = pathlib.Path('event_commands.MiniSecBGP')
-                if file.exists():
+                event_commands_file = pathlib.Path('event_commands.MiniSecBGP')
+                event_monitoring_file = pathlib.Path('event_monitoring.MiniSecBGP')
+                if event_commands_file.exists() and event_monitoring_file.exists():
                     if 1 in self.option_executed:
                         self.start_hijack_scenario()
                         self.input_to_continue('Hijacking attack scenario started successfully.\n\n'

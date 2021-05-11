@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import getopt
+import itertools
 import os
 import sys
 import time
@@ -21,7 +22,9 @@ class EventDetail(object):
             filter(models.EventBehaviour.id_topology == models.Topology.id).first()
         self.event_behaviour = self.dbsession.query(models.EventBehaviour).\
             filter_by(id=self.id_event_behaviour).first()
-        self.output_file = '/tmp/MiniSecBGP/output/topology/%s/event_commands.MiniSecBGP' % self.topology.Topology.topology
+        self.output_event_command_file = '/tmp/MiniSecBGP/output/topology/%s/event_commands.MiniSecBGP' % self.topology.Topology.topology
+        self.output_event_monitoring_file = '/tmp/MiniSecBGP/output/topology/%s/event_monitoring.MiniSecBGP' % self.topology.Topology.topology
+        self.show_exp_file = '/tmp/MiniSecBGP/output/topology/%s/show.exp' % self.topology.Topology.topology
         self.start_datetime = str(
             datetime.datetime.strptime(str(self.event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
         self.end_datetime = str(
@@ -32,19 +35,42 @@ class EventDetail(object):
     def dfs_from_database(self):
 
         # get PID from
-        query = 'select a.announcer as autonomous_system ' \
-                'from event_announcement a ' \
-                'where a.id_event_behaviour = %s ' \
-                'union ' \
-                'select w.withdrawer as autonomous_system ' \
-                'from event_withdrawn w ' \
-                'where w.id_event_behaviour = %s ' \
-                'union ' \
-                'select p.prepender as autonomous_system ' \
-                'from event_prepend p ' \
-                'where p.id_event_behaviour = %s; ' % \
-                (self.id_event_behaviour, self.id_event_behaviour, self.id_event_behaviour)
+        query = 'select em.all as all ' \
+                'from event_monitoring em ' \
+                'where em.id_event_behaviour = %s ' \
+                'and em.all = True;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
+        all_autonomous_systems = False
+        for row in result_proxy:
+            all_autonomous_systems = row[0]
+
+        if not all_autonomous_systems:
+            query = 'select a.announcer as autonomous_system ' \
+                    'from event_announcement a ' \
+                    'where a.id_event_behaviour = %s ' \
+                    'union ' \
+                    'select w.withdrawer as autonomous_system ' \
+                    'from event_withdrawn w ' \
+                    'where w.id_event_behaviour = %s ' \
+                    'union ' \
+                    'select p.prepender as autonomous_system ' \
+                    'from event_prepend p ' \
+                    'where p.id_event_behaviour = %s ' \
+                    'union ' \
+                    'select m.monitor as autonomous_system ' \
+                    'from event_monitoring m ' \
+                    'where m.id_event_behaviour = %s; ' % \
+                    (self.id_event_behaviour, self.id_event_behaviour,
+                     self.id_event_behaviour, self.id_event_behaviour)
+            result_proxy = self.dbsession.bind.execute(query)
+        else:
+            query = 'select asys.autonomous_system as autonomous_system ' \
+                    'from autonomous_system asys, ' \
+                    'event_behaviour eb ' \
+                    'where eb.id = %s ' \
+                    'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
+            result_proxy = self.dbsession.bind.execute(query)
+
         self.pid = list()
         for row in result_proxy:
             self.pid.append(row['autonomous_system'])
@@ -116,6 +142,36 @@ class EventDetail(object):
         # 1   2008-02-24 20:00:00     in       3491      17557      NaN   10          4227          4288      NaN
         # 2   2008-02-24 18:48:08    out       1299       3491  29686.0    2          4211          4227   4319.0
         # 3   2008-02-24 18:48:09    out       1299       3491  28917.0    2          4211          4227   4313.0
+
+        # Monitoring
+        query = 'select em.event_datetime as event_datetime, ' \
+                'em.monitor as monitor, ' \
+                'em.all as all ' \
+                'from event_monitoring em ' \
+                'where em.id_event_behaviour = %s;' % self.id_event_behaviour
+        result_proxy = self.dbsession.bind.execute(query)
+        monitoring_list_temp = list()
+        for row in result_proxy:
+            if row[2]:
+                query = 'select asys.autonomous_system as autonomous_system ' \
+                        'from autonomous_system asys, ' \
+                        'event_behaviour eb ' \
+                        'where eb.id = %s ' \
+                        'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
+                result_proxy = self.dbsession.bind.execute(query)
+                for autonomous_system in result_proxy:
+                    monitoring_list_temp.append([row[0], autonomous_system[0]])
+            else:
+                monitoring_list_temp.append([row[0], row[1]])
+            monitoring_list_temp.sort()
+            monitoring_list = list(monitoring_list_temp for monitoring_list_temp,_ in itertools.groupby(monitoring_list_temp))
+        self.df_monitoring = pd.DataFrame.from_records(monitoring_list, columns=['event_datetime', 'monitor'])
+        # print(self.df_monitoring)
+        #          event_datetime  monitor
+        # 0   2008-02-24 18:45:01      333
+        # 1   2008-02-24 18:45:01    65001
+        # 2   2008-02-24 18:45:01    65002
+        # 3   2008-02-24 18:45:01    65003
 
     def pid_commands(self):
         self.pid_commands_list = list()
@@ -319,21 +375,18 @@ class EventDetail(object):
                     (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
                      '%s', str(row[4]), int(row[5]), hmt_list, str(row[3]), route_map_in_commands, '%', str(row[3])))
 
-    def time_slot_show_commands(self):
-        pass
-
-    def time_write_files(self):
+    def time_write_config_files(self):
         """
             Write configuration files to server filesystem
         """
 
         # erase previews configuration
         try:
-            os.remove(self.output_file)
+            os.remove(self.output_event_command_file)
         except FileNotFoundError:
             pass
 
-        with open(self.output_file, 'w') as file:
+        with open(self.output_event_command_file, 'w') as file:
 
             # get template
             with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_1.template', 'r') as template_file:
@@ -382,7 +435,97 @@ class EventDetail(object):
 
         file.close()
 
-        os.chmod(self.output_file, 0o755)
+        os.chmod(self.output_event_command_file, 0o755)
+
+    def monitoring_commands(self):
+        self.monitoring_commands_list = list()
+        for row in self.df_monitoring.itertuples():
+#            self.monitoring_commands_list.append(
+#                '    '
+#                'if current_time == %s:\n'
+#                '        '
+#                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
+#                '/usr/bin/python -c \\"import pexpect; '
+#                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
+#                'child.expect(\'Password: \'); '
+#                'child.sendline(\'en\'); '
+#                'child.expect(\'.+>\'); '
+#                'child.sendline(\'enable\'); '
+#                'child.expect([\'Password: \',\'.+#\']); '
+#                'child.sendline(\'en\'); '
+#                'child.expect(\'.+#\'); '
+#                'child.sendline(\'show ip bgp\'); '
+#                'child.expect(\'.+#\'); '
+#                'print(\'-->Monitoring Datetime:%s\'); '
+#                'print(child.after)\\" >> log/monitoring_%s.log" %s AS%s)\n'
+#                '\n'
+#                '' %
+#                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+#                 '%s', str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+#                 str(row[2]), '%', str(row[2])))
+
+            self.monitoring_commands_list.append(
+                '    '
+                'if current_time == %s:\n'
+                '        '
+                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
+                '-- sh -c \'echo \\"\\n-->current_time:%s\\" >> log/monitor-%s.log; '
+                './show.exp >> log/monitor-%s.log &\'" %s AS%s)\n'
+                '\n'
+                '' %
+                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')), '%s',
+                 str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                 str(row[2]), str(row[2]), '%', str(row[2])))
+
+    def time_write_monitoring_files(self):
+        """
+            Write monitoring files to server filesystem
+        """
+
+        # erase previews configuration
+        try:
+            os.remove(self.output_event_monitoring_file)
+        except FileNotFoundError:
+            pass
+
+        with open(self.show_exp_file, 'w') as file:
+
+            # get template
+            with open('./minisecbgp/static/templates/show.exp.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
+
+        file.close()
+        os.chmod(self.show_exp_file, 0o755)
+
+        with open(self.output_event_monitoring_file, 'w') as file:
+
+            # get template
+            with open('./minisecbgp/static/templates/event_monitoring.MiniSecBGP.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
+
+            # current_time for loop
+            file.write('\n\n## timers\n\ncurrent_time = %s' % self.current_time)
+
+            # PID
+            file.write('\n\n## get Mininet nodes PID\n\n')
+            for pid_command in self.pid_commands_list:
+                file.write(pid_command + '\n')
+
+            # timer loop begin
+            file.write('\n\n## events\n\n')
+            file.write('while current_time != %s:\n' % self.end_datetime)
+
+            # Monitoring
+            file.write('\n    ## Monitoring\n\n')
+            for monitoring_command in self.monitoring_commands_list:
+                file.write(monitoring_command + '\n')
+
+            file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
+
+        file.close()
+        os.chmod(self.output_event_monitoring_file, 0o755)
 
     @staticmethod
     def downloading(dbsession, downloading):
@@ -475,10 +618,22 @@ def main(argv=sys.argv[1:]):
                 time_prepends_commands = time.time() - time_prepends_commands
                 save_to_database(dbsession, ['time_prepends_commands'], [time_prepends_commands], id_event_behaviour)
 
-                time_write_files = time.time()
-                ed.time_write_files()
-                time_write_files = time.time() - time_write_files
-                save_to_database(dbsession, ['time_write_files'], [time_write_files], id_event_behaviour)
+                time_write_config_files = time.time()
+                ed.time_write_config_files()
+                time_write_config_files = time.time() - time_write_config_files
+                save_to_database(dbsession, ['time_write_config_files'], [time_write_config_files], id_event_behaviour)
+
+                time_monitoring_commands = time.time()
+                ed.monitoring_commands()
+                time_monitoring_commands = time.time() - time_monitoring_commands
+                save_to_database(dbsession, ['time_monitoring_commands'], [time_monitoring_commands], id_event_behaviour)
+
+                time_write_monitoring_files = time.time()
+                ed.time_write_monitoring_files()
+                time_write_monitoring_files = time.time() - time_write_monitoring_files
+                save_to_database(dbsession, ['time_write_monitoring_files'], [time_write_monitoring_files], id_event_behaviour)
+
+
         except OperationalError:
             print('Database error')
     else:

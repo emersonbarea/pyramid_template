@@ -143,6 +143,7 @@ class EventBehaviour(Base):
     event_announcement = relationship('EventAnnouncement', foreign_keys='EventAnnouncement.id_event_behaviour')
     event_withdrawn = relationship('EventWithdrawn', foreign_keys='EventWithdrawn.id_event_behaviour')
     event_prepend = relationship('EventPrepend', foreign_keys='EventPrepend.id_event_behaviour')
+    event_monitoring = relationship('EventMonitoring', foreign_keys='EventMonitoring.id_event_behaviour')
     Index('IndexId9_topology', id_topology)
 
 
@@ -155,7 +156,9 @@ class EventDetail(Base):
     time_announcement_commands = Column(String(250))
     time_withdrawn_commands = Column(String(250))
     time_prepends_commands = Column(String(250))
-    time_write_files = Column(String(250))
+    time_write_config_files = Column(String(250))
+    time_monitoring_commands = Column(String(250))
+    time_write_monitoring_files = Column(String(250))
     Index('IndexId2_event_behaviour', id_event_behaviour)
 
 
@@ -188,5 +191,15 @@ class EventPrepend(Base):
     prepender = Column(BigInteger)                      # AS where prepend will occurs
     prepended = Column(BigInteger)                      # The prepended AS
     peer = Column(BigInteger)                           # for which peer of prepender the prepend will be announced
-    hmt = Column(Integer)                              # How Many Times the prepended AS will be prepended
+    hmt = Column(Integer)                               # How Many Times the prepended AS will be prepended
     Index('IndexId5_event_behaviour', id_event_behaviour)
+
+
+class EventMonitoring(Base):
+    __tablename__ = 'event_monitoring'
+    id = Column(Integer, primary_key=True)
+    id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
+    event_datetime = Column(String(19), nullable=False)
+    monitor = Column(BigInteger)
+    all = Column(Boolean)
+    Index('IndexId6_event_behaviour', id_event_behaviour)

@@ -1,4 +1,5 @@
 import ipaddress
+import math
 import subprocess
 import tarfile
 import os.path
@@ -104,7 +105,7 @@ class HijackEventsDateTimeDataForm(Form):
 
 
 class HijackEventsAnnouncementDataForm(Form):
-    announcement_datetime = DateTimeField('Start time: ',
+    announcement_datetime = DateTimeField('Date and Time: ',
                                           format='%Y-%m-%d %H:%M:%S',
                                           validators=[InputRequired()])
     announced_prefix = StringField('Announced Prefix: ',
@@ -122,7 +123,7 @@ class HijackEventsAnnouncementDataForm(Form):
 
 
 class HijackEventsWithdrawDataForm(Form):
-    withdrawn_datetime = DateTimeField('Start time: ',
+    withdrawn_datetime = DateTimeField('Date and Time: ',
                                        format='%Y-%m-%d %H:%M:%S',
                                        validators=[InputRequired()])
     withdrawn_prefix = StringField('Withdrawn Prefix: ',
@@ -140,7 +141,7 @@ class HijackEventsWithdrawDataForm(Form):
 
 
 class HijackEventsPrependDataForm(Form):
-    prepend_datetime = DateTimeField('Start time: ',
+    prepend_datetime = DateTimeField('Date and Time: ',
                                      format='%Y-%m-%d %H:%M:%S',
                                      validators=[InputRequired()])
     prepend_in_out = SelectField('In/Out:',
@@ -166,6 +167,31 @@ class HijackEventsPrependDataForm(Form):
     create_prepend_button = SubmitField('Save')
     prepend_id_event = IntegerField()
     delete_prepend_button = SubmitField('Del')
+
+
+class HijackEventsMonitoringDataForm(Form):
+    monitoring_datetime = DateTimeField('Monitor event date and time: ',
+                                        format='%Y-%m-%d %H:%M:%S',
+                                        validators=[InputRequired()])
+    monitor_by = SelectField('Monitoring frequency:',
+                             validators=[InputRequired()],
+                             choices=[('automatic_time_slot', 'Automatic Time Slot'),
+                                      ('specific_time_slot', 'Specific Time Slot')])
+    amount_of_time_slot = IntegerField('Amount of time slots:',
+                                       validators=[InputRequired(),
+                                                   Length(min=1, max=10,
+                                                          message='How many times slots the scenario will be monitored.')])
+    which_as_will_be_monitored = SelectField('Which AS will be monitored?:',
+                                             validators=[InputRequired()],
+                                             choices=[('all', 'All'),
+                                                      ('only_one_as', 'Only one AS')])
+    monitor = StringField('AS that will be monitored: ',
+                          validators=[InputRequired(),
+                                      Length(min=1, max=18,
+                                             message='Only a valid ASN in this topology.')])
+    create_monitoring_button = SubmitField('Save')
+    monitoring_id_event = IntegerField()
+    delete_monitoring_button = SubmitField('Del')
 
 
 class HijackEventsButtonDataForm(Form):
@@ -681,6 +707,7 @@ def hijack_events(request):
     form_announcement = HijackEventsAnnouncementDataForm(request.POST)
     form_withdrawn = HijackEventsWithdrawDataForm(request.POST)
     form_prepend = HijackEventsPrependDataForm(request.POST)
+    form_monitoring = HijackEventsMonitoringDataForm(request.POST)
 
     form_button = HijackEventsButtonDataForm(request.POST)
 
@@ -853,6 +880,70 @@ def hijack_events(request):
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
 
+        if form_monitoring.create_monitoring_button.data:
+            try:
+
+                time_slots = list()
+                if form_monitoring.monitor_by.data == 'automatic_time_slot':
+                    start_datetime = int(datetime.strptime(str(event_behaviour.start_datetime),
+                                                           '%Y-%m-%d %H:%M:%S').strftime('%s'))
+                    end_datetime = int(datetime.strptime(str(event_behaviour.end_datetime),
+                                                         '%Y-%m-%d %H:%M:%S').strftime('%s'))
+                    amount_of_time_slot = form_monitoring.amount_of_time_slot.data + 1
+                    # time slots definition
+                    if amount_of_time_slot > 1:
+                        time_slot_interval = int(math.modf((end_datetime - start_datetime) / amount_of_time_slot)[1])
+                        for time_event in range(start_datetime, end_datetime, time_slot_interval):
+                            time_slots.append(time_event)
+                    else:
+                        time_slots.append(start_datetime)
+                        time_slots.append(end_datetime)
+                elif form_monitoring.monitor_by.data == 'specific_time_slot':
+                    if not datetime.strptime(str(form_monitoring.monitoring_datetime.data), '%Y-%m-%d %H:%M:%S'):
+                        raise ValueError('Event datetime must be in "%Y-%m-%d %H:%M:%S" format.')
+                    if datetime.strptime(str(form_monitoring.monitoring_datetime.data), '%Y-%m-%d %H:%M:%S') < \
+                            datetime.strptime(str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S') or \
+                            datetime.strptime(str(form_monitoring.monitoring_datetime.data), '%Y-%m-%d %H:%M:%S') > \
+                            datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
+                        raise ValueError(
+                            'Event datetime must be between Start time and End time (Events and Behaviour)')
+                    time_slots.append(int(datetime.strptime(str(form_monitoring.monitoring_datetime.data),
+                                                            '%Y-%m-%d %H:%M:%S').strftime('%s')))
+
+                autonomous_systems = list()
+                if form_monitoring.which_as_will_be_monitored.data == 'all':
+                    for time_slot in time_slots:
+                        event_monitoring = models.EventMonitoring(
+                            id_event_behaviour=event_behaviour.id,
+                            event_datetime=datetime.fromtimestamp(time_slot),
+                            monitor=None,
+                            all=True)
+                        request.dbsession.add(event_monitoring)
+                elif form_monitoring.which_as_will_be_monitored.data == 'only_one_as':
+                    query = 'select asys.autonomous_system as autonomous_system ' \
+                            'from event_behaviour as eb, ' \
+                            'autonomous_system as asys ' \
+                            'where eb.id_topology = asys.id_topology ' \
+                            'and eb.id = %s' \
+                            'and asys.autonomous_system = %s;' % \
+                            (event_behaviour.id, form_monitoring.monitor.data)
+                    result_proxy = request.dbsession.bind.execute(query)
+                    for autonomous_system in result_proxy:
+                        autonomous_systems.append(autonomous_system.autonomous_system)
+                    if not autonomous_systems:
+                        raise ValueError('Autonomous System does not exist in the topology')
+                    for time_slot in time_slots:
+                        for autonomous_system in autonomous_systems:
+                            event_monitoring = models.EventMonitoring(
+                                id_event_behaviour=event_behaviour.id,
+                                event_datetime=datetime.fromtimestamp(time_slot),
+                                monitor=autonomous_system)
+                            request.dbsession.add(event_monitoring)
+
+            except Exception as error:
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
         if form_announcement.delete_announcement_button.data:
             try:
                 request.dbsession.query(models.EventAnnouncement).\
@@ -875,6 +966,14 @@ def hijack_events(request):
                 request.dbsession.query(models.EventPrepend).\
                     filter_by(id=form_prepend.prepend_id_event.data).delete()
 
+            except Exception as error:
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_monitoring.delete_monitoring_button.data:
+            try:
+                request.dbsession.query(models.EventMonitoring).\
+                    filter_by(id=form_monitoring.monitoring_id_event.data).delete()
             except Exception as error:
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
@@ -913,6 +1012,10 @@ def hijack_events(request):
             filter_by(id_event_behaviour=event_behaviour.id). \
             order_by(models.EventPrepend.event_datetime).all()
 
+        dictionary['events_monitoring'] = request.dbsession.query(models.EventMonitoring). \
+            filter_by(id_event_behaviour=event_behaviour.id). \
+            order_by(models.EventMonitoring.event_datetime).all()
+
     if event_behaviour:
         dictionary['event_behaviour'] = True
 
@@ -922,6 +1025,7 @@ def hijack_events(request):
     dictionary['form_announcement'] = form_announcement
     dictionary['form_withdrawn'] = form_withdrawn
     dictionary['form_prepend'] = form_prepend
+    dictionary['form_monitoring'] = form_monitoring
     dictionary['form_button'] = form_button
 
     return dictionary
@@ -948,7 +1052,9 @@ def hijack_events_detail(request):
                 'ed.time_announcement_commands as time_announcement_commands, ' \
                 'ed.time_withdrawn_commands as time_withdrawn_commands, ' \
                 'ed.time_prepends_commands as time_prepends_commands, ' \
-                'ed.time_write_files as time_write_files ' \
+                'ed.time_write_config_files as time_write_config_files, ' \
+                'ed.time_monitoring_commands as time_monitoring_commands, ' \
+                'ed.time_write_monitoring_files as time_write_monitoring_files ' \
                 'from event_detail ed ' \
                 'where ed.id_event_behaviour = %s;' % id_event_behaviour
         result_proxy = request.dbsession.bind.execute(query)
@@ -961,11 +1067,16 @@ def hijack_events_detail(request):
                            'time_announcement_commands': event.time_announcement_commands,
                            'time_withdrawn_commands': event.time_withdrawn_commands,
                            'time_prepends_commands': event.time_prepends_commands,
-                           'time_write_files': event.time_write_files,
+                           'time_write_config_files': event.time_write_config_files,
+                           'time_monitoring_commands': event.time_monitoring_commands,
+                           'time_write_monitoring_files': event.time_write_monitoring_files,
                            'total_time': (float(event.time_get_data) if event.time_get_data else 0) +
                                          (float(event.time_announcement_commands) if event.time_announcement_commands else 0) +
                                          (float(event.time_withdrawn_commands) if event.time_withdrawn_commands else 0) +
-                                         (float(event.time_write_files) if event.time_write_files else 0)})
+                                         (float(event.time_prepends_commands) if event.time_prepends_commands else 0) +
+                                         (float(event.time_write_config_files) if event.time_write_config_files else 0) +
+                                         (float(event.time_monitoring_commands) if event.time_monitoring_commands else 0) +
+                                         (float(event.time_write_monitoring_files) if event.time_write_monitoring_files else 0)})
 
         dictionary['events'] = events
 

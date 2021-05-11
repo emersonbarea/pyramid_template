@@ -1,0 +1,17 @@
+#!/usr/bin/expect
+
+spawn telnet 0 bgpd
+expect "Password:"
+send "en\r"
+expect ".*>"
+send "en\r"
+expect "Password:"
+send "en\r"
+expect ".*#"
+send "terminal length 0\r"
+set timeout 120
+match_max 60000000
+send "show ip bgp\r"
+expect exp_continue
+send "exit\r"
+expect eof

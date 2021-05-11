@@ -51,7 +51,8 @@ from .hijack import (
     EventDetail,
     EventAnnouncement,
     EventWithdrawn,
-    EventPrepend)
+    EventPrepend,
+    EventMonitoring)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

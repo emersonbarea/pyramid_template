@@ -2,7 +2,6 @@
 import sys
 import os
 import math
-import time
 
 from datetime import datetime
 
@@ -13,12 +12,17 @@ class Parser(object):
     def __init__(self, argv):
 
         self.config_directory = argv + '/AS/'
-
         self.log_directory = argv + '/log/'
+
         self.log_files = list()
         for file in os.listdir(self.log_directory):
             if file.startswith('bgp'):
                 self.log_files.append(file)
+
+        self.monitor_files = list()
+        for file in os.listdir(self.log_directory):
+            if file.startswith('monitor'):
+                self.monitor_files.append(file)
 
     def read_file(self, path, file):
         try:
@@ -53,177 +57,156 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def original_convergence_time_for_prefix(self, prefix, prefix_hijacker):
+    def original_convergence_time_for_prefix(self, data):
         try:
-            for file in self.log_files:
-                data = self.read_file(self.log_directory, file)
-                for line in data.splitlines():
+            for prefix, prefix_hijacker in data:
+                for file in self.log_files:
+                    data = self.read_file(self.log_directory, file)
+                    for line in data.splitlines():
 
-                    # get last "%ADJCHANGE: neighbor ... Up" event before hijack
-                    if '%ADJCHANGE: neighbor ' in line and line.endswith('Up'):
-                        last_adjacency_time = datetime.timestamp(
-                            datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
+                        # get last "%ADJCHANGE: neighbor ... Up" event before hijack
+                        if '%ADJCHANGE: neighbor ' in line and line.endswith('Up'):
+                            last_adjacency_time = datetime.timestamp(
+                                datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
-                for line in data.splitlines():
+                    for line in data.splitlines():
 
-                    # get last "prefix" valid route add event
-                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
-                        last_route_add_event = datetime.timestamp(
-                            datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
+                        # get last "prefix" valid route add event
+                        if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
+                            last_route_add_event = datetime.timestamp(
+                                datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
-                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
-                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
-                        break
+                        # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
+                        if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
+                            break
 
-                # print the original route convergence time per AS
-                print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
+                    # print the original route convergence time per AS
+                    print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
 
         except Exception as error:
             print(error)
 
-    def original_route_path(self, prefix, prefix_hijacker):
+    def original_route_path(self, data):
         try:
-            for file in self.log_files:
-                data = self.read_file(self.log_directory, file)
+            row = list()
+            current_time_list = list()
+            prefix_list = list()
+            origin_AS_list = list()
+            for prefix in data:
 
-                lines = list()
-                for line in data.splitlines():
+                # remove prefix length from prefix when prefix length is 24 bits
+                #    Network          Next Hop            Metric LocPrf Weight Path
+                # *> 208.65.152.0/22  1.0.2.165                              0 3491 23352 36561 i
+                # *> 208.65.153.0     0.0.0.0                  0         32768 i
+                if prefix.split('/')[1] == '24':
+                    prefix = prefix.split('/')[0]
 
-                    lines.append(line)
+                for file in self.monitor_files:
+                    data = self.read_file(self.log_directory, file)
+                    prefix_found = False
+                    for line in data.splitlines():
 
-                    # get last "prefix" valid route add event
-                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
-                        nexthop = str(line.split('nexthop')[1].split(' ')[1])
+                        if line.startswith('-->current_time:'):
+                            current_time = line.split(':')[1]
+                            prefix_found = False
 
-                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
-                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
-                        break
+                        if len(line.split()) == 2 and line.startswith('*>'):
+                            prefix_found = True
+                            continue
 
-                for line in reversed(lines):
+                        if line.startswith('*>') and line.split()[1] == prefix and line.split()[2] == '0.0.0.0':
+                            row.append([int(current_time),
+                                        int(file.split('-')[1].split('.')[0]),
+                                        prefix,
+                                        int(file.split('-')[1].split('.')[0]),
+                                        [int(file.split('-')[1].split('.')[0])]])
+                            current_time_list.append(int(current_time))
+                            prefix_list.append(prefix)
+                            origin_AS_list.append(int(file.split('-')[1].split('.')[0]))
+                            prefix_found = False
+                            continue
 
-                    # get the original route path
-                    if '%s rcvd UPDATE w/ attr: nexthop %s, origin i,' % (nexthop, nexthop) in line:
-                        path = list(map(int, line.split('path ')[1].split(' ')))
+                        if prefix_found:
+                            if line.startswith('*>'):
+                                path = list()
+                                for hop in reversed(line.split()[:-1]):
+                                    if hop == '0':
+                                        break
+                                    else:
+                                        path.append(int(hop))
+                                path.reverse()
+                                row.append([int(current_time),
+                                            int(file.split('-')[1].split('.')[0]),
+                                            prefix,
+                                            int(line.split()[-2]),
+                                            path])
+                                current_time_list.append(int(current_time))
+                                prefix_list.append(prefix)
+                                origin_AS_list.append(int(line.split()[-2]))
+                                prefix_found = False
+                                continue
 
-                # print the original route convergence time per AS
-                print('%s,%s' % (file.split('-')[1].split('.')[0], path))
-
-        except Exception as error:
-            print(error)
-
-    def original_AS_route_origin(self, prefix, prefix_hijacker):
-        try:
-            for file in self.log_files:
-                data = self.read_file(self.log_directory, file)
-
-                lines = list()
-                for line in data.splitlines():
-
-                    lines.append(line)
-
-                    # get last "prefix" valid route add event
-                    if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
-                        nexthop = str(line.split('nexthop')[1].split(' ')[1])
-
-                    # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
-                    if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
-                        break
-
-                for line in reversed(lines):
-
-                    # get the original route path
-                    if '%s rcvd UPDATE w/ attr: nexthop %s, origin i,' % (nexthop, nexthop) in line:
-                        AS = line.split('path ')[1].split(' ')[-1]
-
-                # print the original route convergence time per AS
-                print('%s,%s' % (file.split('-')[1].split('.')[0], AS))
-
-        except Exception as error:
-            print(error)
-
-    def per_time_slot_route_path_per_prefix(self, prefixes, time_slot_number):
-        try:
-
-            # get start_datetime and end_datetime
-            data = self.read_file(self.log_directory, '/system_date_time')
-            for line in data.splitlines():
-                if line.startswith('start_datetime:'):
-                    start_datetime = int(line.split(':')[-1])
-                elif line.startswith('end_datetime:'):
-                    end_datetime = int(line.split(':')[-1])
-
-            # defining time slots
-            time_slots = list()
-            time_slot_interval = int(math.modf((end_datetime - start_datetime) / time_slot_number)[1])
-            for time_event in range(start_datetime, end_datetime, time_slot_interval):
-                time_slots.append(time_event)
-
-            # for each prefix
-            for prefix in prefixes:
-                for time_slot in time_slots:
-                    print('')
-                    for file in self.log_files:
-
-                        announcer_path = [None]
-                        nexthop = False
-                        remote_announcement_received = False
-
-                        # checking if the prefix was announced at the scenario startup
-                        data = self.read_file(self.config_directory + '/' + file.split('.')[0].split('-')[1], 'bgpd.conf')
-                        for line in reversed(data.splitlines()):
-                            if ' network %s' % prefix in line:
-                                announcer_path = [int(file.split('.')[0].split('-')[1])]
-                                break
-
-                        # checking if the prefix was announced at the scenario startup
-                        data = self.read_file(self.log_directory, file)
-                        for line in reversed(data.splitlines()):
-
-                            # read all lines less than or equal to the time slot
-                            line_datetime = datetime.timestamp(datetime.strptime(line.split('.')[0], '%Y/%m/%d %H:%M:%S'))
-                            if int(line_datetime) <= int(time_slot):
-
-                                # LAST PREFIX ANNOUNCEMENT
-
-                                # 1 - looking for the prefix announcement on the router itself during scenario execution
-                                if '127.0.0.1(config-router)# network %s' % prefix in line and not remote_announcement_received:
-                                    announcer_path = [int(file.split('-')[1].split('.')[0])]
+                        if line.startswith('*>') and line.split()[1] == prefix:
+                            path = list()
+                            for hop in reversed(line.split()[:-1]):
+                                if hop == '0':
                                     break
+                                else:
+                                    path.append(int(hop))
+                            path.reverse()
+                            row.append([int(current_time),
+                                        int(file.split('-')[1].split('.')[0]),
+                                        prefix,
+                                        int(line.split()[-2]),
+                                        path])
+                            current_time_list.append(int(current_time))
+                            prefix_list.append(prefix)
+                            origin_AS_list.append(int(line.split()[-2]))
+                            prefix_found = False
+                            continue
 
-                                # 2 - looking for the prefix announcement received from another router during scenario execution
-                                # Obs.: pega withdrawn, prepend out
-                                # Obs.: não pega a mudança de path no roteador onde ocorre o "prepend in" (não consegue pegar que o path aumenta com o prepend)
-                                if 'Zebra send: IPv4 route add %s nexthop' % prefix in line and not remote_announcement_received:
-                                    nexthop = line.split('nexthop ')[1].split(' ')[0]
-                                    remote_announcement_received = True
-                                if 'BGP: %s rcvd UPDATE w/ attr: nexthop %s,' % (nexthop, nexthop) in line and remote_announcement_received:
-                                    path_temp = line.split(' path')[-1]
-                                    path = list()
-                                    for hop in path_temp.split(' '):
-                                        if hop:
-                                            path.append(int(hop))
-                                    announcer_path = path
-                                    break
+                        if len(line.split()) > 1 and line.split()[1] == prefix and not line.startswith('*>'):
+                            prefix_found = True
 
-                                # LAST PREFIX REMOVAL/WITHDRAWN
+            df_original_route_path = pd.DataFrame(data=row, columns=['current_time',
+                                                                     'monitored_AS',
+                                                                     'prefix',
+                                                                     'origin_AS',
+                                                                     'route_path'])
+            print('Original BGP route path for prefix:')
+            print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
+            print(df_original_route_path)
 
-                                # looking for the prefix removal/withdrawn on the router itself during scenario execution
-                                if '127.0.0.1(config-router)# no network %s' % prefix in line and not remote_announcement_received:
-                                    break
-                                # looking for the prefix removal/withdrawn from another router during scenario execution
-                                if 'rcvd UPDATE about %s -- withdrawn' % prefix in line and not remote_announcement_received:
-                                    break
+            df_groupby = df_original_route_path[['current_time',
+                                                 'monitored_AS',
+                                                 'prefix',
+                                                 'origin_AS']].groupby(['current_time',
+                                                                         'prefix',
+                                                                         'origin_AS']).agg(['count'])
+            df_groupby.columns = ['number_of_AS']
 
-                                # looking for prepended routes
+            current_time_set = set(current_time_list)
+            prefix_set = set(prefix_list)
+            origin_AS_set = set(origin_AS_list)
 
+            row = list()
+            for current_time in current_time_set:
+                for prefix in prefix_set:
+                    for origin_AS in origin_AS_set:
+                        if df_groupby.query("current_time == '%s' and prefix == '%s' and origin_AS == '%s'" %
+                                            (current_time, prefix, origin_AS)).empty:
+                            row.append([current_time, prefix, origin_AS, 0])
 
+            df_groupby_temp = pd.DataFrame(data=row, columns=['current_time',
+                                                              'prefix',
+                                                              'origin_AS',
+                                                              'number_of_AS'])
+            df_groupby.reset_index(inplace=True)
+            df = pd.concat([df_groupby, df_groupby_temp], ignore_index=True).set_index('current_time')
 
-                                #looking for withdrawn routes
-
-
-
-
-                        print('\'%s\',%s,%s,%s' % (prefix, time_slot, file.split('-')[1].split('.')[0], announcer_path))
+            print('Number of AS routing byOriginal BGP route path for prefix:')
+            print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
+            print(df.sort_values(by=['current_time', 'prefix', 'origin_AS']))
 
         except Exception as error:
             print(error)
@@ -244,46 +227,18 @@ def main(argv=sys.argv[1:]):
         parser.adjacency_time()
 
         print('\n')
-        #data = [['208.65.152.0/22', '17557']]
-        data = [['20.0.0.0/24', '333']]
-        for prefix, prefix_hijacker in data:
-            print('Original BGP convergence time for prefix %s:' % prefix)
-            print('\nAS,Convergence_time\n')
-            parser.original_convergence_time_for_prefix(prefix, prefix_hijacker)
+        data = [['208.65.152.0/22', '17557']]
+        print('Original convergence time for prefix: %s' % data[0][0])
+        print('\nAS,Convergence_time\n')
+        parser.original_convergence_time_for_prefix(data)
 
         print('\n')
-        #data = [['208.65.152.0/22', '17557']]
-        data = [['20.0.0.0/24', '333']]
-        for prefix, prefix_hijacker in data:
-            print('Original BGP route path for prefix %s:' % prefix)
-            print('\nAS,[Route_path]\n')
-            parser.original_route_path(prefix, prefix_hijacker)
-
-        print('\n')
-        #data = [['208.65.152.0/22', '17557']]
-        data = [['20.0.0.0/24', '333']]
-        for prefix, prefix_hijacker in data:
-            print('Original announcer AS for the prefix %s:' % prefix)
-            print('\nAS,AS_announcer\n')
-            parser.original_AS_route_origin(prefix, prefix_hijacker)
-
-        print('\n')
-        print('PER TIME SLOT')
-
-        print('\n')
-        time_slot_number = 9
-        #prefixes = ['208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
-        prefixes = ['20.0.0.0/24']
-        print('BGP route origin per time slot for the prefixes %s:' % prefixes)
-        print('\nprefix,time_slot,AS,[Route_path]\n')
-        parser.per_time_slot_route_path_per_prefix(prefixes, time_slot_number)
-
-        print('\n\n\n\n')
-        print('-- BGP route path per prefix per time slot')
+        data = ['208.65.152.0/22', '208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
+        parser.original_route_path(data)
 
     except Exception as error:
         print(error)
-        print('Usage: ./parser_testbed.py <logs directory>')
+        print('Usage: ./parser_testbed_show_commands.py <logs directory>')
 
 
 if __name__ == '__main__':
