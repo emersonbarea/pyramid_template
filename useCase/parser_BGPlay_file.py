@@ -26,7 +26,7 @@ class Parser(object):
 
     def time_interval(self):
         try:
-            print('start_datetime:' , self.data_from['data']['query_starttime'])
+            print('start_datetime:', self.data_from['data']['query_starttime'])
             self.start_datetime = int(datetime.strptime(
                 str(self.data_from['data']['query_starttime']).replace('T', ' '),
                 '%Y-%m-%d %H:%M:%S').strftime('%s'))                            # 1203889500
