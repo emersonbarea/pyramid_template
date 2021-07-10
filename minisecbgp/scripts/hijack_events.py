@@ -633,7 +633,6 @@ def main(argv=sys.argv[1:]):
                 time_write_monitoring_files = time.time() - time_write_monitoring_files
                 save_to_database(dbsession, ['time_write_monitoring_files'], [time_write_monitoring_files], id_event_behaviour)
 
-
         except OperationalError:
             print('Database error')
     else:

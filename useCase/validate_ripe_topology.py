@@ -1,6 +1,10 @@
 #!/usr/bin/python3
+
 import sys
 import os
+import json
+import ipaddress
+import time
 
 from datetime import datetime
 
@@ -8,20 +12,26 @@ import pandas as pd
 
 
 class Parser(object):
-    def __init__(self, argv):
+    def __init__(self, argv0, argv1):
 
-        self.config_directory = argv + '/AS/'
-        self.log_directory = argv + '/log/'
-
+        self.config_directory = argv0 + '/AS/'
+        self.log_directory = argv0 + '/log/'
+        self.file_from = argv1
         self.log_files = list()
-        for file in os.listdir(self.log_directory):
-            if file.startswith('bgp'):
-                self.log_files.append(file)
-
         self.monitor_files = list()
-        for file in os.listdir(self.log_directory):
-            if file.startswith('monitor'):
-                self.monitor_files.append(file)
+        self.sources = list()
+        self.id_sources = list()
+        self.nodes = list()
+        self.others = list()
+
+        # read BGPlay json file and parse it
+        try:
+            with open(self.file_from) as file:
+                self.data_from = json.load(file)
+        except Exception as error:
+            print(error)
+        finally:
+            file.close()
 
     def read_file(self, path, file):
         try:
@@ -33,7 +43,57 @@ class Parser(object):
             opened_file.close()
             return data
 
-    def adjacency_time(self):
+    def number_of_autonomous_system_from_json(self):
+        def validIPv4(ip_address):
+            try:
+                return True if type(ipaddress.ip_address(ip_address)) is ipaddress.IPv4Address else False
+            except ValueError:
+                return False
+
+        try:
+            nodes = self.data_from['data']['nodes']
+            sources = self.data_from['data']['sources']
+
+            for source in sources:
+                if validIPv4(source['id'].split('-')[1]):
+                    self.sources.append(source['as_number'])
+                    self.id_sources.append({'id_source': source['id'], 'source': source['as_number']})
+            sources = set(self.sources)
+
+            for node in nodes:
+                self.nodes.append(node['as_number'])
+            nodes = set(self.nodes)
+
+            self.others = list(nodes - sources)
+
+            self.sources = list(sources)
+            self.nodes = list(nodes)
+
+        except Exception as error:
+            print(error)
+        else:
+            print('\nTotal number of Nodes: %s' % len(self.nodes))  # Total number of Nodes: 136
+            print('Total number of Sources: %s' % len(self.sources))  # Total number of Sources: 85
+
+    def clear_log_files(self):
+        for other in self.others:
+            try:
+                os.remove(self.log_directory + 'bgpd-%s.log' % other)
+                os.remove(self.log_directory + 'zebra-%s.log' % other)
+                os.remove(self.log_directory + 'monitor-%s.log' % other)
+            except FileNotFoundError:
+                pass
+
+    def list_log_files(self):
+        for file in os.listdir(self.log_directory):
+            if file.startswith('bgp'):
+                self.log_files.append(file)
+
+        for file in os.listdir(self.log_directory):
+            if file.startswith('monitor'):
+                self.monitor_files.append(file)
+
+    def adjacency_time_from_log_file(self):
         try:
             for file in self.log_files:
                 data = self.read_file(self.log_directory, file)
@@ -56,7 +116,7 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def original_convergence_time_for_prefix(self, data):
+    def original_convergence_time_for_prefix_from_log_file(self, data):
         try:
             for prefix, prefix_hijacker in data:
                 for file in self.log_files:
@@ -85,7 +145,7 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def all_data(self, data):
+    def all_data_from_log_file(self, data):
         try:
             row = list()
             current_time_list = list()
@@ -233,7 +293,7 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def number_of_autonomous_system(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
+    def number_of_autonomous_system_from_log_file(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
         try:
 
             df_groupby = df_all_data[['current_time',
@@ -244,7 +304,7 @@ class Parser(object):
                                                              'origin_AS']).agg(['count'])
             df_groupby.columns = ['number_of_AS']
 
-            print(df_groupby)
+            # print(df_groupby)
             # current_time prefix            origin_AS           number_of_AS
             # 1203889500   208.65.152.0/22   36561               143
             # 1203890433   208.65.152.0/22   36561               143
@@ -266,7 +326,6 @@ class Parser(object):
             df_number_of_autonomous_system = pd.concat([df_groupby, df_groupby_temp], ignore_index=True).\
                 sort_values(by=['current_time', 'prefix', 'origin_AS'])
 
-            number_of_ASes = 143
             row = list()
             for current_time in current_time_list:
                 for prefix in prefix_list:
@@ -274,7 +333,7 @@ class Parser(object):
                     for row1 in df_number_of_autonomous_system.iterrows():
                         if current_time == row1[1][0] and prefix == row1[1][1]:
                             sum_of_AS = sum_of_AS + row1[1][3]
-                    row.append([current_time, prefix, 0, number_of_ASes - sum_of_AS])
+                    row.append([current_time, prefix, 0, len(self.sources) - sum_of_AS])
 
             df_groupby_temp = pd.DataFrame(data=row, columns=['current_time',
                                                               'prefix',
@@ -330,6 +389,84 @@ class Parser(object):
         except Exception as error:
             print(error)
 
+    def all_data_from_json_file(self, data, current_time_list):
+        try:
+
+            all_data = list()
+
+            # from initial state
+            initial_states = self.data_from['data']['initial_state']
+
+            current_time = int(datetime.strptime(str(self.data_from['data']['query_starttime']).replace('T', ' '),
+                                                 '%Y-%m-%d %H:%M:%S').strftime('%s'))
+
+            for initial_state in initial_states:
+                for prefix in data:
+                    if prefix == initial_state['target_prefix']:
+                        for id_source in self.id_sources:
+                            if id_source['id_source'] == initial_state['source_id']:
+                                all_data.append(
+                                    [current_time, id_source['source'], initial_state['target_prefix'],
+                                     initial_state['path'][-1], initial_state['path'][1:]])
+
+            # from events
+            events = self.data_from['data']['events']
+
+            all_data_temp = list()
+            for event in events:
+
+                for id_source in self.id_sources:
+                    if id_source['id_source'] == event['attrs']['source_id']:
+                        event['attrs']['source_id'] = id_source['source']
+
+                all_data_temp.append({
+                    'seq': event['seq'],
+                    'type': event['type'],
+                    'timestamp': int(datetime.strptime(str(event['timestamp']).replace('T', ' '),
+                                                       '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                    'monitored_AS': event['attrs']['source_id'],
+                    'prefix': event['attrs']['target_prefix'],
+                    'origin_AS': event['attrs']['path'][-1] if event['type'] == 'A' else None,
+                    'route_path': event['attrs']['path'][1:] if event['type'] == 'A' else [None]
+                })
+
+            all_data = list()
+
+            for current_time in current_time_list:
+                for source in self.sources:
+                    for prefix in data:
+                        route_found = False
+                        for data_temp in reversed(all_data_temp):
+                            if not route_found:
+                                if current_time > data_temp['timestamp']:
+                                    if data_temp['type'] == 'A' and source == data_temp['monitored_AS'] and prefix == data_temp['prefix']:
+                                        all_data.append([data_temp['seq'],
+                                                         current_time,
+                                                         source,
+                                                         prefix,
+                                                         data_temp['origin_AS'],
+                                                         data_temp['route_path']])
+                                        route_found = True
+                                    elif data_temp['type'] == 'W':
+                                        route_found = True
+
+
+            for data in all_data:
+                print(data)
+
+
+
+            df_all_data = 0
+
+            return df_all_data
+
+        except Exception as error:
+            print('DEU ERRO !!!!!!!!!!!!!!!')
+            print(error)
+
+    def number_of_autonomous_system_from_json_file(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
+        pass
+
 
 def main(argv=sys.argv[1:]):
     try:
@@ -338,38 +475,62 @@ def main(argv=sys.argv[1:]):
         pd.set_option('display.width', None)
         pd.set_option('display.max_colwidth', None)
 
-        parser = Parser(argv[0])
-
-#        print('\n')
-#        print('Clearing log files:')
-#        parser.clear_log_file()
+        parser = Parser(argv[0], argv[1])
 
         print('\n')
-        print('BGP Adjacency time:')
+        print('Number of Autonomous Systems from Json:')
+        parser.number_of_autonomous_system_from_json()
+
+        print('\n')
+        print('Clearing log files:')
+        parser.clear_log_files()
+
+        print('\n')
+        print('List log files:')
+        parser.list_log_files()
+
+        print('\n')
+        print('BGP Adjacency time (from log files):')
         print('\nAS,Adjacency time\n')
-        parser.adjacency_time()
+        parser.adjacency_time_from_log_file()
 
         print('\n')
         data = [['208.65.152.0/22', '17557']]
-        print('Original convergence time for prefix: %s' % data[0][0])
+        print('Original convergence time for prefix: %s (from log files)' % data[0][0])
         print('\nAS,Convergence_time\n')
-        parser.original_convergence_time_for_prefix(data)
+        parser.original_convergence_time_for_prefix_from_log_file(data)
+
+        data = ['208.65.152.0/22', '208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
+
+        # from log files
 
         print('\n')
-        data = ['208.65.152.0/22', '208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
-        print('All data:')
+        print('All data (from log files)')
         print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
-        all_data, current_time, prefix, origin_AS = parser.all_data(data)
+        all_data, current_time, prefix, origin_AS = parser.all_data_from_log_file(data)
         print(all_data)
 
         print('\n')
         print('Number of AS per origin AS per time slot:')
         print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
-        parser.number_of_autonomous_system(all_data, current_time, prefix, origin_AS)
+        parser.number_of_autonomous_system_from_log_file(all_data, current_time, prefix, origin_AS)
+
+        # from json file
+
+        print('\n')
+        print('All data (from json file)')
+        print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
+        all_data = parser.all_data_from_json_file(data, current_time)
+        print(all_data)
+
+        print('\n')
+        print('Number of AS per origin AS per time slot:')
+        print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
+#        parser.number_of_autonomous_system_from_json_file(all_data, current_time, prefix, origin_AS)
 
     except Exception as error:
         print(error)
-        print('Usage: ./parser_testbed_show_commands.py <logs directory>')
+        print('Usage: ./parser_testbed_show_commands.py <logs directory> <ripe_json_file.MiniSecBGP>')
 
 
 if __name__ == '__main__':

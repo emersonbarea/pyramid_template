@@ -107,8 +107,8 @@ class Parser(object):
 
             # print('\n-------------------------\n')
             # print('announcements\n')
-            # for announcement in announcements:
-            #     print(announcement)
+            for announcement in announcements:
+                print(announcement)
             # print('\n-------------------------\n')
 
             # announcements = [['201.0.0.0/17', 7018, 27699, 1228515620], ['201.0.0.0/17', 196613, 27699, 1228515620]...
@@ -254,7 +254,7 @@ def main(argv=sys.argv[1:]):
         # Obs.: the extremes will be used too (0 and 8400)
         number_of_slots = 10
         # look for path to networks
-        networks = ['208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
+        networks = ['208.65.152.0/22', '208.65.153.0/24', '208.65.153.0/25', '208.65.153.128/25']
         # networks = ['200.0.0.0/24', '201.0.0.0/17']
 
         parser.announcements(number_of_slots, networks)

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+while read file; do rm log/$file; done < clear_log.txt
