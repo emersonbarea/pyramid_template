@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import copy
 import sys
 import os
 import json
@@ -111,7 +111,7 @@ class Parser(object):
                             datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
                 # print the BGP adjacency time per AS
-                print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_adjacency_time - start_time)))
+#                print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_adjacency_time - start_time)))
 
         except Exception as error:
             print(error)
@@ -140,7 +140,7 @@ class Parser(object):
                             break
 
                     # print the original route convergence time per AS
-                    print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
+#                    print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
 
         except Exception as error:
             print(error)
@@ -293,9 +293,96 @@ class Parser(object):
         except Exception as error:
             print(error)
 
-    def number_of_autonomous_system_from_log_file(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
+    def all_data_from_json_file(self, data, current_time_list):
         try:
 
+            # from initial state
+
+            initial_states = self.data_from['data']['initial_state']
+            all_data_initial_states = list()
+            current_time = int(datetime.strptime(str(self.data_from['data']['query_starttime']).replace('T', ' '),
+                                                 '%Y-%m-%d %H:%M:%S').strftime('%s'))
+            sources = copy.copy(self.id_sources)
+            for initial_state in initial_states:
+                for prefix in data:
+                    if prefix == initial_state['target_prefix']:
+                        for id_source in sources:
+                            if id_source['id_source'] == initial_state['source_id']:
+                                all_data_initial_states.append(
+                                    [current_time, id_source['source'], initial_state['target_prefix'],
+                                     initial_state['path'][-1], initial_state['path'][1:]])
+                                for remove_source in sources:
+                                    if id_source['source'] == remove_source['source']:
+                                        sources.remove(remove_source)
+
+            # from events
+
+            events = self.data_from['data']['events']
+            all_data_events = list()
+            all_data_temp = list()
+            for event in events:
+
+                for id_source in self.id_sources:
+                    if id_source['id_source'] == event['attrs']['source_id']:
+                        event['attrs']['source_id'] = id_source['source']
+
+                all_data_temp.append([
+                    event['type'],
+                    int(datetime.strptime(str(event['timestamp']).replace('T', ' '),
+                                          '%Y-%m-%d %H:%M:%S').strftime('%s')),
+                    event['attrs']['source_id'],
+                    event['attrs']['target_prefix'],
+                    event['attrs']['path'][-1] if event['type'] == 'A' else None,
+                    event['attrs']['path'][1:] if event['type'] == 'A' else [None]
+                ])
+
+            for current_time in current_time_list:
+                for source in self.sources:
+                    for prefix in data:
+                        route_found = False
+                        for data_temp in reversed(all_data_temp):
+                            if not route_found:
+                                if current_time > data_temp[1]:
+                                    if data_temp[0] == 'A' and \
+                                            source == data_temp[2] and \
+                                            prefix == data_temp[3]:
+                                        all_data_events.append([current_time,
+                                                                source,
+                                                                prefix,
+                                                                data_temp[4],
+                                                                data_temp[5]])
+                                        route_found = True
+
+                                    elif data_temp[0] == 'W' and \
+                                            source == data_temp[2] and \
+                                            prefix == data_temp[3]:
+                                        route_found = True
+
+                        if not route_found:
+                            for row in all_data_initial_states:
+                                if current_time > row[0] and \
+                                        source == row[1] and \
+                                        prefix == row[2]:
+                                    all_data_events.append([current_time,
+                                                            source,
+                                                            prefix,
+                                                            row[3],
+                                                            row[4]])
+
+            all_data = all_data_initial_states + all_data_events
+
+            df_all_data = pd.DataFrame(data=all_data, columns=['current_time',
+                                                               'monitored_AS',
+                                                               'prefix',
+                                                               'origin_AS',
+                                                               'route_path'])
+            return df_all_data
+
+        except Exception as error:
+            print(error)
+
+    def number_of_autonomous_system(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
+        try:
             df_groupby = df_all_data[['current_time',
                                       'monitored_AS',
                                       'prefix',
@@ -322,6 +409,7 @@ class Parser(object):
                                                               'prefix',
                                                               'origin_AS',
                                                               'number_of_AS'])
+
             df_groupby.reset_index(inplace=True)
             df_number_of_autonomous_system = pd.concat([df_groupby, df_groupby_temp], ignore_index=True).\
                 sort_values(by=['current_time', 'prefix', 'origin_AS'])
@@ -359,9 +447,12 @@ class Parser(object):
             # 1203897897    208.65.153.128/25      36561           106
 
             result = list()
-            origin_AS_list.insert(0, 0)
+
+            origin_AS_list_temp = copy.copy(origin_AS_list)
+            origin_AS_list_temp.insert(0, 0)
+
             for prefix in prefix_list:
-                for origin_AS in origin_AS_list:
+                for origin_AS in origin_AS_list_temp:
                     result_temp = list()
                     result_temp.append(prefix)
                     result_temp.append(origin_AS)
@@ -373,99 +464,21 @@ class Parser(object):
 
             for r in result:
                 print(r)
-#             ['208.65.152.0/22', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             ['208.65.152.0/22', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             ['208.65.152.0/22', 36561, 143, 143, 143, 143, 143, 143, 143, 143, 143, 143]
-#             ['208.65.153.0/24', 0, 143, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             ['208.65.153.0/24', 17557, 0, 143, 143, 143, 143, 143, 64, 64, 64, 34]
-#             ['208.65.153.0/24', 36561, 0, 0, 0, 0, 0, 0, 79, 79, 79, 109]
-#             ['208.65.153.0/25', 0, 143, 143, 143, 143, 143, 143, 143, 0, 0, 0]
-#             ['208.65.153.0/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             ['208.65.153.0/25', 36561, 0, 0, 0, 0, 0, 0, 0, 143, 143, 143]
-#             ['208.65.153.128/25', 0, 143, 143, 143, 143, 143, 143, 143, 40, 40, 37]
-#             ['208.65.153.128/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-#             ['208.65.153.128/25', 36561, 0, 0, 0, 0, 0, 0, 0, 103, 103, 106]
+            # ['208.65.152.0/22', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.152.0/22', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.152.0/22', 36561, 143, 143, 143, 143, 143, 143, 143, 143, 143, 143]
+            # ['208.65.153.0/24', 0, 143, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.0/24', 17557, 0, 143, 143, 143, 143, 143, 64, 64, 64, 34]
+            # ['208.65.153.0/24', 36561, 0, 0, 0, 0, 0, 0, 79, 79, 79, 109]
+            # ['208.65.153.0/25', 0, 143, 143, 143, 143, 143, 143, 143, 0, 0, 0]
+            # ['208.65.153.0/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.0/25', 36561, 0, 0, 0, 0, 0, 0, 0, 143, 143, 143]
+            # ['208.65.153.128/25', 0, 143, 143, 143, 143, 143, 143, 143, 40, 40, 37]
+            # ['208.65.153.128/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.128/25', 36561, 0, 0, 0, 0, 0, 0, 0, 103, 103, 106]
 
         except Exception as error:
             print(error)
-
-    def all_data_from_json_file(self, data, current_time_list):
-        try:
-
-            all_data = list()
-
-            # from initial state
-            initial_states = self.data_from['data']['initial_state']
-
-            current_time = int(datetime.strptime(str(self.data_from['data']['query_starttime']).replace('T', ' '),
-                                                 '%Y-%m-%d %H:%M:%S').strftime('%s'))
-
-            for initial_state in initial_states:
-                for prefix in data:
-                    if prefix == initial_state['target_prefix']:
-                        for id_source in self.id_sources:
-                            if id_source['id_source'] == initial_state['source_id']:
-                                all_data.append(
-                                    [current_time, id_source['source'], initial_state['target_prefix'],
-                                     initial_state['path'][-1], initial_state['path'][1:]])
-
-            # from events
-            events = self.data_from['data']['events']
-
-            all_data_temp = list()
-            for event in events:
-
-                for id_source in self.id_sources:
-                    if id_source['id_source'] == event['attrs']['source_id']:
-                        event['attrs']['source_id'] = id_source['source']
-
-                all_data_temp.append({
-                    'seq': event['seq'],
-                    'type': event['type'],
-                    'timestamp': int(datetime.strptime(str(event['timestamp']).replace('T', ' '),
-                                                       '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                    'monitored_AS': event['attrs']['source_id'],
-                    'prefix': event['attrs']['target_prefix'],
-                    'origin_AS': event['attrs']['path'][-1] if event['type'] == 'A' else None,
-                    'route_path': event['attrs']['path'][1:] if event['type'] == 'A' else [None]
-                })
-
-            all_data = list()
-
-            for current_time in current_time_list:
-                for source in self.sources:
-                    for prefix in data:
-                        route_found = False
-                        for data_temp in reversed(all_data_temp):
-                            if not route_found:
-                                if current_time > data_temp['timestamp']:
-                                    if data_temp['type'] == 'A' and source == data_temp['monitored_AS'] and prefix == data_temp['prefix']:
-                                        all_data.append([data_temp['seq'],
-                                                         current_time,
-                                                         source,
-                                                         prefix,
-                                                         data_temp['origin_AS'],
-                                                         data_temp['route_path']])
-                                        route_found = True
-                                    elif data_temp['type'] == 'W':
-                                        route_found = True
-
-
-            for data in all_data:
-                print(data)
-
-
-
-            df_all_data = 0
-
-            return df_all_data
-
-        except Exception as error:
-            print('DEU ERRO !!!!!!!!!!!!!!!')
-            print(error)
-
-    def number_of_autonomous_system_from_json_file(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
-        pass
 
 
 def main(argv=sys.argv[1:]):
@@ -507,26 +520,24 @@ def main(argv=sys.argv[1:]):
         print('\n')
         print('All data (from log files)')
         print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
-        all_data, current_time, prefix, origin_AS = parser.all_data_from_log_file(data)
-        print(all_data)
+        all_data_log, current_time, prefix, origin_AS = parser.all_data_from_log_file(data)
 
         print('\n')
         print('Number of AS per origin AS per time slot:')
         print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
-        parser.number_of_autonomous_system_from_log_file(all_data, current_time, prefix, origin_AS)
+        parser.number_of_autonomous_system(all_data_log, current_time, prefix, origin_AS)
 
         # from json file
 
         print('\n')
         print('All data (from json file)')
         print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
-        all_data = parser.all_data_from_json_file(data, current_time)
-        print(all_data)
+        all_data_json = parser.all_data_from_json_file(data, current_time)
 
         print('\n')
         print('Number of AS per origin AS per time slot:')
         print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
-#        parser.number_of_autonomous_system_from_json_file(all_data, current_time, prefix, origin_AS)
+        parser.number_of_autonomous_system(all_data_json, current_time, prefix, origin_AS)
 
     except Exception as error:
         print(error)
