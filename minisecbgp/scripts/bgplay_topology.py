@@ -543,22 +543,22 @@ def main(argv=sys.argv[1:]):
         setup_logging(args.config_uri)
         env = bootstrap(args.config_uri)
         try:
-            bgplayt = BGPlayTopology(file)
+            bgplay = BGPlayTopology(file)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 downloading = 1
-                bgplayt.downloading(dbsession, downloading)
+                bgplay.downloading(dbsession, downloading)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
-                bgplayt.create(dbsession)
+                bgplay.create(dbsession)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
-                bgplayt.event(dbsession)
+                bgplay.event(dbsession)
             with env['request'].tm:
                 dbsession = env['request'].dbsession
                 downloading = 0
-                bgplayt.downloading(dbsession, downloading)
-            bgplayt.erase_file()
+                bgplay.downloading(dbsession, downloading)
+            bgplay.erase_file()
         except OperationalError:
             print('Database error')
     else:
