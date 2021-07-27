@@ -219,6 +219,17 @@ def topologies_detail(request):
                 'order by event_datetime;' % request.matchdict["id_topology"]
         dictionary['events_prepend'] = list(request.dbsession.bind.execute(query))
 
+        query = 'select em.event_datetime as event_datetime, ' \
+                'em.monitor as monitor, ' \
+                'em.all as all ' \
+                'from event_monitoring em ' \
+                'where em.id_event_behaviour = (' \
+                'select eb.id ' \
+                'from event_behaviour eb ' \
+                'where eb.id_topology = %s)' \
+                'order by event_datetime;' % request.matchdict["id_topology"]
+        dictionary['events_monitoring'] = list(request.dbsession.bind.execute(query))
+
         query = 'select ra.include_stub as include_stub, ' \
                 '(select tdm.topology_distribution_method ' \
                 'from topology_distribution_method tdm ' \

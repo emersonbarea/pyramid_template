@@ -924,7 +924,7 @@ def hijack_events(request):
                             'from event_behaviour as eb, ' \
                             'autonomous_system as asys ' \
                             'where eb.id_topology = asys.id_topology ' \
-                            'and eb.id = %s' \
+                            'and eb.id = %s ' \
                             'and asys.autonomous_system = %s;' % \
                             (event_behaviour.id, form_monitoring.monitor.data)
                     result_proxy = request.dbsession.bind.execute(query)
