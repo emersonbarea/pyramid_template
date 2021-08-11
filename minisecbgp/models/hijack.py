@@ -179,6 +179,9 @@ class EventWithdrawn(Base):
     event_datetime = Column(String(19), nullable=False)
     prefix = Column(String(255))
     withdrawer = Column(BigInteger)                     # the withdrawer AS needs to announce the prefix earlier
+    in_out = Column(String(3))
+    peer = Column(BigInteger)
+    withdrawn = Column(BigInteger)                      # withdrawn the prefix from/to this peer
     Index('IndexId4_event_behaviour', id_event_behaviour)
 
 

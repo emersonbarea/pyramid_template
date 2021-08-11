@@ -139,11 +139,12 @@ def upload_from_site(request):
                 result = subprocess.Popen(['./venv/bin/MiniSecBGP_bgplay_topology'] +
                                           arguments, stdout=subprocess.PIPE,
                                           stderr=subprocess.PIPE)
+
                 command_result, command_result_error = result.communicate()
                 if command_result:
                     dictionary['message'] = command_result
                     dictionary['css_class'] = 'errorMessage'
-                    return dictionary
+                    #return dictionary
                 url = request.route_url('bgplayTopologies')
                 return HTTPFound(location=url)
 

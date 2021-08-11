@@ -100,15 +100,29 @@
                 <table style="width:100%">
                   <tr>
                     <td align="center"><strong>Datetime</strong></td>
+                    <td align="center"><strong>In/Out</strong></td>
                     <td align="center"><strong>Withdrawn Prefix</strong></td>
                     <td align="center"><strong>AS Withdrawer</strong></td>
+                    <td align="center"><strong>Peer</strong></td>
+                    <td align="center"><strong>AS Source</strong></td>
                   </tr>
                   {% for event in events_withdrawn %}
                     <div class="form-inline">
                       <tr>
                         <td align="center">{{ event[0] }}</td>
                         <td align="center">{{ event[1] }}</td>
-                        <td align="center">{{ event[2] }}</td>
+                        {% if event[2] %}
+                          <td align="center">{{ event[2] }}</td>
+                        {% else %}
+                          <td align="center">--</td>
+                        {% endif %}
+                        <td align="center">{{ event[3] }}</td>
+                        <td align="center">{{ event[4] }}</td>
+                        {% if event[5] %}
+                          <td align="center">{{ event[5] }}</td>
+                        {% else %}
+                          <td align="center">--</td>
+                        {% endif %}
                       </tr>
                     </div>
                   {% endfor %}
@@ -124,7 +138,7 @@
                     <td align="center"><strong>In/Out</strong></td>
                     <td align="center"><strong>AS Prepender</strong></td>
                     <td align="center"><strong>Prepended AS</strong></td>
-                    <td align="center"><strong>Announced to AS</strong></td>
+                    <td align="center"><strong>Peer</strong></td>
                     <td align="center"><strong>HMT</strong></td>
                   </tr>
                   {% for event in events_prepend %}

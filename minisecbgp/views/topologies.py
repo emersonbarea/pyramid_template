@@ -195,8 +195,11 @@ def topologies_detail(request):
         dictionary['events_announcement'] = list(request.dbsession.bind.execute(query))
 
         query = 'select event_datetime as event_datetime, ' \
+                'in_out as in_out, ' \
                 'prefix as prefix, ' \
-                'withdrawer as withdrawer ' \
+                'withdrawer as withdrawer, ' \
+                'peer as peer, ' \
+                'withdrawn as withdrawn ' \
                 'from event_withdrawn ew ' \
                 'where ew.id_event_behaviour = (' \
                 'select eb.id ' \

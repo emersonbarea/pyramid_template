@@ -399,14 +399,46 @@ class BGPlayTopology(object):
             for observed_event in events:
                 if observed_event['type'] == 'W':
                     for source in sources:
+                        peers = list()
                         if str(source['id']) == str(observed_event['attrs']['source_id']):
                             withdrawer = source['as_number']
-                    withdrawn_events_list_temp.append({
-                        'id_event_behaviour': int(self.id_event_behaviour),
-                        'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
-                        'prefix': str(observed_event['attrs']['target_prefix']),
-                        'withdrawer': withdrawer
-                    })
+                    query = 'select asys.autonomous_system autonomous_system ' \
+                            'from autonomous_system asys ' \
+                            'where asys.id in (' \
+                            'select l.id_autonomous_system2 ' \
+                            'from link l ' \
+                            'where l.id_autonomous_system1 in (' \
+                            'select asys.id id_autonomous_system ' \
+                            'from autonomous_system asys, ' \
+                            'event_behaviour eb ' \
+                            'where eb.id = %s ' \
+                            'and eb.id_topology = asys.id_topology ' \
+                            'and asys.autonomous_system = %s) ' \
+                            'union ' \
+                            'select l.id_autonomous_system1 ' \
+                            'from link l ' \
+                            'where l.id_autonomous_system2 in (' \
+                            'select asys.id id_autonomous_system ' \
+                            'from autonomous_system asys, ' \
+                            'event_behaviour eb ' \
+                            'where eb.id = %s ' \
+                            'and eb.id_topology = asys.id_topology ' \
+                            'and asys.autonomous_system = %s));' % (
+                             int(self.id_event_behaviour), int(withdrawer),
+                             int(self.id_event_behaviour), int(withdrawer))
+                    result_proxy = dbsession.bind.execute(query)
+                    for row in result_proxy:
+                        peers.append(row[0])
+
+                    for peer in peers:
+                        withdrawn_events_list_temp.append({
+                            'id_event_behaviour': int(self.id_event_behaviour),
+                            'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
+                            'prefix': str(observed_event['attrs']['target_prefix']),
+                            'withdrawer': withdrawer,
+                            'in_out': 'in',
+                            'peer': peer
+                        })
 
             if withdrawn_events_list_temp:
                 for withdrawn_event_temp in withdrawn_events_list_temp:
@@ -415,7 +447,8 @@ class BGPlayTopology(object):
                     else:
                         for i, withdrawn_event in enumerate(withdrawn_events_list):
                             if (str(withdrawn_event['withdrawer'])) == str(withdrawn_event_temp['withdrawer']) and \
-                                    (str(withdrawn_event['prefix']) == str(withdrawn_event_temp['prefix'])):
+                                    (str(withdrawn_event['prefix']) == str(withdrawn_event_temp['prefix'])) and \
+                                    (str(withdrawn_event['peer'])) == str(withdrawn_event_temp['peer']):
                                 break
                             if i == len(withdrawn_events_list) - 1:
                                 withdrawn_events_list.append(withdrawn_event_temp)
@@ -464,7 +497,7 @@ class BGPlayTopology(object):
                                     'in_out': 'in',
                                     'prepender': prepender,
                                     'prepended': elem,
-                                    'peer': peer_path[-2],
+                                    'peer': elem,
                                     'hmt': path.count(elem)
                                 })
 

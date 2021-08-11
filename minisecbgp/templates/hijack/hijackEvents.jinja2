@@ -181,16 +181,29 @@
                   <table style="width:100%">
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
+                      <td align="center"><strong>In/Out</strong></td>
                       <td align="center"><strong>Withdrawn Prefix</strong></td>
                       <td align="center"><strong>AS Withdrawer</strong></td>
-                      <td></td>
+                      <td align="center"><strong>Peer</strong></td>
+                      <td align="center"><strong>AS Source</strong></td>
                     </tr>
                     {% for event in events_withdrawn %}
                       <div class="form-inline">
                         <tr>
                           <td align="center">{{ event.event_datetime }}</td>
-                          <td align="center">{{ event.prefix }}</td>
+                          <td align="center">{{ event.in_out }}</td>
+                          {% if event.prefix %}
+                            <td align="center">{{ event.prefix }}</td>
+                          {% else %}
+                            <td align="center">--</td>
+                          {% endif %}
                           <td align="center">{{ event.withdrawer }}</td>
+                          <td align="center">{{ event.peer }}</td>
+                          {% if event.withdrawn %}
+                            <td align="center">{{ event.withdrawn }}</td>
+                          {% else %}
+                            <td align="center">--</td>
+                          {% endif %}
                           <td align="center"><button type="button" onclick="eventWithdrawn({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteWithdrawnModal">Del</button></td>
                         </tr>
                       </div>
@@ -218,12 +231,34 @@
                         {{ form_withdrawn.withdrawn_datetime(value="0001-01-01 01:00:00") }} Format: %Y-%m-%d %H:%M:%S
                       </p>
                       <p>
-                        {{ form_withdrawn.withdrawn_prefix.label }}
-                        {{ form_withdrawn.withdrawn_prefix(value="0.0.0.0/0") }} Ex.: 1.0.0.0/8 or 200.233.127.252/24
+                        {{ form_withdrawn.withdrawn_in_out.label }}
+                        {{ form_withdrawn.withdrawn_in_out(onchange="inountFunction()") }}
                       </p>
                       <p>
                         {{ form_withdrawn.withdrawer.label }}
                         {{ form_withdrawn.withdrawer(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                      <p>
+                        {{ form_withdrawn.withdrawn_peer.label }}
+                        {{ form_withdrawn.withdrawn_peer(value="0") }} Format: ASN (16/32 bits)
+                      </p>
+                      <p>
+                        {{ form_withdrawn.withdrawn_prefix_as_source.label }}
+                        {{ form_withdrawn.withdrawn_prefix_as_source(onchange="withdrawComboFunction()") }}
+                      </p>
+                      <p>
+                        <table style="width:100%">
+                          <tr>
+                            <td align="left">{{ form_withdrawn.withdrawn_prefix.label }}</td>
+                            <td align="left">{{ form_withdrawn.withdrawn.label }}</td>
+                          </tr>
+                          <div class="form-inline">
+                            <tr>
+                              <td align="left">{{ form_withdrawn.withdrawn_prefix(value="0.0.0.0/0") }}</td>
+                              <td align="left">{{ form_withdrawn.withdrawn(value="0", disabled=True) }}</td>
+                            </tr>
+                          </div>
+                        </table>
                       </p>
                     </div>
                     <div class="modal-footer">
@@ -272,7 +307,7 @@
                       <td align="center"><strong>In/Out</strong></td>
                       <td align="center"><strong>AS Prepender</strong></td>
                       <td align="center"><strong>Prepended AS</strong></td>
-                      <td align="center"><strong>Announced to AS</strong></td>
+                      <td align="center"><strong>Peer</strong></td>
                       <td align="center"><strong>HMT</strong></td>
                       <td></td>
                     </tr>
@@ -554,6 +589,16 @@
             document.getElementById("prepend_peer").setAttribute("disabled","disabled");
           } else if (choose == 'out') {
             document.getElementById("prepend_peer").removeAttribute("disabled");
+          };
+        };
+        function withdrawComboFunction() {
+          choose = document.getElementById("withdrawn_prefix_as_source").value;
+          if (choose == 'prefix') {
+            document.getElementById("withdrawn_prefix").removeAttribute("disabled");
+            document.getElementById("withdrawn").setAttribute("disabled","disabled");
+          } else if (choose == 'as') {
+            document.getElementById("withdrawn_prefix").setAttribute("disabled","disabled");
+            document.getElementById("withdrawn").removeAttribute("disabled");
           };
         };
         function which_as_will_be_monitoredFunction() {

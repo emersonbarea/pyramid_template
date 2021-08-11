@@ -58,6 +58,9 @@ class Parser(object):
                 if validIPv4(source['id'].split('-')[1]):
                     self.sources.append(source['as_number'])
                     self.id_sources.append({'id_source': source['id'], 'source': source['as_number']})
+
+                    print(str(source['as_number']) + ',' + str(source['id']))
+
             sources = set(self.sources)
 
             for node in nodes:
@@ -481,6 +484,72 @@ class Parser(object):
         except Exception as error:
             print(error)
 
+    @staticmethod
+    def equal_paths(all_data_log, all_data_json, current_time_list, prefix_list):
+        try:
+
+            result = list()
+            equal_paths = list()
+            different_paths = list()
+
+            for prefix in prefix_list:
+
+                result_temp = list()
+                result_temp.append(prefix)
+
+                for current_time in current_time_list:
+                    sum_of_equal_paths = 0
+                    sum_of_different_paths = 0
+                    for idx_log in all_data_log.index:
+                        for idx_json in all_data_json.index:
+
+                            if prefix == all_data_json['prefix'][idx_json] and \
+                                    current_time == all_data_json['current_time'][idx_json] and \
+                                    all_data_log['current_time'][idx_log] == all_data_json['current_time'][idx_json] and \
+                                    all_data_log['monitored_AS'][idx_log] == all_data_json['monitored_AS'][idx_json] and \
+                                    all_data_log['prefix'][idx_log] == all_data_json['prefix'][idx_json] and \
+                                    all_data_log['route_path'][idx_log] == all_data_json['route_path'][idx_json]:
+
+                                equal_paths.append(
+                                    [all_data_log['current_time'][idx_log], all_data_log['monitored_AS'][idx_log],
+                                     all_data_log['prefix'][idx_log], ' -- ', all_data_log['route_path'][idx_log],
+                                     ' - ', all_data_json['route_path'][idx_json]])
+
+                                sum_of_equal_paths = sum_of_equal_paths + 1
+
+                                #print('Equal path: ', all_data_log['current_time'][idx_log],
+                                #      all_data_log['monitored_AS'][idx_log], all_data_log['prefix'][idx_log], ' -- ',
+                                #      all_data_log['route_path'][idx_log], ' - ', all_data_json['route_path'][idx_json])
+
+                            elif prefix == all_data_json['prefix'][idx_json] and \
+                                    current_time == all_data_json['current_time'][idx_json] and \
+                                    all_data_log['current_time'][idx_log] == all_data_json['current_time'][idx_json] and \
+                                    all_data_log['monitored_AS'][idx_log] == all_data_json['monitored_AS'][idx_json] and \
+                                    all_data_log['prefix'][idx_log] == all_data_json['prefix'][idx_json] and \
+                                    all_data_log['route_path'][idx_log] != all_data_json['route_path'][idx_json]:
+
+                                different_paths.append(
+                                    [all_data_log['current_time'][idx_log], all_data_log['monitored_AS'][idx_log],
+                                     all_data_log['prefix'][idx_log], ' -- ', all_data_log['route_path'][idx_log],
+                                     ' - ', all_data_json['route_path'][idx_json]])
+
+                                sum_of_different_paths = sum_of_different_paths + 1
+
+                                #print('Different path: ', all_data_log['current_time'][idx_log],
+                                #      all_data_log['monitored_AS'][idx_log], all_data_log['prefix'][idx_log], ' -- ',
+                                #      all_data_log['route_path'][idx_log], ' - ', all_data_json['route_path'][idx_json])
+
+                    result_temp.append([sum_of_equal_paths, sum_of_different_paths])
+                result.append(result_temp)
+
+            for r in result:
+                print(r)
+
+            return equal_paths, different_paths
+
+        except Exception as error:
+            print(error)
+
 
 def main(argv=sys.argv[1:]):
     try:
@@ -539,6 +608,20 @@ def main(argv=sys.argv[1:]):
         print('Number of AS per origin AS per time slot:')
         print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
         parser.number_of_autonomous_system(all_data_json, current_time, prefix, origin_AS)
+
+        print('\n')
+        print('Equal paths in json and log (by current time, monitored AS and prefix):')
+        equal_paths, different_paths = parser.equal_paths(all_data_log, all_data_json, current_time, prefix)
+
+        print('\nEqual Paths:\n')
+        print('\ncurrent_time,prefix,log_path - json_path\n')
+        for equal_path in equal_paths:
+            print(equal_path)
+
+        print('\nDifferent Paths:\n')
+        print('\ncurrent_time,prefix,log_path - json_path\n')
+        for different_path in different_paths:
+            print(different_path)
 
     except Exception as error:
         print(error)

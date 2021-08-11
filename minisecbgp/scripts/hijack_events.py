@@ -94,20 +94,31 @@ class EventDetail(object):
                 'w.event_datetime as event_datetime, ' \
                 'w.prefix as prefix, ' \
                 'w.withdrawer as withdrawer, ' \
-                'asys.id ' \
+                'w.in_out as in_out, ' \
+                'w.peer as peer, ' \
+                '(select asys.id ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = eb.id_topology ' \
+                'and asys.autonomous_system = w.withdrawer) as id_withdrawer, ' \
+                '(select asys.id ' \
+                'from autonomous_system asys ' \
+                'where asys.id_topology = eb.id_topology ' \
+                'and asys.autonomous_system = w.peer) as id_peer, ' \
+                'w.withdrawn::varchar(255) as withdrawn ' \
                 'from event_withdrawn w, ' \
-                'event_behaviour eb, ' \
-                'autonomous_system asys ' \
+                'event_behaviour eb ' \
                 'where w.id_event_behaviour = %s ' \
-                'and w.id_event_behaviour = eb.id ' \
-                'and eb.id_topology = asys.id_topology ' \
-                'and w.withdrawer = asys.autonomous_system;' % self.id_event_behaviour
+                'and w.id_event_behaviour = eb.id;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        self.df_withdrawn = pd.DataFrame(result_proxy, columns=['event_datetime', 'prefix', 'withdrawer', 'id_autonomous_system'])
+        self.df_withdrawn = pd.DataFrame(result_proxy, columns=[
+            'event_datetime', 'prefix', 'withdrawer', 'in_out', 'peer', 'id_withdrawer', 'id_peer', 'withdrawn'])
         # print(self.df_withdrawn)
-        #         event_datetime         prefix  withdrawer  id_autonomous_system
-        # 0  2020-12-20 08:01:00  55.66.77.0/24       65004                     6
-        # 1  2020-12-20 08:01:20  33.44.55.0/24       65002                     4
+        #          event_datetime             prefix  withdrawer in_out   peer  id_withdrawer  id_peer withdrawn
+        # 0   2008-02-24 20:33:53    208.65.153.0/24       16467     in   2914            229      160      None
+        # 1   2008-02-24 20:33:53    208.65.153.0/24       16467     in   3356            229      166      None
+        # 2   2008-02-24 20:52:18    208.65.153.0/24       16034     in  16150            225      226      None
+        # 3   2008-02-24 20:33:53               None        3491     in  12989            167      218     17557
+        # 4   2008-02-24 21:23:34               None         174    out  24963            144      248      1916
 
         # Prepend
         query = 'select ' \
@@ -151,6 +162,7 @@ class EventDetail(object):
                 'where em.id_event_behaviour = %s;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
         monitoring_list_temp = list()
+        monitoring_list = list()
         for row in result_proxy:
             if row[2]:
                 query = 'select asys.autonomous_system as autonomous_system ' \
@@ -164,7 +176,7 @@ class EventDetail(object):
             else:
                 monitoring_list_temp.append([row[0], row[1]])
             monitoring_list_temp.sort()
-            monitoring_list = list(monitoring_list_temp for monitoring_list_temp,_ in itertools.groupby(monitoring_list_temp))
+            monitoring_list = list(monitoring_list_temp for monitoring_list_temp, _ in itertools.groupby(monitoring_list_temp))
         self.df_monitoring = pd.DataFrame.from_records(monitoring_list, columns=['event_datetime', 'monitor'])
         # print(self.df_monitoring)
         #          event_datetime  monitor
@@ -209,21 +221,76 @@ class EventDetail(object):
     def withdrawn_commands(self):
         self.withdrawn_commands_list = list()
         for row in self.df_withdrawn.itertuples():
-            query = 'select l.ip_autonomous_system2 as ip_peer ' \
+            query = 'select l.ip_autonomous_system2 as ip_prepended ' \
                     'from link l ' \
                     'where l.id_autonomous_system1 = %s ' \
+                    'and l.id_autonomous_system2 = %s ' \
                     'union ' \
-                    'select l.ip_autonomous_system1 as ip_peer ' \
+                    'select l.ip_autonomous_system1 as ip_prepended ' \
                     'from link l ' \
-                    'where l.id_autonomous_system2 = %s;' % \
-                    (str(row[4]), str(row[4]))
+                    'where l.id_autonomous_system1 = %s ' \
+                    'and l.id_autonomous_system2 = %s;' % \
+                    (str(row[6]), str(row[7]), str(row[7]), str(row[6]))
             result_proxy = self.dbsession.bind.execute(query)
-            distribute_list_commands = ''
-            for internal_row in result_proxy:
-                distribute_list_commands = distribute_list_commands + \
-                                           ' child.sendline(\'neighbor %s distribute-list %s out\'); ' \
-                                           'child.expect(\'.+#\');' % \
-                                           (str(list(internal_row)[0]), str(row[2]))
+
+            for ip in result_proxy:
+                ip_peer = ip[0]
+
+            list_commands = ''
+            if row[2]:  # if prefix
+                list_commands = list_commands + \
+                                ' child.sendline(\'no access-list ip-address-%s-%s-%s permit any\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'access-list ip-address-%s-%s-%s deny %s exact-match\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'access-list ip-address-%s-%s-%s permit any\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'route-map %s-%s-%s permit 10\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'match as-path as-path-%s-%s-%s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'exit\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'router bgp %s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'neighbor %s route-map %s-%s-%s %s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'exit\'); ' \
+                                'child.expect(\'.+#\'); ' % \
+                                (str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]), str(row[2]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[3]),
+                                 str(ip_peer), str(row[4]), str(row[3]), str(row[5]), str(row[4]))
+            elif row[4]:  # if AS source
+                list_commands = list_commands + \
+                                ' child.sendline(\'no ip as-path access-list as-path-%s-%s-%s permit .*\'); ' \
+                                'child.expect(\'.+#\');' \
+                                ' child.sendline(\'ip as-path access-list as-path-%s-%s-%s deny _%s$\'); ' \
+                                'child.expect(\'.+#\');' \
+                                ' child.sendline(\'ip as-path access-list as-path-%s-%s-%s permit .*\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'route-map %s-%s-%s permit 10\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'match ip address ip-address-%s-%s-%s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'exit\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'router bgp %s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'neighbor %s route-map %s-%s-%s %s\'); ' \
+                                'child.expect(\'.+#\'); ' \
+                                'child.sendline(\'exit\'); ' \
+                                'child.expect(\'.+#\'); ' % \
+                                (str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]), str(row[8]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[4]), str(row[3]), str(row[5]),
+                                 str(row[3]),
+                                 str(ip_peer), str(row[4]), str(row[3]), str(row[5]), str(row[4]))
 
             self.withdrawn_commands_list.append(
                 '    '
@@ -241,102 +308,36 @@ class EventDetail(object):
                 'child.expect(\'.+#\'); '
                 'child.sendline(\'configure terminal\'); '
                 'child.expect(\'.+#\'); '
-                'child.sendline(\'access-list %s deny %s exact-match\'); '
-                'child.expect(\'.+#\'); '
-                'child.sendline(\'access-list %s permit any\'); '
-                'child.expect(\'.+#\'); '
-                'child.sendline(\'router bgp %s\'); '
-                'child.expect(\'.+#\'); '
                 '%s'
-                ' child.sendline(\'exit\'); '
-                'child.expect(\'.+#\'); '
                 'child.sendline(\'exit\'); '
                 'child.expect(\'.+#\'); '
-                'child.sendline(\'clear ip bgp * soft\'); '                
+                'child.sendline(\'clear ip bgp * soft\'); '
                 'child.expect(\'.+#\')\\"" %s AS%s)\n' %
                 (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                 '%s', str(row[2]), str(row[2]), str(row[2]), str(row[3]), distribute_list_commands,
-                 '%', str(row[3])))
+                 '%s', list_commands, '%', str(row[3])))
 
     def prepend_commands(self):
         self.prepend_commands_list = list()
         for row in self.df_prepend.itertuples():
+            # get the IP address of the Prepended AS interface of the link with the AS Prepender
+            query = 'select l.ip_autonomous_system2 as ip_prepended ' \
+                    'from link l ' \
+                    'where l.id_autonomous_system1 = %s ' \
+                    'and l.id_autonomous_system2 = %s ' \
+                    'union ' \
+                    'select l.ip_autonomous_system1 as ip_prepended ' \
+                    'from link l ' \
+                    'where l.id_autonomous_system1 = %s ' \
+                    'and l.id_autonomous_system2 = %s;' % \
+                    (str(row[7]), str(row[8]), str(row[8]), str(row[7]))
+            result_proxy = self.dbsession.bind.execute(query)
+            route_map_commands = ''
+            for internal_row in result_proxy:
+                route_map_commands = route_map_commands + \
+                                     ' child.sendline(\'neighbor %s route-map %s-%s-%s %s\'); ' \
+                                     'child.expect(\'.+#\');' % \
+                                     (str(list(internal_row)[0]), str(row[2]), str(row[3]), str(row[5]), str(row[2]))
 
-            if row[2] == 'in':
-
-                # get the IP address of the Prepended AS interface of the link with the AS Prepender
-                query = 'select l.ip_autonomous_system2 as ip_prepended ' \
-                        'from link l ' \
-                        'where l.id_autonomous_system1 = %s ' \
-                        'and l.id_autonomous_system2 = %s ' \
-                        'union ' \
-                        'select l.ip_autonomous_system1 as ip_prepended ' \
-                        'from link l ' \
-                        'where l.id_autonomous_system1 = %s ' \
-                        'and l.id_autonomous_system2 = %s;' % \
-                        (str(row[7]), str(row[8]), str(row[8]), str(row[7]))
-                result_proxy = self.dbsession.bind.execute(query)
-                route_map_in_commands = ''
-                for internal_row in result_proxy:
-                    route_map_in_commands = route_map_in_commands + \
-                                            ' child.sendline(\'neighbor %s route-map in-%s in\'); ' \
-                                            'child.expect(\'.+#\');' % \
-                                            (str(list(internal_row)[0]), str(row[4]))
-
-                self.prepend_commands_list.append(
-                    '    '
-                    'if current_time == %s:\n'
-                    '        '
-                    'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
-                    '/usr/bin/python -c \\"import pexpect; '
-                    'child = pexpect.spawn(\'telnet 0 bgpd\'); '
-                    'child.expect(\'Password: \'); '
-                    'child.sendline(\'en\'); '
-                    'child.expect(\'.+>\'); '
-                    'child.sendline(\'enable\'); '
-                    'child.expect([\'Password: \',\'.+#\']); '
-                    'child.sendline(\'en\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'configure terminal\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'route-map in-%s permit 10\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'set as-path prepend last-as %s\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'exit\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'router bgp %s\'); '
-                    'child.expect(\'.+#\'); '
-                    '%s'
-                    ' child.sendline(\'exit\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'exit\'); '
-                    'child.expect(\'.+#\'); '
-                    'child.sendline(\'clear ip bgp * soft\'); '
-                    'child.expect(\'.+#\')\\"" %s AS%s)\n' %
-                    (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                     '%s', str(row[4]), str(row[6]), str(row[3]), route_map_in_commands, '%', str(row[3])))
-
-            elif row[2] == 'out':
-
-                # get the IP address of the Peer AS interface ot the link with the AS Prepender
-                query = 'select l.ip_autonomous_system2 as ip_prepended ' \
-                        'from link l ' \
-                        'where l.id_autonomous_system1 = %s ' \
-                        'and l.id_autonomous_system2 = %s ' \
-                        'union ' \
-                        'select l.ip_autonomous_system1 as ip_prepended ' \
-                        'from link l ' \
-                        'where l.id_autonomous_system1 = %s ' \
-                        'and l.id_autonomous_system2 = %s;' % \
-                        (str(row[7]), str(row[9]), str(row[9]), str(row[7]))
-                result_proxy = self.dbsession.bind.execute(query)
-                route_map_in_commands = ''
-                for internal_row in result_proxy:
-                    route_map_in_commands = route_map_in_commands + \
-                                            ' child.sendline(\'neighbor %s route-map out-%s-%s out\'); ' \
-                                            'child.expect(\'.+#\');' % \
-                                            (str(list(internal_row)[0]), str(row[4]), int(row[5]))
                 hmt_list = ''
                 for hmt in range(row[6]):
                     hmt_list = hmt_list + ' %s' % str(row[4])
@@ -357,7 +358,7 @@ class EventDetail(object):
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'configure terminal\'); '
                     'child.expect(\'.+#\'); '
-                    'child.sendline(\'route-map out-%s-%s permit 10\'); '
+                    'child.sendline(\'route-map %s-%s-%s permit 10\'); '
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'set as-path prepend %s\'); '
                     'child.expect(\'.+#\'); '
@@ -372,8 +373,8 @@ class EventDetail(object):
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'clear ip bgp * soft\'); '
                     'child.expect(\'.+#\')\\"" %s AS%s)\n' %
-                    (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                     '%s', str(row[4]), int(row[5]), hmt_list, str(row[3]), route_map_in_commands, '%', str(row[3])))
+                    (str(datetime.datetime.strptime(str(row[1]),'%Y-%m-%d %H:%M:%S').strftime('%s')), '%s', str(row[2]),
+                     str(row[3]), str(row[5]), hmt_list, str(row[3]), route_map_commands, '%', str(row[3])))
 
     def time_write_config_files(self):
         """

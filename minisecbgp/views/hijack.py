@@ -112,7 +112,6 @@ class HijackEventsAnnouncementDataForm(Form):
                                    validators=[InputRequired(),
                                                Length(min=9, max=18,
                                                message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
-
     announcer = StringField('AS announcer: ',
                             validators=[InputRequired(),
                                         Length(min=1, max=18,
@@ -126,15 +125,28 @@ class HijackEventsWithdrawDataForm(Form):
     withdrawn_datetime = DateTimeField('Date and Time: ',
                                        format='%Y-%m-%d %H:%M:%S',
                                        validators=[InputRequired()])
-    withdrawn_prefix = StringField('Withdrawn Prefix: ',
-                                   validators=[InputRequired(),
-                                               Length(min=9, max=18,
-                                                      message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
-
+    withdrawn_in_out = SelectField('In/Out:',
+                                   validators=[InputRequired()],
+                                   choices=[('out', 'Out'),
+                                            ('in', 'In')])
     withdrawer = StringField('AS Withdrawer: ',
                              validators=[InputRequired(),
                                          Length(min=1, max=18,
                                                 message='Only a valid ASN in this topology.')])
+    withdrawn_peer = StringField('Peer AS: ',
+                                 validators=[InputRequired(),
+                                             Length(min=1, max=18,
+                                                    message='Only a valid ASN in this topology.')])
+    withdrawn_prefix_as_source = SelectField('Withdraw by prefix or AS source:',
+                                             validators=[InputRequired()],
+                                             choices=[('prefix', 'Prefix'),
+                                                      ('as', 'AS source')])
+    withdrawn_prefix = StringField('Withdrawn Prefix: ',
+                                   validators=[Length(min=9, max=18,
+                                                      message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
+    withdrawn = StringField('Withdrawn AS Source: ',
+                            validators=[Length(min=1, max=18,
+                                               message='Only a valid ASN in this topology.')])
     create_withdraw_button = SubmitField('Save')
     withdrawn_id_event = IntegerField()
     delete_withdrawn_button = SubmitField('Del')
@@ -785,7 +797,8 @@ def hijack_events(request):
                         datetime.strptime(str(event_behaviour.end_datetime), '%Y-%m-%d %H:%M:%S'):
                     raise ValueError('Event datetime must be between Start time and End time (Events and Behaviour)')
 
-                if not type(ipaddress.ip_network(form_withdrawn.withdrawn_prefix.data)) is ipaddress.IPv4Network:
+                if form_withdrawn.withdrawn_prefix.data and \
+                        not type(ipaddress.ip_network(form_withdrawn.withdrawn_prefix.data)) is ipaddress.IPv4Network:
                     raise ValueError('Withdrawn prefix must be a valid IPv4 network.')
 
                 withdrawer = request.dbsession.query(models.AutonomousSystem).\
@@ -794,11 +807,26 @@ def hijack_events(request):
                 if not withdrawer:
                     raise ValueError('The AS withdrawer must be a valid ASN in topology.')
 
+                withdrawn_peer = request.dbsession.query(models.AutonomousSystem). \
+                    filter_by(id_topology=topology.id). \
+                    filter_by(autonomous_system=form_withdrawn.withdrawn_peer.data).first()
+                if not withdrawn_peer:
+                    raise ValueError('The peer must be a valid ASN in topology.')
+
+                if form_withdrawn.withdrawn_prefix_as_source.data == 'prefix':
+                    form_withdrawn.withdrawn.data = None
+                elif form_withdrawn.withdrawn_prefix_as_source.data == 'as':
+                    form_withdrawn.withdrawn_prefix.data = None
+
                 event_withdrawn = models.EventWithdrawn(
                     id_event_behaviour=event_behaviour.id,
                     event_datetime=datetime.strptime(str(form_withdrawn.withdrawn_datetime.data), '%Y-%m-%d %H:%M:%S'),
+                    in_out=form_withdrawn.withdrawn_in_out.data,
                     prefix=form_withdrawn.withdrawn_prefix.data,
-                    withdrawer=form_withdrawn.withdrawer.data)
+                    withdrawer=form_withdrawn.withdrawer.data,
+                    peer=form_withdrawn.withdrawn_peer.data,
+                    withdrawn=form_withdrawn.withdrawn.data
+                )
                 request.dbsession.add(event_withdrawn)
 
             except Exception as error:
@@ -845,6 +873,8 @@ def hijack_events(request):
                     result_proxy = request.dbsession.bind.execute(query)
                     if int(list(result_proxy)[0][0]) == 0:
                         raise ValueError('AS Prepender and Prepended AS must be peer in an Inbound AS-Path Prepending.')
+
+                    form_prepend.prepend_peer.data = form_prepend.prepended.data
 
                 # must be (out)
                 if form_prepend.prepend_in_out.data == 'out':
