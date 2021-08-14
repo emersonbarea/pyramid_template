@@ -4,7 +4,6 @@ import sys
 import os
 import json
 import ipaddress
-import time
 
 from datetime import datetime
 
