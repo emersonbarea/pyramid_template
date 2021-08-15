@@ -239,15 +239,15 @@ class EventDetail(object):
             list_commands = ''
             if row[2]:  # if prefix
                 list_commands = list_commands + \
-                                ' child.sendline(\'no access-list ip-address-%s-%s-%s permit any\'); ' \
+                                ' child.sendline(\'no ip prefix-list prefix-list-%s-%s-%s permit any\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'access-list ip-address-%s-%s-%s deny %s exact-match\'); ' \
+                                'child.sendline(\'ip prefix-list prefix-list-%s-%s-%s deny %s\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'access-list ip-address-%s-%s-%s permit any\'); ' \
+                                'child.sendline(\'ip prefix-list prefix-list-%s-%s-%s permit any\'); ' \
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'route-map %s-%s-%s permit 10\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'match as-path as-path-%s-%s-%s\'); ' \
+                                'child.sendline(\'match ip address prefix-list prefix-list-%s-%s-%s\'); ' \
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'exit\'); ' \
                                 'child.expect(\'.+#\'); ' \
@@ -274,7 +274,7 @@ class EventDetail(object):
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'route-map %s-%s-%s permit 10\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'match ip address ip-address-%s-%s-%s\'); ' \
+                                'child.sendline(\'match as-path as-path-%s-%s-%s\'); ' \
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'exit\'); ' \
                                 'child.expect(\'.+#\'); ' \
