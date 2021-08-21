@@ -1,10 +1,12 @@
 import argparse
 import datetime
 import getopt
+import ipaddress
 import itertools
 import os
 import sys
 import time
+import json
 import pandas as pd
 
 from pyramid.paster import bootstrap, setup_logging
@@ -32,46 +34,31 @@ class EventDetail(object):
         self.current_time = str(
             datetime.datetime.strptime(str(self.event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
 
+        self.pid = list()
+        self.df_announcement = pd.DataFrame()
+        self.df_withdrawn = pd.DataFrame()
+        self.df_prepend = pd.DataFrame()
+        self.df_monitoring = pd.DataFrame()
+        self.pid_commands_list = list()
+        self.automatic_output_filter_rules_commands_list = list()
+        self.automatic_prepend_initial_state_rules_commands_list = list()
+        self.automatic_output_initial_state_rules_commands_list = list()
+        self.automatic_output_event_rules_commands_list = list()
+        self.automatic_prepend_event_rules_commands_list = list()
+        self.announcement_commands_list = list()
+        self.withdrawn_commands_list = list()
+        self.prepend_commands_list = list()
+
     def dfs_from_database(self):
 
         # get PID from
-        query = 'select em.all as all ' \
-                'from event_monitoring em ' \
-                'where em.id_event_behaviour = %s ' \
-                'and em.all = True;' % self.id_event_behaviour
+        query = 'select asys.autonomous_system as autonomous_system ' \
+                'from autonomous_system asys, ' \
+                'event_behaviour eb ' \
+                'where eb.id = %s ' \
+                'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
-        all_autonomous_systems = False
-        for row in result_proxy:
-            all_autonomous_systems = row[0]
 
-        if not all_autonomous_systems:
-            query = 'select a.announcer as autonomous_system ' \
-                    'from event_announcement a ' \
-                    'where a.id_event_behaviour = %s ' \
-                    'union ' \
-                    'select w.withdrawer as autonomous_system ' \
-                    'from event_withdrawn w ' \
-                    'where w.id_event_behaviour = %s ' \
-                    'union ' \
-                    'select p.prepender as autonomous_system ' \
-                    'from event_prepend p ' \
-                    'where p.id_event_behaviour = %s ' \
-                    'union ' \
-                    'select m.monitor as autonomous_system ' \
-                    'from event_monitoring m ' \
-                    'where m.id_event_behaviour = %s; ' % \
-                    (self.id_event_behaviour, self.id_event_behaviour,
-                     self.id_event_behaviour, self.id_event_behaviour)
-            result_proxy = self.dbsession.bind.execute(query)
-        else:
-            query = 'select asys.autonomous_system as autonomous_system ' \
-                    'from autonomous_system asys, ' \
-                    'event_behaviour eb ' \
-                    'where eb.id = %s ' \
-                    'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
-            result_proxy = self.dbsession.bind.execute(query)
-
-        self.pid = list()
         for row in result_proxy:
             self.pid.append(row['autonomous_system'])
 
@@ -186,14 +173,660 @@ class EventDetail(object):
         # 3   2008-02-24 18:45:01    65003
 
     def pid_commands(self):
-        self.pid_commands_list = list()
         for pid in self.pid:
             self.pid_commands_list.append(
                 'AS%s = str(os.popen(\'ps ax | grep -w "mininet:AS%s" | grep bash | grep -v mnexec | awk \\\'{print $1};\\\'\').read()).strip()' %
                 (pid, pid))
 
+    def automatic_filter_rules_commands(self, file):
+
+        # validate if IPv4 network
+        def validNetworkIPv4(ip_address):
+            try:
+                return True if type(ipaddress.ip_network(ip_address)) is \
+                               ipaddress.IPv4Network else False
+            except ValueError:
+                return False
+
+        # validate if IPv4 address
+        def validIPv4(ip_address):
+            try:
+                return True if type(ipaddress.ip_address(ip_address)) is ipaddress.IPv4Address else False
+            except ValueError:
+                return False
+
+        # read json file data
+        with open(file) as json_file:
+            data = json.load(json_file)
+        json_file.close()
+
+        # get all peering relationship information
+        all_peering_relationship = list()
+        query = 'select ' \
+                '(select asys.autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id = l.id_autonomous_system1) as target_as, ' \
+                '(select asys.autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id = l.id_autonomous_system2) as peer_as, ' \
+                'l.ip_autonomous_system2 as peer_ip ' \
+                'from link l ' \
+                'where l.id_topology = %s ' \
+                'union ' \
+                'select ' \
+                '(select asys.autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id = l.id_autonomous_system2) as target_as, ' \
+                '(select asys.autonomous_system ' \
+                'from autonomous_system asys ' \
+                'where asys.id = l.id_autonomous_system1) as peer_as, ' \
+                'l.ip_autonomous_system1 as peer_ip ' \
+                'from link l ' \
+                'where l.id_topology = %s;' % (self.topology.Topology.id, self.topology.Topology.id)
+        result_proxy = self.dbsession.bind.execute(query)
+
+        for peering_relationship in result_proxy:
+            all_peering_relationship.append({'target_as': peering_relationship[0],
+                                             'peer_as': peering_relationship[1],
+                                             'peer_ip': peering_relationship[2],
+                                             'count': 1})
+
+        # print(all_peering_relationship)
+        # return
+        # [
+        #   {'target_as': 65001, 'peer_as': 65002, 'peer_ip': '192.168.0.2', 'count': 1},
+        #   {'target_as': 65001, 'peer_as': 65003, 'peer_ip': '192.168.0.10', 'count': 1},
+        #   {'target_as': 65002, 'peer_as': 65001, 'peer_ip': '192.168.0.1', 'count': 1},
+        #   {'target_as': 65002, 'peer_as': 65006, 'peer_ip': '192.168.0.6', 'count': 1}
+        # ]
+
+        #################################################
+        #
+        # create all automatic filter rules (output cleanup)
+        #
+        #################################################
+
+        header = 'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s ' \
+                 '/usr/bin/python -c \\"import pexpect; ' \
+                 'child = pexpect.spawn(\'telnet 0 bgpd\'); ' \
+                 'child.expect(\'Password: \'); ' \
+                 'child.sendline(\'en\'); ' \
+                 'child.expect(\'.+>\'); ' \
+                 'child.sendline(\'enable\'); ' \
+                 'child.expect([\'Password: \',\'.+#\']); ' \
+                 'child.sendline(\'en\'); ' \
+                 'child.expect(\'.+#\'); ' \
+                 'child.sendline(\'configure terminal\'); ' \
+                 'child.expect(\'.+#\'); ' % '%s'
+
+        for peering_relationship in all_peering_relationship:
+            target_as = peering_relationship['target_as']
+            peer_as = peering_relationship['peer_as']
+            for i, row in enumerate(all_peering_relationship):
+                if row['target_as'] == target_as and row['peer_as'] == peer_as:
+                    peer_ip = all_peering_relationship[i]['peer_ip']
+                    route_map_count = str(all_peering_relationship[i]['count'])
+                    all_peering_relationship[i]['count'] = all_peering_relationship[i]['count'] + 1
+            prefix_list_name = 'pl-out-deny-all-%s-%s' % (str(target_as), str(peer_as))
+            prefix_list_command = 'child.sendline(\'ip prefix-list %s deny any\'); child.expect(\'.+#\');' % prefix_list_name
+            as_path_name = 'ap-out-deny-all-%s-%s' % (str(target_as), str(peer_as))
+            as_path_command = 'child.sendline(\'ip as-path access-list %s deny .*\'); child.expect(\'.+#\');' % as_path_name
+            route_map_name = 'out-%s-%s' % (str(target_as), str(peer_as))
+            route_map_command = 'child.sendline(\'route-map %s permit 1\'); child.expect(\'.+#\');' \
+                                'child.sendline(\'match ip address prefix-list %s\'); child.expect(\'.+#\');' \
+                                'child.sendline(\'match as-path %s\'); child.expect(\'.+#\');' \
+                                'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                (route_map_name, prefix_list_name, as_path_name)
+            router_bgp_command = 'child.sendline(\'router bgp %s\'); child.expect(\'.+#\');' \
+                                 'child.sendline(\'neighbor %s route-map %s out\'); child.expect(\'.+#\');' \
+                                 'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                 (str(target_as), peer_ip, route_map_name)
+            clear_bpg_command = 'child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                'child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % \
+                                ('%', str(target_as))
+
+            self.automatic_output_filter_rules_commands_list.append(header +
+                                                                    prefix_list_command +
+                                                                    as_path_command +
+                                                                    route_map_command +
+                                                                    router_bgp_command +
+                                                                    clear_bpg_command)
+
+        # for output_filter_rules_commands in self.automatic_output_filter_rules_commands_list:
+        #    print(output_filter_rules_commands)
+        # return
+
+        # os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd');
+        # child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']);
+        # child.sendline('en'); child.expect('.+#');
+        # child.sendline('configure terminal'); child.expect('.+#');
+        # child.sendline('ip prefix-list pl-out-deny-all-29686-3257 deny any'); child.expect('.+#');
+        # child.sendline('ip as-path access-list ap-out-deny-all-29686-3257 deny .*'); child.expect('.+#');
+        # child.sendline('route-map out-29686-3257 permit 1'); child.expect('.+#');
+        # child.sendline('match ip address prefix-list pl-out-deny-all-29686-3257'); child.expect('.+#');
+        # child.sendline('match as-path ap-out-deny-all-29686-3257'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');child.sendline('router bgp 29686'); child.expect('.+#');
+        # child.sendline('neighbor 1.0.2.118 route-map out-29686-3257 out'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS29686)
+
+        #################################################
+        #
+        # get json initial state information
+        #
+        #################################################
+
+        initial_states = data['data']['initial_state']
+
+        #################################################
+        #
+        # create all automatic filter rules (prepends from initial state)
+        #
+        #################################################
+
+        # make prepends from initial state
+        for initial_state in initial_states:
+            seen = {}
+            for x in initial_state['path']:
+                if x not in seen:
+                    seen[x] = 1
+                else:
+                    seen[x] += 1
+
+            # print(seen)
+            # {8331: 1, 12695: 4, 174: 1, 36561: 4}
+
+            prepender_as = ''
+            hmt = ''
+            for x in seen.items():
+                if prepender_as and x[1] > 1:
+                    prepended_as = x[0]
+                    for i in range(x[1] - 1):
+                        hmt = hmt + ' ' + str(prepended_as)
+                    for j, row in enumerate(all_peering_relationship):
+                        if row['target_as'] == prepender_as and row['peer_as'] == prepended_as:
+                            peer_ip = all_peering_relationship[j]['peer_ip']
+                    route_map_name = 'in-%s-%s' % (str(prepender_as), str(prepended_as))
+                    route_map_command = 'child.sendline(\'route-map %s permit 1\'); child.expect(\'.+#\');' \
+                                        'child.sendline(\'set as-path prepend %s\'); child.expect(\'.+#\');' \
+                                        'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                        (route_map_name, hmt)
+                    router_bgp_command = 'child.sendline(\'router bgp %s\'); child.expect(\'.+#\');' \
+                                         'child.sendline(\'neighbor %s route-map %s in\'); child.expect(\'.+#\');' \
+                                         'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                         (str(prepender_as), peer_ip, route_map_name)
+                    clear_bpg_command = 'child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                        'child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % \
+                                        ('%', str(prepender_as))
+
+                    self.automatic_prepend_initial_state_rules_commands_list.append(header +
+                                                                                    route_map_command +
+                                                                                    router_bgp_command +
+                                                                                    clear_bpg_command)
+                prepender_as = x[0]
+
+        # for automatic_prepend_initial_state_rule in self.automatic_prepend_initial_state_rules_commands_list:
+        #     print(automatic_prepend_rule)
+        # return
+
+        # os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd');
+        # child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']);
+        # child.sendline('en'); child.expect('.+#');
+        # child.sendline('configure terminal'); child.expect('.+#');
+        # child.sendline('route-map in-31323-3549 permit 1'); child.expect('.+#');
+        # child.sendline('set as-path prepend  3549'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('router bgp 3549'); child.expect('.+#');
+        # child.sendline('neighbor 1.0.1.82 route-map in-31323-3549 in'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS3549)
+
+        #################################################
+        #
+        # create all automatic filter rules (permit paths from initial state)
+        #
+        #################################################
+
+        existing_pf_ap = list()
+        for initial_state in initial_states:
+            if validNetworkIPv4(initial_state['target_prefix']):
+                # get source AS information
+                source_as = initial_state['path'][-1]
+                for i, target_as in enumerate(initial_state['path']):
+                    if i + 1 <= len(initial_state['path']) - 1:
+                        peer_as = initial_state['path'][i + 1]
+                        for j, row in enumerate(all_peering_relationship):
+                            if row['target_as'] == peer_as and row['peer_as'] == target_as:
+                                route_map_entry_idx = j
+                                peer_ip = all_peering_relationship[j]['peer_ip']
+                                route_map_count = str(all_peering_relationship[j]['count'])
+                        prefix = initial_state['target_prefix']
+
+                        as_path = initial_state['path'][i + 2:]
+                        if peer_as in as_path:
+                            as_path.remove(peer_as)
+                        as_path = ' '.join(map(str, as_path))
+                        prefix_list_name = 'pl-out-permit-%s-%s-%s' % \
+                                           (str(initial_state['target_prefix']).split('/')[0],
+                                            str(initial_state['target_prefix']).split('/')[1],
+                                            str(target_as) + '-' + str('-'.join(map(str, initial_state['path'][i + 1:]))))
+                        prefix_list_command = ' child.sendline(\'no ip prefix-list %s deny any\'); child.expect(\'.+#\');' \
+                                              ' child.sendline(\'ip prefix-list %s permit %s\'); child.expect(\'.+#\');' \
+                                              ' child.sendline(\'ip prefix-list %s deny any\'); child.expect(\'.+#\');' % \
+                                              (prefix_list_name,
+                                               prefix_list_name,
+                                               prefix,
+                                               prefix_list_name)
+                        if peer_as == source_as:
+                            as_path_name = ''
+                            as_path_command = ''
+                        else:
+                            as_path_name = 'ap-out-permit-%s-%s-%s' % \
+                                           (str(initial_state['target_prefix']).split('/')[0],
+                                            str(initial_state['target_prefix']).split('/')[1],
+                                            str(target_as) + '-' + str('-'.join(map(str, initial_state['path'][i + 1:]))))
+                            as_path_command = ' child.sendline(\'no ip as-path access-list %s deny .*\'); child.expect(\'.+#\');' \
+                                              ' child.sendline(\'ip as-path access-list %s permit %s\'); child.expect(\'.+#\');' \
+                                              ' child.sendline(\'ip as-path access-list %s deny .*\'); child.expect(\'.+#\');' % \
+                                              (as_path_name,
+                                               as_path_name,
+                                               as_path,
+                                               as_path_name)
+
+                        route_map_name = 'out-%s-%s' % (str(peer_as), str(target_as))
+                        route_map_command = ' child.sendline(\'route-map %s permit %s\'); child.expect(\'.+#\');' \
+                                            ' child.sendline(\'match ip address prefix-list %s\'); child.expect(\'.+#\');' % \
+                                            (route_map_name,
+                                             route_map_count,
+                                             prefix_list_name)
+                        if peer_as == source_as:
+                            route_map_command = route_map_command + \
+                                                ' child.sendline(\'exit\'); child.expect(\'.+#\');'
+                        else:
+                            route_map_command = route_map_command + \
+                                                ' child.sendline(\'match as-path %s\'); child.expect(\'.+#\');' \
+                                                ' child.sendline(\'exit\'); child.expect(\'.+#\');' % as_path_name
+                        router_bgp_command = ' child.sendline(\'router bgp %s\'); child.expect(\'.+#\');' \
+                                             ' child.sendline(\'neighbor %s route-map %s out\'); child.expect(\'.+#\');' \
+                                             ' child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                             (str(peer_as),
+                                              peer_ip,
+                                              route_map_name)
+                        clear_bpg_command = ' child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                            ' child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % ('%', str(peer_as))
+
+                        # print(target_as, ' | ',
+                        #       peer_as, ' | ',
+                        #       source_as, ' | ',
+                        #       prefix, ' | ',
+                        #       as_path, ' | ',
+                        #       prefix_list_name, ' | ',
+                        #       prefix_list_command, ' | ',
+                        #       as_path_name, ' | ',
+                        #       as_path_command,
+                        #       route_map_name, ' | ',
+                        #       route_map_command, ' | ',
+                        #       router_bgp_command, ' | ',
+                        #       clear_bpg_command)
+
+                        # [22548, 8167, 1239, 36561]
+                        #
+                        # ----------------------------------------------------------------------------------------------------
+                        # 22548  |  8167  |  36561  |  208.65.152.0/22  |  8167 1239 36561  |
+                        #
+                        # pl-out-208.65.152.0-22-22548-8167-1239-36561  |
+                        #
+                        # child.sendline('no ip prefix-list pl-out-permit-208.65.152.0-22-22548-8167-1239-36561 deny any')
+                        # child.sendline('ip prefix-list pl-out-permit-208.65.152.0-22-22548-8167-1239-36561 permit 208.65.152.0/22')
+                        # child.sendline('ip prefix-list pl-out-permit-208.65.152.0-22-22548-8167-1239-36561 deny any')  |
+                        #
+                        # ap-out-208.65.152.0-22-22548-8167-1239-36561  |
+                        #
+                        # child.sendline('no ip as-path access-list ap-out-permit-208.65.152.0-22-22548-8167-1239-36561 deny .*')
+                        # child.sendline('ip as-path access-list ap-out-permit-208.65.152.0-22-22548-8167-1239-36561 permit 8167 1239 36561')
+                        # child.sendline('ip as-path access-list ap-out-permit-208.65.152.0-22-22548-8167-1239-36561 deny .*')
+                        #
+                        # out-8167-22548  |
+                        #
+                        # child.sendline('route-map out-8167-22548 permit 2')
+                        # child.sendline('match ip address prefix-list pl-out-permit-208.65.152.0-22-22548-8167-1239-36561')
+                        # child.sendline('match as-path ap-out-permit-208.65.152.0-22-22548-8167-1239-36561')
+                        # child.sendline('exit')  |
+                        #
+                        # child.sendline('router bgp 8167')
+                        # child.sendline('neighbor 1.0.4.101 route-map out-8167-22548 out')
+                        # child.sendline('exit')  |
+
+                        found = False
+                        if existing_pf_ap:
+                            for idx, val in enumerate(existing_pf_ap):
+                                if existing_pf_ap[idx]['target_as'] == peer_as and \
+                                        existing_pf_ap[idx]['prefix_list_name'] == prefix_list_name and \
+                                        existing_pf_ap[idx]['as_path_name'] == as_path_name or \
+                                        target_as == peer_as:
+                                    found = True
+                            if not found:
+                                existing_pf_ap.append({'target_as': peer_as,
+                                                       'prefix_list_name': prefix_list_name,
+                                                       'as_path_name': as_path_name})
+                                self.automatic_output_initial_state_rules_commands_list.append(header +
+                                                                                               prefix_list_command +
+                                                                                               as_path_command +
+                                                                                               route_map_command +
+                                                                                               router_bgp_command +
+                                                                                               clear_bpg_command)
+                                all_peering_relationship[route_map_entry_idx]['count'] = \
+                                    all_peering_relationship[route_map_entry_idx]['count'] + 1
+                        else:
+                            existing_pf_ap.append({'target_as': peer_as,
+                                                   'prefix_list_name': prefix_list_name,
+                                                   'as_path_name': as_path_name})
+                            self.automatic_output_initial_state_rules_commands_list.append(header +
+                                                                                           prefix_list_command +
+                                                                                           as_path_command +
+                                                                                           route_map_command +
+                                                                                           router_bgp_command +
+                                                                                           clear_bpg_command)
+                            all_peering_relationship[route_map_entry_idx]['count'] = \
+                                all_peering_relationship[route_map_entry_idx]['count'] + 1
+
+        # for x in self.automatic_output_initial_state_rules_commands_list:
+        #     print(x)
+        # return
+        #
+        # os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd');
+        # child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']);
+        # child.sendline('en'); child.expect('.+#');
+        # child.sendline('configure terminal'); child.expect('.+#');
+        # child.sendline('no ip prefix-list pl-out-permit-208.65.152.0-22-3549-36561 deny any'); child.expect('.+#');
+        # child.sendline('ip prefix-list pl-out-permit-208.65.152.0-22-3549-36561 permit 208.65.152.0/22'); child.expect('.+#');
+        # child.sendline('ip prefix-list pl-out-permit-208.65.152.0-22-3549-36561 deny any'); child.expect('.+#');
+        # child.sendline('route-map out-36561-3549 permit 27'); child.expect('.+#');
+        # child.sendline('match ip address prefix-list pl-out-208.65.152.0-22-3549-36561'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 36561'); child.expect('.+#');
+        # child.sendline('neighbor 1.0.1.177 route-map out-36561-3549 out'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS36561)
+
+        #################################################
+        #
+        # get json events information
+        #
+        #################################################
+
+        events = data['data']['events']
+
+        #################################################
+        #
+        # create all automatic filter rules (permit paths from events)
+        #
+        #################################################
+
+        for event in events:
+            if event['type'] == 'A':
+                if validNetworkIPv4(event['attrs']['target_prefix']):
+                    # get source AS information
+                    source_as = event['attrs']['path'][-1]
+                    for i, target_as in enumerate(event['attrs']['path']):
+                        if i + 1 <= len(event['attrs']['path']) - 1:
+                            timestamp = str(datetime.datetime.strptime(str(event['timestamp']), '%Y-%m-%dT%H:%M:%S').strftime('%s'))
+                            header = '    ' \
+                                     'if current_time == %s:\n' \
+                                     '        ' \
+                                     'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s ' \
+                                     '/usr/bin/python -c \\"import pexpect; ' \
+                                     'child = pexpect.spawn(\'telnet 0 bgpd\'); ' \
+                                     'child.expect(\'Password: \'); ' \
+                                     'child.sendline(\'en\'); ' \
+                                     'child.expect(\'.+>\'); ' \
+                                     'child.sendline(\'enable\'); ' \
+                                     'child.expect([\'Password: \',\'.+#\']); ' \
+                                     'child.sendline(\'en\'); ' \
+                                     'child.expect(\'.+#\'); ' \
+                                     'child.sendline(\'configure terminal\'); ' \
+                                     'child.expect(\'.+#\'); ' % (timestamp, '%s')
+                            peer_as = event['attrs']['path'][i + 1]
+                            for j, row in enumerate(all_peering_relationship):
+                                if row['target_as'] == peer_as and row['peer_as'] == target_as:
+                                    route_map_entry_idx = j
+                                    peer_ip = all_peering_relationship[j]['peer_ip']
+                                    route_map_count = str(all_peering_relationship[j]['count'])
+                            prefix = event['attrs']['target_prefix']
+                            as_path = event['attrs']['path'][i + 2:]
+                            if peer_as in as_path:
+                                as_path.remove(peer_as)
+                            as_path = ' '.join(map(str, as_path))
+                            prefix_list_name = 'pl-out-permit-%s-%s-%s' % \
+                                               (str(event['attrs']['target_prefix']).split('/')[0],
+                                                str(event['attrs']['target_prefix']).split('/')[1],
+                                                str(target_as) + '-' + str('-'.join(map(str, event['attrs']['path'][i + 1:]))))
+                            prefix_list_command = ' child.sendline(\'no ip prefix-list %s deny any\'); child.expect(\'.+#\');' \
+                                                  ' child.sendline(\'ip prefix-list %s permit %s\'); child.expect(\'.+#\');' \
+                                                  ' child.sendline(\'ip prefix-list %s deny any\'); child.expect(\'.+#\');' % \
+                                                  (prefix_list_name,
+                                                   prefix_list_name,
+                                                   prefix,
+                                                   prefix_list_name)
+                            if peer_as == source_as:
+                                as_path_name = ''
+                                as_path_command = ''
+                            else:
+                                as_path_name = 'ap-out-permit-%s-%s-%s' % \
+                                               (str(event['attrs']['target_prefix']).split('/')[0],
+                                                str(event['attrs']['target_prefix']).split('/')[1],
+                                                str(target_as) + '-' + str('-'.join(map(str, event['attrs']['path'][i + 1:]))))
+                                as_path_command = ' child.sendline(\'no ip as-path access-list %s deny .*\'); child.expect(\'.+#\');' \
+                                                  ' child.sendline(\'ip as-path access-list %s permit %s\'); child.expect(\'.+#\');' \
+                                                  ' child.sendline(\'ip as-path access-list %s deny .*\'); child.expect(\'.+#\');' % \
+                                                  (as_path_name,
+                                                   as_path_name,
+                                                   as_path,
+                                                   as_path_name)
+                            route_map_name = 'out-%s-%s' % (str(peer_as), str(target_as))
+                            route_map_command = ' child.sendline(\'route-map %s permit %s\'); child.expect(\'.+#\');' \
+                                                ' child.sendline(\'match ip address prefix-list %s\'); child.expect(\'.+#\');' % \
+                                                (route_map_name,
+                                                 route_map_count,
+                                                 prefix_list_name)
+                            if peer_as == source_as:
+                                route_map_command = route_map_command + \
+                                                    ' child.sendline(\'exit\'); child.expect(\'.+#\');'
+                            else:
+                                route_map_command = route_map_command + \
+                                                    ' child.sendline(\'match as-path %s\'); child.expect(\'.+#\');' \
+                                                    ' child.sendline(\'exit\'); child.expect(\'.+#\');' % as_path_name
+                            router_bgp_command = ' child.sendline(\'router bgp %s\'); child.expect(\'.+#\');' \
+                                                 ' child.sendline(\'neighbor %s route-map %s out\'); child.expect(\'.+#\');' \
+                                                 ' child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                                 (str(peer_as),
+                                                  peer_ip,
+                                                  route_map_name)
+                            clear_bpg_command = ' child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                                ' child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % \
+                                                ('%', str(peer_as))
+
+                            # print(target_as, ' | ',
+                            #       peer_as, ' | ',
+                            #       source_as, ' | ',
+                            #       prefix, ' | ',
+                            #       as_path, ' | ',
+                            #       prefix_list_name, ' | ',
+                            #       prefix_list_command, ' | ',
+                            #       as_path_name, ' | ',
+                            #       as_path_command,
+                            #       route_map_name, ' | ',
+                            #       route_map_command, ' | ',
+                            #       router_bgp_command, ' | ',
+                            #       clear_bpg_command)
+                            #
+                            # 9080  |  8928  |  36561  |  208.65.153.0/24  |  36561  |
+                            #
+                            # pl-out-208.65.153.0-24-9080-36561  |
+                            #
+                            # child.sendline('no ip prefix-list pl-out-permit-208.65.153.0-24-9080-36561 deny any'); child.expect('.+#');
+                            # child.sendline('ip prefix-list pl-out-permit-208.65.153.0-24-9080-36561 permit 208.65.153.0/24'); child.expect('.+#');
+                            # child.sendline('ip prefix-list pl-out-permit-208.65.153.0-24-9080-36561 deny any'); child.expect('.+#');  |
+                            #
+                            # ap-out-208.65.153.0-24-9080-36561  |
+                            #
+                            # child.sendline('no ip as-path access-list ap-out-permit-208.65.153.0-24-9080-36561 deny .*'); child.expect('.+#');
+                            # child.sendline('ip as-path access-list ap-out-permit-208.65.153.0-24-9080-36561 permit 36561'); child.expect('.+#');
+                            # child.sendline('ip as-path access-list ap-out-permit-208.65.153.0-24-9080-36561 deny .*'); child.expect('.+#');
+                            #
+                            # out-8928-9080  |
+                            #
+                            # child.sendline('route-map out-8928-9080 permit 2'); child.expect('.+#');
+                            # child.sendline('match ip address prefix-list pl-out-permit-208.65.153.0-24-9080-36561'); child.expect('.+#');
+                            # child.sendline('match as-path ap-out-permit-208.65.153.0-24-9080-36561'); child.expect('.+#');
+                            # child.sendline('exit'); child.expect('.+#');  |
+                            #
+                            # child.sendline('router bgp 8928'); child.expect('.+#');
+                            # child.sendline('neighbor 1.0.2.241 route-map out-8928-9080 out'); child.expect('.+#');
+                            # child.sendline('exit');
+
+                            found = False
+                            if existing_pf_ap:
+                                for idx, val in enumerate(existing_pf_ap):
+                                    if existing_pf_ap[idx]['target_as'] == peer_as and \
+                                            existing_pf_ap[idx]['prefix_list_name'] == prefix_list_name and \
+                                            existing_pf_ap[idx]['as_path_name'] == as_path_name or \
+                                            target_as == peer_as:
+                                        found = True
+                                if not found:
+                                    existing_pf_ap.append({'target_as': peer_as,
+                                                           'prefix_list_name': prefix_list_name,
+                                                           'as_path_name': as_path_name})
+                                    self.automatic_output_event_rules_commands_list.append(header +
+                                                                                           prefix_list_command +
+                                                                                           as_path_command +
+                                                                                           route_map_command +
+                                                                                           router_bgp_command +
+                                                                                           clear_bpg_command)
+                                    all_peering_relationship[route_map_entry_idx]['count'] = \
+                                        all_peering_relationship[route_map_entry_idx]['count'] + 1
+                            else:
+                                existing_pf_ap.append({'target_as': peer_as,
+                                                       'prefix_list_name': prefix_list_name,
+                                                       'as_path_name': as_path_name})
+                                self.automatic_output_event_rules_commands_list.append(header +
+                                                                                       prefix_list_command +
+                                                                                       as_path_command +
+                                                                                       route_map_command +
+                                                                                       router_bgp_command +
+                                                                                       clear_bpg_command)
+                                all_peering_relationship[route_map_entry_idx]['count'] = \
+                                    all_peering_relationship[route_map_entry_idx]['count'] + 1
+
+                # for x in self.automatic_output_event_rules_commands_list:
+                #    print(x)
+                #
+                # if current_time == 1203889677:
+                # os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd');
+                # child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']);
+                # child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');
+                # child.sendline('no ip prefix-list pl-out-permit-208.65.153.0-24-29636-2914-3491-17557 deny any'); child.expect('.+#');
+                # child.sendline('ip prefix-list pl-out-permit-208.65.153.0-24-29636-2914-3491-17557 permit 208.65.153.0/24'); child.expect('.+#');
+                # child.sendline('ip prefix-list pl-out-permit-208.65.153.0-24-29636-2914-3491-17557 deny any'); child.expect('.+#');
+                # child.sendline('no ip as-path access-list ap-out-permit-208.65.153.0-24-29636-2914-3491-17557 deny .*'); child.expect('.+#');
+                # child.sendline('ip as-path access-list ap-out-permit-208.65.153.0-24-29636-2914-3491-17557 permit 3491 17557'); child.expect('.+#');
+                # child.sendline('ip as-path access-list ap-out-permit-208.65.153.0-24-29636-2914-3491-17557 deny .*'); child.expect('.+#');
+                # child.sendline('route-map out-2914-29636 permit 3'); child.expect('.+#');
+                # child.sendline('match ip address prefix-list pl-out-permit-208.65.153.0-24-29636-2914-3491-17557'); child.expect('.+#');
+                # child.sendline('match as-path ap-out-permit-208.65.153.0-24-29636-2914-3491-17557'); child.expect('.+#');
+                # child.sendline('exit'); child.expect('.+#');
+                # child.sendline('router bgp 2914'); child.expect('.+#');
+                # child.sendline('neighbor 1.0.1.145 route-map out-2914-29636 out'); child.expect('.+#');
+                # child.sendline('exit'); child.expect('.+#');
+                # child.sendline('exit'); child.expect('.+#');
+                # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS2914)
+
+        #################################################
+        #
+        # create all automatic filter rules (prepends from events)
+        #
+        #################################################
+
+        # make prepends from events
+        for event in events:
+            if event['type'] == 'A':
+                seen = {}
+                for x in event['attrs']['path']:
+                    if x not in seen:
+                        seen[x] = 1
+                    else:
+                        seen[x] += 1
+
+                # print(seen)
+                # {8331: 1, 12695: 4, 174: 1, 36561: 4}
+
+                timestamp = str(datetime.datetime.strptime(str(event['timestamp']), '%Y-%m-%dT%H:%M:%S').strftime('%s'))
+                header = '    ' \
+                         'if current_time == %s:\n' \
+                         '        ' \
+                         'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s ' \
+                         '/usr/bin/python -c \\"import pexpect; ' \
+                         'child = pexpect.spawn(\'telnet 0 bgpd\'); ' \
+                         'child.expect(\'Password: \'); ' \
+                         'child.sendline(\'en\'); ' \
+                         'child.expect(\'.+>\'); ' \
+                         'child.sendline(\'enable\'); ' \
+                         'child.expect([\'Password: \',\'.+#\']); ' \
+                         'child.sendline(\'en\'); ' \
+                         'child.expect(\'.+#\'); ' \
+                         'child.sendline(\'configure terminal\'); ' \
+                         'child.expect(\'.+#\'); ' % (timestamp, '%s')
+                prepender_as = ''
+                hmt = ''
+                for x in seen.items():
+                    if prepender_as and x[1] > 1:
+                        prepended_as = x[0]
+                        for i in range(x[1] - 1):
+                            hmt = hmt + ' ' + str(prepended_as)
+                        for j, row in enumerate(all_peering_relationship):
+                            if row['target_as'] == prepender_as and row['peer_as'] == prepended_as:
+                                peer_ip = all_peering_relationship[j]['peer_ip']
+                        route_map_name = 'in-%s-%s' % (str(prepender_as), str(prepended_as))
+                        route_map_command = 'child.sendline(\'route-map %s permit 1\'); child.expect(\'.+#\');' \
+                                            'child.sendline(\'set as-path prepend %s\'); child.expect(\'.+#\');' \
+                                            'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                            (route_map_name, hmt)
+                        router_bgp_command = 'child.sendline(\'router bgp %s\'); child.expect(\'.+#\');' \
+                                             'child.sendline(\'neighbor %s route-map %s in\'); child.expect(\'.+#\');' \
+                                             'child.sendline(\'exit\'); child.expect(\'.+#\');' % \
+                                             (str(prepender_as), peer_ip, route_map_name)
+                        clear_bpg_command = 'child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                            'child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % \
+                                            ('%', str(prepender_as))
+
+                        self.automatic_prepend_event_rules_commands_list.append(header +
+                                                                                route_map_command +
+                                                                                router_bgp_command +
+                                                                                clear_bpg_command)
+                    prepender_as = x[0]
+
+        # for automatic_prepend_event_rule in self.automatic_prepend_event_rules_commands_list:
+        #     print(automatic_prepend_event_rule)
+        # return
+
+        # if current_time == 2008-02-24T18:48:13:
+        # os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect;
+        # child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en');
+        # child.expect('.+>'); child.sendline('enable');
+        # child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#');
+        # child.sendline('configure terminal'); child.expect('.+#');
+        # child.sendline('route-map in-31323-3549 permit 1'); child.expect('.+#');
+        # child.sendline('set as-path prepend  3549'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('router bgp 31323'); child.expect('.+#');
+        # child.sendline('neighbor 1.0.1.82 route-map in-31323-3549 in'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('exit'); child.expect('.+#');
+        # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS31323)
+
     def announcement_commands(self):
-        self.announcement_commands_list = list()
         for row in self.df_announcement.itertuples():
             self.announcement_commands_list.append(
                 '    '
@@ -219,7 +852,6 @@ class EventDetail(object):
                  '%s', str(row[3]), str(row[2]), '%', str(row[3])))
 
     def withdrawn_commands(self):
-        self.withdrawn_commands_list = list()
         for row in self.df_withdrawn.itertuples():
             query = 'select l.ip_autonomous_system2 as ip_prepended ' \
                     'from link l ' \
@@ -239,15 +871,15 @@ class EventDetail(object):
             list_commands = ''
             if row[2]:  # if prefix
                 list_commands = list_commands + \
-                                ' child.sendline(\'no ip prefix-list prefix-list-%s-%s-%s permit any\'); ' \
+                                ' child.sendline(\'no ip prefix-list pl-in-deny-%s-%s-%s permit any\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'ip prefix-list prefix-list-%s-%s-%s deny %s\'); ' \
+                                'child.sendline(\'ip prefix-list pl-in-deny-%s-%s-%s deny %s\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'ip prefix-list prefix-list-%s-%s-%s permit any\'); ' \
+                                'child.sendline(\'ip prefix-list pl-in-deny-%s-%s-%s permit any\'); ' \
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'route-map %s-%s-%s permit 10\'); ' \
                                 'child.expect(\'.+#\'); ' \
-                                'child.sendline(\'match ip address prefix-list prefix-list-%s-%s-%s\'); ' \
+                                'child.sendline(\'match ip address prefix-list pl-in-deny-%s-%s-%s\'); ' \
                                 'child.expect(\'.+#\'); ' \
                                 'child.sendline(\'exit\'); ' \
                                 'child.expect(\'.+#\'); ' \
@@ -311,13 +943,12 @@ class EventDetail(object):
                 '%s'
                 'child.sendline(\'exit\'); '
                 'child.expect(\'.+#\'); '
-                'child.sendline(\'clear ip bgp * soft\'); '
+                'child.sendline(\'clear ip bgp *\'); '
                 'child.expect(\'.+#\')\\"" %s AS%s)\n' %
                 (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
                  '%s', list_commands, '%', str(row[3])))
 
     def prepend_commands(self):
-        self.prepend_commands_list = list()
         for row in self.df_prepend.itertuples():
             # get the IP address of the Prepended AS interface of the link with the AS Prepender
             query = 'select l.ip_autonomous_system2 as ip_prepended ' \
@@ -358,7 +989,7 @@ class EventDetail(object):
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'configure terminal\'); '
                     'child.expect(\'.+#\'); '
-                    'child.sendline(\'route-map %s-%s-%s permit 10\'); '
+                    'child.sendline(\'route-map %s-%s-%s permit 1\'); '
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'set as-path prepend %s\'); '
                     'child.expect(\'.+#\'); '
@@ -371,7 +1002,7 @@ class EventDetail(object):
                     'child.expect(\'.+#\'); '
                     'child.sendline(\'exit\'); '
                     'child.expect(\'.+#\'); '
-                    'child.sendline(\'clear ip bgp * soft\'); '
+                    'child.sendline(\'clear ip bgp *\'); '
                     'child.expect(\'.+#\')\\"" %s AS%s)\n' %
                     (str(datetime.datetime.strptime(str(row[1]),'%Y-%m-%d %H:%M:%S').strftime('%s')), '%s', str(row[2]),
                      str(row[3]), str(row[5]), hmt_list, str(row[3]), route_map_commands, '%', str(row[3])))
@@ -398,19 +1029,47 @@ class EventDetail(object):
             file.write('\n\n## timers\n\nstart_datetime = %s\nend_datetime = %s\ncurrent_time = %s' %
                        (self.start_datetime, self.end_datetime, self.current_time))
 
-            # get template
-            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_2.template', 'r') as template_file:
-                file.write(template_file.read())
-            template_file.close()
-
             # PID
             file.write('\n\n## get Mininet nodes PID\n\n')
             for pid_command in self.pid_commands_list:
                 file.write(pid_command + '\n')
 
+            # Automatic output filter rules
+            file.write('\n## Automatic output filter rules\n\n')
+            for automatic_output_filter_rule in self.automatic_output_filter_rules_commands_list:
+                file.write(automatic_output_filter_rule + '\n')
+
+            # Automatic prepend rules
+            file.write('\n## Automatic prepend rules\n\n')
+            for automatic_prepend_initial_state_rule in self.automatic_prepend_initial_state_rules_commands_list:
+                file.write(automatic_prepend_initial_state_rule + '\n')
+
+            # Automatic output initial state rules
+            file.write('\n## Automatic output initial state rules\n\n')
+            for automatic_output_initial_state_rule in self.automatic_output_initial_state_rules_commands_list:
+                file.write(automatic_output_initial_state_rule + '\n')
+
+            # delay to wait for all BGP convergence time
+            file.write('\n\n## delay to wait for all BGP convergence time\n\n')
+            file.write('time.sleep(120)\n')
+
+            # get template
+            with open('./minisecbgp/static/templates/event_commands.MiniSecBGP_2.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
+
+            # starting monitoring process
+            file.write('\n\n## starting monitoring process\n\n')
+            file.write('subprocess.Popen([\'./event_monitoring.MiniSecBGP\'])\n')
+
             # timer loop begin
             file.write('\n\n## events\n\n')
             file.write('while current_time != %s:\n' % self.end_datetime)
+
+            # Automatic output event rules
+            file.write('\n    ## Automatic output event rules\n\n')
+            for automatic_output_event_rule in self.automatic_output_event_rules_commands_list:
+                file.write(automatic_output_event_rule + '\n')
 
             # Announcements
             file.write('\n    ## Announcements\n\n')
@@ -422,10 +1081,15 @@ class EventDetail(object):
             for withdrawn_command in self.withdrawn_commands_list:
                 file.write(withdrawn_command + '\n')
 
-            # Prepends
-            file.write('\n    ## Prepends\n\n')
-            for prepend_command in self.prepend_commands_list:
-                file.write(prepend_command + '\n')
+#            # Prepends
+#            file.write('\n    ## Prepends\n\n')
+#            for prepend_command in self.prepend_commands_list:
+#                file.write(prepend_command + '\n')
+
+            # Automatic prepend event rules
+            file.write('\n## Automatic prepend event rules\n\n')
+            for automatic_prepend_event_rule in self.automatic_prepend_event_rules_commands_list:
+                file.write(automatic_prepend_event_rule + '\n')
 
             file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
 
@@ -603,6 +1267,9 @@ def main(argv=sys.argv[1:]):
                 ed.pid_commands()
                 time_pid_commands = time.time() - time_pid_commands
                 save_to_database(dbsession, ['time_pid_commands'], [time_pid_commands], id_event_behaviour)
+
+                file = '/home/tocha/Documentos/projetos/MiniSecBGP/minisecbgp/static/topology/Youtube_vs_Pakistan_Telecom.BGPlay'
+                ed.automatic_filter_rules_commands(file)
 
                 time_announcement_commands = time.time()
                 ed.announcement_commands()
