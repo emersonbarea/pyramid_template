@@ -33,7 +33,7 @@
 
     def start_hijack_scenario(self):
         subprocess.Popen(['./event_commands.MiniSecBGP'])
-        subprocess.Popen(['./event_monitoring.MiniSecBGP'])
+        # subprocess.Popen(['./event_monitoring.MiniSecBGP'])
 
     @staticmethod
     def input_to_continue(phrase, color):

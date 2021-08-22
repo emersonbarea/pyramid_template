@@ -383,13 +383,14 @@ class EventDetail(object):
         # child.sendline('exit'); child.expect('.+#');
         # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS3549)
 
+        existing_pl_ap = list()
+
         #################################################
         #
         # create all automatic filter rules (permit paths from initial state)
         #
         #################################################
 
-        existing_pf_ap = list()
         for initial_state in initial_states:
             if validNetworkIPv4(initial_state['target_prefix']):
                 # get source AS information
@@ -500,17 +501,19 @@ class EventDetail(object):
                         # child.sendline('exit')  |
 
                         found = False
-                        if existing_pf_ap:
-                            for idx, val in enumerate(existing_pf_ap):
-                                if existing_pf_ap[idx]['target_as'] == peer_as and \
-                                        existing_pf_ap[idx]['prefix_list_name'] == prefix_list_name and \
-                                        existing_pf_ap[idx]['as_path_name'] == as_path_name or \
+                        if existing_pl_ap:
+                            for idx, val in enumerate(existing_pl_ap):
+                                if existing_pl_ap[idx]['target_as'] == peer_as and \
+                                        existing_pl_ap[idx]['prefix_list_name'] == prefix_list_name and \
+                                        existing_pl_ap[idx]['as_path_name'] == as_path_name or \
                                         target_as == peer_as:
                                     found = True
                             if not found:
-                                existing_pf_ap.append({'target_as': peer_as,
+                                existing_pl_ap.append({'target_as': peer_as,
+                                                       'peer_as': target_as,
                                                        'prefix_list_name': prefix_list_name,
-                                                       'as_path_name': as_path_name})
+                                                       'as_path_name': as_path_name,
+                                                       'prefix': prefix})
                                 self.automatic_output_initial_state_rules_commands_list.append(header +
                                                                                                prefix_list_command +
                                                                                                as_path_command +
@@ -520,9 +523,11 @@ class EventDetail(object):
                                 all_peering_relationship[route_map_entry_idx]['count'] = \
                                     all_peering_relationship[route_map_entry_idx]['count'] + 1
                         else:
-                            existing_pf_ap.append({'target_as': peer_as,
+                            existing_pl_ap.append({'target_as': peer_as,
+                                                   'peer_as': target_as,
                                                    'prefix_list_name': prefix_list_name,
-                                                   'as_path_name': as_path_name})
+                                                   'as_path_name': as_path_name,
+                                                   'prefix': prefix})
                             self.automatic_output_initial_state_rules_commands_list.append(header +
                                                                                            prefix_list_command +
                                                                                            as_path_command +
@@ -551,6 +556,19 @@ class EventDetail(object):
         # child.sendline('exit'); child.expect('.+#');
         # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS36561)
 
+        # for x in existing_pl_ap:
+        #     print(x)
+        # return
+        #
+        # {'target_as': 174, 'peer_as': 3327, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-3327-174-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-3327-174-36561'}
+        # {'target_as': 174, 'peer_as': 6461, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-6461-174-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-6461-174-36561'}
+        # {'target_as': 3549, 'peer_as': 1280, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-1280-3549-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-1280-3549-36561'}
+        # {'target_as': 8167, 'peer_as': 22548, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-22548-8167-1239-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-22548-8167-1239-36561'}
+        # {'target_as': 1239, 'peer_as': 8167, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-8167-1239-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-8167-1239-36561'}
+        # {'target_as': 3549, 'peer_as': 19089, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-19089-3549-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-19089-3549-36561'}
+        # {'target_as': 3549, 'peer_as': 27664, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-27664-3549-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-27664-3549-36561'}
+        # {'target_as': 3549, 'peer_as': 1916, 'prefix_list_name': 'pl-out-permit-208.65.152.0-22-1916-3549-36561', 'as_path_name': 'ap-out-permit-208.65.152.0-22-1916-3549-36561'}
+
         #################################################
         #
         # get json events information
@@ -561,11 +579,20 @@ class EventDetail(object):
 
         #################################################
         #
-        # create all automatic filter rules (permit paths from events)
+        # get json sources information
         #
         #################################################
 
+        sources = data['data']['sources']
+
         for event in events:
+
+            #################################################
+            #
+            # create all automatic filter rules (permit paths from events)
+            #
+            #################################################
+
             if event['type'] == 'A':
                 if validNetworkIPv4(event['attrs']['target_prefix']):
                     # get source AS information
@@ -688,17 +715,19 @@ class EventDetail(object):
                             # child.sendline('exit');
 
                             found = False
-                            if existing_pf_ap:
-                                for idx, val in enumerate(existing_pf_ap):
-                                    if existing_pf_ap[idx]['target_as'] == peer_as and \
-                                            existing_pf_ap[idx]['prefix_list_name'] == prefix_list_name and \
-                                            existing_pf_ap[idx]['as_path_name'] == as_path_name or \
+                            if existing_pl_ap:
+                                for idx, val in enumerate(existing_pl_ap):
+                                    if existing_pl_ap[idx]['target_as'] == peer_as and \
+                                            existing_pl_ap[idx]['prefix_list_name'] == prefix_list_name and \
+                                            existing_pl_ap[idx]['as_path_name'] == as_path_name or \
                                             target_as == peer_as:
                                         found = True
                                 if not found:
-                                    existing_pf_ap.append({'target_as': peer_as,
+                                    existing_pl_ap.append({'target_as': peer_as,
+                                                           'peer_as': target_as,
                                                            'prefix_list_name': prefix_list_name,
-                                                           'as_path_name': as_path_name})
+                                                           'as_path_name': as_path_name,
+                                                           'prefix': prefix})
                                     self.automatic_output_event_rules_commands_list.append(header +
                                                                                            prefix_list_command +
                                                                                            as_path_command +
@@ -708,9 +737,11 @@ class EventDetail(object):
                                     all_peering_relationship[route_map_entry_idx]['count'] = \
                                         all_peering_relationship[route_map_entry_idx]['count'] + 1
                             else:
-                                existing_pf_ap.append({'target_as': peer_as,
+                                existing_pl_ap.append({'target_as': peer_as,
+                                                       'peer_as': target_as,
                                                        'prefix_list_name': prefix_list_name,
-                                                       'as_path_name': as_path_name})
+                                                       'as_path_name': as_path_name,
+                                                       'prefix': prefix})
                                 self.automatic_output_event_rules_commands_list.append(header +
                                                                                        prefix_list_command +
                                                                                        as_path_command +
@@ -742,6 +773,58 @@ class EventDetail(object):
                 # child.sendline('exit'); child.expect('.+#');
                 # child.sendline('exit'); child.expect('.+#');
                 # child.sendline('clear bgp *'); child.expect('.+#')\"" % AS2914)
+
+            #################################################
+            #
+            # create all automatic filter rules (withdraw from events)
+            #
+            #################################################
+
+            if event['type'] == 'W':
+
+                for source in sources:
+                    if validIPv4(source['ip']) and event['attrs']['source_id'] == source['id']:
+                        # get all source['as_number'] peers
+                        peers = list()
+                        for peering_relationship in all_peering_relationship:
+                            if source['as_number'] == peering_relationship['target_as']:
+                                peers.append(peering_relationship['peer_as'])
+                        existing_pl_ap_temp = list()
+                        for idx, row in enumerate(existing_pl_ap):
+                            for peer in peers:
+                                if row['target_as'] == peer and \
+                                        row['peer_as'] == source['as_number'] and \
+                                        row['prefix'] == event['attrs']['target_prefix']:
+                                    timestamp = str(datetime.datetime.strptime(str(event['timestamp']),
+                                                                               '%Y-%m-%dT%H:%M:%S').strftime('%s'))
+                                    command = '    ' \
+                                              'if current_time == %s:\n' \
+                                              '        ' \
+                                              'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s ' \
+                                              '/usr/bin/python -c \\"import pexpect; ' \
+                                              'child = pexpect.spawn(\'telnet 0 bgpd\'); ' \
+                                              'child.expect(\'Password: \'); ' \
+                                              'child.sendline(\'en\'); ' \
+                                              'child.expect(\'.+>\'); ' \
+                                              'child.sendline(\'enable\'); ' \
+                                              'child.expect([\'Password: \',\'.+#\']); ' \
+                                              'child.sendline(\'en\'); ' \
+                                              'child.expect(\'.+#\'); ' \
+                                              'child.sendline(\'configure terminal\'); ' \
+                                              'child.expect(\'.+#\'); ' \
+                                              'child.sendline(\'no ip prefix-list %s permit %s\'); ' \
+                                              'child.expect(\'.+#\'); ' \
+                                              'child.sendline(\'exit\'); child.expect(\'.+#\');' \
+                                              ' child.sendline(\'clear bgp *\'); child.expect(\'.+#\')\\"" %s AS%s)\n' % \
+                                              (timestamp, '%s', row['prefix_list_name'],
+                                               row['prefix'], '%', row['target_as'])
+                                    self.automatic_output_event_rules_commands_list.append(command)
+                                    existing_pl_ap_temp.append(idx)
+                        existing_pl_ap_temp.sort(reverse=True)
+
+                        # remove existing_pl_ap row from existing_pl_ap list
+                        for idx in existing_pl_ap_temp:
+                            del existing_pl_ap[idx]
 
         #################################################
         #
@@ -1076,10 +1159,10 @@ class EventDetail(object):
             for announcement_command in self.announcement_commands_list:
                 file.write(announcement_command + '\n')
 
-            # Withdrawn
-            file.write('\n    ## Withdrawns\n\n')
-            for withdrawn_command in self.withdrawn_commands_list:
-                file.write(withdrawn_command + '\n')
+#            # Withdrawn
+#            file.write('\n    ## Withdrawns\n\n')
+#            for withdrawn_command in self.withdrawn_commands_list:
+#                file.write(withdrawn_command + '\n')
 
 #            # Prepends
 #            file.write('\n    ## Prepends\n\n')
