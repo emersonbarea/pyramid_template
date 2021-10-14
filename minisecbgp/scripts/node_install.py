@@ -143,7 +143,7 @@ class ConfigClusterNode(object):
                             'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
                             'cd /home/minisecbgpuser/containernet/ansible; '
                             'sudo ansible-playbook -i "localhost," -c local install.yml',
-                            'cd /home/minisecbgpuser/containernet/; sudo python setup.py install',
+                            'cd /home/minisecbgpuser/containernet/; sudo python3 setup.py install',
                             'sudo pip uninstall backports.ssl-match-hostname -y',
                             'sudo apt-get install python-backports.ssl-match-hostname -y']
                 for command in commands:
