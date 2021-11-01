@@ -210,6 +210,7 @@ def topologies_detail(request):
 
         query = 'select event_datetime as event_datetime, ' \
                 'in_out as in_out, ' \
+                'prefix as prefix, ' \
                 'prepender as prepender, ' \
                 'prepended as prepended, ' \
                 'peer as peer, ' \
@@ -224,7 +225,8 @@ def topologies_detail(request):
 
         query = 'select em.event_datetime as event_datetime, ' \
                 'em.monitor as monitor, ' \
-                'em.all as all ' \
+                'em.all as all, ' \
+                'em.sleep_time ' \
                 'from event_monitoring em ' \
                 'where em.id_event_behaviour = (' \
                 'select eb.id ' \

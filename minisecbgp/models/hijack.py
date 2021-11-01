@@ -204,6 +204,7 @@ class EventMonitoring(Base):
     id = Column(Integer, primary_key=True)
     id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
     event_datetime = Column(String(19), nullable=False)
-    monitor = Column(BigInteger)
-    all = Column(Boolean)
+    monitor = Column(BigInteger)                        # AS that will be monitored
+    all = Column(Boolean)                               # When all ASs will be monitored
+    sleep_time = Column(BigInteger)                     # Sleep time (in seconds) between last BGP event before monitor
     Index('IndexId6_event_behaviour', id_event_behaviour)

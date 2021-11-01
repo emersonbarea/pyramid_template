@@ -79,8 +79,8 @@
                 <table style="width:100%">
                   <tr>
                     <td align="center"><strong>Datetime</strong></td>
-                    <td align="center"><strong>Announced Prefix</strong></td>
-                    <td align="center"><strong>AS Announcer</strong></td>
+                    <td align="center"><strong>Prefix</strong></td>
+                    <td align="center"><strong>Announcer</strong></td>
                   </tr>
                   {% for event in events_announcement %}
                     <div class="form-inline">
@@ -94,17 +94,17 @@
                 </table>
               </div>
             </p>
-            <p>Type of Event: <strong>Prefix Withdrawn:</strong></p>
+            <p>Type of Event: <strong>Prefix Withdrawn</strong></p>
             <p>
               <div class="frame-color">
                 <table style="width:100%">
                   <tr>
                     <td align="center"><strong>Datetime</strong></td>
                     <td align="center"><strong>In/Out</strong></td>
-                    <td align="center"><strong>Withdrawn Prefix</strong></td>
-                    <td align="center"><strong>AS Withdrawer</strong></td>
+                    <td align="center"><strong>Prefix</strong></td>
+                    <td align="center"><strong>Withdrawer</strong></td>
                     <td align="center"><strong>Peer</strong></td>
-                    <td align="center"><strong>AS Source</strong></td>
+                    <td align="center"><strong>Source</strong></td>
                   </tr>
                   {% for event in events_withdrawn %}
                     <div class="form-inline">
@@ -129,15 +129,16 @@
                 </table>
               </div>
             </p>
-            <p>Type of Event: <strong>AS Prepend:</strong></p>
+            <p>Type of Event: <strong>AS-Path Prepend</strong></p>
             <p>
               <div class="frame-color">
                 <table style="width:100%">
                   <tr>
                     <td align="center"><strong>Datetime</strong></td>
                     <td align="center"><strong>In/Out</strong></td>
-                    <td align="center"><strong>AS Prepender</strong></td>
-                    <td align="center"><strong>Prepended AS</strong></td>
+                    <td align="center"><strong>Prefix</strong></td>
+                    <td align="center"><strong>Prepender</strong></td>
+                    <td align="center"><strong>Prepended</strong></td>
                     <td align="center"><strong>Peer</strong></td>
                     <td align="center"><strong>HMT</strong></td>
                   </tr>
@@ -151,19 +152,21 @@
                         <td align="center">{{ event[4] }}</td>
                         <td align="center">{{ event[5] }}</td>
                         <td align="center">{{ event[6] }}</td>
+                        <td align="center">{{ event[7] }}</td>
                       </tr>
                     </div>
                   {% endfor %}
                 </table>
               </div>
             </p>
-            <p>Type of Event: <strong>Monitoring:</strong></p>
+            <p>Type of Event: <strong>Monitoring</strong></p>
             <p>
               <div class="frame-color">
                 <table style="width:100%">
                   <tr>
                     <td align="center"><strong>Datetime</strong></td>
-                    <td align="center"><strong>Monitored AS</strong></td>
+                    <td align="center"><strong>Monitored</strong></td>
+                    <td align="center"><strong>Sleep time (sec.)</strong></td>
                   </tr>
                   {% for event in events_monitoring %}
                     <div class="form-inline">
@@ -174,6 +177,7 @@
                         {% else %}
                           <td align="center">all</td>
                         {% endif %}
+                        <td align="center">{{ event[3] }} </td>
                       </tr>
                     </div>
                   {% endfor %}

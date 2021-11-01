@@ -91,8 +91,8 @@
                   <table style="width:100%">
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
-                      <td align="center"><strong>Announced Prefix</strong></td>
-                      <td align="center"><strong>AS Announcer</strong></td>
+                      <td align="center"><strong>Prefix</strong></td>
+                      <td align="center"><strong>Announcer</strong></td>
                       <td></td>
                     </tr>
                     {% for event in events_announcement %}
@@ -182,10 +182,10 @@
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
                       <td align="center"><strong>In/Out</strong></td>
-                      <td align="center"><strong>Withdrawn Prefix</strong></td>
-                      <td align="center"><strong>AS Withdrawer</strong></td>
+                      <td align="center"><strong>Prefix</strong></td>
+                      <td align="center"><strong>Withdrawer</strong></td>
                       <td align="center"><strong>Peer</strong></td>
-                      <td align="center"><strong>AS Source</strong></td>
+                      <td align="center"><strong>Prefix Announcer</strong></td>
                     </tr>
                     {% for event in events_withdrawn %}
                       <div class="form-inline">
@@ -299,14 +299,15 @@
             <form action="#" method="POST">
               <p><hr></p>
               <div class="form-field">
-                <p>Autonomous System Prepend:</p>
+                <p>AS-Path Prepend:</p>
                 <div class="frame-color">
                   <table style="width:100%">
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
                       <td align="center"><strong>In/Out</strong></td>
-                      <td align="center"><strong>AS Prepender</strong></td>
-                      <td align="center"><strong>Prepended AS</strong></td>
+                      <td align="center"><strong>Prefix</strong></td>
+                      <td align="center"><strong>Prepender</strong></td>
+                      <td align="center"><strong>Prepended</strong></td>
                       <td align="center"><strong>Peer</strong></td>
                       <td align="center"><strong>HMT</strong></td>
                       <td></td>
@@ -316,6 +317,7 @@
                         <tr>
                           <td align="center">{{ event.event_datetime }}</td>
                           <td align="center">{{ event.in_out }}</td>
+                          <td align="center">{{ event.prefix }}</td>
                           <td align="center">{{ event.prepender }}</td>
                           <td align="center">{{ event.prepended }}</td>
                           <td align="center">{{ event.peer }}</td>
@@ -349,6 +351,10 @@
                       <p>
                         {{ form_prepend.prepend_in_out.label }}
                         {{ form_prepend.prepend_in_out(onchange="inountFunction()") }}
+                      </p>
+                      <p>
+                        {{ form_prepend.prepend_prefix.label }}
+                        {{ form_prepend.prepend_prefix }}
                       </p>
                       <p>
                         <table style="width:100%">
@@ -424,7 +430,8 @@
                   <table style="width:100%">
                     <tr>
                       <td align="center"><strong>Datetime</strong></td>
-                      <td align="center"><strong>Monitored AS</strong></td>
+                      <td align="center"><strong>Monitored</strong></td>
+                      <td align="center"><strong>Sleep time (sec.)</strong></td>
                       <td></td>
                     </tr>
                     {% for event in events_monitoring %}
@@ -436,6 +443,7 @@
                           {% else %}
                             <td align="center">All</td>
                           {% endif %}
+                          <td align="center">{{ event.sleep_time }}</td>
                           <td align="center"><button type="button" onclick="eventMonitoring({{ event.id }})" class="btn btn-primary" data-toggle="modal" data-target="#confirmationDeleteMonitoringModal">Del</button></td>
                         </tr>
                       </div>
@@ -468,7 +476,7 @@
                           </tr>
                           <div class="form-inline">
                             <tr>
-                              <td align="left">{{ form_monitoring.amount_of_time_slot(value="0") }}</td>
+                              <td align="left">{{ form_monitoring.amount_of_time_slot(value="0") }} Start and end datetime automatically included</td>
                             </tr>
                           </div>
                         </table>
@@ -492,6 +500,10 @@
                             </tr>
                           </div>
                         </table>
+                      </p>
+                      <p>
+                        {{ form_monitoring.sleep_time.label }}
+                        {{ form_monitoring.sleep_time }}
                       </p>
 
                     </div>
@@ -527,12 +539,19 @@
             </form>
           </div>
 
+          <!-- restrict mode -->
 
-
-
-
-
-
+          <div class="span12">
+            <form action="#" method="POST">
+              <p><hr></p>
+              <div class="form-field">
+                <p>
+                  {{ form_restrict_mode.restrict_mode.label }}
+                  {{ form_restrict_mode.restrict_mode }}
+                </p>
+              </div>
+            </form>
+          </div>
 
         {% endif %}
 

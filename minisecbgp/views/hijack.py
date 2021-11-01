@@ -1,5 +1,4 @@
 import ipaddress
-import math
 import subprocess
 import tarfile
 import os.path
@@ -160,6 +159,9 @@ class HijackEventsPrependDataForm(Form):
                                  validators=[InputRequired()],
                                  choices=[('out', 'Out'),
                                           ('in', 'In')])
+    prepend_prefix = StringField('Prefix: ',
+                                 validators=[Length(min=9, max=18,
+                                                    message='Only valid prefix format. Ex.: 1.0.0.0/8 or 200.233.127.252/24.')])
     prepended = StringField('Prepended AS: ',
                             validators=[InputRequired(),
                                         Length(min=1, max=18,
@@ -201,9 +203,21 @@ class HijackEventsMonitoringDataForm(Form):
                           validators=[InputRequired(),
                                       Length(min=1, max=18,
                                              message='Only a valid ASN in this topology.')])
+    sleep_time = IntegerField('Sleep time between last BGP event and monitor task (sec.):',
+                              validators=[InputRequired(),
+                                          Length(min=1, max=10,
+                                                 message='How long will the system wait between the last BGP event '
+                                                         'runs and the monitoring task.')])
     create_monitoring_button = SubmitField('Save')
     monitoring_id_event = IntegerField()
     delete_monitoring_button = SubmitField('Del')
+
+
+class HijackEventsRestrictMode(Form):
+    restrict_mode = SelectField('Restrict mode:',
+                                validators=[InputRequired()],
+                                choices=[('permissive', 'Permissive'),
+                                         ('restrictive', 'Restrictive')])
 
 
 class HijackEventsButtonDataForm(Form):
@@ -720,7 +734,7 @@ def hijack_events(request):
     form_withdrawn = HijackEventsWithdrawDataForm(request.POST)
     form_prepend = HijackEventsPrependDataForm(request.POST)
     form_monitoring = HijackEventsMonitoringDataForm(request.POST)
-
+    form_restrict_mode = HijackEventsRestrictMode(request.POST)
     form_button = HijackEventsButtonDataForm(request.POST)
 
     realistic_analysis = request.dbsession.query(models.RealisticAnalysis).\
@@ -896,10 +910,15 @@ def hijack_events(request):
                     if int(list(result_proxy)[0][0]) == 0:
                         raise ValueError('AS prepender and AS peer must be BGP peer in an Outbound AS-Path Prepending.')
 
+                if form_prepend.prepend_prefix.data and \
+                        not type(ipaddress.ip_network(form_prepend.prepend_prefix.data)) is ipaddress.IPv4Network:
+                    raise ValueError('Prepended prefix must be a valid IPv4 network.')
+
                 event = models.EventPrepend(
                     id_event_behaviour=event_behaviour.id,
                     event_datetime=datetime.strptime(str(form_prepend.prepend_datetime.data), '%Y-%m-%d %H:%M:%S'),
                     in_out=form_prepend.prepend_in_out.data,
+                    prefix=form_prepend.prepend_prefix.data,
                     prepender=form_prepend.prepender.data,
                     prepended=form_prepend.prepended.data,
                     peer=form_prepend.prepend_peer.data,
@@ -919,12 +938,15 @@ def hijack_events(request):
                                                            '%Y-%m-%d %H:%M:%S').strftime('%s'))
                     end_datetime = int(datetime.strptime(str(event_behaviour.end_datetime),
                                                          '%Y-%m-%d %H:%M:%S').strftime('%s'))
-                    amount_of_time_slot = form_monitoring.amount_of_time_slot.data + 1
+                    amount_of_time_slot = form_monitoring.amount_of_time_slot.data + 2
                     # time slots definition
-                    if amount_of_time_slot > 1:
-                        time_slot_interval = int(math.modf((end_datetime - start_datetime) / amount_of_time_slot)[1])
-                        for time_event in range(start_datetime, end_datetime, time_slot_interval):
-                            time_slots.append(time_event)
+                    if amount_of_time_slot > 0:
+                        time_slot_interval = int((end_datetime - start_datetime) / (amount_of_time_slot - 1))
+                        reference_time = start_datetime
+                        for time_event in range(amount_of_time_slot - 1):
+                            time_slots.append(reference_time)
+                            reference_time = reference_time + time_slot_interval
+                        time_slots.append(end_datetime)
                     else:
                         time_slots.append(start_datetime)
                         time_slots.append(end_datetime)
@@ -947,7 +969,8 @@ def hijack_events(request):
                             id_event_behaviour=event_behaviour.id,
                             event_datetime=datetime.fromtimestamp(time_slot),
                             monitor=None,
-                            all=True)
+                            all=True,
+                            sleep_time=form_monitoring.sleep_time.data)
                         request.dbsession.add(event_monitoring)
                 elif form_monitoring.which_as_will_be_monitored.data == 'only_one_as':
                     query = 'select asys.autonomous_system as autonomous_system ' \
@@ -967,7 +990,8 @@ def hijack_events(request):
                             event_monitoring = models.EventMonitoring(
                                 id_event_behaviour=event_behaviour.id,
                                 event_datetime=datetime.fromtimestamp(time_slot),
-                                monitor=autonomous_system)
+                                monitor=autonomous_system,
+                                sleep_time=form_monitoring.sleep_time.data)
                             request.dbsession.add(event_monitoring)
 
             except Exception as error:
@@ -1009,6 +1033,8 @@ def hijack_events(request):
                 dictionary['css_class'] = 'errorMessage'
 
         if form_button.generate_files_button.data:
+
+            print(form_restrict_mode.restrict_mode.data)
 
             # delete previous event detail if exist
             request.dbsession.query(models.EventDetail).filter_by(id_event_behaviour=event_behaviour.id).delete()
@@ -1056,6 +1082,7 @@ def hijack_events(request):
     dictionary['form_withdrawn'] = form_withdrawn
     dictionary['form_prepend'] = form_prepend
     dictionary['form_monitoring'] = form_monitoring
+    dictionary['form_restrict_mode'] = form_restrict_mode
     dictionary['form_button'] = form_button
 
     return dictionary
