@@ -485,20 +485,22 @@ class BGPlayTopology(object):
                                     'id_event_behaviour': int(self.id_event_behaviour),
                                     'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
                                     'in_out': 'out',
+                                    'prefix': observed_event['attrs']['target_prefix'],
                                     'prepender': prepender,
                                     'prepended': elem,
                                     'peer': peer_path[-2],
-                                    'hmt': path.count(elem)
+                                    'hmt': path.count(elem) - 1
                                 })
                             else:
                                 prepend_events_list_temp.append({
                                     'id_event_behaviour': int(self.id_event_behaviour),
                                     'event_datetime': str(observed_event['timestamp']).replace('T', ' '),
                                     'in_out': 'in',
+                                    'prefix': observed_event['attrs']['target_prefix'],
                                     'prepender': prepender,
                                     'prepended': elem,
                                     'peer': elem,
-                                    'hmt': path.count(elem)
+                                    'hmt': path.count(elem) - 1
                                 })
 
             if prepend_events_list_temp:
@@ -507,7 +509,8 @@ class BGPlayTopology(object):
                         prepend_events_list.append(prepend_event_temp)
                     else:
                         for i, prepend_event in enumerate(prepend_events_list):
-                            if (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
+                            if (str(prepend_event['prefix']) == str(prepend_event_temp['prefix'])) and \
+                                    (str(prepend_event['prepender']) == str(prepend_event_temp['prepender'])) and \
                                     (str(prepend_event['prepended'])) == str(prepend_event_temp['prepended']) and \
                                     (str(prepend_event['peer'])) == str(prepend_event_temp['peer']) and \
                                     (str(prepend_event['hmt']) == str(prepend_event_temp['hmt'])):

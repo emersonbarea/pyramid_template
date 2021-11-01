@@ -100,6 +100,7 @@ class Parser(object):
             for file in self.log_files:
                 data = self.read_file(self.log_directory, file)
                 start_time = False
+                peer_list = list()
                 for line in data.splitlines():
 
                     # get file start_time
@@ -109,8 +110,11 @@ class Parser(object):
 
                     # get last "%ADJCHANGE: neighbor ... Up" event before hijack
                     if '%ADJCHANGE: neighbor ' in line and line.endswith('Up'):
-                        last_adjacency_time = datetime.timestamp(
-                            datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
+                        peer = line.split()[-2]
+                        if peer not in peer_list:
+                            peer_list.append(peer)
+                            last_adjacency_time = datetime.timestamp(
+                                datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
                 # print the BGP adjacency time per AS
                 print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_adjacency_time - start_time)))
@@ -123,26 +127,45 @@ class Parser(object):
             for prefix, prefix_hijacker in data:
                 for file in self.log_files:
                     data = self.read_file(self.log_directory, file)
+                    start_time = False
+                    peer_list = list()
+                    last_route_add_event = False
                     for line in data.splitlines():
 
                         # get last "%ADJCHANGE: neighbor ... Up" event before hijack
-                        if '%ADJCHANGE: neighbor ' in line and line.endswith('Up'):
-                            last_adjacency_time = datetime.timestamp(
+                        #if '%ADJCHANGE: neighbor ' in line and line.endswith('Up'):
+                        #    peer = line.split()[-2]
+                        #    if peer not in peer_list:
+                        #        peer_list.append(peer)
+                        #        last_adjacency_time = datetime.timestamp(
+                        #            datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
+
+                        # get file start_time
+                        if not start_time:
+                            start_time = datetime.timestamp(
                                 datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
 
                     for line in data.splitlines():
 
-                        # get last "prefix" valid route add event
+                        # get first "prefix" valid route add event
                         if 'Zebra send: IPv4 route add %s nexthop' % prefix in line:
                             last_route_add_event = datetime.timestamp(
                                 datetime.strptime(str(line.split('BGP:')[0])[:-3], '%Y/%m/%d %H:%M:%S.%f'))
+                            break
 
                         # break when "rcvd UPDATE w/ attr: nexthop ... "prefix_hijacker"" was found
-                        if 'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
+                        if last_route_add_event and \
+                                'rcvd UPDATE w/ attr: nexthop ' in line and line.endswith(prefix_hijacker):
+                            break
+
+                        # break when "ADJCHANGE: neighbor ... Down User reset" was found
+                        if last_route_add_event and \
+                                'ADJCHANGE: neighbor ' in line and line.endswith("Down User reset"):
                             break
 
                     # print the original route convergence time per AS
-                    print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
+                    #print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - last_adjacency_time)))
+                    print('%s,%s' % (file.split('-')[1].split('.')[0], str(last_route_add_event - start_time)))
 
         except Exception as error:
             print(error)

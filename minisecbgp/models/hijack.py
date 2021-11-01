@@ -191,6 +191,7 @@ class EventPrepend(Base):
     id_event_behaviour = Column(Integer, ForeignKey('event_behaviour.id'))
     event_datetime = Column(String(19), nullable=False)
     in_out = Column(String(3))
+    prefix = Column(String(255))
     prepender = Column(BigInteger)                      # AS where prepend will occurs
     prepended = Column(BigInteger)                      # The prepended AS
     peer = Column(BigInteger)                           # for which peer of prepender the prepend will be announced
