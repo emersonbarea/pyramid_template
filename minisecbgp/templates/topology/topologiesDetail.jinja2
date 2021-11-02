@@ -64,9 +64,11 @@
             {% if event_behaviour %}
               <p>Start time: <strong>{{ event_behaviour[0][0] }}</strong></p>
               <p>End time: <strong>{{ event_behaviour[0][1] }}</strong></p>
+              <p>Restrict mode: <strong>{{ event_behaviour[0][2] }}</strong></p>
             {% else %}
               <p>Start time: <i>not configured yet</i></p>
               <p>End time: <i>not configured yet</i></p>
+              <p>Restrict mode: <i>not configured yet</i></p>
             {% endif %}
           </div>
 

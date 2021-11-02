@@ -111,6 +111,7 @@ class EventDetail(object):
         query = 'select ' \
                 'p.event_datetime as event_datetime, ' \
                 'p.in_out as in_out, ' \
+                'p.prefix as prefix, ' \
                 'p.prepender as prepender, ' \
                 'p.prepended as prepended, ' \
                 'p.peer as peer, ' \
@@ -133,7 +134,8 @@ class EventDetail(object):
                 'and p.id_event_behaviour = eb.id;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
         self.df_prepend = pd.DataFrame(result_proxy, columns=[
-            'event_datetime', 'in_out', 'prepender', 'prepended', 'peer', 'hmt', 'id_prepender', 'id_prepended', 'id_peer'])
+            'event_datetime', 'in_out', 'prefix', 'prepender', 'prepended',
+            'peer', 'hmt', 'id_prepender', 'id_prepended', 'id_peer'])
         # print(self.df_prepend)
         #          event_datetime in_out  prepender  prepended     peer  hmt  id_prepender  id_prepended  id_peer
         # 0   2008-02-24 20:00:00     in       3491      17557  33970.0    2          4227          4288   4327.0
@@ -144,7 +146,8 @@ class EventDetail(object):
         # Monitoring
         query = 'select em.event_datetime as event_datetime, ' \
                 'em.monitor as monitor, ' \
-                'em.all as all ' \
+                'em.all as all, ' \
+                'em.sleep_time ' \
                 'from event_monitoring em ' \
                 'where em.id_event_behaviour = %s;' % self.id_event_behaviour
         result_proxy = self.dbsession.bind.execute(query)
@@ -159,18 +162,18 @@ class EventDetail(object):
                         'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
                 result_proxy = self.dbsession.bind.execute(query)
                 for autonomous_system in result_proxy:
-                    monitoring_list_temp.append([row[0], autonomous_system[0]])
+                    monitoring_list_temp.append([row[0], autonomous_system[0], row[3]])
             else:
-                monitoring_list_temp.append([row[0], row[1]])
+                monitoring_list_temp.append([row[0], row[1], row[3]])
             monitoring_list_temp.sort()
             monitoring_list = list(monitoring_list_temp for monitoring_list_temp, _ in itertools.groupby(monitoring_list_temp))
-        self.df_monitoring = pd.DataFrame.from_records(monitoring_list, columns=['event_datetime', 'monitor'])
-        # print(self.df_monitoring)
-        #          event_datetime  monitor
-        # 0   2008-02-24 18:45:01      333
-        # 1   2008-02-24 18:45:01    65001
-        # 2   2008-02-24 18:45:01    65002
-        # 3   2008-02-24 18:45:01    65003
+        self.df_monitoring = pd.DataFrame.from_records(monitoring_list, columns=['event_datetime', 'monitor', 'sleep_time'])
+        print(self.df_monitoring)
+        #          event_datetime  monitor  sleep_time
+        # 0   2008-02-24 18:45:01      333         240
+        # 1   2008-02-24 18:45:01    65001         240
+        # 2   2008-02-24 18:45:01    65002         240
+        # 3   2008-02-24 18:45:01    65003         240
 
     def pid_commands(self):
         for pid in self.pid:
@@ -1249,7 +1252,7 @@ class EventDetail(object):
         with open(self.output_event_monitoring_file, 'w') as file:
 
             # get template
-            with open('./minisecbgp/static/templates/event_monitoring.MiniSecBGP.template', 'r') as template_file:
+            with open('./minisecbgp/static/templates/event_monitoring.MiniSecBGP_1.template', 'r') as template_file:
                 file.write(template_file.read())
             template_file.close()
 

@@ -74,7 +74,8 @@ setup(
             'MiniSecBGP_bgplay_topology = minisecbgp.scripts.bgplay_topology:main',
             'MiniSecBGP_hijack_realistic_analysis = minisecbgp.scripts.hijack_realistic_analysis:main',
             'MiniSecBGP_hijack_attack_scenario = minisecbgp.scripts.hijack_attack_scenario:main',
-            'MiniSecBGP_hijack_events = minisecbgp.scripts.hijack_events:main'
+            'MiniSecBGP_hijack_events_restrictive_mode = minisecbgp.scripts.hijack_events_restrictive_mode:main',
+            'MiniSecBGP_hijack_events_permissive_mode = minisecbgp.scripts.hijack_events_permissive_mode:main'
         ],
     },
 )

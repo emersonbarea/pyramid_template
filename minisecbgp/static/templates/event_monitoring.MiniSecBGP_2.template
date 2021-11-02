@@ -1,0 +1,13 @@
+
+
+def main(argv=sys.argv[1:]):
+    try:
+        m = Monitor(argv[0])
+        m.monitor()
+    except Exception as error:
+        print(error)
+        print('Usage: ./event_monitoring.MiniSecBGP <timestamp>')
+
+
+if __name__ == '__main__':
+    main()

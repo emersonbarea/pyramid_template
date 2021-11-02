@@ -15,7 +15,8 @@ class Parser(object):
     def __init__(self, argv0):
 
         self.event_commands_file = argv0 + 'event_commands.MiniSecBGP'
-        self.file_to_write = 'event_commands.MiniSecBGP'
+        self.file_to_write = argv0 + 'event_commands.new.MiniSecBGP'
+
         self.commands = list()
         self.timestamps = [1203889500,
                            1203890433,

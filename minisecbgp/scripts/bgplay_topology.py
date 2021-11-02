@@ -79,7 +79,8 @@ class BGPlayTopology(object):
 
             event_behaviour = models.EventBehaviour(id_topology=id_topology[0],
                                                     start_datetime=start_datetime.replace('T', ' '),
-                                                    end_datetime=end_datetime.replace('T', ' '))
+                                                    end_datetime=end_datetime.replace('T', ' '),
+                                                    restrict_mode='permissive')
             dbsession.add(event_behaviour)
 
             dbsession.flush()

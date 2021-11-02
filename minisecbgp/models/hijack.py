@@ -138,6 +138,7 @@ class EventBehaviour(Base):
     id_topology = Column(Integer, ForeignKey('topology.id'))
     start_datetime = Column(String(19), nullable=False)
     end_datetime = Column(String(19), nullable=False)
+    restrict_mode = Column(String(11), nullable=False)
     bgplay = relationship('BGPlay', foreign_keys='BGPlay.id_event_behaviour')
     event_detail = relationship('EventDetail', foreign_keys='EventDetail.id_event_behaviour')
     event_announcement = relationship('EventAnnouncement', foreign_keys='EventAnnouncement.id_event_behaviour')

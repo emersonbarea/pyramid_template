@@ -32,6 +32,15 @@ class EventDetail(object):
         self.current_time = str(
             datetime.datetime.strptime(str(self.event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S').strftime('%s'))
 
+        self.pid = list()
+        self.pid_commands_list = list()
+        self.announcement_commands_list = list()
+        self.withdrawn_commands_list = list()
+        self.prepend_commands_list = list()
+        self.monitoring_commands_list = list()
+        self.monitoring_current_times_list = list()
+        self.monitor_command = ''
+
     def dfs_from_database(self):
 
         # get PID from
@@ -71,7 +80,6 @@ class EventDetail(object):
                     'and eb.id_topology = asys.id_topology;' % self.id_event_behaviour
             result_proxy = self.dbsession.bind.execute(query)
 
-        self.pid = list()
         for row in result_proxy:
             self.pid.append(row['autonomous_system'])
 
@@ -155,6 +163,7 @@ class EventDetail(object):
         # 3   2008-02-24 18:48:09    out       1299       3491  28917.0    2          4211          4227   4313.0
 
         # Monitoring
+        monitoring_current_times_list_temp = list()
         query = 'select em.event_datetime as event_datetime, ' \
                 'em.monitor as monitor, ' \
                 'em.all as all ' \
@@ -164,6 +173,10 @@ class EventDetail(object):
         monitoring_list_temp = list()
         monitoring_list = list()
         for row in result_proxy:
+
+            monitoring_current_times_list_temp.append(
+                str(datetime.datetime.strptime(str(row[0]), '%Y-%m-%d %H:%M:%S').strftime('%s')))
+
             if row[2]:
                 query = 'select asys.autonomous_system as autonomous_system ' \
                         'from autonomous_system asys, ' \
@@ -179,21 +192,23 @@ class EventDetail(object):
             monitoring_list = list(monitoring_list_temp for monitoring_list_temp, _ in itertools.groupby(monitoring_list_temp))
         self.df_monitoring = pd.DataFrame.from_records(monitoring_list, columns=['event_datetime', 'monitor'])
         # print(self.df_monitoring)
-        #          event_datetime  monitor
-        # 0   2008-02-24 18:45:01      333
-        # 1   2008-02-24 18:45:01    65001
-        # 2   2008-02-24 18:45:01    65002
-        # 3   2008-02-24 18:45:01    65003
+        #          event_datetime  monitor  sleep_time
+        # 0   2008-02-24 18:45:01      333         240
+        # 1   2008-02-24 18:45:01    65001         240
+        # 2   2008-02-24 18:45:01    65002         240
+        # 3   2008-02-24 18:45:01    65003         240
+
+        self.monitoring_current_times_list = sorted(list(set(monitoring_current_times_list_temp)))
+        # print(self.monitoring_current_times_list)
+        # ['1203889500', '1203890433', '1203890550', '1203891366', '1203891600', '1203892299', '1203892650', '1203893232']
 
     def pid_commands(self):
-        self.pid_commands_list = list()
         for pid in self.pid:
             self.pid_commands_list.append(
                 'AS%s = str(os.popen(\'ps ax | grep -w "mininet:AS%s" | grep bash | grep -v mnexec | awk \\\'{print $1};\\\'\').read()).strip()' %
                 (pid, pid))
 
     def announcement_commands(self):
-        self.announcement_commands_list = list()
         for row in self.df_announcement.itertuples():
             self.announcement_commands_list.append(
                 '    '
@@ -219,7 +234,6 @@ class EventDetail(object):
                  '%s', str(row[3]), str(row[2]), '%', str(row[3])))
 
     def withdrawn_commands(self):
-        self.withdrawn_commands_list = list()
         for row in self.df_withdrawn.itertuples():
             query = 'select l.ip_autonomous_system2 as ip_prepended ' \
                     'from link l ' \
@@ -317,7 +331,6 @@ class EventDetail(object):
                  '%s', list_commands, '%', str(row[3])))
 
     def prepend_commands(self):
-        self.prepend_commands_list = list()
         for row in self.df_prepend.itertuples():
             # get the IP address of the Prepended AS interface of the link with the AS Prepender
             query = 'select l.ip_autonomous_system2 as ip_prepended ' \
@@ -376,6 +389,16 @@ class EventDetail(object):
                     (str(datetime.datetime.strptime(str(row[1]),'%Y-%m-%d %H:%M:%S').strftime('%s')), '%s', str(row[2]),
                      str(row[3]), str(row[5]), hmt_list, str(row[3]), route_map_commands, '%', str(row[3])))
 
+    def monitoring_commands(self):
+        for current_time in self.monitoring_current_times_list:
+            self.monitoring_commands_list.append(
+                '    '
+                'if current_time == %s:\n'
+                '        time.sleep(%s)\n'
+                '        os.popen("./event_monitoring.MiniSecBGP %s")\n'
+                '        time.sleep(60)\n' %
+                (current_time, '240', current_time))
+
     def time_write_config_files(self):
         """
             Write configuration files to server filesystem
@@ -427,6 +450,11 @@ class EventDetail(object):
             for prepend_command in self.prepend_commands_list:
                 file.write(prepend_command + '\n')
 
+            # Monitoring
+            file.write('\n    ## Monitoring\n\n')
+            for monitoring_command in self.monitoring_commands_list:
+                file.write(monitoring_command + '\n')
+
             file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
 
             # get template
@@ -437,46 +465,6 @@ class EventDetail(object):
         file.close()
 
         os.chmod(self.output_event_command_file, 0o755)
-
-    def monitoring_commands(self):
-        self.monitoring_commands_list = list()
-        for row in self.df_monitoring.itertuples():
-#            self.monitoring_commands_list.append(
-#                '    '
-#                'if current_time == %s:\n'
-#                '        '
-#                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
-#                '/usr/bin/python -c \\"import pexpect; '
-#                'child = pexpect.spawn(\'telnet 0 bgpd\'); '
-#                'child.expect(\'Password: \'); '
-#                'child.sendline(\'en\'); '
-#                'child.expect(\'.+>\'); '
-#                'child.sendline(\'enable\'); '
-#                'child.expect([\'Password: \',\'.+#\']); '
-#                'child.sendline(\'en\'); '
-#                'child.expect(\'.+#\'); '
-#                'child.sendline(\'show ip bgp\'); '
-#                'child.expect(\'.+#\'); '
-#                'print(\'-->Monitoring Datetime:%s\'); '
-#                'print(child.after)\\" >> log/monitoring_%s.log" %s AS%s)\n'
-#                '\n'
-#                '' %
-#                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-#                 '%s', str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-#                 str(row[2]), '%', str(row[2])))
-
-            self.monitoring_commands_list.append(
-                '    '
-                'if current_time == %s:\n'
-                '        '
-                'os.popen("sudo -u minisecbgpuser sudo mnexec -a %s '
-                '-- sh -c \'echo \\"\\n-->current_time:%s\\" >> log/monitor-%s.log; '
-                './show.exp >> log/monitor-%s.log &\'" %s AS%s)\n'
-                '\n'
-                '' %
-                (str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')), '%s',
-                 str(datetime.datetime.strptime(str(row[1]), '%Y-%m-%d %H:%M:%S').strftime('%s')),
-                 str(row[2]), str(row[2]), '%', str(row[2])))
 
     def time_write_monitoring_files(self):
         """
@@ -506,24 +494,23 @@ class EventDetail(object):
                 file.write(template_file.read())
             template_file.close()
 
-            # current_time for loop
-            file.write('\n\n## timers\n\ncurrent_time = %s' % self.current_time)
-
             # PID
-            file.write('\n\n## get Mininet nodes PID\n\n')
+            file.write('\n\n        ## get Mininet nodes PID\n\n')
             for pid_command in self.pid_commands_list:
-                file.write(pid_command + '\n')
-
-            # timer loop begin
-            file.write('\n\n## events\n\n')
-            file.write('while current_time != %s:\n' % self.end_datetime)
+                file.write('        ' + pid_command + '\n')
 
             # Monitoring
-            file.write('\n    ## Monitoring\n\n')
-            for monitoring_command in self.monitoring_commands_list:
-                file.write(monitoring_command + '\n')
+            file.write('\n        ## Monitoring\n\n')
+            for monitoring_current_time in self.monitoring_current_times_list:
+                file.write('\n        if self.timestamp == %s:\n' % monitoring_current_time)
+                for row in self.df_monitoring.itertuples():
+                    if str(datetime.datetime.strptime(str(row[1]),'%Y-%m-%d %H:%M:%S').strftime('%s')) == monitoring_current_time:
+                        file.write('            os.popen("sudo -u minisecbgpuser sudo mnexec -a %s -- sh -c \'echo \\"\\n-->current_time:%s\\" >> log/monitor-%s.log; ./show.exp >> log/monitor-%s.log &\'" %s (AS%s, self.timestamp))\n' % ('%s', '%s', row[2], row[2], '%', row[2]))
 
-            file.write('    time.sleep(1)\n\n    current_time = current_time + 1\n')
+            # get template
+            with open('./minisecbgp/static/templates/event_monitoring.MiniSecBGP_2.template', 'r') as template_file:
+                file.write(template_file.read())
+            template_file.close()
 
         file.close()
         os.chmod(self.output_event_monitoring_file, 0o755)
@@ -619,15 +606,15 @@ def main(argv=sys.argv[1:]):
                 time_prepends_commands = time.time() - time_prepends_commands
                 save_to_database(dbsession, ['time_prepends_commands'], [time_prepends_commands], id_event_behaviour)
 
-                time_write_config_files = time.time()
-                ed.time_write_config_files()
-                time_write_config_files = time.time() - time_write_config_files
-                save_to_database(dbsession, ['time_write_config_files'], [time_write_config_files], id_event_behaviour)
-
                 time_monitoring_commands = time.time()
                 ed.monitoring_commands()
                 time_monitoring_commands = time.time() - time_monitoring_commands
                 save_to_database(dbsession, ['time_monitoring_commands'], [time_monitoring_commands], id_event_behaviour)
+
+                time_write_config_files = time.time()
+                ed.time_write_config_files()
+                time_write_config_files = time.time() - time_write_config_files
+                save_to_database(dbsession, ['time_write_config_files'], [time_write_config_files], id_event_behaviour)
 
                 time_write_monitoring_files = time.time()
                 ed.time_write_monitoring_files()

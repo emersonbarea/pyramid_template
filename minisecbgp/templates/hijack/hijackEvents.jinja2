@@ -80,6 +80,51 @@
 
         {% if event_behaviour %}
 
+          <!-- Restrict Mode -->
+
+          <div class="span12">
+            <form action="#" method="POST">
+              <div class="frame-color">
+                <div class="form-field">
+                  <p>
+                    {{ form_restrict_mode.restrict_mode.label }}
+                    {{ form_restrict_mode.restrict_mode(disabled=True) }}
+                  </p>
+                </div>
+              </div>
+              <br>
+              <div class="form-group" align="center">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editRestrictModeConfirmationModal">Edit Restrict Mode</button>
+              </div>
+
+              <div class="modal fade" id="editRestrictModeConfirmationModal" tabindex='-1' role="dialog" aria-labelledby="submitModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                      </br></br>
+                      <div class="form-field">
+                        <p>
+                          {{ form_restrict_mode.restrict_mode.label }}
+                          {{ form_restrict_mode.restrict_mode }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <div class="form-group">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        {{ form_restrict_mode.edit_restrict_mode_button(class="btn btn-primary", id_realistic_analysis=realistic_analysis.id) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
           <!-- Announcement -->
 
           <div class="span12">
@@ -535,20 +580,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </form>
-          </div>
-
-          <!-- restrict mode -->
-
-          <div class="span12">
-            <form action="#" method="POST">
-              <p><hr></p>
-              <div class="form-field">
-                <p>
-                  {{ form_restrict_mode.restrict_mode.label }}
-                  {{ form_restrict_mode.restrict_mode }}
-                </p>
               </div>
             </form>
           </div>

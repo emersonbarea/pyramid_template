@@ -169,7 +169,8 @@ def topologies_detail(request):
             filter(models.AutonomousSystem.id == models.Prefix.id_autonomous_system).count()
 
         query = 'select eb.start_datetime as start_datetime, ' \
-                'eb.end_datetime as end_datetime ' \
+                'eb.end_datetime as end_datetime, ' \
+                'eb.restrict_mode ' \
                 'from event_behaviour eb ' \
                 'where eb.id_topology = %s;' % request.matchdict["id_topology"]
         dictionary['event_behaviour'] = list(request.dbsession.bind.execute(query))

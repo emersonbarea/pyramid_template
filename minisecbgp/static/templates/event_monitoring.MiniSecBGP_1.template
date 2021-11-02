@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+
+import sys
+import os
+
+class Monitor(object):
+    def __init__(self, argv0):
+        self.timestamp = int(argv0)
+
+    def monitor(self):

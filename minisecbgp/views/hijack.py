@@ -218,6 +218,7 @@ class HijackEventsRestrictMode(Form):
                                 validators=[InputRequired()],
                                 choices=[('permissive', 'Permissive'),
                                          ('restrictive', 'Restrictive')])
+    edit_restrict_mode_button = SubmitField('Save')
 
 
 class HijackEventsButtonDataForm(Form):
@@ -697,7 +698,7 @@ def hijack_realistic_analysis_detail(request):
 
         if request.method == 'POST':
             if form.events_button.data:
-                return HTTPFound(location=request.route_path('hijackEvents', id_realistic_analysis=id_realistic_analysis))
+                return HTTPFound(location=request.route_path('hijackEvents', id_realistic_analysis=id_realistic_analysis,restrict_mode='permissive'))
 
             if form_button.emulate_button.data:
                 os.system('gnome-terminal -- /bin/bash -c "cd %s; ./topology.py; exec bash"' %
@@ -746,7 +747,12 @@ def hijack_events(request):
     event_behaviour = request.dbsession.query(models.EventBehaviour).\
         filter_by(id_topology=topology.id).first()
 
+    if request.method == 'GET' and event_behaviour:
+
+        form_restrict_mode.restrict_mode.data = event_behaviour.restrict_mode
+
     if request.method == 'POST':
+
         if form_datetime.edit_button.data:
             try:
                 start_datetime = datetime.strptime(str(form_datetime.start_datetime.data), '%Y-%m-%d %H:%M:%S')
@@ -761,10 +767,19 @@ def hijack_events(request):
                 else:
                     event_behaviour = (models.EventBehaviour(id_topology=realistic_analysis.id_topology,
                                                              start_datetime=start_datetime,
-                                                             end_datetime=end_datetime))
+                                                             end_datetime=end_datetime,
+                                                             restrict_mode='permissive'))
                     request.dbsession.add(event_behaviour)
                 request.dbsession.flush()
 
+            except Exception as error:
+                dictionary['message'] = error
+                dictionary['css_class'] = 'errorMessage'
+
+        if form_restrict_mode.edit_restrict_mode_button.data:
+            try:
+                event_behaviour.restrict_mode = form_restrict_mode.restrict_mode.data
+                request.dbsession.flush()
             except Exception as error:
                 dictionary['message'] = error
                 dictionary['css_class'] = 'errorMessage'
@@ -1034,8 +1049,6 @@ def hijack_events(request):
 
         if form_button.generate_files_button.data:
 
-            print(form_restrict_mode.restrict_mode.data)
-
             # delete previous event detail if exist
             request.dbsession.query(models.EventDetail).filter_by(id_event_behaviour=event_behaviour.id).delete()
 
@@ -1046,11 +1059,18 @@ def hijack_events(request):
 
             arguments = ['--config-file=minisecbgp.ini',
                          '--id-event-behaviour=%s' % event_behaviour.id]
-            subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events'] + arguments)
+
+            if event_behaviour.restrict_mode == 'permissive':
+                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events_permissive_mode'] + arguments)
+            elif event_behaviour.restrict_mode == 'restrictive':
+                subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events_restrictive_mode'] + arguments)
+
+            #subprocess.Popen(['./venv/bin/MiniSecBGP_hijack_events'] + arguments)
 
             return HTTPFound(location=request.route_path('hijackEventsDetail', id_event_behaviour=event_behaviour.id))
 
     if event_behaviour:
+
         form_datetime.start_datetime.data = datetime.strptime(
             str(event_behaviour.start_datetime), '%Y-%m-%d %H:%M:%S')
         form_datetime.end_datetime.data = datetime.strptime(
@@ -1072,7 +1092,6 @@ def hijack_events(request):
             filter_by(id_event_behaviour=event_behaviour.id). \
             order_by(models.EventMonitoring.event_datetime).all()
 
-    if event_behaviour:
         dictionary['event_behaviour'] = True
 
     dictionary['realistic_analysis'] = realistic_analysis
