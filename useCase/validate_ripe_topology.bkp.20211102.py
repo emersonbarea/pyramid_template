@@ -298,7 +298,7 @@ class Parser(object):
             prefix_list = sorted(list(set(prefix_list)))
             origin_AS_list = sorted(list(set(origin_AS_list)))
 
-#            print(df_all_data)
+            print(df_all_data)
             #       current_time  monitored_AS             prefix  origin_AS                                route_path
             # 0       1203889500         16243    208.65.152.0/22      36561                      [3491, 23352, 36561]
             # 1       1203890433         16243    208.65.152.0/22      36561                      [3491, 23352, 36561]
@@ -406,277 +406,107 @@ class Parser(object):
 
             df_all_data = df_all_data.sort_values(by=['current_time', 'prefix', 'origin_AS', 'monitored_AS'])
 
-#            print(df_all_data)
+            print(df_all_data)
             return df_all_data
 
         except Exception as error:
             print(error)
 
-    def number_of_autonomous_system(self, all_data_log, all_data_json, current_time_list, prefix_list, origin_AS_list):
+    def number_of_autonomous_system(self, df_all_data, current_time_list, prefix_list, origin_AS_list):
         try:
-
-            # Index(['current_time', 'monitored_AS', 'prefix', 'origin_AS', 'route_path'], dtype='object')
-            # for data_log in all_data_log.iterrows():
-            #     print(data_log[1]['origin_AS'])
-
-            same_source_same_aspath_list = list()
-            same_source_different_aspath_list = list()
-            different_source_different_aspath_list = list()
-            shouldnt_have_been_announced_list = list()
-
-            for data_log in all_data_log.iterrows():
-                shouldnt_have_been_announced_list.append([data_log[1]['current_time'],
-                                                          data_log[1]['monitored_AS'],
-                                                          data_log[1]['prefix'],
-                                                          '',                           # expected source
-                                                          data_log[1]['origin_AS'],     # received source
-                                                          '',                           # expected as-path
-                                                          data_log[1]['route_path']])   # received as-path
-
-            for data_log in all_data_log.iterrows():
-
-                for data_json in all_data_json.iterrows():
-
-                    # same AS source and same AS-Path
-
-                    if data_log[1]['current_time'] == data_json[1]['current_time'] and \
-                            data_log[1]['monitored_AS'] == data_json[1]['monitored_AS']and \
-                            data_log[1]['prefix'] == data_json[1]['prefix']and \
-                            data_log[1]['origin_AS'] == data_json[1]['origin_AS']and \
-                            data_log[1]['route_path'] == data_json[1]['route_path']:
-                        same_source_same_aspath_list.append([data_log[1]['current_time'],
-                                                             data_log[1]['monitored_AS'],
-                                                             data_log[1]['prefix'],
-                                                             data_json[1]['origin_AS'],             # expected source
-                                                             data_log[1]['origin_AS'],              # received source
-                                                             data_json[1]['route_path'],            # expected as-path
-                                                             data_log[1]['route_path']])            # received as-path
-
-                        try:
-                            shouldnt_have_been_announced_list.remove([data_log[1]['current_time'],
-                                                                      data_log[1]['monitored_AS'],
-                                                                      data_log[1]['prefix'],
-                                                                      '',                           # expected source
-                                                                      data_log[1]['origin_AS'],     # received source
-                                                                      '',                           # expected as-path
-                                                                      data_log[1]['route_path']])   # received as-path
-                        except ValueError:
-                            pass
-
-                    # same AS source and different AS-Path
-
-                    if data_log[1]['current_time'] == data_json[1]['current_time'] and \
-                            data_log[1]['monitored_AS'] == data_json[1]['monitored_AS'] and \
-                            data_log[1]['prefix'] == data_json[1]['prefix'] and \
-                            data_log[1]['origin_AS'] == data_json[1]['origin_AS'] and \
-                            data_log[1]['route_path'] != data_json[1]['route_path']:
-                        same_source_different_aspath_list.append([data_log[1]['current_time'],
-                                                                  data_log[1]['monitored_AS'],
-                                                                  data_log[1]['prefix'],
-                                                                  data_json[1]['origin_AS'],        # expected source
-                                                                  data_log[1]['origin_AS'],         # received source
-                                                                  data_json[1]['route_path'],       # expected as-path
-                                                                  data_log[1]['route_path']])       # received as-path
-
-                        try:
-                            shouldnt_have_been_announced_list.remove([data_log[1]['current_time'],
-                                                                      data_log[1]['monitored_AS'],
-                                                                      data_log[1]['prefix'],
-                                                                      '',                           # expected source
-                                                                      data_log[1]['origin_AS'],     # received source
-                                                                      '',                           # expected as-path
-                                                                      data_log[1]['route_path']])   # received as-path
-                        except ValueError:
-                            pass
-
-                    # different AS source and different AS-Path
-
-                    if data_log[1]['current_time'] == data_json[1]['current_time'] and \
-                            data_log[1]['monitored_AS'] == data_json[1]['monitored_AS'] and \
-                            data_log[1]['prefix'] == data_json[1]['prefix'] and \
-                            data_log[1]['origin_AS'] != data_json[1]['origin_AS'] and \
-                            data_log[1]['route_path'] != data_json[1]['route_path']:
-                        different_source_different_aspath_list.append([data_log[1]['current_time'],
-                                                                       data_log[1]['monitored_AS'],
-                                                                       data_log[1]['prefix'],
-                                                                       data_json[1]['origin_AS'],   # expected source
-                                                                       data_log[1]['origin_AS'],    # received source
-                                                                       data_json[1]['route_path'],  # expected as-path
-                                                                       data_log[1]['route_path']])  # received as-path
-
-                        try:
-                            shouldnt_have_been_announced_list.remove([data_log[1]['current_time'],
-                                                                      data_log[1]['monitored_AS'],
-                                                                      data_log[1]['prefix'],
-                                                                      '',                           # expected source
-                                                                      data_log[1]['origin_AS'],     # received source
-                                                                      '',                           # expected as-path
-                                                                      data_log[1]['route_path']])   # received as-path
-                        except ValueError:
-                            pass
-
-            # print('\nsame_source_same_aspath_list: ', len(same_source_same_aspath_list))
-            # for same_source_same_aspath in same_source_same_aspath_list:
-            #    print(same_source_same_aspath)
-
-            # same_source_same_aspath_list: 14
-            # [1203895038, 1280, '208.65.153.0/24', 36561, 36561, [3549, 36561], [3549, 36561]]
-            # [1203895038, 1916, '208.65.153.0/24', 36561, 36561, [3549, 36561], [3549, 36561]]
-
-            # print('\nsame_source_different_aspath_list: ', len(same_source_different_aspath_list))
-            # for same_source_different_aspath in same_source_different_aspath_list:
-            #     print(same_source_different_aspath)
-
-            # same_source_different_aspath_list: 20
-            # [1203895038, 1103, '208.65.153.0/24', 36561, 36561, [3549, 36561], [174, 36561]]
-            # [1203895038, 1853, '208.65.153.0/24', 36561, 36561, [3356, 3549, 36561], [174, 36561]]
-
-            # print('\ndifferent_source_different_aspath_list: ', len(different_source_different_aspath_list))
-            # for different_source_different_aspath in different_source_different_aspath_list:
-            #    print(different_source_different_aspath)
-
-            # different_source_different_aspath_list: 15
-            # [1203895038, 3333, '208.65.153.0/24', 17557, 36561, [12859, 3491, 17557], [3356, 36561]]
-            # [1203895038, 4608, '208.65.153.0/24', 17557, 36561, [1221, 4637, 3491, 17557], [1221, 4637, 36561]]
-
-            all_same_source_list = same_source_same_aspath_list + same_source_different_aspath_list
-
-            # print('\nsame_as_list: ', len(all_same_source_list))
-            # for all_same_source in all_same_source_list:
-            #    print(all_same_source)
-
-            # all_same_source_list: 34
-            # [1203895038, 1280, '208.65.153.0/24', 36561, 36561, [3549, 36561], [3549, 36561]]
-            # [1203895038, 39792, '208.65.153.0/24', 36561, 36561, [8359, 3549, 36561], [174, 36561]]
-
-            # print('\nshouldnt_have_been_announced_list: ', len(shouldnt_have_been_announced_list))
-            # for shouldnt_have_been_announced in shouldnt_have_been_announced_list:
-            #     print(shouldnt_have_been_announced)
-
-            df_same_source_same_aspath = pd.DataFrame(data=same_source_same_aspath_list,
-                                                      columns=['current_time',
-                                                               'monitored_AS',
-                                                               'prefix',
-                                                               'expected_source',
-                                                               'received_source',
-                                                               'expected_as-path',
-                                                               'received_as-path'])
-            print('\n\n-------------------------------------------\n\ndf_same_source_same_aspath:\n')
-            print(df_same_source_same_aspath)
-
-            df_same_source_different_aspath = pd.DataFrame(data=same_source_different_aspath_list,
-                                                           columns=['current_time',
-                                                                    'monitored_AS',
-                                                                    'prefix',
-                                                                    'expected_source',
-                                                                    'received_source',
-                                                                    'expected_as-path',
-                                                                    'received_as-path'])
-            print('\n\n-------------------------------------------\n\ndf_same_source_different_aspath:\n')
-            print(df_same_source_different_aspath)
-
-            df_all_same_source = pd.DataFrame(data=all_same_source_list,
-                                              columns=['current_time',
-                                                       'monitored_AS',
-                                                       'prefix',
-                                                       'expected_source',
-                                                       'received_source',
-                                                       'expected_as-path',
-                                                       'received_as-path'])
-            print('\n\n#############################################\n\ndf_all_same_source:\n')
-            print(df_all_same_source)
-
-            df_different_source_different_aspath = pd.DataFrame(data=different_source_different_aspath_list,
-                                                                columns=['current_time',
-                                                                         'monitored_AS',
-                                                                         'prefix',
-                                                                         'expected_source',
-                                                                         'received_source',
-                                                                         'expected_as-path',
-                                                                         'received_as-path'])
-            print('\n\n-------------------------------------------\n\ndf_different_source_different_aspath:\n')
-            print(df_different_source_different_aspath)
-
-            df_shouldnt_have_been_announced = pd.DataFrame(data=shouldnt_have_been_announced_list,
-                                                           columns=['current_time',
-                                                                    'monitored_AS',
-                                                                    'prefix',
-                                                                    'expected_source',
-                                                                    'received_source',
-                                                                    'expected_as-path',
-                                                                    'received_as-path'])
-            print('\n\n-------------------------------------------\n\ndf_shouldnt_have_been_announced:\n')
-            print(df_shouldnt_have_been_announced)
-
-            print('\n\n\n\n\n\n\n\n')
-
-            # count everything
-
-            df_same_source_same_aspath_groupby = df_same_source_same_aspath[['current_time',
-                                                                             'prefix',
-                                                                             'expected_source',
-                                                                             'received_source']].groupby(['current_time',
-                                                                                                          'prefix',
-                                                                                                          'expected_source']).agg(['count'])
-            df_same_source_same_aspath_groupby.columns = ['announcements']
-            df_same_source_same_aspath_groupby.reset_index(inplace=True)
-            df_same_source_same_aspath_groupby.sort_values(by=['current_time', 'prefix', 'expected_source'])
-            print('\n\n-------------------------------------------\n\ndf_same_source_same_aspath_groupby:\n')
-            print(df_same_source_same_aspath_groupby)
-
-            df_same_source_different_aspath_groupby = df_same_source_different_aspath[['current_time',
-                                                                                       'prefix',
-                                                                                       'expected_source',
-                                                                                       'received_source']].groupby(['current_time',
-                                                                                                                    'prefix',
-                                                                                                                    'expected_source']).agg(['count'])
-            df_same_source_different_aspath_groupby.columns = ['announcements']
-            df_same_source_different_aspath_groupby.reset_index(inplace=True)
-            df_same_source_different_aspath_groupby.sort_values(by=['current_time', 'prefix', 'expected_source'])
-            print('\n\n-------------------------------------------\n\ndf_same_source_different_aspath_groupby:\n')
-            print(df_same_source_different_aspath_groupby)
-
-            df_all_same_source_groupby = df_all_same_source[['current_time',
+            df_groupby = df_all_data[['current_time',
+                                      'monitored_AS',
+                                      'prefix',
+                                      'origin_AS']].groupby(['current_time',
                                                              'prefix',
-                                                             'expected_source',
-                                                             'received_source',
-                                                             'expected_as-path']].groupby(['current_time',
-                                                                                           'prefix',
-                                                                                           'expected_source',
-                                                                                           'received_source']).agg(['count'])
-            df_all_same_source_groupby.columns = ['announcements']
-            df_all_same_source_groupby.reset_index(inplace=True)
-            df_all_same_source_groupby.sort_values(by=['current_time', 'prefix', 'expected_source', 'received_source'])
-            print('\n\n#############################################\n\ndf_all_same_source_groupby:\n')
-            print(df_all_same_source_groupby)
+                                                             'origin_AS']).agg(['count'])
+            df_groupby.columns = ['number_of_AS']
 
-            df_different_source_different_aspath_groupby = df_different_source_different_aspath[['current_time',
-                                                                                                 'prefix',
-                                                                                                 'expected_source',
-                                                                                                 'received_source',
-                                                                                                 'expected_as-path']].groupby(['current_time',
-                                                                                                                               'prefix',
-                                                                                                                               'expected_source',
-                                                                                                                               'received_source']).agg(['count'])
-            df_different_source_different_aspath_groupby.columns = ['announcements']
-            df_different_source_different_aspath_groupby.reset_index(inplace=True)
-            df_different_source_different_aspath_groupby.sort_values(by=['current_time', 'prefix', 'expected_source', 'received_source'])
-            print('\n\n-------------------------------------------\n\ndf_different_source_different_aspath_groupby:\n')
-            print(df_different_source_different_aspath_groupby)
+            print(df_groupby)
+            # current_time prefix            origin_AS           number_of_AS
+            # 1203889500   208.65.152.0/22   36561               143
+            # 1203890433   208.65.152.0/22   36561               143
+            #              208.65.153.0/24   17557               143
+            # 1203891366   208.65.152.0/22   36561               143
 
-            df_shouldnt_have_been_announced_groupby = df_shouldnt_have_been_announced[['current_time',
-                                                                                       'prefix',
-                                                                                       'expected_source',
-                                                                                       'received_source',
-                                                                                       'expected_as-path']].groupby(['current_time',
-                                                                                                                     'prefix',
-                                                                                                                     'expected_source',
-                                                                                                                     'received_source']).agg(['count'])
-            df_shouldnt_have_been_announced_groupby.columns = ['announcements']
-            df_shouldnt_have_been_announced_groupby.reset_index(inplace=True)
-            df_shouldnt_have_been_announced_groupby.sort_values(by=['current_time', 'prefix', 'expected_source', 'received_source'])
-            print('\n\n-------------------------------------------\n\ndf_shouldnt_have_been_announced_groupby:\n')
-            print(df_shouldnt_have_been_announced_groupby)
+            row = list()
+            for current_time in current_time_list:
+                for prefix in prefix_list:
+                    for origin_AS in origin_AS_list:
+                        if df_groupby.query("current_time == '%s' and prefix == '%s' and origin_AS == '%s'" %
+                                            (current_time, prefix, origin_AS)).empty:
+                            row.append([current_time, prefix, origin_AS, 0])
+            df_groupby_temp = pd.DataFrame(data=row, columns=['current_time',
+                                                              'prefix',
+                                                              'origin_AS',
+                                                              'number_of_AS'])
+
+            df_groupby.reset_index(inplace=True)
+            df_number_of_autonomous_system = pd.concat([df_groupby, df_groupby_temp], ignore_index=True).\
+                sort_values(by=['current_time', 'prefix', 'origin_AS'])
+
+            row = list()
+            for current_time in current_time_list:
+                for prefix in prefix_list:
+                    sum_of_AS = 0
+                    for row1 in df_number_of_autonomous_system.iterrows():
+                        if current_time == row1[1][0] and prefix == row1[1][1]:
+                            sum_of_AS = sum_of_AS + row1[1][3]
+                    row.append([current_time, prefix, 0, len(self.sources) - sum_of_AS])
+
+            df_groupby_temp = pd.DataFrame(data=row, columns=['current_time',
+                                                              'prefix',
+                                                              'origin_AS',
+                                                              'number_of_AS'])
+            df_number_of_autonomous_system = pd.concat([df_number_of_autonomous_system, df_groupby_temp],
+                                                       ignore_index=True).set_index('current_time').\
+                sort_values(by=['current_time', 'prefix', 'origin_AS'])
+
+            # print(df_number_of_autonomous_system)
+            # current_time             prefix  origin_AS  number_of_AS
+            # 1203897897      208.65.152.0/22          0             0
+            # 1203897897      208.65.152.0/22      17557             0
+            # 1203897897      208.65.152.0/22      36561           143
+            # 1203897897      208.65.153.0/24          0             0
+            # 1203897897      208.65.153.0/24      17557            34
+            # 1203897897      208.65.153.0/24      36561           109
+            # 1203897897      208.65.153.0/25          0             0
+            # 1203897897      208.65.153.0/25      17557             0
+            # 1203897897      208.65.153.0/25      36561           143
+            # 1203897897    208.65.153.128/25          0            37
+            # 1203897897    208.65.153.128/25      17557             0
+            # 1203897897    208.65.153.128/25      36561           106
+
+            result = list()
+
+            origin_AS_list_temp = copy.copy(origin_AS_list)
+            origin_AS_list_temp.insert(0, 0)
+
+            for prefix in prefix_list:
+                for origin_AS in origin_AS_list_temp:
+                    result_temp = list()
+                    result_temp.append(prefix)
+                    result_temp.append(origin_AS)
+                    for current_time in current_time_list:
+                        for row in df_number_of_autonomous_system.iterrows():
+                            if row[0] == current_time and row[1][0] == prefix and row[1][1] == origin_AS:
+                                result_temp.append(row[1][2])
+                    result.append(result_temp)
+
+            for r in result:
+                print(r)
+            # ['208.65.152.0/22', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.152.0/22', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.152.0/22', 36561, 143, 143, 143, 143, 143, 143, 143, 143, 143, 143]
+            # ['208.65.153.0/24', 0, 143, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.0/24', 17557, 0, 143, 143, 143, 143, 143, 64, 64, 64, 34]
+            # ['208.65.153.0/24', 36561, 0, 0, 0, 0, 0, 0, 79, 79, 79, 109]
+            # ['208.65.153.0/25', 0, 143, 143, 143, 143, 143, 143, 143, 0, 0, 0]
+            # ['208.65.153.0/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.0/25', 36561, 0, 0, 0, 0, 0, 0, 0, 143, 143, 143]
+            # ['208.65.153.128/25', 0, 143, 143, 143, 143, 143, 143, 143, 40, 40, 37]
+            # ['208.65.153.128/25', 17557, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            # ['208.65.153.128/25', 36561, 0, 0, 0, 0, 0, 0, 0, 103, 103, 106]
 
         except Exception as error:
             print(error)
@@ -785,37 +615,40 @@ def main(argv=sys.argv[1:]):
         # from log files
 
         print('\n')
-#        print('All data (from log files)')
-#        print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
+        print('All data (from log files)')
+        print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
         all_data_log, current_time, prefix, origin_AS = parser.all_data_from_log_file(data)
+
+        print('\n')
+        print('Number of AS per origin AS per time slot:')
+        print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
+        parser.number_of_autonomous_system(all_data_log, current_time, prefix, origin_AS)
 
         # from json file
 
-#        print('\n')
-#        print('All data (from json file)')
-#        print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
+        print('\n')
+        print('All data (from json file)')
+        print('\ncurrent_time,monitored_AS,prefix,origin_AS,[route_path]\n')
         all_data_json = parser.all_data_from_json_file(data, current_time)
 
-        # analyzing the information
+        print('\n')
+        print('Number of AS per origin AS per time slot:')
+        print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
+        parser.number_of_autonomous_system(all_data_json, current_time, prefix, origin_AS)
 
-#        print('\n')
-#        print('Number of AS per origin AS per time slot:')
-#        print('\ncurrent_time,prefix,origin_AS,number_of_AS\n')
-        parser.number_of_autonomous_system(all_data_log, all_data_json, current_time, prefix, origin_AS)
+        print('\n')
+        print('Equal paths in json and log (by current time, monitored AS and prefix):')
+        equal_paths, different_paths = parser.equal_paths(all_data_log, all_data_json, current_time, prefix)
 
-#        print('\n')
-#        print('Equal paths in json and log (by current time, monitored AS and prefix):')
-#        equal_paths, different_paths = parser.equal_paths(all_data_log, all_data_json, current_time, prefix)
+        print('\nEqual Paths:\n')
+        print('\ncurrent_time,prefix,log_path - json_path\n')
+        for equal_path in equal_paths:
+            print(equal_path)
 
-#        print('\nEqual Paths:\n')
-#        print('\ncurrent_time,prefix,log_path - json_path\n')
-#        for equal_path in equal_paths:
-#            print(equal_path)
-
-#        print('\nDifferent Paths:\n')
-#        print('\ncurrent_time,prefix,log_path - json_path\n')
-#        for different_path in different_paths:
-#            print(different_path)
+        print('\nDifferent Paths:\n')
+        print('\ncurrent_time,prefix,log_path - json_path\n')
+        for different_path in different_paths:
+            print(different_path)
 
     except Exception as error:
         print(error)
