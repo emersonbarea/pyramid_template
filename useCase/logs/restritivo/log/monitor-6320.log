@@ -1,0 +1,297 @@
+
+-->current_time:1203889500
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+
+Displayed  1 out of 1 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203890433
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*> 208.65.153.0     1.0.3.86                               0 3549 3491 17557 i
+
+Displayed  2 out of 2 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203891366
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*> 208.65.153.0     1.0.3.86                               0 3549 3491 17557 i
+
+Displayed  2 out of 2 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203892299
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*> 208.65.153.0     1.0.3.86                               0 3549 3491 17557 i
+
+Displayed  2 out of 2 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203893232
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*> 208.65.153.0     1.0.3.86                               0 3549 3491 17557 i
+
+Displayed  2 out of 2 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203894165
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*> 208.65.153.0     1.0.3.86                               0 3549 3491 17557 i
+
+Displayed  2 out of 2 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203895038
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+
+Displayed  1 out of 1 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203895971
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+
+Displayed  1 out of 1 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203896964
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+
+Displayed  1 out of 1 total prefixes
+AS6320# exit
+Connection closed by foreign host.
+
+-->current_time:1203897897
+spawn telnet 0 bgpd
+Trying 0.0.0.0...
+Connected to 0.
+Escape character is '^]'.
+
+Hello, this is Quagga (version 1.2.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+
+User Access Verification
+
+Password: 
+AS6320> en
+Password: 
+AS6320# terminal length 0
+AS6320# show ip bgp
+BGP table version is 0, local router ID is 195.69.144.178
+Status codes: s suppressed, d damped, h history, * valid, > best, = multipath,
+              i internal, r RIB-failure, S Stale, R Removed
+Origin codes: i - IGP, e - EGP, ? - incomplete
+
+   Network          Next Hop            Metric LocPrf Weight Path
+*> 208.65.152.0/22  1.0.3.86                               0 3549 36561 i
+*  208.65.153.0     1.0.4.78                               0 3491 17557 17557 i
+*>                  1.0.3.86                               0 3549 36561 i
+
+Displayed  2 out of 3 total prefixes
+AS6320# exit
+Connection closed by foreign host.

@@ -652,7 +652,7 @@ def main(argv=sys.argv[1:]):
 
     except Exception as error:
         print(error)
-        print('Usage: ./validate_ripe_topology.py <logs directory> <ripe_json_file.MiniSecBGP>')
+        print('Usage: ./validate_scenario.py <logs directory> <ripe_json_file.MiniSecBGP>')
 
 
 if __name__ == '__main__':

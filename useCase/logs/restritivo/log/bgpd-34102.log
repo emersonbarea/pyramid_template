@@ -1,0 +1,1857 @@
+2021/08/22 18:09:04.325832 BGP: BGPd 1.2.4 starting: vty@2605, bgp@<all>:179 pid 19006
+2021/08/22 18:09:04.344469 BGP: Zebra rcvd: router id update 1.0.2.213/32
+2021/08/22 18:09:04.344509 BGP: Zebra rcvd: interface add 34102-3216
+2021/08/22 18:09:04.344532 BGP: Zebra rcvd: interface 34102-3216 address add 1.0.2.213/30
+2021/08/22 18:09:04.344559 BGP: Zebra rcvd: interface 34102-3216 address add fe80::b8b1:c6ff:fe5f:f715/64
+2021/08/22 18:09:04.344576 BGP: Zebra rcvd: interface add erspan0
+2021/08/22 18:09:04.344590 BGP: Zebra rcvd: interface add gre0
+2021/08/22 18:09:04.344604 BGP: Zebra rcvd: interface add gretap0
+2021/08/22 18:09:04.344617 BGP: Zebra rcvd: interface add lo
+2021/08/22 18:09:04.344631 BGP: Zebra rcvd: interface lo address add 127.0.0.1/8
+2021/08/22 18:09:04.344645 BGP: Zebra rcvd: interface lo address add ::1/128
+2021/08/22 18:09:04.344659 BGP: Zebra rcvd: interface lo address add 127.0.0.1/32
+2021/08/22 18:09:05.326717 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:09:05.326770 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:09:05.326912 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:09:05.326943 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:09:05.326948 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:09:05.326973 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:09:05.326988 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:09:05.326992 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:09:05.326996 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:09:05.327010 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:09:05.327037 BGP: 1.0.2.214 [Event] BGP connection closed fd 12
+2021/08/22 18:09:05.327097 BGP: 1.0.2.214 went from OpenSent to Active
+2021/08/22 18:09:05.337095 BGP: [Event] BGP connection from host 1.0.2.214:57512
+2021/08/22 18:09:05.337106 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:09:05.337216 BGP: 1.0.2.214 passive open
+2021/08/22 18:09:05.337219 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:09:05.337229 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:09:05.337250 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:09:05.337252 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:09:05.337255 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:09:05.337257 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:09:05.337259 BGP: 1.0.2.214:57512 [Event] Transfer accept BGP peer to real (state Active)
+2021/08/22 18:09:05.337273 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:09:05.337275 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:09:05.337277 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:09:05.337279 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:09:05.337281 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:09:05.337284 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:09:05.337286 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:09:05.337289 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:09:05.337291 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:09:05.337293 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:09:05.337295 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:09:05.337297 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:09:05.337299 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:09:05.337300 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:09:05.337309 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:09:05.337311 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:09:05.337313 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:09:05.337315 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:09:05.337317 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:09:05.337318 BGP: 1.0.2.214 Peer has restarted. Restart Time : 120
+2021/08/22 18:09:05.337327 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:09:05.337353 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:09:05.337355 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:09:05.337357 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:09:05.337402 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:09:05.337405 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:09:05.337696 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:09:05.337738 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:09:05.337741 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:09:05.337744 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:09:05.337750 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:09:06.338285 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:09:06.338315 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:09:09.340160 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 174 36561
+2021/08/22 18:09:09.340199 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:09:09.340245 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:09:09.340248 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:09:09.340339 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:09:09.340353 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:09:09.390383 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:09:12.340495 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 18:09:12.340526 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:09:12.340534 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:09:12.390639 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:03.369931 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 174 36561
+2021/08/22 18:10:03.369998 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:03.370013 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:03.420125 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:05.338602 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:10:05.338681 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:10:06.368619 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:10:06.368666 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:06.368674 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:06.418782 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:18.369958 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 36561
+2021/08/22 18:10:18.369995 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:18.370007 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:18.420103 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:24.371718 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 18:10:24.371785 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:24.371804 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:24.421973 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:27.372573 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 36561
+2021/08/22 18:10:27.372602 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:27.372611 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:27.422713 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:28.274082 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 18:10:28.274122 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:10:28.274133 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 18:10:28.274165 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:10:28.284227 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:10:28.334301 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:10:28.334347 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:10:28.334353 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:10:29.285253 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:29.285364 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:10:29.285508 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:10:29.285537 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:10:29.285547 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:10:29.285576 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:10:29.285642 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:10:29.285683 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:10:29.285689 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:10:29.285707 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:10:29.285726 BGP: 1.0.2.214 [Event] BGP connection closed fd 12
+2021/08/22 18:10:29.285805 BGP: 1.0.2.214 went from OpenSent to Active
+2021/08/22 18:10:30.275784 BGP: [Event] BGP connection from host 1.0.2.214:60658
+2021/08/22 18:10:30.275943 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:10:30.276070 BGP: 1.0.2.214 passive open
+2021/08/22 18:10:30.276076 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:10:30.276095 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:10:30.276106 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:10:30.276112 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:10:30.276119 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:10:30.276123 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:10:30.276133 BGP: 1.0.2.214:60658 [Event] Transfer accept BGP peer to real (state Active)
+2021/08/22 18:10:30.276152 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:10:30.276157 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:10:30.276167 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:10:30.276275 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:10:30.276281 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:10:30.276287 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:10:30.276326 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:10:30.276332 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:10:30.276339 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:10:30.276345 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:10:30.276366 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:10:30.276376 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:10:30.276382 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:10:30.276385 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:10:30.276395 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:10:30.276401 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:10:30.276406 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:10:30.276415 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:10:30.276420 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:10:30.276424 BGP: 1.0.2.214 Peer has restarted. Restart Time : 120
+2021/08/22 18:10:30.276439 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:10:30.276457 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:10:30.276466 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:10:30.276472 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:10:30.276504 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:10:30.276514 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:10:30.276707 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:10:30.276723 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:10:30.276728 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:10:30.276735 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:10:30.276746 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:10:31.277756 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:10:31.277919 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 18:10:31.277935 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:31.277951 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:31.277954 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:10:31.277971 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:10:31.278066 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:10:31.278079 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:10:31.328058 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:34.278479 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 36561
+2021/08/22 18:10:34.278533 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:34.278540 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:34.328641 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:39.262671 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:10:39.312799 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:10:39.312840 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:10:39.312845 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:10:46.280482 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:10:46.280533 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:46.280548 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:46.280562 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:10:46.280714 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:10:46.280732 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:10:46.330793 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:10:46.501203 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:10:46.551361 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:10:46.551447 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:10:46.551457 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:10:52.281366 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 36561
+2021/08/22 18:10:52.281405 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:10:52.281419 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:10:52.281433 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:10:52.281541 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:10:52.281555 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:10:52.331540 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:01.284572 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:11:01.284630 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:01.284646 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:01.334863 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:04.284535 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3491 23352 36561
+2021/08/22 18:11:04.284583 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:04.284600 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:04.334694 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:16.290301 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:11:16.290326 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:16.290333 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:16.340417 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:28.295603 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 12989 36561
+2021/08/22 18:11:28.295644 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:28.295651 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:28.345733 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:30.277247 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:11:30.277392 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:11:33.916454 BGP: Vty connection from 127.0.0.1
+2021/08/22 18:11:34.018247 BGP: vty[13]@127.0.0.1> enable
+2021/08/22 18:11:34.119814 BGP: vty[13]@127.0.0.1# configure terminal
+2021/08/22 18:11:34.170870 BGP: vty[13]@127.0.0.1(config)# ip prefix-list pl-out-deny-all-34102-3216 deny any
+2021/08/22 18:11:34.221687 BGP: vty[13]@127.0.0.1(config)# ip as-path access-list ap-out-deny-all-34102-3216 deny .*
+2021/08/22 18:11:34.272665 BGP: vty[13]@127.0.0.1(config)# route-map out-34102-3216 permit 1
+2021/08/22 18:11:34.296384 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:11:34.296416 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:34.296424 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:34.323429 BGP: vty[13]@127.0.0.1(config-route-map)# match ip address prefix-list pl-out-deny-all-34102-3216
+2021/08/22 18:11:34.346526 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:34.374169 BGP: vty[13]@127.0.0.1(config-route-map)# match as-path ap-out-deny-all-34102-3216
+2021/08/22 18:11:34.425028 BGP: vty[13]@127.0.0.1(config-route-map)# exit
+2021/08/22 18:11:34.475877 BGP: vty[13]@127.0.0.1(config)# router bgp 34102
+2021/08/22 18:11:34.526635 BGP: vty[13]@127.0.0.1(config-router)# neighbor 1.0.2.214 route-map out-34102-3216 out
+2021/08/22 18:11:34.578015 BGP: vty[13]@127.0.0.1(config-router)# exit
+2021/08/22 18:11:34.629378 BGP: vty[13]@127.0.0.1(config)# exit
+2021/08/22 18:11:34.680520 BGP: vty[13]@127.0.0.1# clear bgp *
+2021/08/22 18:11:34.680922 BGP: %NOTIFICATION: sent to neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:11:34.680930 BGP: 1.0.2.214 send message type 3, length (incl. header) 21
+2021/08/22 18:11:34.680933 BGP: Notification sent to neighbor 1.0.2.214:0: User reset
+2021/08/22 18:11:34.681007 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down User reset
+2021/08/22 18:11:34.681045 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:11:34.691147 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:11:34.741271 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:11:34.741305 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:11:34.741310 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:11:35.681920 BGP: [Event] BGP connection from host 1.0.2.214:36468
+2021/08/22 18:11:35.681956 BGP: [Event] BGP connection IP address 1.0.2.214 is Idle state
+2021/08/22 18:11:37.692298 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:37.692352 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:11:37.692433 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:11:37.692457 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:11:37.692462 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:11:37.692476 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:11:37.692485 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:11:37.692488 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:11:37.692490 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:11:37.692498 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:11:37.693566 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:11:37.693582 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, outbound connection
+2021/08/22 18:11:37.693589 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:11:37.693593 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:11:37.693597 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:11:37.693603 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:11:37.693607 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:11:37.693611 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:11:37.693615 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:11:37.693619 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:11:37.693623 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:11:37.693627 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:11:37.693631 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:11:37.693635 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:11:37.693638 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:11:37.693642 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:11:37.693646 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:11:37.693650 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:11:37.693653 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:11:37.693657 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:11:37.693660 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:11:37.693664 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:11:37.693668 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 18:11:37.693697 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:11:37.693703 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:11:37.693714 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:11:37.693724 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:11:37.693728 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:11:37.693733 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:11:37.693911 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:11:38.694112 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:11:38.694141 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:38.694147 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:38.694165 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:11:38.694171 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:11:38.744291 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:44.694625 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 12989 36561
+2021/08/22 18:11:44.694653 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:44.694659 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:44.744780 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:47.694850 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 7018 1239 36561
+2021/08/22 18:11:47.694878 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:47.694887 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:47.744971 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:50.695097 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 1239 36561
+2021/08/22 18:11:50.695130 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:50.695138 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:50.745218 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:53.695687 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3491 4637 36561
+2021/08/22 18:11:53.695899 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:53.695964 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:53.746228 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:11:56.695719 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:11:56.696002 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:11:56.696147 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:11:56.746489 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:08.696654 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 174 36561
+2021/08/22 18:12:08.696692 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:08.696703 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:08.746847 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:11.696887 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 174 36561
+2021/08/22 18:12:11.696917 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:11.696925 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:11.747053 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:14.697170 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 2497 36561
+2021/08/22 18:12:14.697198 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:14.697206 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:14.747307 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:17.697435 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 12989 3491 4637 36561
+2021/08/22 18:12:17.697466 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:17.697474 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:17.747598 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:20.697698 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8434 174 36561
+2021/08/22 18:12:20.697733 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:20.697742 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:20.747856 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:23.697952 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 1239 36561
+2021/08/22 18:12:23.697983 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:23.697992 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:23.748106 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:27.747179 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:12:27.797519 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:12:27.797544 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:12:32.699182 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:12:32.699220 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:32.699226 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:32.749345 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:37.695305 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:12:37.695337 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:12:38.699987 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 4637 36561
+2021/08/22 18:12:38.700025 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:38.700035 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:38.750192 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:50.701806 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 25462 36561
+2021/08/22 18:12:50.701847 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:50.701854 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:50.751936 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:53.702146 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 2497 36561
+2021/08/22 18:12:53.702170 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:53.702179 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:53.752273 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:12:59.703145 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 6667 3549 4637 36561
+2021/08/22 18:12:59.703215 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:12:59.703224 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:12:59.753326 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:02.703555 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:13:02.703598 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:02.703611 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:02.753741 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:14.705374 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:13:14.705405 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:14.705427 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:14.755539 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:17.705774 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:13:17.705833 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:17.705887 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:17.755989 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:23.706621 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:13:23.706654 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:23.706663 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:23.756828 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:35.708328 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:13:35.708361 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:35.708370 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:35.758527 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:37.013633 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 18:13:37.013663 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:13:37.013679 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 18:13:37.013717 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:13:37.023823 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:13:37.073910 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:13:37.073974 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:13:38.024196 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:38.024252 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:13:38.024367 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:13:38.024410 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:13:38.024420 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:13:38.024423 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:13:38.024427 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:13:38.024489 BGP: 1.0.2.214 [Event] BGP connection closed fd 12
+2021/08/22 18:13:38.024526 BGP: 1.0.2.214 went from OpenSent to Active
+2021/08/22 18:13:40.015390 BGP: [Event] BGP connection from host 1.0.2.214:44368
+2021/08/22 18:13:40.015415 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:13:40.015497 BGP: 1.0.2.214 passive open
+2021/08/22 18:13:40.015503 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:13:40.015545 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:13:40.015552 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:13:40.015557 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:13:40.015561 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:13:40.015593 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:13:40.015598 BGP: 1.0.2.214:44368 [Event] Transfer accept BGP peer to real (state Active)
+2021/08/22 18:13:40.015665 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:13:40.015670 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:13:40.015673 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:13:40.015676 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:13:40.015679 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:13:40.015722 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:13:40.015724 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:13:40.015727 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:13:40.015730 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:13:40.015732 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:13:40.015734 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:13:40.015736 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:13:40.015738 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:13:40.015740 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:13:40.015742 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:13:40.015744 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:13:40.015746 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:13:40.015749 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:13:40.015751 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:13:40.015753 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 18:13:40.015781 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:13:40.015797 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:13:40.015801 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:13:40.015806 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:13:40.015831 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:13:40.015835 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:13:40.016092 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:13:40.016105 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:13:40.016109 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:13:40.016114 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:13:40.016121 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:13:41.016293 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:13:41.016538 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:13:44.017622 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:13:44.017652 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:44.017667 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:44.017671 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:13:44.017789 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:13:44.017822 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:13:44.067845 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:45.660654 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:13:45.710780 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:13:45.710827 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:13:45.710832 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:13:50.018873 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 16034 16150 36561
+2021/08/22 18:13:50.018918 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:50.018935 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:50.018940 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:13:50.019091 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:13:50.019112 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:13:50.069043 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:53.019431 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:13:53.019460 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:53.019468 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:53.069575 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:13:59.020496 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:13:59.020532 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:13:59.020544 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:13:59.070642 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:02.021253 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:14:02.021438 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:02.021521 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:02.071851 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:08.022214 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:14:08.022243 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:08.022252 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:08.072352 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:14.023389 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 174 36561
+2021/08/22 18:14:14.023496 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:14.023604 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:14.073748 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:14.754632 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:14:14.804934 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:14:14.805108 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:14:14.805120 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:14:29.027120 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8881 174 36561
+2021/08/22 18:14:29.027166 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:29.027196 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:29.027205 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:14:29.027325 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:14:29.027405 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:14:29.077411 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:32.027948 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8434 174 36561
+2021/08/22 18:14:32.028003 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:32.028010 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:32.078111 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:35.028429 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:14:35.028464 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:35.028473 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:35.078640 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:38.028620 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 5511 3549 4637 36561
+2021/08/22 18:14:38.028650 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:38.028659 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:38.078744 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:40.017124 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:14:40.017199 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:14:41.029691 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8881 174 36561
+2021/08/22 18:14:41.029721 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:41.029728 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:41.079907 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:50.030530 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8881 3491 4637 36561
+2021/08/22 18:14:50.030557 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:50.030565 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:50.080659 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:14:56.031545 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 2497 36561
+2021/08/22 18:14:56.031576 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:14:56.031586 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:14:56.081680 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:15:19.964457 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:15:20.014565 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:15:20.014618 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:15:20.014623 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:15:40.018236 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:15:40.018309 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:15:41.036017 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 3491 3327 174 36561
+2021/08/22 18:15:41.036046 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:15:41.036063 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:15:41.036067 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:15:41.036196 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:15:41.036216 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:15:41.086175 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:15:44.036471 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:15:44.036524 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:15:44.036532 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:15:44.086626 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:15:56.040049 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3356 8881 174 36561
+2021/08/22 18:15:56.040098 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:15:56.040106 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:15:56.090234 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:16:02.041461 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 1273 3561 3549 4637 36561
+2021/08/22 18:16:02.041488 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:16:02.041496 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:16:02.091605 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:16:13.057343 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:16:13.107471 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:16:13.107551 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:16:13.107556 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:16:40.018351 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:16:40.018404 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:16:45.104065 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 18:16:45.104111 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:16:45.104127 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 18:16:45.104167 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:16:45.104195 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:16:48.104628 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:16:48.104678 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:16:48.104748 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:16:48.104772 BGP: [Event] BGP connection from host 1.0.2.214:57336
+2021/08/22 18:16:48.104780 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:16:48.104856 BGP: 1.0.2.214 passive open
+2021/08/22 18:16:48.104863 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:16:48.104879 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:16:48.104884 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:16:48.104903 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:16:48.104912 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:16:48.104915 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:16:48.104918 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:16:48.104927 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:16:48.104963 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:16:48.104973 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:16:48.104977 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:16:48.104982 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:16:48.104985 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:16:48.104990 BGP: 1.0.2.214 Collision resolution, local ID higher, closing inbound
+2021/08/22 18:16:48.104996 BGP: %NOTIFICATION: sent to neighbor 1.0.2.214 6/7 (Cease/Connection collision resolution) 0 bytes 
+2021/08/22 18:16:48.105001 BGP: 1.0.2.214 send message type 3, length (incl. header) 21
+2021/08/22 18:16:48.105005 BGP: Notification sent to neighbor 1.0.2.214:57336: type 6/7
+2021/08/22 18:16:48.105030 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:16:48.105065 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:16:48.105070 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:16:48.105074 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:16:48.105243 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:16:48.105252 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, outbound connection
+2021/08/22 18:16:48.105256 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:16:48.105259 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:16:48.105262 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:16:48.105264 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:16:48.105267 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:16:48.105269 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:16:48.105272 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:16:48.105274 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:16:48.105277 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:16:48.105280 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:16:48.105283 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:16:48.105287 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:16:48.105306 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:16:48.105309 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:16:48.105312 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:16:48.105314 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:16:48.105316 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:16:48.105318 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:16:48.105321 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:16:48.105323 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:16:48.105325 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 18:16:48.105339 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:16:48.105343 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:16:48.105349 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:16:48.105356 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:16:48.105358 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:16:48.105363 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:16:48.105567 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:16:49.106090 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:16:49.106234 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:16:58.015749 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 18:16:58.015774 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:16:58.015785 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 18:16:58.015816 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:16:58.015833 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:17:00.016344 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:17:00.016465 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:17:00.016634 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:17:00.016665 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:17:00.016669 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:17:00.016707 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:17:00.016725 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:17:00.016731 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:17:00.016737 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:17:00.016761 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:17:00.016869 BGP: [Event] BGP connection from host 1.0.2.214:57904
+2021/08/22 18:17:00.016884 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:17:00.017002 BGP: 1.0.2.214 passive open
+2021/08/22 18:17:00.017009 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:17:00.017445 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:17:00.017458 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:17:00.017462 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:17:00.017466 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:17:00.017469 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:17:00.017473 BGP: 1.0.2.214 Collision resolution, local ID higher, closing inbound
+2021/08/22 18:17:00.017478 BGP: %NOTIFICATION: sent to neighbor 1.0.2.214 6/7 (Cease/Connection collision resolution) 0 bytes 
+2021/08/22 18:17:00.017482 BGP: 1.0.2.214 send message type 3, length (incl. header) 21
+2021/08/22 18:17:00.017486 BGP: Notification sent to neighbor 1.0.2.214:57904: type 6/7
+2021/08/22 18:17:00.017532 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:17:00.017553 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:17:00.017557 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:17:00.017560 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:17:00.017732 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:17:00.017741 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, outbound connection
+2021/08/22 18:17:00.017745 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:17:00.017748 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:17:00.017750 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:17:00.017753 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:17:00.017755 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:17:00.017758 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:17:00.017761 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:17:00.017763 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:17:00.017766 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:17:00.017768 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:17:00.017771 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:17:00.017773 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:17:00.017775 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:17:00.017778 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:17:00.017780 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:17:00.017782 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:17:00.017785 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:17:00.017787 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:17:00.017789 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:17:00.017792 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:17:00.017794 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 18:17:00.017808 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:17:00.017811 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:17:00.017817 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:17:00.017824 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:17:00.017826 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:17:00.017830 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:17:00.018015 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:17:01.018166 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:17:01.018196 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:18:00.018000 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:18:00.018042 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:19:00.018073 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:19:00.018150 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:20:00.018190 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:20:00.018228 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:20:46.583472 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 18:20:46.583554 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 18:20:46.583579 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 18:20:46.583774 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 18:20:46.583817 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 18:20:48.585135 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:20:48.585280 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 18:20:48.585347 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 18:20:48.585419 BGP: [Event] BGP connection from host 1.0.2.214:45940
+2021/08/22 18:20:48.585442 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:20:48.585624 BGP: 1.0.2.214 passive open
+2021/08/22 18:20:48.585629 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:20:48.585741 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:20:48.585748 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 18:20:48.585772 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 18:20:48.585794 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:20:48.585886 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:20:48.585890 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 18:20:48.585941 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:20:48.585958 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:20:48.585976 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:20:48.585983 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:20:48.585988 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:20:48.585991 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:20:48.585995 BGP: 1.0.2.214 Collision resolution, local ID higher, closing inbound
+2021/08/22 18:20:48.586006 BGP: %NOTIFICATION: sent to neighbor 1.0.2.214 6/7 (Cease/Connection collision resolution) 0 bytes 
+2021/08/22 18:20:48.586014 BGP: 1.0.2.214 send message type 3, length (incl. header) 21
+2021/08/22 18:20:48.586019 BGP: Notification sent to neighbor 1.0.2.214:45940: type 6/7
+2021/08/22 18:20:48.586102 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:20:48.586163 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:20:48.586171 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 18:20:48.586174 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 18:20:48.586363 BGP: 1.0.2.214 [Event] BGP connection closed fd 12
+2021/08/22 18:20:48.586598 BGP: 1.0.2.214 went from OpenSent to Active
+2021/08/22 18:20:50.586570 BGP: [Event] BGP connection from host 1.0.2.214:46086
+2021/08/22 18:20:50.586612 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 18:20:50.586668 BGP: 1.0.2.214 passive open
+2021/08/22 18:20:50.586675 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 18:20:50.586687 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 18:20:50.586693 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 18:20:50.586697 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 18:20:50.586700 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 18:20:50.586702 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:20:50.586706 BGP: 1.0.2.214:46086 [Event] Transfer accept BGP peer to real (state Active)
+2021/08/22 18:20:50.586721 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 18:20:50.586724 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 18:20:50.586727 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 18:20:50.586729 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:20:50.586732 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 18:20:50.586735 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 18:20:50.586767 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:20:50.586769 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 18:20:50.586772 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 18:20:50.586774 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 18:20:50.586776 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 18:20:50.586778 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 18:20:50.586780 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 18:20:50.586782 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 18:20:50.586785 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 18:20:50.586787 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 18:20:50.586789 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 18:20:50.586791 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 18:20:50.586793 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 18:20:50.586795 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 18:20:50.586804 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 18:20:50.586812 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 18:20:50.586827 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:20:50.586830 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 18:20:50.587194 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:20:50.587240 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 18:20:50.587245 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 18:20:50.587250 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:20:50.587257 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:20:51.588150 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 18:20:51.588213 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 18:21:06.590295 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 18:21:06.590322 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 18:21:06.590337 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 18:21:06.590341 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 18:21:06.590543 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 18:21:06.590591 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 18:21:06.640492 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 18:21:50.588202 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:21:50.588285 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:22:50.589163 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:22:50.589454 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:23:50.590383 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:23:50.590414 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:24:50.591477 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:24:50.591510 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:25:50.592209 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:25:50.592297 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:26:50.593416 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:26:50.593450 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:27:50.594868 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:27:50.594902 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:28:50.596119 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:28:50.596154 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:29:50.596927 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:29:50.596986 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:30:50.598001 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:30:50.598221 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:31:50.598987 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:31:50.599017 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:32:50.600206 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:32:50.600250 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:33:50.601086 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:33:50.601120 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:34:50.602016 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:34:50.602045 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:35:50.603017 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:35:50.603092 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:36:50.603828 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:36:50.603922 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:37:50.604898 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:37:50.604955 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:38:50.605785 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:38:50.605836 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:39:50.606800 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:39:50.606834 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:40:50.607760 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:40:50.607794 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:41:50.608462 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:41:50.608508 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:42:50.609149 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:42:50.609219 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:43:50.610050 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:43:50.610136 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:44:50.611019 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:44:50.611524 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:45:50.611975 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:45:50.612247 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:46:50.612386 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:46:50.612579 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:47:50.613215 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:47:50.613453 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:48:50.613982 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:48:50.614026 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:49:50.614597 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:49:50.614809 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:50:50.615123 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:50:50.615385 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:51:07.195097 BGP: Vty connection from 127.0.0.1
+2021/08/22 18:51:17.196710 BGP: vty[13]@127.0.0.1> en
+2021/08/22 18:51:27.197523 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 18:51:27.197918 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 18:51:50.615620 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:51:50.616483 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:52:50.616214 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:52:50.616820 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:53:27.199002 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 18:53:50.616783 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:53:50.617214 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:54:50.617143 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:54:50.617209 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:55:50.617393 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:55:50.617943 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:56:50.617591 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:56:50.617777 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:57:50.617744 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:57:50.618029 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:58:50.617871 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:58:50.618129 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:59:50.618830 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 18:59:50.618879 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 18:59:52.011660 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 18:59:52.061761 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 18:59:52.061795 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 18:59:52.061804 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:00:28.313577 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:00:28.313603 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:00:28.313616 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:00:28.313620 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:00:28.313765 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:00:28.313780 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:00:28.363762 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:00:28.724317 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:00:28.774413 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:00:28.774454 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:00:28.774459 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:00:43.317391 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:00:43.317426 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:00:43.317455 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:00:43.317497 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:00:43.317782 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:00:43.317884 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:00:43.367596 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:00:48.031826 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:00:48.081930 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:00:48.081951 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:00:48.081956 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:00:50.619523 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:00:50.619557 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:01:13.323593 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:01:13.323626 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:01:13.323644 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:01:13.323650 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:01:13.323736 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:01:13.323764 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:01:13.373740 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:01:13.779818 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:01:13.829910 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:01:13.829941 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:01:13.829945 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:01:19.325202 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:01:19.325232 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:01:19.325245 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:01:19.325250 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:01:19.325326 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:01:19.325344 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:01:19.375354 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:01:22.736470 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:01:22.786569 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:01:22.786594 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:01:22.786600 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:01:28.327874 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:01:28.328064 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:01:28.328334 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:01:28.328378 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:01:28.328551 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:01:28.328646 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:01:28.378658 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:01:50.620435 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:01:50.620883 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:01:52.789755 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:01:52.839865 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:01:52.839889 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:01:52.839895 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:02:07.336401 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:02:07.336470 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:02:07.336483 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:02:07.336487 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:02:07.337481 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:02:07.337620 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:02:07.386584 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:02:14.095253 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:02:14.145357 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:02:14.145429 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:02:14.145453 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:02:22.340411 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:02:22.340438 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:02:22.340450 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:02:22.340455 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 19:02:22.340526 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:02:22.340551 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:02:22.390563 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:02:30.705827 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 19:02:30.755964 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:02:30.755993 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:02:30.756000 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 19:02:42.897755 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 19:02:42.897784 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 19:02:42.897798 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 19:02:42.897840 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 19:02:42.897860 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 19:02:44.899266 BGP: [Event] BGP connection from host 1.0.2.214:34962
+2021/08/22 19:02:44.899317 BGP: [Event] BGP connection IP address 1.0.2.214 is Idle state
+2021/08/22 19:02:45.898915 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:02:45.898966 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 19:02:45.899022 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 19:02:45.899056 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 19:02:45.899071 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 19:02:45.899090 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 19:02:45.899100 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 19:02:45.899104 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 19:02:45.899108 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 19:02:45.899121 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 19:02:45.899449 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 19:02:45.899459 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, outbound connection
+2021/08/22 19:02:45.899462 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 19:02:45.899466 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 19:02:45.899468 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 19:02:45.899471 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 19:02:45.899474 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 19:02:45.899477 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 19:02:45.899479 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 19:02:45.899482 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 19:02:45.899485 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 19:02:45.899488 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 19:02:45.899490 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 19:02:45.899493 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 19:02:45.899495 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 19:02:45.899498 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 19:02:45.899501 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 19:02:45.899518 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 19:02:45.899521 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 19:02:45.899524 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 19:02:45.899526 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 19:02:45.899529 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 19:02:45.899531 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 19:02:45.899543 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:02:45.899548 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 19:02:45.899564 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:02:45.899607 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 19:02:45.899610 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 19:02:45.899613 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:02:45.899734 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:02:46.900322 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 19:02:46.900353 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 19:02:49.901539 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:02:49.901701 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:02:49.901744 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:02:49.951948 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:03:10.802193 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 19:03:10.802225 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 19:03:10.802239 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 19:03:10.802280 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 19:03:10.812356 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 19:03:10.862428 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 19:03:10.862453 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 19:03:12.802853 BGP: [Event] BGP connection from host 1.0.2.214:37354
+2021/08/22 19:03:12.802884 BGP: [Event] BGP connection IP address 1.0.2.214 is Idle state
+2021/08/22 19:03:13.813415 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:03:13.813448 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 19:03:13.813491 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 19:03:13.813512 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 19:03:13.813520 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 19:03:13.813523 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 19:03:13.813526 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 19:03:13.815973 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 19:03:13.815987 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, outbound connection
+2021/08/22 19:03:13.815991 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 19:03:13.815994 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 19:03:13.815997 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 19:03:13.816001 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 19:03:13.816003 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 19:03:13.816006 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 19:03:13.816009 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 19:03:13.816012 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 19:03:13.816014 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 19:03:13.816027 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 19:03:13.816030 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 19:03:13.816032 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 19:03:13.816034 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 19:03:13.816036 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 19:03:13.816039 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 19:03:13.816041 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 19:03:13.816043 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 19:03:13.816045 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 19:03:13.816048 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 19:03:13.816050 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 19:03:13.816052 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 19:03:13.816066 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:03:13.816069 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 19:03:13.816076 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:03:13.816082 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 19:03:13.816085 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 19:03:13.816088 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:03:13.816516 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:03:14.816279 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 19:03:14.816522 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 19:03:14.816546 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 19:03:14.816551 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:03:14.816569 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 19:03:14.866652 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:03:20.818313 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 3491 17557
+2021/08/22 19:03:20.818348 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 19:03:20.818353 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 19:03:20.868465 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 19:04:13.817006 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:04:13.817037 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:05:13.818014 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:05:13.818042 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:06:13.818951 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:06:13.818980 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:07:13.820000 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:07:13.820034 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:08:13.820331 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:08:13.820414 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:09:13.821568 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:09:13.821600 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:10:13.822476 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:10:13.822509 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:11:13.823449 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:11:13.823673 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:12:13.824253 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:12:13.824445 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:13:13.825509 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:13:13.825543 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:14:13.826611 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:14:13.826811 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:15:13.827548 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:15:13.827750 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:16:13.828538 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:16:13.828570 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:17:13.829848 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:17:13.830027 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:18:13.830728 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:18:13.830799 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:19:13.831836 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:19:13.831870 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:20:13.832210 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:20:13.832720 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:21:13.833343 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:21:13.833603 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:22:13.834438 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:22:13.834543 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:23:13.835462 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:23:13.835674 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:24:13.836490 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:24:13.836695 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:25:13.837400 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:25:13.837625 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:26:13.838289 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:26:13.838556 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:27:13.839122 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:27:13.839469 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:28:13.839878 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:28:13.840216 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:29:13.840287 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:29:13.840464 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:30:13.840969 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:30:13.841201 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:31:13.841615 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:31:13.841941 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:32:13.842203 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:32:13.842858 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:33:13.842698 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:33:13.843500 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:33:27.372470 BGP: Vty connection from 127.0.0.1
+2021/08/22 19:33:37.376954 BGP: vty[13]@127.0.0.1> en
+2021/08/22 19:33:47.378327 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 19:33:47.378616 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 19:34:13.843338 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:34:13.843934 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:35:13.843923 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:35:13.844546 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:35:47.379296 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 19:36:13.844409 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:36:13.844787 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:37:13.844684 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:37:13.844924 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:38:13.844902 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:38:13.845195 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:39:13.845078 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:39:13.845272 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:40:13.845197 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:40:13.845506 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:41:13.846857 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:41:13.846908 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:42:13.847470 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:42:13.847547 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:43:13.848612 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:43:13.848645 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:44:13.850082 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:44:13.850133 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:45:13.850955 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:45:13.851004 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:46:13.852010 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:46:13.852040 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:47:13.853018 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:47:13.853045 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:48:13.854024 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:48:13.854085 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:49:13.855115 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:49:13.855240 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:50:13.605092 BGP: Vty connection from 127.0.0.1
+2021/08/22 19:50:13.855510 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:50:13.855783 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:50:23.609192 BGP: vty[13]@127.0.0.1> en
+2021/08/22 19:50:33.611321 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 19:50:33.612965 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 19:51:13.856552 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:51:13.856729 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:52:13.857256 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:52:13.857309 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:52:33.619011 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 19:53:13.858116 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:53:13.858146 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:54:13.858913 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:54:13.858943 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:55:13.859831 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:55:13.859888 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:56:13.860421 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:56:13.860463 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:57:13.861120 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:57:13.861154 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:58:13.861774 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:58:13.861872 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 19:59:13.862308 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 19:59:13.862340 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:00:13.862860 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:00:13.862891 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:01:13.863307 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:01:13.863338 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:02:13.863776 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:02:13.863809 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:03:13.864230 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:03:13.864287 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:04:13.864417 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:04:13.864469 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:05:13.864648 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:05:13.864702 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:06:13.864839 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:06:13.864894 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:07:00.352012 BGP: Vty connection from 127.0.0.1
+2021/08/22 20:07:10.352821 BGP: vty[13]@127.0.0.1> en
+2021/08/22 20:07:13.865036 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:07:13.865065 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:07:20.354151 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 20:07:20.354419 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 20:08:13.865198 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:08:13.865226 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:09:13.866216 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:09:13.866270 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:09:20.355435 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 20:10:13.867330 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:10:13.867411 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:11:13.868245 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:11:13.868294 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:12:13.869310 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:12:13.869343 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:13:13.870385 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:13:13.870415 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:14:13.871741 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:14:13.871949 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:15:13.872719 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:15:13.872750 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:16:13.873971 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:16:13.874003 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:17:13.875175 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:17:13.875321 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:18:13.876209 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:18:13.876640 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:19:13.877312 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:19:13.877832 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:20:13.878416 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:20:13.878578 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:21:13.879521 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:21:13.879802 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:22:13.880618 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:22:13.880652 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:23:13.881524 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:23:13.881677 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:23:48.399278 BGP: Vty connection from 127.0.0.1
+2021/08/22 20:23:58.404585 BGP: vty[13]@127.0.0.1> en
+2021/08/22 20:24:08.405641 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 20:24:08.405881 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 20:24:13.882397 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:24:13.882630 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:25:13.883178 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:25:13.883350 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:26:08.406862 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 20:26:13.883971 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:26:13.884167 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:27:13.884660 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:27:13.884843 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:28:13.885287 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:28:13.885508 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:29:13.885886 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:29:13.886096 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:30:13.886458 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:30:13.887029 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:31:13.887092 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:31:13.887262 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:32:13.887579 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:32:13.887751 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:33:13.887963 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:33:13.888124 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:34:13.888308 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:34:13.888913 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:35:13.888569 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:35:13.888804 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:36:13.888826 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:36:13.888988 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:37:13.889074 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:37:13.889589 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:38:13.889337 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:38:13.889570 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:39:13.890264 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:39:13.890291 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:40:13.891354 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:40:13.891406 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:40:35.105394 BGP: Vty connection from 127.0.0.1
+2021/08/22 20:40:45.106689 BGP: vty[13]@127.0.0.1> en
+2021/08/22 20:40:55.108974 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 20:40:55.110823 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 20:41:13.891663 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:41:13.891715 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:42:13.892758 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:42:13.892787 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:42:55.115754 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 20:43:13.893777 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:43:13.893804 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:44:13.894817 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:44:13.894842 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:45:13.896237 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:45:13.896265 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:46:13.896350 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:46:13.896378 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:47:13.897397 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:47:13.897424 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:48:13.898537 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:48:13.898708 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:48:56.301114 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 20:48:56.301140 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 20:48:56.351220 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 20:48:56.351241 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 20:48:56.351249 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 20:48:56.351258 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 20:49:13.898598 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:49:13.898727 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:49:27.983119 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 20:49:27.983140 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 20:49:27.983145 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 20:49:28.033237 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 20:49:29.462843 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 20:49:29.512942 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 20:49:29.512960 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 20:49:38.351857 BGP: 1.0.2.214 rcv message type 3, length (excl. header) 2
+2021/08/22 20:49:38.352013 BGP: %NOTIFICATION: received from neighbor 1.0.2.214 6/4 (Cease/Administratively Reset) 0 bytes 
+2021/08/22 20:49:38.352064 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 20:49:38.352133 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 20:49:38.352154 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 20:49:39.352207 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 20:49:39.352267 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 20:49:39.352348 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 20:49:39.352392 BGP: 1.0.2.214 open active, local address 1.0.2.213
+2021/08/22 20:49:39.352417 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 20:49:39.352422 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 20:49:39.352427 BGP: 1.0.2.214 went from Connect to OpenSent
+2021/08/22 20:49:39.352447 BGP: 1.0.2.214 [Event] BGP connection closed fd 12
+2021/08/22 20:49:39.352525 BGP: 1.0.2.214 went from OpenSent to Active
+2021/08/22 20:49:41.353393 BGP: [Event] BGP connection from host 1.0.2.214:45426
+2021/08/22 20:49:41.353539 BGP: [Event] Make dummy peer structure until read Open packet
+2021/08/22 20:49:41.353616 BGP: 1.0.2.214 passive open
+2021/08/22 20:49:41.353625 BGP: 1.0.2.214 went from Active to OpenSent
+2021/08/22 20:49:41.353644 BGP: 1.0.2.214 rcv message type 1, length (excl. header) 40
+2021/08/22 20:49:41.353660 BGP: 1.0.2.214 rcv OPEN, version 4, remote-as (in open) 3216, holdtime 180, id 1.0.4.114, inbound connection
+2021/08/22 20:49:41.353669 BGP: 1.0.2.214 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/08/22 20:49:41.353675 BGP: [AS4] found AS4 capability, about to parse
+2021/08/22 20:49:41.353681 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 20:49:41.353687 BGP: 1.0.2.214:45426 [Event] Transfer accept BGP peer to real (state Active)
+2021/08/22 20:49:41.353715 BGP: 1.0.2.214 sending OPEN, version 4, my as 34102, holdtime 180, id 193.232.244.60
+2021/08/22 20:49:41.353720 BGP: 1.0.2.214 send message type 1, length (incl. header) 59
+2021/08/22 20:49:41.353725 BGP: 1.0.2.214 rcv OPEN w/ OPTION parameter len: 30
+2021/08/22 20:49:41.353735 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 20:49:41.353740 BGP: 1.0.2.214 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/08/22 20:49:41.353745 BGP: 1.0.2.214 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/08/22 20:49:41.353755 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 20:49:41.353760 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/08/22 20:49:41.353766 BGP: 1.0.2.214 OPEN has Route Refresh (Old) capability (128), length 0
+2021/08/22 20:49:41.353776 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/08/22 20:49:41.353780 BGP: 1.0.2.214 OPEN has Route Refresh capability (2), length 0
+2021/08/22 20:49:41.353786 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/08/22 20:49:41.353796 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/08/22 20:49:41.353803 BGP: 1.0.2.214 OPEN has 4-octet AS number capability (65), length 4
+2021/08/22 20:49:41.353808 BGP: 1.0.2.214 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3216
+2021/08/22 20:49:41.353820 BGP: 1.0.2.214 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/08/22 20:49:41.353826 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/08/22 20:49:41.353830 BGP: 1.0.2.214 OPEN has Graceful Restart capability (64), length 2
+2021/08/22 20:49:41.353841 BGP: 1.0.2.214 OPEN has Graceful Restart capability
+2021/08/22 20:49:41.353847 BGP: 1.0.2.214 Peer has not restarted. Restart Time : 120
+2021/08/22 20:49:41.353865 BGP: 1.0.2.214 [Event] Accepting BGP peer delete
+2021/08/22 20:49:41.353879 BGP: 1.0.2.214 went from OpenSent to Deleted
+2021/08/22 20:49:41.353886 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.214
+2021/08/22 20:49:41.353891 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 20:49:41.353928 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:49:41.353939 BGP: 1.0.2.214 went from OpenSent to OpenConfirm
+2021/08/22 20:49:41.354153 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:49:41.354173 BGP: 1.0.2.214 went from OpenConfirm to Established
+2021/08/22 20:49:41.354177 BGP: %ADJCHANGE: neighbor 1.0.2.214 Up
+2021/08/22 20:49:41.354189 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:49:41.354208 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:49:42.354964 BGP: rcvd End-of-RIB for 1.0.2.214 from IPv4 Unicast
+2021/08/22 20:49:42.355012 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.214
+2021/08/22 20:49:54.358850 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 20:49:54.358884 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 20:49:54.358908 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 20:49:54.358911 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 20:49:54.358927 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 20:49:54.358938 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 20:49:54.358944 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 20:49:54.358996 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 20:49:54.359024 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 20:49:54.408998 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 20:49:54.409021 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 20:50:41.354418 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:50:41.354508 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:51:41.354807 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:51:41.354857 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:52:41.355092 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:52:41.355147 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:53:41.355742 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:53:41.355772 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:54:41.356295 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:54:41.356325 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:55:41.356288 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:55:41.356376 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:56:41.356528 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:56:41.356556 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:57:41.356659 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:57:41.356940 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:58:41.356761 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 20:58:41.357014 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:59:41.357863 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 20:59:41.357892 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:00:41.358944 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:00:41.358972 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:01:41.360041 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:01:41.360079 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:02:41.360336 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:02:41.360400 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:03:41.361398 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:03:41.361456 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:04:41.362441 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:04:41.362496 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:05:41.363546 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:05:41.363573 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:06:41.364244 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:06:41.364450 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:07:41.365363 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:07:41.365463 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:08:41.366510 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:08:41.366718 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:09:41.367736 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:09:41.367935 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:10:41.368284 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:10:41.368776 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:11:41.369356 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:11:41.369537 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:12:41.369867 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:12:41.369896 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:13:41.370662 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:13:41.371171 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:14:41.371424 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:14:41.371970 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:15:41.372116 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:15:41.372318 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:16:41.372753 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:16:41.372941 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:17:41.373330 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:17:41.373563 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:18:41.373909 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:18:41.374511 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:19:41.374450 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:19:41.375040 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:19:55.703597 BGP: Vty connection from 127.0.0.1
+2021/08/22 21:20:05.704079 BGP: vty[13]@127.0.0.1> en
+2021/08/22 21:20:15.705120 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 21:20:15.705384 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 21:20:41.374934 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:20:41.375147 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:21:41.375319 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:21:41.375495 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:22:15.706131 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 21:22:41.375630 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:22:41.375820 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:23:41.375906 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:23:41.376147 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:24:41.376178 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:24:41.376426 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:25:41.376332 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:25:41.376509 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:26:41.376483 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:26:41.376730 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:27:41.377770 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:27:41.377800 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:28:16.879813 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 21:28:16.879834 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 21:28:16.929969 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 21:28:16.929991 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 21:28:16.930000 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 21:28:16.930015 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 21:28:16.930020 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 21:28:41.378845 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:28:41.378992 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:29:01.160345 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 3491 17557
+2021/08/22 21:29:01.160380 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 21:29:01.160401 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 21:29:01.160407 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 21:29:01.160502 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 21:29:01.160520 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 21:29:01.210498 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 21:29:10.758068 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 21:29:10.808163 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 21:29:10.808195 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 21:29:10.808201 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 21:29:22.166667 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 21:29:22.166687 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 21:29:22.166700 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 21:29:22.166702 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 21:29:22.166719 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 21:29:22.166722 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 21:29:22.166724 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 21:29:22.166816 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 21:29:22.166830 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 21:29:22.216852 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 21:29:22.216867 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 21:29:41.379625 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:29:41.379655 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:30:41.380192 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:30:41.380219 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:31:41.380480 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:31:41.380510 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:32:41.380950 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:32:41.380979 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:33:41.381465 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:33:41.381495 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:34:41.381837 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:34:41.381868 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:35:41.382260 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:35:41.382435 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:36:41.382591 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:36:41.382622 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:37:41.382968 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:37:41.382998 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:38:41.383322 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:38:41.383352 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:39:41.383642 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:39:41.383673 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:40:41.383979 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:40:41.384006 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:41:41.384339 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:41:41.384693 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:42:41.384664 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:42:41.384696 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:43:41.385325 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:43:41.385354 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:44:41.385819 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:44:41.385850 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:45:41.386159 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:45:41.386187 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:46:41.386982 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:46:41.387012 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:47:41.386978 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:47:41.387010 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:48:41.387159 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:48:41.387187 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:49:41.387393 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:49:41.387423 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:50:41.387587 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:50:41.387617 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:51:41.387675 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:51:41.387704 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:52:41.387912 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:52:41.388099 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:53:41.388284 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:53:41.388798 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:54:41.389812 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:54:41.390007 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:55:41.390781 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:55:41.390810 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:56:41.391767 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:56:41.391794 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:57:41.392797 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:57:41.392823 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:58:41.393765 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:58:41.393793 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:59:23.936854 BGP: Vty connection from 127.0.0.1
+2021/08/22 21:59:33.937483 BGP: vty[13]@127.0.0.1> en
+2021/08/22 21:59:41.394659 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 21:59:41.394727 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 21:59:43.938383 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 21:59:43.938628 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 22:00:41.395651 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:00:41.395729 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:01:41.396655 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:01:41.396715 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:01:43.939787 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 22:02:41.397834 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:02:41.397993 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:03:41.398743 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:03:41.398908 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:04:41.399649 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:04:41.399678 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:05:41.400209 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:05:41.400628 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:06:41.401284 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:06:41.401361 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:07:41.402255 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:07:41.402288 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:07:44.949486 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 22:07:44.999603 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 22:07:44.999618 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:07:46.600273 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 3491 17557
+2021/08/22 22:07:46.600312 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:07:46.600324 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:07:46.650504 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:07:52.604275 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 22:07:52.604314 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 22:07:52.604328 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:07:52.604338 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:07:52.604353 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:07:52.654487 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:07:52.654516 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:08:41.403168 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:08:41.403199 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:09:41.404021 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:09:41.404057 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:10:41.404795 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:10:41.404824 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:11:41.405478 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:11:41.405540 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:12:41.406231 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:12:41.406316 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:13:41.406875 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:13:41.407324 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:14:41.407515 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:14:41.407741 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:15:41.408054 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:15:41.408248 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:16:41.408619 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:16:41.408857 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:17:41.409071 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:17:41.409159 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:18:41.409590 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:18:41.409795 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:19:41.410032 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:19:41.410116 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:20:41.410406 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:20:41.410624 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:21:41.410929 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:21:41.411117 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:22:41.411207 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:22:41.411243 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:23:41.411343 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:23:41.411521 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:24:41.411508 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:24:41.411702 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:25:41.411980 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:25:41.412031 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:26:41.412153 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:26:41.412192 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:27:41.412300 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:27:41.412329 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:28:41.412453 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:28:41.412480 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:29:41.413512 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:29:41.413567 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:30:41.414708 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:30:41.414739 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:31:41.415887 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:31:41.415918 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:32:41.416929 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:32:41.416957 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:33:41.418106 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:33:41.418136 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:34:41.419137 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:34:41.419163 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:35:41.420160 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:35:41.420250 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:36:41.421150 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:36:41.421218 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:37:41.422222 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:37:41.422287 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:37:53.884166 BGP: Vty connection from 127.0.0.1
+2021/08/22 22:38:03.885093 BGP: vty[13]@127.0.0.1> en
+2021/08/22 22:38:13.886245 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 22:38:13.887727 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 22:38:41.423537 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:38:41.423696 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:39:41.424415 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:39:41.424588 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:40:13.891718 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 22:40:41.425325 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:40:41.425432 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:41:41.426479 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:41:41.426532 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:42:41.427543 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:42:41.427597 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:43:41.428663 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:43:41.428717 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:44:41.429733 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:44:41.429790 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:45:41.430865 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:45:41.430889 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:46:20.164192 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 22:46:20.164216 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 22:46:20.214293 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 22:46:20.214315 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:46:20.214324 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 22:46:20.214334 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:46:20.214338 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 22:46:30.183973 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 22:46:30.184001 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 22:46:30.184020 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:46:30.184024 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:46:30.184033 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:46:30.184038 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:46:30.184042 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:46:30.184598 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 22:46:30.184640 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 22:46:30.234117 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:46:30.234157 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:46:41.432030 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:46:41.432055 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:46:48.529450 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 22:46:48.529471 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 22:46:48.579556 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 22:46:48.579575 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:46:48.579580 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 22:46:48.579587 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:46:48.579590 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 22:46:54.187184 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 22:46:54.187315 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 22:46:54.187396 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:46:54.187415 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:46:54.187519 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:46:54.187534 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:46:54.187552 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:46:54.187657 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 22:46:54.187715 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 22:46:54.237650 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:46:54.237752 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:47:06.119211 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 22:47:06.119229 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 22:47:06.169302 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 22:47:06.169325 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:47:06.169333 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 22:47:06.169344 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:47:06.169349 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 22:47:18.196473 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 3491 17557
+2021/08/22 22:47:18.196492 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:47:18.196504 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:47:18.196518 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:47:18.196641 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 22:47:18.196682 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 22:47:18.246605 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:47:21.199229 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 22:47:21.199248 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 22:47:21.199252 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:47:21.199258 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:47:21.199262 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:47:21.249341 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:47:21.249360 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:47:21.564997 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 22:47:21.565007 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 22:47:21.615125 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 22:47:21.615140 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:47:21.615146 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 22:47:21.615152 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 22:47:21.615154 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 22:47:41.432244 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:47:41.432306 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:48:15.207838 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 36561
+2021/08/22 22:48:15.207859 BGP: 1.0.2.214 rcvd 208.65.152.0/22
+2021/08/22 22:48:15.207870 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:48:15.207872 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:48:15.207910 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 22:48:15.207913 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 22:48:15.207915 BGP: bgp_update_main(1.0.2.214): NH unresolved
+2021/08/22 22:48:15.208014 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 22:48:15.208024 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=1
+2021/08/22 22:48:15.257992 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:48:15.258014 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 22:48:41.433336 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:48:41.433363 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:49:41.434387 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:49:41.434417 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:50:41.435445 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:50:41.435472 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:51:41.436209 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:51:41.436396 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:52:41.437842 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:52:41.437906 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:53:41.438761 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:53:41.438787 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:54:41.439975 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:54:41.440135 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:55:41.440228 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:55:41.440293 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:56:41.441648 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:56:41.441777 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:57:41.442797 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:57:41.442990 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:58:41.443805 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:58:41.443854 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 22:59:41.444869 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 22:59:41.444897 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:00:41.446081 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:00:41.446109 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:01:41.447205 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:01:41.447233 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:02:41.448323 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:02:41.448351 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:03:41.449400 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:03:41.449740 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:04:41.450405 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:04:41.450953 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:05:41.451434 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:05:41.452011 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:06:41.452246 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:06:41.452327 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:07:41.453096 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:07:41.453292 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:08:41.453952 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:08:41.454187 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:09:41.454703 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:09:41.454884 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:10:41.455387 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:10:41.455550 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:11:41.456034 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:11:41.456541 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:12:41.456241 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:12:41.456408 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:13:41.456757 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:13:41.456957 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:14:41.457225 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:14:41.457686 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:15:41.457645 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:15:41.457816 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:16:41.458012 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:16:41.458179 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:17:41.458298 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:17:41.458373 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:18:41.458594 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:18:41.459067 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:18:44.430365 BGP: Vty connection from 127.0.0.1
+2021/08/22 23:18:54.431986 BGP: vty[13]@127.0.0.1> en
+2021/08/22 23:19:04.433402 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/08/22 23:19:04.433683 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/08/22 23:19:41.458806 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:19:41.459026 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:20:41.458992 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:20:41.459164 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:21:04.435534 BGP: vty[13]@127.0.0.1# exit
+2021/08/22 23:21:41.459113 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:21:41.459357 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:22:41.460086 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:22:41.460146 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:23:41.460305 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:23:41.460370 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:24:41.460966 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:24:41.461260 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:25:41.461764 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:25:41.461793 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:26:41.462369 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:26:41.462396 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:27:41.462952 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:27:41.462976 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:28:41.463449 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:28:41.463475 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:29:41.464017 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:29:41.464155 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:30:41.464209 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:30:41.464334 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:31:41.464682 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:31:41.464709 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:32:41.465513 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:32:41.465574 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:33:41.465721 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:33:41.465774 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:34:41.466073 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:34:41.466133 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:35:41.466151 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:35:41.466193 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:36:41.466370 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:36:41.466578 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:37:41.466560 BGP: 1.0.2.214 rcv message type 4, length (excl. header) 0
+2021/08/22 23:37:41.466761 BGP: 1.0.2.214 send message type 4, length (incl. header) 19
+2021/08/22 23:37:58.131298 BGP: 1.0.2.214 rcvd UPDATE about 208.65.152.0/22 -- withdrawn
+2021/08/22 23:37:58.181397 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/08/22 23:37:58.181415 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 23:37:59.458321 BGP: 1.0.2.214 rcvd UPDATE w/ attr: nexthop 1.0.2.214, origin i, path 3216 3549 3491 17557 17557
+2021/08/22 23:37:59.458349 BGP: 1.0.2.214 rcvd 208.65.153.0/24
+2021/08/22 23:37:59.458358 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 23:37:59.508459 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.214 metric 0 tag 0 count 1
+2021/08/22 23:38:00.865232 BGP: 1.0.2.214 rcvd UPDATE about 208.65.153.0/24 -- withdrawn
+2021/08/22 23:38:00.915334 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/08/22 23:38:00.915352 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.214/32
+2021/08/22 23:38:00.915355 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.214/32
+2021/08/22 23:38:01.292954 BGP: Zebra rcvd: interface 34102-3216 down
+2021/08/22 23:38:01.293005 BGP: %ADJCHANGE: neighbor 1.0.2.214 Down BGP Notification received
+2021/08/22 23:38:01.293040 BGP: 1.0.2.214 went from Established to Clearing
+2021/08/22 23:38:01.293060 BGP: 1.0.2.214 went from Clearing to Idle
+2021/08/22 23:38:01.293086 BGP: Zebra rcvd: interface 34102-3216 address delete fe80::b8b1:c6ff:fe5f:f715/64
+2021/08/22 23:38:01.297332 BGP: Zebra rcvd: router id update 0.0.0.0/32
+2021/08/22 23:38:01.297372 BGP: Zebra rcvd: interface 34102-3216 address delete 1.0.2.213/30
+2021/08/22 23:38:01.297447 BGP: Zebra rcvd: interface delete 34102-3216
+2021/08/22 23:38:02.294125 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.214/32
+2021/08/22 23:38:02.294174 BGP: 1.0.2.214 [Event] Connect start to 1.0.2.214 fd 12
+2021/08/22 23:38:02.294189 BGP: can't connect to 1.0.2.214 fd 12 : Network is unreachable
+2021/08/22 23:38:02.294194 BGP: 1.0.2.214 went from Idle to Connect
+2021/08/22 23:38:02.294220 BGP: 1.0.2.214 went from Connect to Active
+2021/08/22 23:38:02.294233 BGP: parse nexthop update(1.0.2.214/32): metric=0, #nexthop=0
+2021/08/22 23:38:02.294236 BGP: evaluate_paths: Updating peer (1.0.2.214) status with NHT
+2021/08/22 23:38:06.845912 BGP: SIGHUP received
+2021/08/22 23:38:06.845968 BGP: bgpd restarting!
+2021/08/22 23:38:07.295789 BGP: zclient_socket_un connect failure: 111

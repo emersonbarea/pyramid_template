@@ -1,0 +1,561 @@
+2021/11/02 07:34:22.395627 BGP: BGPd 1.2.4 starting: vty@2605, bgp@<all>:179 pid 539
+2021/11/02 07:34:22.396044 BGP: Zebra rcvd: router id update 1.0.2.45/32
+2021/11/02 07:34:22.396072 BGP: Zebra rcvd: interface add 1280-3549
+2021/11/02 07:34:22.396091 BGP: Zebra rcvd: interface 1280-3549 address add 1.0.2.45/30
+2021/11/02 07:34:22.396113 BGP: Zebra rcvd: interface 1280-3549 address add fe80::ec1c:49ff:fe3c:6dc8/64
+2021/11/02 07:34:22.396129 BGP: Zebra rcvd: interface add erspan0
+2021/11/02 07:34:22.396142 BGP: Zebra rcvd: interface add gre0
+2021/11/02 07:34:22.396155 BGP: Zebra rcvd: interface add gretap0
+2021/11/02 07:34:22.396167 BGP: Zebra rcvd: interface add lo
+2021/11/02 07:34:22.396181 BGP: Zebra rcvd: interface lo address add 127.0.0.1/8
+2021/11/02 07:34:22.396195 BGP: Zebra rcvd: interface lo address add ::1/128
+2021/11/02 07:34:22.396208 BGP: Zebra rcvd: interface lo address add 127.0.0.1/32
+2021/11/02 07:34:24.396808 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 07:34:24.396875 BGP: 1.0.2.46 [Event] Connect start to 1.0.2.46 fd 12
+2021/11/02 07:34:24.397148 BGP: 1.0.2.46 went from Idle to Connect
+2021/11/02 07:34:24.397195 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=0
+2021/11/02 07:34:24.397203 BGP: evaluate_paths: Updating peer (1.0.2.46) status with NHT
+2021/11/02 07:34:24.397250 BGP: 1.0.2.46 open active, local address 1.0.2.45
+2021/11/02 07:34:24.397290 BGP: 1.0.2.46 sending OPEN, version 4, my as 1280, holdtime 180, id 198.32.176.3
+2021/11/02 07:34:24.397298 BGP: 1.0.2.46 send message type 1, length (incl. header) 59
+2021/11/02 07:34:24.397306 BGP: 1.0.2.46 went from Connect to OpenSent
+2021/11/02 07:34:24.397335 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=1
+2021/11/02 07:34:24.397365 BGP: 1.0.2.46 [Event] BGP connection closed fd 12
+2021/11/02 07:34:24.397554 BGP: 1.0.2.46 went from OpenSent to Active
+2021/11/02 07:34:24.535991 BGP: [Event] BGP connection from host 1.0.2.46:49786
+2021/11/02 07:34:24.536010 BGP: [Event] Make dummy peer structure until read Open packet
+2021/11/02 07:34:24.536124 BGP: 1.0.2.46 passive open
+2021/11/02 07:34:24.536130 BGP: 1.0.2.46 went from Active to OpenSent
+2021/11/02 07:34:24.536513 BGP: 1.0.2.46 rcv message type 1, length (excl. header) 40
+2021/11/02 07:34:24.536532 BGP: 1.0.2.46 rcv OPEN, version 4, remote-as (in open) 3549, holdtime 180, id 208.51.134.248, inbound connection
+2021/11/02 07:34:24.536540 BGP: 1.0.2.46 [AS4] rcv OPEN w/ OPTION parameter len: 30, peeking for as4
+2021/11/02 07:34:24.536547 BGP: [AS4] found AS4 capability, about to parse
+2021/11/02 07:34:24.536553 BGP: 1.0.2.46 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3549
+2021/11/02 07:34:24.536558 BGP: 1.0.2.46:49786 [Event] Transfer accept BGP peer to real (state Active)
+2021/11/02 07:34:24.536582 BGP: 1.0.2.46 sending OPEN, version 4, my as 1280, holdtime 180, id 198.32.176.3
+2021/11/02 07:34:24.536586 BGP: 1.0.2.46 send message type 1, length (incl. header) 59
+2021/11/02 07:34:24.536590 BGP: 1.0.2.46 rcv OPEN w/ OPTION parameter len: 30
+2021/11/02 07:34:24.536594 BGP: 1.0.2.46 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/11/02 07:34:24.536598 BGP: 1.0.2.46 OPEN has MultiProtocol Extensions capability (1), length 4
+2021/11/02 07:34:24.536602 BGP: 1.0.2.46 OPEN has MP_EXT CAP for afi/safi: 1/1
+2021/11/02 07:34:24.536606 BGP: 1.0.2.46 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/11/02 07:34:24.536610 BGP: message index 128 [Route Refresh (Old)] found in capcode_str at position 6 (max is 8)
+2021/11/02 07:34:24.536614 BGP: 1.0.2.46 OPEN has Route Refresh (Old) capability (128), length 0
+2021/11/02 07:34:24.536618 BGP: 1.0.2.46 rcvd OPEN w/ optional parameter type 2 (Capability) len 2
+2021/11/02 07:34:24.536621 BGP: 1.0.2.46 OPEN has Route Refresh capability (2), length 0
+2021/11/02 07:34:24.536625 BGP: 1.0.2.46 rcvd OPEN w/ optional parameter type 2 (Capability) len 6
+2021/11/02 07:34:24.536629 BGP: message index 65 [4-octet AS number] found in capcode_str at position 4 (max is 8)
+2021/11/02 07:34:24.536632 BGP: 1.0.2.46 OPEN has 4-octet AS number capability (65), length 4
+2021/11/02 07:34:24.536649 BGP: 1.0.2.46 [AS4] about to set cap PEER_CAP_AS4_RCV, got as4 3549
+2021/11/02 07:34:24.536653 BGP: 1.0.2.46 rcvd OPEN w/ optional parameter type 2 (Capability) len 4
+2021/11/02 07:34:24.536657 BGP: message index 64 [Graceful Restart] found in capcode_str at position 3 (max is 8)
+2021/11/02 07:34:24.536661 BGP: 1.0.2.46 OPEN has Graceful Restart capability (64), length 2
+2021/11/02 07:34:24.536664 BGP: 1.0.2.46 OPEN has Graceful Restart capability
+2021/11/02 07:34:24.536667 BGP: 1.0.2.46 Peer has restarted. Restart Time : 120
+2021/11/02 07:34:24.536681 BGP: 1.0.2.46 [Event] Accepting BGP peer delete
+2021/11/02 07:34:24.536695 BGP: 1.0.2.46 went from OpenSent to Deleted
+2021/11/02 07:34:24.536700 BGP: bgp_unlink_nexthop_by_peer: NHT unlinking 1.0.2.46
+2021/11/02 07:34:24.536705 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.46/32
+2021/11/02 07:34:24.536743 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:34:24.536752 BGP: 1.0.2.46 went from OpenSent to OpenConfirm
+2021/11/02 07:34:24.537219 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:34:24.537236 BGP: 1.0.2.46 went from OpenConfirm to Established
+2021/11/02 07:34:24.537239 BGP: %ADJCHANGE: neighbor 1.0.2.46 Up
+2021/11/02 07:34:24.537244 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:34:24.537254 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:34:25.537278 BGP: rcvd End-of-RIB for 1.0.2.46 from IPv4 Unicast
+2021/11/02 07:34:25.537315 BGP: send End-of-RIB for IPv4 Unicast to 1.0.2.46
+2021/11/02 07:34:28.537347 BGP: 1.0.2.46 rcvd UPDATE w/ attr: nexthop 1.0.2.46, origin i, path 3549 36561
+2021/11/02 07:34:28.537377 BGP: 1.0.2.46 rcvd 208.65.152.0/22
+2021/11/02 07:34:28.537400 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 07:34:28.537407 BGP: bgp_update_main(1.0.2.46): NH unresolved
+2021/11/02 07:34:28.537511 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=0
+2021/11/02 07:34:28.537534 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=1
+2021/11/02 07:34:28.587517 BGP: Zebra send: IPv4 route add 208.65.152.0/22 nexthop 1.0.2.46 metric 0 tag 0 count 1
+2021/11/02 07:35:24.537219 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:35:24.537259 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:36:24.537312 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:36:24.537352 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:37:24.537388 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:37:24.537431 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:38:24.537445 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:38:24.537481 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:39:24.537545 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:39:24.537592 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:39:40.361350 BGP: Vty connection from 127.0.0.1
+2021/11/02 07:39:50.365000 BGP: vty[13]@127.0.0.1> en
+2021/11/02 07:40:00.365890 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 07:40:00.366228 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 07:40:24.537632 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:40:24.537671 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:41:24.537699 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:41:24.537739 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:42:00.367225 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 07:42:24.537719 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:42:24.537770 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:43:24.537834 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:43:24.537881 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:43:37.565816 BGP: 1.0.2.46 rcvd UPDATE w/ attr: nexthop 1.0.2.46, origin i, path 3549 3491 17557
+2021/11/02 07:43:37.565874 BGP: 1.0.2.46 rcvd 208.65.153.0/24
+2021/11/02 07:43:37.565885 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 07:43:37.615993 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.46 metric 0 tag 0 count 1
+2021/11/02 07:44:24.538051 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:44:24.538097 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:45:24.538104 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:45:24.538159 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:46:24.538306 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:46:24.538357 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:47:24.538424 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:47:24.538474 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:48:24.538631 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:48:24.538689 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:49:24.538782 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:49:24.538841 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:50:24.538975 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:50:24.539037 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:51:24.539178 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:51:24.539227 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:52:24.539388 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:52:24.539437 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:53:24.539611 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:53:24.539660 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:54:24.539777 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:54:24.539822 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:55:24.539933 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:55:24.539977 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:56:24.540033 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:56:24.540092 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:57:24.540240 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:57:24.540290 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:58:24.540402 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:58:24.540449 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 07:59:24.540497 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 07:59:24.540553 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:00:24.540537 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:00:24.540567 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:00:25.510285 BGP: Vty connection from 127.0.0.1
+2021/11/02 08:00:35.515447 BGP: vty[13]@127.0.0.1> en
+2021/11/02 08:00:45.516559 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 08:00:45.516876 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 08:01:24.540805 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:01:24.540853 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:02:24.540964 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:02:24.541013 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:02:45.518042 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 08:03:24.541152 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:03:24.541210 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:04:24.541272 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:04:24.541335 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:05:24.541545 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:05:24.541594 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:06:24.541756 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:06:24.541803 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:07:24.541875 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:07:24.541929 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:08:24.541970 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:08:24.542018 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:09:24.542182 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:09:24.542231 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:10:24.542413 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:10:24.542472 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:11:24.542626 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:11:24.542670 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:12:24.542842 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:12:24.542890 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:13:24.542950 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:13:24.542997 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:14:24.543255 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:14:24.543303 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:15:24.543343 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:15:24.543393 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:16:24.543504 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:16:24.543563 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:17:24.543613 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:17:24.543728 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:18:24.543764 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:18:24.543918 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:19:24.543896 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:19:24.544000 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:20:24.544215 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:20:24.544264 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:21:04.874988 BGP: Vty connection from 127.0.0.1
+2021/11/02 08:21:14.877142 BGP: vty[13]@127.0.0.1> en
+2021/11/02 08:21:24.544402 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:21:24.544448 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:21:24.877971 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 08:21:24.878304 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 08:22:24.544610 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:22:24.544657 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:23:24.544719 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:23:24.544765 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:23:24.879259 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 08:24:24.544889 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:24:24.544939 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:25:24.545084 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:25:24.545132 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:26:24.545246 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:26:24.545304 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:27:24.545424 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:27:24.545482 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:28:24.545667 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:28:24.545715 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:29:24.545858 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:29:24.545906 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:30:24.546007 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:30:24.546067 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:31:24.546201 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:31:24.546259 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:32:24.546413 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:32:24.546456 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:33:24.546573 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:33:24.546621 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:34:24.546729 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:34:24.546786 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:35:24.546919 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:35:24.546973 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:36:24.547079 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:36:24.547138 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:37:24.547219 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:37:24.547278 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:38:24.547433 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:38:24.547491 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:39:24.547620 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:39:24.547688 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:40:24.547784 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:40:24.547833 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:41:24.547903 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:41:24.547962 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:41:43.821240 BGP: Vty connection from 127.0.0.1
+2021/11/02 08:41:53.822581 BGP: vty[13]@127.0.0.1> en
+2021/11/02 08:42:03.823664 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 08:42:03.823969 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 08:42:24.548104 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:42:24.548152 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:43:24.548258 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:43:24.548313 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:44:03.825069 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 08:44:24.548463 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:44:24.548511 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:45:24.548579 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:45:24.548623 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:46:24.548770 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:46:24.548815 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:47:24.548883 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:47:24.548938 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:48:24.549033 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:48:24.549082 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:49:24.549251 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:49:24.549298 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:50:24.549494 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:50:24.549544 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:51:24.549655 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:51:24.549704 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:52:24.549884 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:52:24.549932 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:53:24.549968 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:53:24.550012 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:54:24.550141 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:54:24.550201 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:55:24.550330 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:55:24.550376 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:56:24.550622 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:56:24.550668 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:57:24.550832 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:57:24.550878 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:58:24.550968 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:58:24.551015 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 08:59:24.551088 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 08:59:24.551143 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:00:24.551349 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:00:24.551395 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:01:24.551502 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:01:24.551547 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:02:22.746030 BGP: Vty connection from 127.0.0.1
+2021/11/02 09:02:24.551663 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:02:24.551710 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:02:32.747988 BGP: vty[13]@127.0.0.1> en
+2021/11/02 09:02:42.749112 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 09:02:42.749453 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 09:03:24.551840 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:03:24.551888 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:04:24.551947 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:04:24.551987 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:04:42.750470 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 09:05:24.552144 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:05:24.552193 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:06:24.552353 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:06:24.552400 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:07:24.552502 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:07:24.552547 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:08:24.552659 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:08:24.552707 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:09:24.552779 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:09:24.552822 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:10:24.552939 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:10:24.553005 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:11:24.553087 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:11:24.553135 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:12:24.553288 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:12:24.553336 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:13:24.553557 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:13:24.553608 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:14:24.553675 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:14:24.553725 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:15:24.553874 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:15:24.553927 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:16:24.554060 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:16:24.554104 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:17:24.554200 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:17:24.554247 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:18:24.554393 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:18:24.554440 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:19:24.554574 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:19:24.554608 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:20:24.554760 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:20:24.554807 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:21:24.555066 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:21:24.555114 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:22:24.555268 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:22:24.555316 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:23:01.907396 BGP: Vty connection from 127.0.0.1
+2021/11/02 09:23:11.910298 BGP: vty[13]@127.0.0.1> en
+2021/11/02 09:23:21.911444 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 09:23:21.911777 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 09:23:24.555371 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:23:24.555429 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:24:24.555564 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:24:24.555637 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:25:21.912911 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 09:25:24.555748 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:25:24.555864 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:26:24.555884 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:26:24.555991 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:27:24.556158 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:27:24.556205 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:28:24.556221 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:28:24.556263 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:28:48.076583 BGP: 1.0.2.46 rcvd UPDATE w/ attr: nexthop 1.0.2.46, origin i, path 3549 36561
+2021/11/02 09:28:48.076616 BGP: 1.0.2.46 rcvd 208.65.153.0/24
+2021/11/02 09:28:48.076626 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 09:28:48.126712 BGP: Zebra send: IPv4 route add 208.65.153.0/24 nexthop 1.0.2.46 metric 0 tag 0 count 1
+2021/11/02 09:29:24.556459 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:29:24.556506 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:30:24.556506 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:30:24.556560 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:31:24.556677 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:31:24.556731 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:32:24.556869 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:32:24.556922 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:33:24.557050 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:33:24.557104 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:34:24.557259 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:34:24.557315 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:35:24.557412 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:35:24.557468 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:36:24.557573 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:36:24.557623 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:37:24.557774 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:37:24.557822 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:38:24.557900 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:38:24.557948 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:39:24.558133 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:39:24.558179 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:40:24.558309 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:40:24.558356 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:41:24.558450 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:41:24.558485 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:42:24.558770 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:42:24.558824 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:42:41.337388 BGP: Vty connection from 127.0.0.1
+2021/11/02 09:42:51.338114 BGP: vty[13]@127.0.0.1> en
+2021/11/02 09:43:01.339069 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 09:43:01.339375 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 09:43:24.558897 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:43:24.558943 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:44:24.559096 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:44:24.559143 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:45:01.340537 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 09:45:12.915932 BGP: 1.0.2.46 rcvd UPDATE w/ attr: nexthop 1.0.2.46, origin i, path 3549 36561
+2021/11/02 09:45:12.915971 BGP: 1.0.2.46 rcvd 208.65.153.128/25
+2021/11/02 09:45:12.915983 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 09:45:12.915995 BGP: 1.0.2.46 rcvd 208.65.153.0/25
+2021/11/02 09:45:12.916004 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 09:45:12.966074 BGP: Zebra send: IPv4 route add 208.65.153.128/25 nexthop 1.0.2.46 metric 0 tag 0 count 1
+2021/11/02 09:45:12.966110 BGP: Zebra send: IPv4 route add 208.65.153.0/25 nexthop 1.0.2.46 metric 0 tag 0 count 1
+2021/11/02 09:45:24.559221 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:45:24.559264 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:46:24.559378 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:46:24.559422 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:47:24.559555 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:47:24.559627 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:48:24.559880 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:48:24.559925 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:49:24.560004 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:49:24.560050 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:50:24.560123 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:50:24.560170 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:51:24.560220 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:51:24.560282 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:52:24.560403 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:52:24.560460 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:53:24.560724 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:53:24.560776 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:54:24.560846 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:54:24.560899 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:55:24.560965 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:55:24.561014 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:56:24.561170 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:56:24.561223 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:57:24.561347 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:57:24.561395 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:58:24.561552 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:58:24.561600 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 09:59:24.561805 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 09:59:24.561852 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:00:24.561979 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:00:24.562034 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:01:24.562144 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:01:24.562193 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:02:24.562344 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:02:24.562394 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:03:24.219754 BGP: Vty connection from 127.0.0.1
+2021/11/02 10:03:24.562350 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:03:24.562449 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:03:34.220371 BGP: vty[13]@127.0.0.1> en
+2021/11/02 10:03:44.221331 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 10:03:44.221628 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 10:04:24.562677 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:04:24.562727 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:05:24.562805 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:05:24.562854 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:05:44.222647 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 10:06:24.563014 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:06:24.563065 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:07:24.563148 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:07:24.563197 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:08:24.563375 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:08:24.563428 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:09:24.563615 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:09:24.563664 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:10:24.563705 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:10:24.563750 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:11:24.563979 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:11:24.564025 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:12:24.564081 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:12:24.564134 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:13:24.564290 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:13:24.564338 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:14:24.564409 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:14:24.564457 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:15:24.564540 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:15:24.564592 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:16:24.564747 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:16:24.564796 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:17:24.564921 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:17:24.564968 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:18:24.565088 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:18:24.565137 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:19:24.565216 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:19:24.565263 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:20:24.565449 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:20:24.565505 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:21:24.565682 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:21:24.565730 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:22:24.565834 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:22:24.565882 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:23:24.566001 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:23:24.566047 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:24:24.566174 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:24:24.566216 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:25:05.447504 BGP: Vty connection from 127.0.0.1
+2021/11/02 10:25:15.448303 BGP: vty[13]@127.0.0.1> en
+2021/11/02 10:25:24.566338 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:25:24.566385 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:25:25.449509 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 10:25:25.449845 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 10:26:24.566517 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:26:24.566575 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:27:24.566735 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:27:24.566784 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:27:25.450916 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 10:28:24.566882 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:28:24.566930 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:29:24.567058 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:29:24.567105 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:30:24.567208 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:30:24.567257 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:31:24.567512 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:31:24.567558 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:32:24.567679 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:32:24.567731 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:33:24.567876 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:33:24.567923 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:34:24.568042 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:34:24.568091 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:35:24.568177 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:35:24.568224 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:36:24.568335 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:36:24.568392 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:37:24.568533 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:37:24.568582 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:38:24.568689 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:38:24.568737 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:39:24.568844 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:39:24.568892 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:40:24.569035 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:40:24.569084 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:41:24.569144 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:41:24.569203 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:42:24.569318 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:42:24.569367 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:43:24.569488 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:43:24.569533 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:44:24.569672 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:44:24.569718 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:45:24.569876 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:45:24.569924 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:46:22.609297 BGP: Vty connection from 127.0.0.1
+2021/11/02 10:46:24.570069 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:46:24.570115 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:46:32.612824 BGP: vty[13]@127.0.0.1> en
+2021/11/02 10:46:42.613667 BGP: vty[13]@127.0.0.1# terminal length 0
+2021/11/02 10:46:42.614021 BGP: vty[13]@127.0.0.1# show ip bgp
+2021/11/02 10:47:24.570246 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:47:24.570293 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:48:24.570455 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:48:24.570510 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:48:42.615160 BGP: vty[13]@127.0.0.1# exit
+2021/11/02 10:49:24.570614 BGP: 1.0.2.46 send message type 4, length (incl. header) 19
+2021/11/02 10:49:24.570663 BGP: 1.0.2.46 rcv message type 4, length (excl. header) 0
+2021/11/02 10:50:15.179398 BGP: Zebra rcvd: interface 1280-3549 down
+2021/11/02 10:50:15.179441 BGP: %ADJCHANGE: neighbor 1.0.2.46 Down 
+2021/11/02 10:50:15.179481 BGP: 1.0.2.46 went from Established to Clearing
+2021/11/02 10:50:15.179506 BGP: Zebra rcvd: interface 1280-3549 address delete fe80::ec1c:49ff:fe3c:6dc8/64
+2021/11/02 10:50:15.183830 BGP: Zebra rcvd: router id update 0.0.0.0/32
+2021/11/02 10:50:15.183862 BGP: Zebra rcvd: interface 1280-3549 address delete 1.0.2.45/30
+2021/11/02 10:50:15.184011 BGP: Zebra rcvd: interface delete 1280-3549
+2021/11/02 10:50:15.189607 BGP: 1.0.2.46 went from Clearing to Idle
+2021/11/02 10:50:15.189878 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=0
+2021/11/02 10:50:15.239688 BGP: Zebra send: IPv4 route delete 208.65.152.0/22 metric 0 tag 0
+2021/11/02 10:50:15.239739 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.46/32
+2021/11/02 10:50:15.239746 BGP: Zebra send: IPv4 route delete 208.65.153.0/24 metric 0 tag 0
+2021/11/02 10:50:15.239751 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.46/32
+2021/11/02 10:50:15.239754 BGP: Zebra send: IPv4 route delete 208.65.153.0/25 metric 0 tag 0
+2021/11/02 10:50:15.239759 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.46/32
+2021/11/02 10:50:15.239763 BGP: Zebra send: IPv4 route delete 208.65.153.128/25 metric 0 tag 0
+2021/11/02 10:50:15.239770 BGP: bgp_unlink_nexthop: NHT unlinking 1.0.2.46/32
+2021/11/02 10:50:15.239773 BGP: bgp_unlink_nexthop: freeing bnc 1.0.2.46/32
+2021/11/02 10:50:17.191724 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 10:50:17.191802 BGP: 1.0.2.46 [Event] Connect start to 1.0.2.46 fd 12
+2021/11/02 10:50:17.191821 BGP: can't connect to 1.0.2.46 fd 12 : Network is unreachable
+2021/11/02 10:50:17.191826 BGP: 1.0.2.46 went from Idle to Connect
+2021/11/02 10:50:17.191861 BGP: 1.0.2.46 went from Connect to Active
+2021/11/02 10:50:17.191877 BGP: parse nexthop update(1.0.2.46/32): metric=0, #nexthop=0
+2021/11/02 10:50:17.191882 BGP: evaluate_paths: Updating peer (1.0.2.46) status with NHT
+2021/11/02 10:50:22.195697 BGP: bgp_ensure_nexthop: NHT ensured 1.0.2.46/32
+2021/11/02 10:50:22.195779 BGP: 1.0.2.46 [Event] Connect start to 1.0.2.46 fd 12
+2021/11/02 10:50:22.195794 BGP: can't connect to 1.0.2.46 fd 12 : Network is unreachable
+2021/11/02 10:50:22.195799 BGP: 1.0.2.46 went from Active to Connect
+2021/11/02 10:50:22.195834 BGP: 1.0.2.46 went from Connect to Active
+2021/11/02 10:50:23.447450 BGP: SIGHUP received
+2021/11/02 10:50:23.447510 BGP: bgpd restarting!

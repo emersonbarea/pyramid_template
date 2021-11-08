@@ -1,0 +1,429 @@
+#!/usr/bin/python
+
+import time
+import os
+import subprocess
+from datetime import datetime
+
+## timers
+
+start_datetime = 1203889500
+end_datetime = 1203897900
+current_time = 1203889500
+
+# write startup system datetime
+os.system('echo start_datetime:%s > log/system_date_time' % str(time.mktime(datetime.now().timetuple()) + datetime.now().microsecond * 1e-6).split('.')[0])
+
+## get Mininet nodes PID
+
+AS174 = str(os.popen('ps ax | grep -w "mininet:AS174" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS286 = str(os.popen('ps ax | grep -w "mininet:AS286" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1103 = str(os.popen('ps ax | grep -w "mininet:AS1103" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1221 = str(os.popen('ps ax | grep -w "mininet:AS1221" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1239 = str(os.popen('ps ax | grep -w "mininet:AS1239" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1273 = str(os.popen('ps ax | grep -w "mininet:AS1273" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1299 = str(os.popen('ps ax | grep -w "mininet:AS1299" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1853 = str(os.popen('ps ax | grep -w "mininet:AS1853" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1930 = str(os.popen('ps ax | grep -w "mininet:AS1930" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2119 = str(os.popen('ps ax | grep -w "mininet:AS2119" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2200 = str(os.popen('ps ax | grep -w "mininet:AS2200" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2497 = str(os.popen('ps ax | grep -w "mininet:AS2497" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2516 = str(os.popen('ps ax | grep -w "mininet:AS2516" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2857 = str(os.popen('ps ax | grep -w "mininet:AS2857" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS2914 = str(os.popen('ps ax | grep -w "mininet:AS2914" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3216 = str(os.popen('ps ax | grep -w "mininet:AS3216" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3257 = str(os.popen('ps ax | grep -w "mininet:AS3257" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3320 = str(os.popen('ps ax | grep -w "mininet:AS3320" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3327 = str(os.popen('ps ax | grep -w "mininet:AS3327" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3333 = str(os.popen('ps ax | grep -w "mininet:AS3333" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3356 = str(os.popen('ps ax | grep -w "mininet:AS3356" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3491 = str(os.popen('ps ax | grep -w "mininet:AS3491" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3549 = str(os.popen('ps ax | grep -w "mininet:AS3549" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3561 = str(os.popen('ps ax | grep -w "mininet:AS3561" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS3741 = str(os.popen('ps ax | grep -w "mininet:AS3741" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS4436 = str(os.popen('ps ax | grep -w "mininet:AS4436" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS4589 = str(os.popen('ps ax | grep -w "mininet:AS4589" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS4608 = str(os.popen('ps ax | grep -w "mininet:AS4608" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS4637 = str(os.popen('ps ax | grep -w "mininet:AS4637" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS4777 = str(os.popen('ps ax | grep -w "mininet:AS4777" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS5392 = str(os.popen('ps ax | grep -w "mininet:AS5392" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS5400 = str(os.popen('ps ax | grep -w "mininet:AS5400" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS5430 = str(os.popen('ps ax | grep -w "mininet:AS5430" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS5511 = str(os.popen('ps ax | grep -w "mininet:AS5511" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6067 = str(os.popen('ps ax | grep -w "mininet:AS6067" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6320 = str(os.popen('ps ax | grep -w "mininet:AS6320" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6453 = str(os.popen('ps ax | grep -w "mininet:AS6453" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6461 = str(os.popen('ps ax | grep -w "mininet:AS6461" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6667 = str(os.popen('ps ax | grep -w "mininet:AS6667" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6695 = str(os.popen('ps ax | grep -w "mininet:AS6695" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6762 = str(os.popen('ps ax | grep -w "mininet:AS6762" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6881 = str(os.popen('ps ax | grep -w "mininet:AS6881" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS6939 = str(os.popen('ps ax | grep -w "mininet:AS6939" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS7018 = str(os.popen('ps ax | grep -w "mininet:AS7018" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS7473 = str(os.popen('ps ax | grep -w "mininet:AS7473" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS7474 = str(os.popen('ps ax | grep -w "mininet:AS7474" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS7575 = str(os.popen('ps ax | grep -w "mininet:AS7575" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8167 = str(os.popen('ps ax | grep -w "mininet:AS8167" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8359 = str(os.popen('ps ax | grep -w "mininet:AS8359" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8402 = str(os.popen('ps ax | grep -w "mininet:AS8402" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8419 = str(os.popen('ps ax | grep -w "mininet:AS8419" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8434 = str(os.popen('ps ax | grep -w "mininet:AS8434" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8447 = str(os.popen('ps ax | grep -w "mininet:AS8447" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8468 = str(os.popen('ps ax | grep -w "mininet:AS8468" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8763 = str(os.popen('ps ax | grep -w "mininet:AS8763" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8881 = str(os.popen('ps ax | grep -w "mininet:AS8881" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8928 = str(os.popen('ps ax | grep -w "mininet:AS8928" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS9009 = str(os.popen('ps ax | grep -w "mininet:AS9009" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS9080 = str(os.popen('ps ax | grep -w "mininet:AS9080" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS10429 = str(os.popen('ps ax | grep -w "mininet:AS10429" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12399 = str(os.popen('ps ax | grep -w "mininet:AS12399" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12676 = str(os.popen('ps ax | grep -w "mininet:AS12676" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12695 = str(os.popen('ps ax | grep -w "mininet:AS12695" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12731 = str(os.popen('ps ax | grep -w "mininet:AS12731" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12779 = str(os.popen('ps ax | grep -w "mininet:AS12779" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12859 = str(os.popen('ps ax | grep -w "mininet:AS12859" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12956 = str(os.popen('ps ax | grep -w "mininet:AS12956" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12976 = str(os.popen('ps ax | grep -w "mininet:AS12976" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12989 = str(os.popen('ps ax | grep -w "mininet:AS12989" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS13101 = str(os.popen('ps ax | grep -w "mininet:AS13101" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS13237 = str(os.popen('ps ax | grep -w "mininet:AS13237" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS13645 = str(os.popen('ps ax | grep -w "mininet:AS13645" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS14361 = str(os.popen('ps ax | grep -w "mininet:AS14361" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS15703 = str(os.popen('ps ax | grep -w "mininet:AS15703" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS15756 = str(os.popen('ps ax | grep -w "mininet:AS15756" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16034 = str(os.popen('ps ax | grep -w "mininet:AS16034" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16150 = str(os.popen('ps ax | grep -w "mininet:AS16150" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16243 = str(os.popen('ps ax | grep -w "mininet:AS16243" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16467 = str(os.popen('ps ax | grep -w "mininet:AS16467" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16735 = str(os.popen('ps ax | grep -w "mininet:AS16735" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS19089 = str(os.popen('ps ax | grep -w "mininet:AS19089" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS19151 = str(os.popen('ps ax | grep -w "mininet:AS19151" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS19624 = str(os.popen('ps ax | grep -w "mininet:AS19624" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS20485 = str(os.popen('ps ax | grep -w "mininet:AS20485" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS20640 = str(os.popen('ps ax | grep -w "mininet:AS20640" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS20932 = str(os.popen('ps ax | grep -w "mininet:AS20932" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS20965 = str(os.popen('ps ax | grep -w "mininet:AS20965" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS21202 = str(os.popen('ps ax | grep -w "mininet:AS21202" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS21318 = str(os.popen('ps ax | grep -w "mininet:AS21318" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS21385 = str(os.popen('ps ax | grep -w "mininet:AS21385" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS22548 = str(os.popen('ps ax | grep -w "mininet:AS22548" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS22691 = str(os.popen('ps ax | grep -w "mininet:AS22691" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS23352 = str(os.popen('ps ax | grep -w "mininet:AS23352" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS24785 = str(os.popen('ps ax | grep -w "mininet:AS24785" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS24875 = str(os.popen('ps ax | grep -w "mininet:AS24875" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS24963 = str(os.popen('ps ax | grep -w "mininet:AS24963" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25091 = str(os.popen('ps ax | grep -w "mininet:AS25091" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25232 = str(os.popen('ps ax | grep -w "mininet:AS25232" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25462 = str(os.popen('ps ax | grep -w "mininet:AS25462" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25512 = str(os.popen('ps ax | grep -w "mininet:AS25512" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25525 = str(os.popen('ps ax | grep -w "mininet:AS25525" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS25560 = str(os.popen('ps ax | grep -w "mininet:AS25560" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS26943 = str(os.popen('ps ax | grep -w "mininet:AS26943" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS27664 = str(os.popen('ps ax | grep -w "mininet:AS27664" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS28917 = str(os.popen('ps ax | grep -w "mininet:AS28917" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS29073 = str(os.popen('ps ax | grep -w "mininet:AS29073" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS29208 = str(os.popen('ps ax | grep -w "mininet:AS29208" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS29636 = str(os.popen('ps ax | grep -w "mininet:AS29636" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS29686 = str(os.popen('ps ax | grep -w "mininet:AS29686" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS30126 = str(os.popen('ps ax | grep -w "mininet:AS30126" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS30132 = str(os.popen('ps ax | grep -w "mininet:AS30132" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS30844 = str(os.popen('ps ax | grep -w "mininet:AS30844" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS30890 = str(os.popen('ps ax | grep -w "mininet:AS30890" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS30912 = str(os.popen('ps ax | grep -w "mininet:AS30912" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS33970 = str(os.popen('ps ax | grep -w "mininet:AS33970" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34225 = str(os.popen('ps ax | grep -w "mininet:AS34225" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34948 = str(os.popen('ps ax | grep -w "mininet:AS34948" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34997 = str(os.popen('ps ax | grep -w "mininet:AS34997" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS36561 = str(os.popen('ps ax | grep -w "mininet:AS36561" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS39196 = str(os.popen('ps ax | grep -w "mininet:AS39196" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS39202 = str(os.popen('ps ax | grep -w "mininet:AS39202" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS39792 = str(os.popen('ps ax | grep -w "mininet:AS39792" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS39912 = str(os.popen('ps ax | grep -w "mininet:AS39912" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS41692 = str(os.popen('ps ax | grep -w "mininet:AS41692" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS20483 = str(os.popen('ps ax | grep -w "mininet:AS20483" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1916 = str(os.popen('ps ax | grep -w "mininet:AS1916" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS29449 = str(os.popen('ps ax | grep -w "mininet:AS29449" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS31323 = str(os.popen('ps ax | grep -w "mininet:AS31323" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8289 = str(os.popen('ps ax | grep -w "mininet:AS8289" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS1280 = str(os.popen('ps ax | grep -w "mininet:AS1280" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS28929 = str(os.popen('ps ax | grep -w "mininet:AS28929" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS17557 = str(os.popen('ps ax | grep -w "mininet:AS17557" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34347 = str(os.popen('ps ax | grep -w "mininet:AS34347" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34102 = str(os.popen('ps ax | grep -w "mininet:AS34102" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS34245 = str(os.popen('ps ax | grep -w "mininet:AS34245" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS31477 = str(os.popen('ps ax | grep -w "mininet:AS31477" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8331 = str(os.popen('ps ax | grep -w "mininet:AS8331" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS8596 = str(os.popen('ps ax | grep -w "mininet:AS8596" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS12350 = str(os.popen('ps ax | grep -w "mininet:AS12350" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS27319 = str(os.popen('ps ax | grep -w "mininet:AS27319" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS28895 = str(os.popen('ps ax | grep -w "mininet:AS28895" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS39637 = str(os.popen('ps ax | grep -w "mininet:AS39637" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+AS16186 = str(os.popen('ps ax | grep -w "mininet:AS16186" | grep bash | grep -v mnexec | awk \'{print $1};\'').read()).strip()
+
+
+## events
+
+while current_time != 1203897900:
+
+    ## Announcements
+
+    if current_time == 1203895123:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('router bgp 36561'); child.expect('.+#'); child.sendline('network 208.65.153.128/25'); child.expect('.+#')\"" % AS36561)
+
+    if current_time == 1203895123:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('router bgp 36561'); child.expect('.+#'); child.sendline('network 208.65.153.0/25'); child.expect('.+#')\"" % AS36561)
+
+    if current_time == 1203894445:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('router bgp 36561'); child.expect('.+#'); child.sendline('network 208.65.153.0/24'); child.expect('.+#')\"" % AS36561)
+
+    if current_time == 1203890049:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('router bgp 36561'); child.expect('.+#'); child.sendline('network 208.65.152.0/22'); child.expect('.+#')\"" % AS36561)
+
+    if current_time == 1203889673:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('router bgp 17557'); child.expect('.+#'); child.sendline('network 208.65.153.0/24'); child.expect('.+#')\"" % AS17557)
+
+
+    ## Withdrawns
+
+    if current_time == 1203897682:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-8763-3491 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-8763-3491 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-8763-3491 permit any'); child.expect('.+#'); child.sendline('route-map in-8763-3491 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-8763-3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 8763'); child.expect('.+#'); child.sendline('neighbor 1.0.1.166 route-map in-8763-3491 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS8763)
+
+    if current_time == 1203897682:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-8763-174 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-8763-174 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-8763-174 permit any'); child.expect('.+#'); child.sendline('route-map in-8763-174 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-8763-174'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 8763'); child.expect('.+#'); child.sendline('neighbor 1.0.4.66 route-map in-8763-174 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS8763)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-13237-25512 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-25512 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-25512 permit any'); child.expect('.+#'); child.sendline('route-map in-13237-25512 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-13237-25512'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 13237'); child.expect('.+#'); child.sendline('neighbor 1.0.3.237 route-map in-13237-25512 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS13237)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-13237-3549 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3549 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3549 permit any'); child.expect('.+#'); child.sendline('route-map in-13237-3549 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-13237-3549'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 13237'); child.expect('.+#'); child.sendline('neighbor 1.0.1.206 route-map in-13237-3549 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS13237)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-13237-3491 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3491 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3491 permit any'); child.expect('.+#'); child.sendline('route-map in-13237-3491 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-13237-3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 13237'); child.expect('.+#'); child.sendline('neighbor 1.0.0.242 route-map in-13237-3491 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS13237)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-13237-3320 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3320 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-3320 permit any'); child.expect('.+#'); child.sendline('route-map in-13237-3320 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-13237-3320'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 13237'); child.expect('.+#'); child.sendline('neighbor 1.0.2.190 route-map in-13237-3320 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS13237)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-13237-174 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-174 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-13237-174 permit any'); child.expect('.+#'); child.sendline('route-map in-13237-174 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-13237-174'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 13237'); child.expect('.+#'); child.sendline('neighbor 1.0.1.22 route-map in-13237-174 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS13237)
+
+    if current_time == 1203897674:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-20640-3491 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-20640-3491 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-20640-3491 permit any'); child.expect('.+#'); child.sendline('route-map in-20640-3491 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-20640-3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 20640'); child.expect('.+#'); child.sendline('neighbor 1.0.0.190 route-map in-20640-3491 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS20640)
+
+    if current_time == 1203897674:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-20640-174 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-20640-174 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-20640-174 permit any'); child.expect('.+#'); child.sendline('route-map in-20640-174 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-20640-174'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 20640'); child.expect('.+#'); child.sendline('neighbor 1.0.0.146 route-map in-20640-174 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS20640)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-36561 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-36561 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-36561 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-36561 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-36561'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.3.170 route-map in-12989-36561 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-4436 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-4436 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-4436 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-4436 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-4436'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.2.210 route-map in-12989-4436 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-3549 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3549 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3549 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-3549 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-3549'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.2.198 route-map in-12989-3549 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-3491 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3491 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3491 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-3491 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.4.118 route-map in-12989-3491 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-3356 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3356 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-3356 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-3356 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-3356'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.2.122 route-map in-12989-3356 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897659:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-12989-174 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-174 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-12989-174 permit any'); child.expect('.+#'); child.sendline('route-map in-12989-174 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-12989-174'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 12989'); child.expect('.+#'); child.sendline('neighbor 1.0.0.114 route-map in-12989-174 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS12989)
+
+    if current_time == 1203897138:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-16034-16150 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-16150 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-16150 permit any'); child.expect('.+#'); child.sendline('route-map in-16034-16150 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-16034-16150'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16034'); child.expect('.+#'); child.sendline('neighbor 1.0.3.198 route-map in-16034-16150 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16034)
+
+    if current_time == 1203897138:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-16034-3491 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-3491 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-3491 permit any'); child.expect('.+#'); child.sendline('route-map in-16034-3491 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-16034-3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16034'); child.expect('.+#'); child.sendline('neighbor 1.0.2.102 route-map in-16034-3491 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16034)
+
+    if current_time == 1203897138:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-16034-174 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-174 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16034-174 permit any'); child.expect('.+#'); child.sendline('route-map in-16034-174 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-16034-174'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16034'); child.expect('.+#'); child.sendline('neighbor 1.0.0.54 route-map in-16034-174 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16034)
+
+    if current_time == 1203896033:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-16467-3356 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16467-3356 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16467-3356 permit any'); child.expect('.+#'); child.sendline('route-map in-16467-3356 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-16467-3356'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16467'); child.expect('.+#'); child.sendline('neighbor 1.0.0.14 route-map in-16467-3356 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16467)
+
+    if current_time == 1203896033:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#');  child.sendline('no ip prefix-list prefix-list-in-16467-2914 permit any'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16467-2914 deny 208.65.153.0/24'); child.expect('.+#'); child.sendline('ip prefix-list prefix-list-in-16467-2914 permit any'); child.expect('.+#'); child.sendline('route-map in-16467-2914 permit 10'); child.expect('.+#'); child.sendline('match ip address prefix-list prefix-list-in-16467-2914'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16467'); child.expect('.+#'); child.sendline('neighbor 1.0.0.250 route-map in-16467-2914 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16467)
+
+
+    ## Prepends
+
+    if current_time == 1203889688:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-1299-29686 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 1299'); child.expect('.+#');  child.sendline('neighbor 1.0.0.182 route-map out-1299-29686 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS1299)
+
+    if current_time == 1203889689:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-1299-28917 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 1299'); child.expect('.+#');  child.sendline('neighbor 1.0.0.182 route-map out-1299-28917 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS1299)
+
+    if current_time == 1203889689:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-1299-34225 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 1299'); child.expect('.+#');  child.sendline('neighbor 1.0.0.182 route-map out-1299-34225 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS1299)
+
+    if current_time == 1203889689:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-1299-12676 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3491'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 1299'); child.expect('.+#');  child.sendline('neighbor 1.0.0.182 route-map out-1299-12676 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS1299)
+
+    if current_time == 1203889693:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-31323-3549 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3549'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 31323'); child.expect('.+#');  child.sendline('neighbor 1.0.1.82 route-map in-31323-3549 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS31323)
+
+    if current_time == 1203889707:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-16186-21318 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  21318'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16186'); child.expect('.+#');  child.sendline('neighbor 1.0.4.126 route-map in-16186-21318 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16186)
+
+    if current_time == 1203889715:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-30890-6453 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  6453 6453'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 30890'); child.expect('.+#');  child.sendline('neighbor 1.0.3.106 route-map in-30890-6453 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS30890)
+
+    if current_time == 1203895131:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-31323-3549 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3549'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 31323'); child.expect('.+#');  child.sendline('neighbor 1.0.1.82 route-map in-31323-3549 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS31323)
+
+    if current_time == 1203895131:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-31323-3549 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  3549'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 31323'); child.expect('.+#');  child.sendline('neighbor 1.0.1.82 route-map in-31323-3549 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS31323)
+
+    if current_time == 1203895137:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-16186-21318 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  21318'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16186'); child.expect('.+#');  child.sendline('neighbor 1.0.4.126 route-map in-16186-21318 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16186)
+
+    if current_time == 1203895137:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map in-16186-21318 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  21318'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 16186'); child.expect('.+#');  child.sendline('neighbor 1.0.4.126 route-map in-16186-21318 in'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS16186)
+
+    if current_time == 1203897139:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-29636 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-29636 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897145:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-286 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-286 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897145:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-9009 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-9009 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897146:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-12989 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-12989 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897146:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-25232 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-25232 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897146:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-16243 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-16243 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897147:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-8419 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-8419 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897148:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-6320 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-6320 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897149:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-6067 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-6067 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897153:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-39202 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-39202 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897154:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-3741 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-3741 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897156:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-8447 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-8447 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897156:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-13237 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-13237 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897156:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-29686 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-29686 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897156:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-12676 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-12676 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897157:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-39196 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-39196 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897157:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-24963 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-24963 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897157:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-12859 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-12859 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897158:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-41692 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-41692 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897162:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-30844 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-30844 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897162:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-8881 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-8881 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897169:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-16034 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-16034 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897169:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-8468 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-8468 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897169:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-2857 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-2857 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897177:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-20640 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-20640 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897186:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-8763 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-8763 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897200:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-3327 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-3327 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897262:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-29208 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-29208 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+    if current_time == 1203897681:
+        os.popen("sudo -u minisecbgpuser sudo mnexec -a %s /usr/bin/python -c \"import pexpect; child = pexpect.spawn('telnet 0 bgpd'); child.expect('Password: '); child.sendline('en'); child.expect('.+>'); child.sendline('enable'); child.expect(['Password: ','.+#']); child.sendline('en'); child.expect('.+#'); child.sendline('configure terminal'); child.expect('.+#'); child.sendline('route-map out-3491-33970 permit 10'); child.expect('.+#'); child.sendline('set as-path prepend  17557'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('router bgp 3491'); child.expect('.+#');  child.sendline('neighbor 1.0.2.166 route-map out-3491-33970 out'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('exit'); child.expect('.+#'); child.sendline('clear ip bgp * soft'); child.expect('.+#')\"" % AS3491)
+
+
+    ## Monitoring
+
+    if current_time == 1203889500:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203889500")
+        time.sleep(60)
+
+    if current_time == 1203890433:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203890433")
+        time.sleep(60)
+
+    if current_time == 1203891366:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203891366")
+        time.sleep(60)
+
+    if current_time == 1203892299:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203892299")
+        time.sleep(60)
+
+    if current_time == 1203893232:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203893232")
+        time.sleep(60)
+
+    if current_time == 1203894165:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203894165")
+        time.sleep(60)
+
+    if current_time == 1203895038:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203895038")
+        time.sleep(60)
+
+    if current_time == 1203895971:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203895971")
+        time.sleep(60)
+
+    if current_time == 1203896964:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203896964")
+        time.sleep(60)
+
+    if current_time == 1203897897:
+        time.sleep(240)
+        os.popen("./event_monitoring.MiniSecBGP 1203897897")
+        time.sleep(60)
+
+    time.sleep(1)
+
+    current_time = current_time + 1
+
+# write system end datetime
+os.system('echo end_datetime:%s >> log/system_date_time' % str(time.mktime(datetime.now().timetuple()) + datetime.now().microsecond * 1e-6).split('.')[0])

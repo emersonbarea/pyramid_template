@@ -1,0 +1,999 @@
+2021/08/22 18:09:04.166565 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWADDR(20), seq=6
+2021/08/22 18:09:04.166723 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWADDR(20), seq=6, pid=0
+2021/08/22 18:09:04.167063 ZEBRA: Zebra 1.2.4 starting: vty@2601
+2021/08/22 18:09:04.167088 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_NEWADDR(20), seq=6, pid=3551071801
+2021/08/22 18:09:04.167095 ZEBRA: netlink_interface_addr RTM_NEWADDR lo vrf 0:
+2021/08/22 18:09:04.167103 ZEBRA:   IFA_LOCAL     127.0.0.1/32
+2021/08/22 18:09:04.167107 ZEBRA:   IFA_ADDRESS   127.0.0.1/32
+2021/08/22 18:09:04.167110 ZEBRA:   IFA_CACHEINFO pref -1, valid -1
+2021/08/22 18:09:04.167127 ZEBRA: MESSAGE: ZEBRA_INTERFACE_ADDRESS_ADD 127.0.0.1/32 on lo
+2021/08/22 18:09:04.167133 ZEBRA: rib_add_ipv4: calling rib_addnode (0x55fb54fb7720, 0x55fb54fb9840)
+2021/08/22 18:09:04.167139 ZEBRA: rib_link: 127.0.0.1/32 vrf 0: rn 0x55fb54fb7720, rib 0x55fb54fb9840
+2021/08/22 18:09:04.167144 ZEBRA: rib_link: 127.0.0.1/32 vrf 0: adding dest to table
+2021/08/22 18:09:04.167148 ZEBRA: rib_add_ipv4: calling rib_addnode (0x55fb54fb9930, 0x55fb54fb9990)
+2021/08/22 18:09:04.167153 ZEBRA: rib_link: 127.0.0.1/32 (MRIB) vrf 0: rn 0x55fb54fb9930, rib 0x55fb54fb9990
+2021/08/22 18:09:04.167157 ZEBRA: rib_link: 127.0.0.1/32 (MRIB) vrf 0: adding dest to table
+2021/08/22 18:09:04.500837 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:09:04.500856 ZEBRA: zebra message received [ZEBRA_HELLO] 1 in VRF 0
+2021/08/22 18:09:04.500860 ZEBRA: client 13 says hello and bids fair to announce only bgp routes
+2021/08/22 18:09:04.500879 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:09:04.500884 ZEBRA: zebra message received [ZEBRA_ROUTER_ID_ADD] 0 in VRF 0
+2021/08/22 18:09:04.500913 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:09:04.500924 ZEBRA: zebra message received [ZEBRA_INTERFACE_ADD] 0 in VRF 0
+2021/08/22 18:09:04.500932 ZEBRA: Try to set TE Link Param
+2021/08/22 18:09:04.500952 ZEBRA: Try to set TE Link Param
+2021/08/22 18:09:04.500965 ZEBRA: Try to set TE Link Param
+2021/08/22 18:09:04.500973 ZEBRA: Try to set TE Link Param
+2021/08/22 18:09:04.500983 ZEBRA: Try to set TE Link Param
+2021/08/22 18:09:05.500732 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:09:05.500756 ZEBRA: zebra message received [ZEBRA_NEXTHOP_REGISTER] 8 in VRF 0
+2021/08/22 18:09:05.500761 ZEBRA: nexthop_register msg from client bgp: length=8
+
+2021/08/22 18:09:05.500768 ZEBRA: add rnh 1.0.0.174/32 in vrf 0
+2021/08/22 18:09:05.500775 ZEBRA: client bgp registers rnh 1.0.0.174/32
+2021/08/22 18:09:05.500789 ZEBRA: rnh 1.0.0.174/32 resolved through route 1.0.0.172/30 - sending nexthop reachable event to clients
+2021/08/22 18:09:09.553924 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:09:09.553940 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 18:09:09.553948 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb670, rib 0x55fb54fbb550
+2021/08/22 18:09:09.553951 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 18:09:09.553955 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb670, 0x55fb54fbb550) on new RIB entry
+2021/08/22 18:09:09.553957 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb550 for 208.65.152.0/22 vrf 0
+2021/08/22 18:09:09.553959 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629666549, type == 9, table == 0
+2021/08/22 18:09:09.553962 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 18:09:09.553963 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 18:09:09.553966 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 18:09:09.553968 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 18:09:09.564041 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:09:09.564049 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:09:09.564052 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=7
+2021/08/22 18:09:09.564089 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=7, pid=0
+2021/08/22 18:10:14.471706 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:10:14.471736 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 18:10:14.471752 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 18:10:14.471764 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb670, rib 0x55fb54fbb550, removing
+2021/08/22 18:10:14.481852 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:10:14.481866 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:10:14.481872 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=8
+2021/08/22 18:10:14.481949 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=8, pid=0
+2021/08/22 18:10:14.481960 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb670, removing rib 0x55fb54fbb550
+2021/08/22 18:10:14.481968 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb670, rib 0x55fb54fbb550
+2021/08/22 18:10:14.481977 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 18:10:18.588933 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:10:18.588995 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 18:10:18.589008 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb7f0
+2021/08/22 18:10:18.589015 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 18:10:18.589022 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb7f0) on new RIB entry
+2021/08/22 18:10:18.589027 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb7f0 for 208.65.152.0/22 vrf 0
+2021/08/22 18:10:18.589031 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629666618, type == 9, table == 0
+2021/08/22 18:10:18.589036 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 18:10:18.589040 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 18:10:18.589045 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 18:10:18.589050 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 18:10:18.599122 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:10:18.599136 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:10:18.599139 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=9
+2021/08/22 18:10:18.599226 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=9, pid=0
+2021/08/22 18:10:21.589259 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:10:21.589285 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 18:10:21.589297 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 18:10:21.589304 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 18:10:21.589309 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 18:10:21.589313 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629666621, type == 9, table == 0
+2021/08/22 18:10:21.589318 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 18:10:21.589321 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 18:10:21.589326 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 18:10:21.589329 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 18:10:21.589333 ZEBRA: rib_add_ipv4_multipath: calling rib_delnode (0x55fb54fbb910, 0x55fb54fbb7f0) on existing RIB entry
+2021/08/22 18:10:21.589337 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb7f0 for 208.65.152.0/22 vrf 0
+2021/08/22 18:10:21.589361 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629666618, type == 9, table == 0
+2021/08/22 18:10:21.589366 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 16, status == 6
+2021/08/22 18:10:21.589368 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 1, nexthop_fib_num == 0
+2021/08/22 18:10:21.589371 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags ACTIVE FIB 
+2021/08/22 18:10:21.589373 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 18:10:21.589378 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb7f0, removing
+2021/08/22 18:10:21.599440 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:10:21.599453 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:10:21.599455 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=10
+2021/08/22 18:10:21.599594 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=10, pid=0
+2021/08/22 18:10:21.599604 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb7f0
+2021/08/22 18:10:21.599620 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb7f0
+2021/08/22 18:10:48.372835 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:10:48.372854 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 18:10:48.372861 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 18:10:48.372866 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 18:10:48.382962 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:10:48.382971 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:10:48.382974 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=11
+2021/08/22 18:10:48.382998 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=11, pid=0
+2021/08/22 18:10:48.383004 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 18:10:48.383007 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 18:10:48.383011 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 18:13:36.083599 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:13:36.083619 ZEBRA: zebra message received [ZEBRA_NEXTHOP_UNREGISTER] 8 in VRF 0
+2021/08/22 18:13:36.083623 ZEBRA: nexthop_unregister msg from client bgp: length=8
+
+2021/08/22 18:13:36.083630 ZEBRA: client bgp unregisters rnh 1.0.0.174/32
+2021/08/22 18:13:36.083637 ZEBRA: delete rnh 1.0.0.174/32
+2021/08/22 18:15:40.168274 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:15:40.168339 ZEBRA: zebra message received [ZEBRA_NEXTHOP_REGISTER] 8 in VRF 0
+2021/08/22 18:15:40.168345 ZEBRA: nexthop_register msg from client bgp: length=8
+
+2021/08/22 18:15:40.168353 ZEBRA: add rnh 1.0.0.174/32 in vrf 0
+2021/08/22 18:15:40.168362 ZEBRA: client bgp registers rnh 1.0.0.174/32
+2021/08/22 18:15:40.168375 ZEBRA: rnh 1.0.0.174/32 resolved through route 1.0.0.172/30 - sending nexthop reachable event to clients
+2021/08/22 18:16:26.802024 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:16:26.802051 ZEBRA: zebra message received [ZEBRA_NEXTHOP_UNREGISTER] 8 in VRF 0
+2021/08/22 18:16:26.802056 ZEBRA: nexthop_unregister msg from client bgp: length=8
+
+2021/08/22 18:16:26.802065 ZEBRA: client bgp unregisters rnh 1.0.0.174/32
+2021/08/22 18:16:26.802072 ZEBRA: delete rnh 1.0.0.174/32
+2021/08/22 18:18:44.409925 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:18:44.410006 ZEBRA: zebra message received [ZEBRA_NEXTHOP_REGISTER] 8 in VRF 0
+2021/08/22 18:18:44.410018 ZEBRA: nexthop_register msg from client bgp: length=8
+
+2021/08/22 18:18:44.410029 ZEBRA: add rnh 1.0.0.174/32 in vrf 0
+2021/08/22 18:18:44.410045 ZEBRA: client bgp registers rnh 1.0.0.174/32
+2021/08/22 18:18:44.410079 ZEBRA: rnh 1.0.0.174/32 resolved through route 1.0.0.172/30 - sending nexthop reachable event to clients
+2021/08/22 18:18:44.410509 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:18:44.410519 ZEBRA: zebra message received [ZEBRA_NEXTHOP_UNREGISTER] 8 in VRF 0
+2021/08/22 18:18:44.410526 ZEBRA: nexthop_unregister msg from client bgp: length=8
+
+2021/08/22 18:18:44.410533 ZEBRA: client bgp unregisters rnh 1.0.0.174/32
+2021/08/22 18:18:44.410541 ZEBRA: delete rnh 1.0.0.174/32
+2021/08/22 18:20:15.826190 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:20:15.826233 ZEBRA: zebra message received [ZEBRA_NEXTHOP_REGISTER] 8 in VRF 0
+2021/08/22 18:20:15.826242 ZEBRA: nexthop_register msg from client bgp: length=8
+
+2021/08/22 18:20:15.826324 ZEBRA: add rnh 1.0.0.174/32 in vrf 0
+2021/08/22 18:20:15.826332 ZEBRA: client bgp registers rnh 1.0.0.174/32
+2021/08/22 18:20:15.826436 ZEBRA: rnh 1.0.0.174/32 resolved through route 1.0.0.172/30 - sending nexthop reachable event to clients
+2021/08/22 18:20:58.887182 ZEBRA: zebra message comes from socket [13]
+2021/08/22 18:20:58.887230 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 18:20:58.887251 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 18:20:58.887259 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 18:20:58.887271 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 18:20:58.887278 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 18:20:58.887288 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629667258, type == 9, table == 0
+2021/08/22 18:20:58.887294 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 18:20:58.887301 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 18:20:58.887308 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 18:20:58.887318 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 18:20:58.897467 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 18:20:58.897493 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 18:20:58.897503 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=12
+2021/08/22 18:20:58.897577 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=12, pid=0
+2021/08/22 19:00:20.950105 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:00:20.950133 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:00:20.950141 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:00:20.950147 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 19:00:20.960206 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:00:20.960218 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:00:20.960222 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=13
+2021/08/22 19:00:20.960254 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=13, pid=0
+2021/08/22 19:00:20.960261 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 19:00:20.960265 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:00:20.960269 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:00:27.265242 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:00:27.265263 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:00:27.265272 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:00:27.265276 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:00:27.265290 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 19:00:27.265294 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 19:00:27.265297 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669627, type == 9, table == 0
+2021/08/22 19:00:27.265300 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:00:27.265303 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:00:27.265307 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:00:27.265312 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:00:27.275407 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:00:27.275419 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:00:27.275422 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=14
+2021/08/22 19:00:27.275461 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=14, pid=0
+2021/08/22 19:00:58.211397 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:00:58.211416 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:00:58.211422 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:00:58.211428 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 19:00:58.221513 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:00:58.221528 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:00:58.221531 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=15
+2021/08/22 19:00:58.221566 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=15, pid=0
+2021/08/22 19:00:58.221576 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 19:00:58.221580 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:00:58.221584 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:01:03.273256 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:01:03.273279 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:01:03.273287 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:01:03.273291 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:01:03.273295 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 19:01:03.273298 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 19:01:03.273300 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669663, type == 9, table == 0
+2021/08/22 19:01:03.273303 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:01:03.273305 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:01:03.273308 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:01:03.273310 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:01:03.283423 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:01:03.283440 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:01:03.283443 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=16
+2021/08/22 19:01:03.283514 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=16, pid=0
+2021/08/22 19:01:18.181547 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:01:18.181566 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:01:18.181573 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:01:18.181586 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 19:01:18.191755 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:01:18.191767 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:01:18.191770 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=17
+2021/08/22 19:01:18.191800 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=17, pid=0
+2021/08/22 19:01:18.191805 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 19:01:18.191809 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:01:18.191812 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:01:24.184768 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:01:24.184787 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:01:24.184795 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:01:24.184799 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:01:24.184803 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 19:01:24.184820 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 19:01:24.184823 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669684, type == 9, table == 0
+2021/08/22 19:01:24.184827 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:01:24.184831 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:01:24.184872 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:01:24.184875 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:01:24.194866 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:01:24.194878 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:01:24.194881 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=18
+2021/08/22 19:01:24.194927 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=18, pid=0
+2021/08/22 19:01:24.999274 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:01:24.999285 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:01:24.999292 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:01:24.999297 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 19:01:25.009451 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:01:25.009473 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:01:25.009477 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=19
+2021/08/22 19:01:25.009586 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=19, pid=0
+2021/08/22 19:01:25.009594 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 19:01:25.009598 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:01:25.009603 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:01:33.185463 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:01:33.185573 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:01:33.185583 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:01:33.185588 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:01:33.185623 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 19:01:33.185640 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 19:01:33.185667 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669693, type == 9, table == 0
+2021/08/22 19:01:33.185671 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:01:33.185674 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:01:33.185719 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:01:33.185722 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:01:33.195709 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:01:33.195721 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:01:33.195738 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=20
+2021/08/22 19:01:33.195791 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=20, pid=0
+2021/08/22 19:02:46.389320 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:02:46.389355 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:02:46.389370 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:02:46.389382 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 19:02:46.399467 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:02:46.399477 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:02:46.399480 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=21
+2021/08/22 19:02:46.399511 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=21, pid=0
+2021/08/22 19:02:46.399541 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 19:02:46.399545 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:02:46.399590 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:02:51.189977 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:02:51.190064 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:02:51.190104 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:02:51.190108 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:02:51.190113 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 19:02:51.190116 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 19:02:51.190120 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669771, type == 9, table == 0
+2021/08/22 19:02:51.190125 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:02:51.190129 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:02:51.190166 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:02:51.190169 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:02:51.200326 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:02:51.200378 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:02:51.200382 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=22
+2021/08/22 19:02:51.200421 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=22, pid=0
+2021/08/22 19:03:13.138407 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:03:13.138529 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 19:03:13.138581 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 19:03:13.138628 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 19:03:13.148832 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:03:13.148889 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:03:13.148957 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=23
+2021/08/22 19:03:13.149208 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=23, pid=0
+2021/08/22 19:03:13.149250 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 19:03:13.149365 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 19:03:13.149650 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 19:03:21.191263 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:03:21.191281 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:03:21.191289 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 19:03:21.191293 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 19:03:21.191296 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 19:03:21.191299 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 19:03:21.191301 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669801, type == 9, table == 0
+2021/08/22 19:03:21.191304 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:03:21.191306 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:03:21.191309 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:03:21.191311 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:03:21.201419 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 19:03:21.201430 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:03:21.201432 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=24
+2021/08/22 19:03:21.201462 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=24, pid=0
+2021/08/22 19:03:24.191498 ZEBRA: zebra message comes from socket [13]
+2021/08/22 19:03:24.191517 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 19:03:24.191525 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30
+2021/08/22 19:03:24.191529 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 19:03:24.191533 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbbaf0, 0x55fb54fbba30) on new RIB entry
+2021/08/22 19:03:24.191536 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbba30 for 208.65.153.0/24 vrf 0
+2021/08/22 19:03:24.191538 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629669804, type == 9, table == 0
+2021/08/22 19:03:24.191541 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 19:03:24.191543 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 19:03:24.191546 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 19:03:24.191549 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 19:03:24.201619 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 19:03:24.201631 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 19:03:24.201634 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=25
+2021/08/22 19:03:24.201674 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=25, pid=0
+2021/08/22 20:48:56.349668 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:48:56.349693 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 20:48:56.349702 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 20:48:56.349718 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30, removing
+2021/08/22 20:48:56.359814 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 20:48:56.359825 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:48:56.359829 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=26
+2021/08/22 20:48:56.359882 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=26, pid=0
+2021/08/22 20:48:56.359888 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbaf0, removing rib 0x55fb54fbba30
+2021/08/22 20:48:56.359891 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30
+2021/08/22 20:48:56.359895 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 20:48:57.298686 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:48:57.298701 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 20:48:57.298707 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 20:48:57.298711 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 20:48:57.308773 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 20:48:57.308778 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:48:57.308780 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=27
+2021/08/22 20:48:57.308797 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=27, pid=0
+2021/08/22 20:48:57.308802 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 20:48:57.308804 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 20:48:57.308807 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 20:49:05.106764 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:05.106784 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 20:49:05.106793 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 20:49:05.106797 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 20:49:05.106801 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 20:49:05.106804 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 20:49:05.106807 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629676145, type == 9, table == 0
+2021/08/22 20:49:05.106810 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 20:49:05.106812 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 20:49:05.106815 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 20:49:05.106817 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 20:49:05.116870 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:05.116878 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:05.116881 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=28
+2021/08/22 20:49:05.116935 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=28, pid=0
+2021/08/22 20:49:29.114360 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:29.114377 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 20:49:29.114386 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbaf0
+2021/08/22 20:49:29.114389 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 20:49:29.114392 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbba90, 0x55fb54fbbaf0) on new RIB entry
+2021/08/22 20:49:29.114401 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbaf0 for 208.65.153.0/24 vrf 0
+2021/08/22 20:49:29.114403 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629676169, type == 9, table == 0
+2021/08/22 20:49:29.114405 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 20:49:29.114407 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 20:49:29.114409 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 20:49:29.114411 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 20:49:29.124513 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:29.124521 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:29.124523 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=29
+2021/08/22 20:49:29.124555 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=29, pid=0
+2021/08/22 20:49:29.505558 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:29.505567 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 20:49:29.505572 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 20:49:29.505577 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbaf0, removing
+2021/08/22 20:49:29.515649 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:29.515657 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:29.515660 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=30
+2021/08/22 20:49:29.515689 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=30, pid=0
+2021/08/22 20:49:29.515695 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, removing rib 0x55fb54fbbaf0
+2021/08/22 20:49:29.515698 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbaf0
+2021/08/22 20:49:29.515701 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 20:49:37.304119 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:37.304148 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 20:49:37.304153 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 20:49:37.304157 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 20:49:37.314240 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:37.314248 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:37.314251 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=31
+2021/08/22 20:49:37.314278 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=31, pid=0
+2021/08/22 20:49:37.314283 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 20:49:37.314286 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 20:49:37.314289 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 20:49:41.306075 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:41.306092 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 20:49:41.306100 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 20:49:41.306103 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 20:49:41.306106 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 20:49:41.306109 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 20:49:41.306111 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629676181, type == 9, table == 0
+2021/08/22 20:49:41.306113 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 20:49:41.306121 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 20:49:41.306124 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 20:49:41.306126 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 20:49:41.316199 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:41.316207 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:41.316210 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=32
+2021/08/22 20:49:41.316252 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=32, pid=0
+2021/08/22 20:49:56.308005 ZEBRA: zebra message comes from socket [13]
+2021/08/22 20:49:56.308023 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 20:49:56.308032 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba30, rib 0x55fb54fbba90
+2021/08/22 20:49:56.308035 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 20:49:56.308039 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbba30, 0x55fb54fbba90) on new RIB entry
+2021/08/22 20:49:56.308042 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbba90 for 208.65.153.0/24 vrf 0
+2021/08/22 20:49:56.308045 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629676196, type == 9, table == 0
+2021/08/22 20:49:56.308047 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 20:49:56.308049 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 20:49:56.308052 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 20:49:56.308055 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 20:49:56.318177 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 20:49:56.318185 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 20:49:56.318188 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=33
+2021/08/22 20:49:56.318235 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=33, pid=0
+2021/08/22 21:28:16.924047 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:28:16.924065 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 21:28:16.924070 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 21:28:16.924075 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba30, rib 0x55fb54fbba90, removing
+2021/08/22 21:28:16.934145 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 21:28:16.934154 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:28:16.934156 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=34
+2021/08/22 21:28:16.934190 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=34, pid=0
+2021/08/22 21:28:16.934196 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba30, removing rib 0x55fb54fbba90
+2021/08/22 21:28:16.934199 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba30, rib 0x55fb54fbba90
+2021/08/22 21:28:16.934203 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 21:28:17.895315 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:28:17.895341 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 21:28:17.895349 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 21:28:17.895356 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 21:28:17.905529 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 21:28:17.905540 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:28:17.905553 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=35
+2021/08/22 21:28:17.905582 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=35, pid=0
+2021/08/22 21:28:17.905589 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 21:28:17.905594 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 21:28:17.905609 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 21:28:30.068676 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:28:30.068691 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 21:28:30.068698 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 21:28:30.068701 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 21:28:30.068705 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 21:28:30.068707 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.152.0/22 vrf 0
+2021/08/22 21:28:30.068709 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629678510, type == 9, table == 0
+2021/08/22 21:28:30.068712 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 21:28:30.068714 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 21:28:30.068716 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 21:28:30.068718 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 21:28:30.078799 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 21:28:30.078807 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:28:30.078809 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=36
+2021/08/22 21:28:30.078841 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=36, pid=0
+2021/08/22 21:28:53.012433 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:28:53.012452 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 21:28:53.012460 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 21:28:53.012466 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 21:28:53.022536 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 21:28:53.022543 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:28:53.022546 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=37
+2021/08/22 21:28:53.022564 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=37, pid=0
+2021/08/22 21:28:53.022570 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 21:28:53.022573 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 21:28:53.022576 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 21:29:03.074186 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:29:03.074204 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 21:29:03.074212 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 21:29:03.074215 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 21:29:03.074219 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 21:29:03.074222 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.153.0/24 vrf 0
+2021/08/22 21:29:03.074224 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629678543, type == 9, table == 0
+2021/08/22 21:29:03.074226 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 21:29:03.074229 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 21:29:03.074239 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 21:29:03.074241 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 21:29:03.084307 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 21:29:03.084316 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:29:03.084318 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=38
+2021/08/22 21:29:03.084370 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=38, pid=0
+2021/08/22 21:29:10.807299 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:29:10.807320 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 21:29:10.807328 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 21:29:10.807334 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0, removing
+2021/08/22 21:29:10.817479 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 21:29:10.817490 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:29:10.817492 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=39
+2021/08/22 21:29:10.817515 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=39, pid=0
+2021/08/22 21:29:10.817522 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb8b0
+2021/08/22 21:29:10.817525 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb8b0
+2021/08/22 21:29:10.817529 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 21:29:21.075283 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:29:21.075301 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 21:29:21.075309 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 21:29:21.075312 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 21:29:21.075315 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 21:29:21.075318 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.153.0/24 vrf 0
+2021/08/22 21:29:21.075320 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629678561, type == 9, table == 0
+2021/08/22 21:29:21.075323 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 21:29:21.075325 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 21:29:21.075327 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 21:29:21.075329 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 21:29:21.075340 ZEBRA: zebra message comes from socket [13]
+2021/08/22 21:29:21.075342 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 21:29:21.075346 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30
+2021/08/22 21:29:21.075348 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 21:29:21.075350 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbbaf0, 0x55fb54fbba30) on new RIB entry
+2021/08/22 21:29:21.075353 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbba30 for 208.65.152.0/22 vrf 0
+2021/08/22 21:29:21.075355 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629678561, type == 9, table == 0
+2021/08/22 21:29:21.075357 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 21:29:21.075359 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 21:29:21.075361 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 21:29:21.075363 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 21:29:21.085420 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 21:29:21.085434 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:29:21.085436 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=40
+2021/08/22 21:29:21.085461 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=40, pid=0
+2021/08/22 21:29:21.085472 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 21:29:21.085474 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 21:29:21.085476 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=41
+2021/08/22 21:29:21.085489 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=41, pid=0
+2021/08/22 22:07:44.998259 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:07:44.998315 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:07:44.998321 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 22:07:44.998326 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30, removing
+2021/08/22 22:07:45.008405 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:07:45.008419 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:07:45.008421 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=42
+2021/08/22 22:07:45.008440 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=42, pid=0
+2021/08/22 22:07:45.008445 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbaf0, removing rib 0x55fb54fbba30
+2021/08/22 22:07:45.008449 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbaf0, rib 0x55fb54fbba30
+2021/08/22 22:07:45.008452 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 22:07:46.914540 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:07:46.914558 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:07:46.914566 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbbaf0
+2021/08/22 22:07:46.914571 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbbaf0) on new RIB entry
+2021/08/22 22:07:46.914574 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbaf0 for 208.65.153.0/24 vrf 0
+2021/08/22 22:07:46.914577 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629680866, type == 9, table == 0
+2021/08/22 22:07:46.914579 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:07:46.914582 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:07:46.914585 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:07:46.914588 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:07:46.914590 ZEBRA: rib_add_ipv4_multipath: calling rib_delnode (0x55fb54fbb910, 0x55fb54fbb970) on existing RIB entry
+2021/08/22 22:07:46.914592 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.153.0/24 vrf 0
+2021/08/22 22:07:46.914595 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629678561, type == 9, table == 0
+2021/08/22 22:07:46.914597 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 16, status == 6
+2021/08/22 22:07:46.914600 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 1, nexthop_fib_num == 0
+2021/08/22 22:07:46.914602 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags ACTIVE FIB 
+2021/08/22 22:07:46.914605 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:07:46.914608 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 22:07:46.924647 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:07:46.924656 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:07:46.924659 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=43
+2021/08/22 22:07:46.924685 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=43, pid=0
+2021/08/22 22:07:46.924691 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 22:07:46.924694 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 22:07:52.919309 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:07:52.919328 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:07:52.919336 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 22:07:52.919341 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb970) on new RIB entry
+2021/08/22 22:07:52.919344 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.153.0/24 vrf 0
+2021/08/22 22:07:52.919347 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629680872, type == 9, table == 0
+2021/08/22 22:07:52.919349 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:07:52.919352 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:07:52.919354 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:07:52.919357 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:07:52.919359 ZEBRA: rib_add_ipv4_multipath: calling rib_delnode (0x55fb54fbb910, 0x55fb54fbbaf0) on existing RIB entry
+2021/08/22 22:07:52.919362 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbaf0 for 208.65.153.0/24 vrf 0
+2021/08/22 22:07:52.919364 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629680866, type == 9, table == 0
+2021/08/22 22:07:52.919366 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 16, status == 6
+2021/08/22 22:07:52.919369 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 1, nexthop_fib_num == 0
+2021/08/22 22:07:52.919371 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags ACTIVE FIB 
+2021/08/22 22:07:52.919374 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:07:52.919377 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbbaf0, removing
+2021/08/22 22:07:52.919388 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:07:52.919390 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:07:52.919394 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbba90
+2021/08/22 22:07:52.919397 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 22:07:52.919400 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbbc00, 0x55fb54fbba90) on new RIB entry
+2021/08/22 22:07:52.919402 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbba90 for 208.65.152.0/22 vrf 0
+2021/08/22 22:07:52.919405 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629680872, type == 9, table == 0
+2021/08/22 22:07:52.919407 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:07:52.919409 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:07:52.919412 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:07:52.919414 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:07:52.929478 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:07:52.929486 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:07:52.929489 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=44
+2021/08/22 22:07:52.929508 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=44, pid=0
+2021/08/22 22:07:52.929514 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbbaf0
+2021/08/22 22:07:52.929517 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbbaf0
+2021/08/22 22:07:52.929532 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:07:52.929535 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:07:52.929537 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=45
+2021/08/22 22:07:52.929556 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=45, pid=0
+2021/08/22 22:46:20.212927 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:46:20.212951 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:46:20.212958 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:46:20.212963 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970, removing
+2021/08/22 22:46:20.223083 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:46:20.223095 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:46:20.223098 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=46
+2021/08/22 22:46:20.223153 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=46, pid=0
+2021/08/22 22:46:20.223159 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb970
+2021/08/22 22:46:20.223163 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb970
+2021/08/22 22:46:20.223167 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:46:27.902492 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:46:27.902510 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:46:27.902519 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb910
+2021/08/22 22:46:27.902522 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:46:27.902526 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb9d0, 0x55fb54fbb910) on new RIB entry
+2021/08/22 22:46:27.902530 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb910 for 208.65.153.0/24 vrf 0
+2021/08/22 22:46:27.902532 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683187, type == 9, table == 0
+2021/08/22 22:46:27.902535 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:46:27.902537 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:46:27.902540 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:46:27.902543 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:46:27.912603 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:46:27.912616 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:46:27.912621 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=47
+2021/08/22 22:46:27.912682 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=47, pid=0
+2021/08/22 22:46:48.578128 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:46:48.578146 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:46:48.578153 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:46:48.578159 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb910, removing
+2021/08/22 22:46:48.588234 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:46:48.588249 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:46:48.588253 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=48
+2021/08/22 22:46:48.588309 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=48, pid=0
+2021/08/22 22:46:48.588318 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, removing rib 0x55fb54fbb910
+2021/08/22 22:46:48.588323 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb9d0, rib 0x55fb54fbb910
+2021/08/22 22:46:48.588336 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:46:54.914522 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:46:54.914539 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:46:54.914547 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0
+2021/08/22 22:46:54.914551 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:46:54.914554 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb970, 0x55fb54fbb9d0) on new RIB entry
+2021/08/22 22:46:54.914557 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb9d0 for 208.65.153.0/24 vrf 0
+2021/08/22 22:46:54.914559 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683214, type == 9, table == 0
+2021/08/22 22:46:54.914562 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:46:54.914564 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:46:54.914567 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:46:54.914569 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:46:54.924635 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:46:54.924644 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:46:54.924646 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=49
+2021/08/22 22:46:54.924686 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=49, pid=0
+2021/08/22 22:47:06.168210 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:06.168265 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:06.168272 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 22:47:06.168277 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbba90, removing
+2021/08/22 22:47:06.168288 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:06.168291 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:06.168294 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:47:06.168297 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0, removing
+2021/08/22 22:47:06.178404 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:06.178411 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:06.178413 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=50
+2021/08/22 22:47:06.178434 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=50, pid=0
+2021/08/22 22:47:06.178448 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbc00, removing rib 0x55fb54fbba90
+2021/08/22 22:47:06.178451 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbba90
+2021/08/22 22:47:06.178455 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 22:47:06.178462 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:06.178465 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:06.178467 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=51
+2021/08/22 22:47:06.178477 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=51, pid=0
+2021/08/22 22:47:06.178481 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, removing rib 0x55fb54fbb9d0
+2021/08/22 22:47:06.178483 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0
+2021/08/22 22:47:06.178486 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:47:12.925041 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:12.925058 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:12.925075 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0
+2021/08/22 22:47:12.925078 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 22:47:12.925081 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 22:47:12.925083 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 22:47:12.925086 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683232, type == 9, table == 0
+2021/08/22 22:47:12.925088 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:12.925090 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:12.925092 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:12.925094 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:12.935159 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:12.935167 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:12.935169 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=52
+2021/08/22 22:47:12.935193 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=52, pid=0
+2021/08/22 22:47:18.928163 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:18.928198 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:18.928205 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbba0, rib 0x55fb54fbbc00
+2021/08/22 22:47:18.928208 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:47:18.928239 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbbba0, 0x55fb54fbbc00) on new RIB entry
+2021/08/22 22:47:18.928241 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbc00 for 208.65.153.0/24 vrf 0
+2021/08/22 22:47:18.928243 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683238, type == 9, table == 0
+2021/08/22 22:47:18.928245 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:18.928247 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:18.928249 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:18.928251 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:18.938340 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:18.938347 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:18.938350 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=53
+2021/08/22 22:47:18.938376 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=53, pid=0
+2021/08/22 22:47:21.613519 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:21.613537 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:21.613543 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:47:21.613547 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbba0, rib 0x55fb54fbbc00, removing
+2021/08/22 22:47:21.623635 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:21.623643 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:21.623646 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=54
+2021/08/22 22:47:21.623665 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=54, pid=0
+2021/08/22 22:47:21.623671 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbba0, removing rib 0x55fb54fbbc00
+2021/08/22 22:47:21.623674 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbba0, rib 0x55fb54fbbc00
+2021/08/22 22:47:21.623677 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:47:23.248821 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:23.248837 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:23.248842 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 22:47:23.248846 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0, removing
+2021/08/22 22:47:23.258927 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:23.258935 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:23.258938 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=55
+2021/08/22 22:47:23.258958 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=55, pid=0
+2021/08/22 22:47:23.258963 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb8b0
+2021/08/22 22:47:23.258966 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0
+2021/08/22 22:47:23.258969 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 22:47:33.930469 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:33.930487 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:33.930494 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0
+2021/08/22 22:47:33.930497 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 22:47:33.930501 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb970, 0x55fb54fbb9d0) on new RIB entry
+2021/08/22 22:47:33.930503 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb9d0 for 208.65.152.0/22 vrf 0
+2021/08/22 22:47:33.930506 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683253, type == 9, table == 0
+2021/08/22 22:47:33.930508 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:33.930510 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:33.930513 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:33.930515 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:33.940575 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:33.940583 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:33.940586 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=56
+2021/08/22 22:47:33.940616 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=56, pid=0
+2021/08/22 22:47:34.130774 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:34.130791 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:34.130796 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 22:47:34.130801 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0, removing
+2021/08/22 22:47:34.140880 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:34.140893 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:34.140897 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=57
+2021/08/22 22:47:34.140933 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=57, pid=0
+2021/08/22 22:47:34.140941 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb970, removing rib 0x55fb54fbb9d0
+2021/08/22 22:47:34.140946 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb9d0
+2021/08/22 22:47:34.140952 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 22:47:39.932401 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:39.932418 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:39.932425 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0
+2021/08/22 22:47:39.932436 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 22:47:39.932439 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb910, 0x55fb54fbb8b0) on new RIB entry
+2021/08/22 22:47:39.932442 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb8b0 for 208.65.152.0/22 vrf 0
+2021/08/22 22:47:39.932444 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683259, type == 9, table == 0
+2021/08/22 22:47:39.932446 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:39.932448 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:39.932450 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:39.932452 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:39.942540 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:39.942548 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:39.942550 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=58
+2021/08/22 22:47:39.942578 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=58, pid=0
+2021/08/22 22:47:48.935019 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:48.935038 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:48.935046 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0
+2021/08/22 22:47:48.935049 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:47:48.935052 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbba90, 0x55fb54fbbba0) on new RIB entry
+2021/08/22 22:47:48.935055 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbba0 for 208.65.153.0/24 vrf 0
+2021/08/22 22:47:48.935057 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683268, type == 9, table == 0
+2021/08/22 22:47:48.935059 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:48.935061 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:48.935063 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:48.935066 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:48.945132 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:48.945140 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:48.945143 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=59
+2021/08/22 22:47:48.945172 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=59, pid=0
+2021/08/22 22:47:49.530576 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:49.530592 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:49.530597 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 22:47:49.530601 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0, removing
+2021/08/22 22:47:49.530612 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:49.530614 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:49.530617 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:47:49.530620 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0, removing
+2021/08/22 22:47:49.540697 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:49.540705 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:49.540707 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=60
+2021/08/22 22:47:49.540731 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=60, pid=0
+2021/08/22 22:47:49.540735 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, removing rib 0x55fb54fbb8b0
+2021/08/22 22:47:49.540744 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbb910, rib 0x55fb54fbb8b0
+2021/08/22 22:47:49.540747 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 22:47:49.540755 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:49.540758 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:49.540760 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=61
+2021/08/22 22:47:49.540771 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=61, pid=0
+2021/08/22 22:47:49.540774 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, removing rib 0x55fb54fbbba0
+2021/08/22 22:47:49.540776 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0
+2021/08/22 22:47:49.540779 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:47:54.936113 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:54.936129 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:47:54.936136 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbb9d0
+2021/08/22 22:47:54.936139 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:47:54.936142 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbbc00, 0x55fb54fbb9d0) on new RIB entry
+2021/08/22 22:47:54.936144 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb9d0 for 208.65.153.0/24 vrf 0
+2021/08/22 22:47:54.936146 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683274, type == 9, table == 0
+2021/08/22 22:47:54.936149 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:47:54.936150 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:47:54.936153 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:47:54.936155 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:47:54.946223 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:54.946230 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:54.946233 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=62
+2021/08/22 22:47:54.946271 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=62, pid=0
+2021/08/22 22:47:56.993544 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:47:56.993561 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:47:56.993567 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:47:56.993572 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbb9d0, removing
+2021/08/22 22:47:57.003670 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:47:57.003690 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:47:57.003692 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=63
+2021/08/22 22:47:57.003732 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=63, pid=0
+2021/08/22 22:47:57.003737 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbc00, removing rib 0x55fb54fbb9d0
+2021/08/22 22:47:57.003740 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbbc00, rib 0x55fb54fbb9d0
+2021/08/22 22:47:57.003743 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:48:03.938611 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:48:03.938651 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:48:03.938660 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0
+2021/08/22 22:48:03.938663 ZEBRA: rib_link: 208.65.152.0/22 vrf 0: adding dest to table
+2021/08/22 22:48:03.938675 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbba90, 0x55fb54fbbba0) on new RIB entry
+2021/08/22 22:48:03.938678 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbbba0 for 208.65.152.0/22 vrf 0
+2021/08/22 22:48:03.938680 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683283, type == 9, table == 0
+2021/08/22 22:48:03.938682 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:48:03.938684 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:48:03.938687 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:48:03.938689 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:48:03.938700 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:48:03.938702 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:48:03.938706 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb910
+2021/08/22 22:48:03.938708 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:48:03.938710 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb970, 0x55fb54fbb910) on new RIB entry
+2021/08/22 22:48:03.938713 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb910 for 208.65.153.0/24 vrf 0
+2021/08/22 22:48:03.938714 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683283, type == 9, table == 0
+2021/08/22 22:48:03.938716 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:48:03.938718 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:48:03.938720 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:48:03.938722 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:48:03.948758 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 22:48:03.948768 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:48:03.948770 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=64
+2021/08/22 22:48:03.948823 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=64, pid=0
+2021/08/22 22:48:03.948834 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:48:03.948837 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:48:03.948839 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=65
+2021/08/22 22:48:03.948858 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=65, pid=0
+2021/08/22 22:48:05.052652 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:48:05.052669 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 22:48:05.052675 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 22:48:05.052680 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb910, removing
+2021/08/22 22:48:05.062770 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:48:05.062780 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:48:05.062783 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=66
+2021/08/22 22:48:05.062817 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_DELROUTE(25), seq=66, pid=0
+2021/08/22 22:48:05.062823 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, removing rib 0x55fb54fbb910
+2021/08/22 22:48:05.062827 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb970, rib 0x55fb54fbb910
+2021/08/22 22:48:05.062830 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 22:48:12.943556 ZEBRA: zebra message comes from socket [13]
+2021/08/22 22:48:12.943583 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_ADD] 20 in VRF 0
+2021/08/22 22:48:12.943593 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb8b0, rib 0x55fb54fbb970
+2021/08/22 22:48:12.943607 ZEBRA: rib_link: 208.65.153.0/24 vrf 0: adding dest to table
+2021/08/22 22:48:12.943611 ZEBRA: rib_add_ipv4_multipath: called rib_addnode (0x55fb54fbb8b0, 0x55fb54fbb970) on new RIB entry
+2021/08/22 22:48:12.943614 ZEBRA: rib_add_ipv4_multipath: dumping RIB entry 0x55fb54fbb970 for 208.65.153.0/24 vrf 0
+2021/08/22 22:48:12.943617 ZEBRA: rib_add_ipv4_multipath: refcnt == 0, uptime == 1629683292, type == 9, table == 0
+2021/08/22 22:48:12.943620 ZEBRA: rib_add_ipv4_multipath: metric == 0, distance == 20, flags == 0, status == 0
+2021/08/22 22:48:12.943622 ZEBRA: rib_add_ipv4_multipath: nexthop_num == 1, nexthop_active_num == 0, nexthop_fib_num == 0
+2021/08/22 22:48:12.943625 ZEBRA: rib_add_ipv4_multipath: NH 1.0.0.174 with flags 
+2021/08/22 22:48:12.943627 ZEBRA: rib_add_ipv4_multipath: dump complete
+2021/08/22 22:48:12.953754 ZEBRA: netlink_route_multipath() (single hop): RTM_NEWROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 22:48:12.953764 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 5
+2021/08/22 22:48:12.953766 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_NEWROUTE(24), seq=67
+2021/08/22 22:48:12.953820 ZEBRA: netlink_parse_info: netlink-cmd (vrf 0) ACK: type=RTM_NEWROUTE(24), seq=67, pid=0
+2021/08/22 23:37:54.867329 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_NEWLINK(16), seq=0, pid=0
+2021/08/22 23:37:54.867352 ZEBRA: MESSAGE: ZEBRA_INTERFACE_DOWN 29449-5392
+2021/08/22 23:37:54.867356 ZEBRA: Try to set TE Link Param
+2021/08/22 23:37:54.867369 ZEBRA: rib_delete_ipv4(): route delete 1.0.0.172/30 vrf 0 ifindex 5
+2021/08/22 23:37:54.867376 ZEBRA: rib_delnode: 1.0.0.172/30 vrf 0: rn 0x55fb54faff60, rib 0x55fb54faffc0, removing
+2021/08/22 23:37:54.867382 ZEBRA: rib_delete_ipv4(): route delete 1.0.0.172/30 vrf 0 ifindex 5
+2021/08/22 23:37:54.867387 ZEBRA: rib_delnode: 1.0.0.172/30 (MRIB) vrf 0: rn 0x55fb54fb0130, rib 0x55fb54fb0190, removing
+2021/08/22 23:37:54.867395 ZEBRA: rib_delnode: fe80::/64 vrf 0: rn 0x55fb54fb0550, rib 0x55fb54fb05b0, removing
+2021/08/22 23:37:54.867403 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELROUTE(25), seq=0, pid=0
+2021/08/22 23:37:54.867406 ZEBRA: RTM_DELROUTE ipv6 unicast proto kernel vrf 0
+2021/08/22 23:37:54.867411 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELROUTE(25), seq=0, pid=0
+2021/08/22 23:37:54.867415 ZEBRA: RTM_DELROUTE ipv6 multicast proto kernel vrf 0
+2021/08/22 23:37:54.867419 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELROUTE(25), seq=0, pid=0
+2021/08/22 23:37:54.867423 ZEBRA: RTM_DELROUTE ipv6 multicast proto kernel vrf 0
+2021/08/22 23:37:54.867451 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELADDR(21), seq=0, pid=0
+2021/08/22 23:37:54.867457 ZEBRA: netlink_interface_addr RTM_DELADDR 29449-5392 vrf 0:
+2021/08/22 23:37:54.867462 ZEBRA:   IFA_ADDRESS   fe80::dcc4:10ff:fe4e:1cd6/64
+2021/08/22 23:37:54.867465 ZEBRA:   IFA_CACHEINFO pref -1, valid -1
+2021/08/22 23:37:54.867470 ZEBRA: MESSAGE: ZEBRA_INTERFACE_ADDRESS_DELETE fe80::dcc4:10ff:fe4e:1cd6/64 on 29449-5392
+2021/08/22 23:37:54.867482 ZEBRA: route fe80::/64 vrf 0 ifindex 5 type 2 doesn't exist in rib
+2021/08/22 23:37:54.875805 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELADDR(21), seq=0, pid=0
+2021/08/22 23:37:54.875814 ZEBRA: netlink_interface_addr RTM_DELADDR 29449-5392 vrf 0:
+2021/08/22 23:37:54.875817 ZEBRA:   IFA_LOCAL     1.0.0.173/30
+2021/08/22 23:37:54.875819 ZEBRA:   IFA_ADDRESS   1.0.0.173/30
+2021/08/22 23:37:54.875822 ZEBRA:   IFA_BROADCAST 1.0.0.175/30
+2021/08/22 23:37:54.875824 ZEBRA:   IFA_CACHEINFO pref -1, valid -1
+2021/08/22 23:37:54.875827 ZEBRA: MESSAGE: ZEBRA_INTERFACE_ADDRESS_DELETE 1.0.0.173/30 on 29449-5392
+2021/08/22 23:37:54.875842 ZEBRA: rib_delete_ipv4(): route delete 1.0.0.172/30 vrf 0 ifindex 5
+2021/08/22 23:37:54.875848 ZEBRA: route 1.0.0.172/30 vrf 0 ifindex 5 type 2 doesn't exist in rib
+2021/08/22 23:37:54.875852 ZEBRA: rib_delete_ipv4(): route delete 1.0.0.172/30 vrf 0 ifindex 5
+2021/08/22 23:37:54.875864 ZEBRA: route 1.0.0.172/30 vrf 0 ifindex 5 type 2 doesn't exist in rib
+2021/08/22 23:37:54.875871 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELROUTE(25), seq=0, pid=0
+2021/08/22 23:37:54.875875 ZEBRA: RTM_DELROUTE ipv4 multicast proto kernel vrf 0
+2021/08/22 23:37:54.876733 ZEBRA: netlink_parse_info: netlink-listen (vrf 0) type RTM_DELLINK(17), seq=0, pid=0
+2021/08/22 23:37:54.876742 ZEBRA: interface 29449-5392 vrf 0 index 5 is now inactive.
+2021/08/22 23:37:54.876744 ZEBRA: MESSAGE: ZEBRA_INTERFACE_DELETE 29449-5392
+2021/08/22 23:37:54.876747 ZEBRA: Try to set TE Link Param
+2021/08/22 23:37:54.877460 ZEBRA: rib_process: 1.0.0.172/30 vrf 0: rn 0x55fb54faff60, removing rib 0x55fb54faffc0
+2021/08/22 23:37:54.877467 ZEBRA: rib_unlink: 1.0.0.172/30 vrf 0: rn 0x55fb54faff60, rib 0x55fb54faffc0
+2021/08/22 23:37:54.877470 ZEBRA: rib_gc_dest: 1.0.0.172/30 vrf 0: removing dest from table
+2021/08/22 23:37:54.877477 ZEBRA: rib_process: 1.0.0.172/30 (MRIB) vrf 0: rn 0x55fb54fb0130, removing rib 0x55fb54fb0190
+2021/08/22 23:37:54.877480 ZEBRA: rib_unlink: 1.0.0.172/30 (MRIB) vrf 0: rn 0x55fb54fb0130, rib 0x55fb54fb0190
+2021/08/22 23:37:54.877482 ZEBRA: rib_gc_dest: 1.0.0.172/30 (MRIB) vrf 0: removing dest from table
+2021/08/22 23:37:54.877497 ZEBRA: rib_process: fe80::/64 vrf 0: rn 0x55fb54fb0550, removing rib 0x55fb54fb05b0
+2021/08/22 23:37:54.877499 ZEBRA: rib_unlink: fe80::/64 vrf 0: rn 0x55fb54fb0550, rib 0x55fb54fb05b0
+2021/08/22 23:37:54.877502 ZEBRA: rib_gc_dest: fe80::/64 vrf 0: removing dest from table
+2021/08/22 23:37:54.877511 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.152.0/22 vrf 0 type IPv4 nexthop
+2021/08/22 23:37:54.877515 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 0
+2021/08/22 23:37:54.877519 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=68
+2021/08/22 23:37:54.878172 ZEBRA: netlink-cmd (vrf 0): error: No such process type=RTM_DELROUTE(25), seq=68, pid=0
+2021/08/22 23:37:54.878218 ZEBRA: netlink_route_multipath() (single hop): RTM_DELROUTE 208.65.153.0/24 vrf 0 type IPv4 nexthop
+2021/08/22 23:37:54.878221 ZEBRA: netlink_route_multipath() (single hop): nexthop via 1.0.0.174 if 0
+2021/08/22 23:37:54.878223 ZEBRA: netlink_talk: netlink-cmd (vrf 0) type RTM_DELROUTE(25), seq=69
+2021/08/22 23:37:54.878231 ZEBRA: netlink-cmd (vrf 0): error: No such process type=RTM_DELROUTE(25), seq=69, pid=0
+2021/08/22 23:37:54.878235 ZEBRA: rnh 1.0.0.174/32 resolved through route null - sending nexthop unreachable event to clients
+2021/08/22 23:37:54.927716 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:37:54.927726 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 23:37:54.927732 ZEBRA: rib_delete_ipv4(): route delete 208.65.152.0/22 vrf 0 ifindex 0
+2021/08/22 23:37:54.927736 ZEBRA: rib_delnode: 208.65.152.0/22 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0, removing
+2021/08/22 23:37:54.927748 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:37:54.927750 ZEBRA: zebra message received [ZEBRA_IPV4_ROUTE_DELETE] 13 in VRF 0
+2021/08/22 23:37:54.927753 ZEBRA: rib_delete_ipv4(): route delete 208.65.153.0/24 vrf 0 ifindex 0
+2021/08/22 23:37:54.927756 ZEBRA: rib_delnode: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb8b0, rib 0x55fb54fbb970, removing
+2021/08/22 23:37:54.937819 ZEBRA: rib_process: 208.65.152.0/22 vrf 0: rn 0x55fb54fbba90, removing rib 0x55fb54fbbba0
+2021/08/22 23:37:54.937827 ZEBRA: rib_unlink: 208.65.152.0/22 vrf 0: rn 0x55fb54fbba90, rib 0x55fb54fbbba0
+2021/08/22 23:37:54.937830 ZEBRA: rib_gc_dest: 208.65.152.0/22 vrf 0: removing dest from table
+2021/08/22 23:37:54.937838 ZEBRA: rib_process: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb8b0, removing rib 0x55fb54fbb970
+2021/08/22 23:37:54.937840 ZEBRA: rib_unlink: 208.65.153.0/24 vrf 0: rn 0x55fb54fbb8b0, rib 0x55fb54fbb970
+2021/08/22 23:37:54.937843 ZEBRA: rib_gc_dest: 208.65.153.0/24 vrf 0: removing dest from table
+2021/08/22 23:38:06.841730 ZEBRA: SIGHUP received
+2021/08/22 23:38:06.841780 ZEBRA: connection closed socket [13]
+2021/08/22 23:38:06.841803 ZEBRA: rnh 1.0.0.174/32 - cleaning state for client bgp
+2021/08/22 23:38:06.841808 ZEBRA: client bgp unregisters rnh 1.0.0.174/32
+2021/08/22 23:38:06.841812 ZEBRA: delete rnh 1.0.0.174/32
+2021/08/22 23:38:06.841823 ZEBRA: client 13 disconnected. 0 bgp routes removed from the rib
+2021/08/22 23:38:06.841948 ZEBRA: SIGHUP received
+2021/08/22 23:38:06.842121 ZEBRA: SIGHUP received
+2021/08/22 23:38:06.885316 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:38:06.885326 ZEBRA: zebra message received [ZEBRA_HELLO] 1 in VRF 0
+2021/08/22 23:38:06.885329 ZEBRA: client 13 says hello and bids fair to announce only bgp routes
+2021/08/22 23:38:06.885336 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:38:06.885338 ZEBRA: zebra message received [ZEBRA_ROUTER_ID_ADD] 0 in VRF 0
+2021/08/22 23:38:06.885348 ZEBRA: buffer_write: write error on fd 13: Broken pipe
+2021/08/22 23:38:06.885350 ZEBRA: zebra_server_send_message: buffer_write failed to zserv client fd 13, closing
+2021/08/22 23:38:06.885359 ZEBRA: client 13 disconnected. 0 bgp routes removed from the rib
+2021/08/22 23:38:06.886331 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:38:06.886338 ZEBRA: zebra message received [ZEBRA_HELLO] 1 in VRF 0
+2021/08/22 23:38:06.886341 ZEBRA: client 13 says hello and bids fair to announce only bgp routes
+2021/08/22 23:38:06.886348 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:38:06.886351 ZEBRA: zebra message received [ZEBRA_ROUTER_ID_ADD] 0 in VRF 0
+2021/08/22 23:38:06.886366 ZEBRA: zebra message comes from socket [13]
+2021/08/22 23:38:06.886368 ZEBRA: zebra message received [ZEBRA_INTERFACE_ADD] 0 in VRF 0
+2021/08/22 23:38:06.886372 ZEBRA: Try to set TE Link Param
+2021/08/22 23:38:06.886376 ZEBRA: Try to set TE Link Param
+2021/08/22 23:38:06.886379 ZEBRA: Try to set TE Link Param
+2021/08/22 23:38:06.886382 ZEBRA: Try to set TE Link Param
