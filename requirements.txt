@@ -13,7 +13,7 @@ Mako==1.1.0
 MarkupSafe==1.1.1
 more-itertools==8.0.1
 packaging==19.2
-paramiko==2.7.1
+paramiko==2.10.1
 Paste==3.2.6
 PasteDeploy==2.0.1
 PasteScript==3.2.0
