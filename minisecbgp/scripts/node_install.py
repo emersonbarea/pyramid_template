@@ -96,7 +96,7 @@ class ConfigClusterNode(object):
             if node_install_status(self.dbsession, self.node_ip_address):
 
                 commands = [
-                    'git clone git://github.com/mininet/mininet /home/minisecbgpuser/mininet',
+                    'git clone https://github.com/mininet/mininet /home/minisecbgpuser/mininet',
                     'cd /home/minisecbgpuser/mininet; git checkout -b 2.2.1rc1 2.2.1rc1; cd util/; ./install.sh']
                 for command in commands:
                     service_ssh, service_ssh_status, command_output, command_error_warning, command_status = \
@@ -140,8 +140,9 @@ class ConfigClusterNode(object):
                             'if [ $? -ne 0 ]; then echo "localhost ansible_connection=local" | '
                             'sudo tee -a /etc/ansible/hosts; fi',
                             'sudo rm -rf /home/minisecbgpuser/openflow &> /dev/null',
-                            'git clone git://github.com/containernet/containernet /home/minisecbgpuser/containernet',
+                            'git clone https://github.com/containernet/containernet /home/minisecbgpuser/containernet',
                             'cd /home/minisecbgpuser/containernet/ansible; '
+                            'sed -i "s/update_cache: yes/update_cache: false/g" install.yml; '
                             'sudo ansible-playbook -i "localhost," -c local install.yml',
                             'cd /home/minisecbgpuser/containernet/; sudo python3 setup.py install',
                             'sudo pip uninstall backports.ssl-match-hostname -y',
@@ -257,7 +258,7 @@ class ConfigClusterNode(object):
             if node_install_status(self.dbsession, self.node_ip_address):
 
                 # install MaxiNet on all cluster nodes
-                commands = ['git clone git://github.com/MaxiNet/MaxiNet.git',
+                commands = ['git clone https://github.com/MaxiNet/MaxiNet.git',
                             'cd /home/minisecbgpuser/MaxiNet;'
                             'git checkout v1.2;'
                             'sudo make install']
